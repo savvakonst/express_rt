@@ -1,5 +1,5 @@
-#ifndef EXO_CUSTOMTYPES_H
-#define EXO_CUSTOMTYPES_H
+#ifndef EXRT_CUSTOMTYPES_H
+#define EXRT_CUSTOMTYPES_H
 
 #include <list>
 #include <map>
@@ -269,5 +269,9 @@ class COMMON_API_ HierarchicalData_ifs {
     virtual std::vector<HierarchicalData_ifs*> getArray() const = 0;
     virtual std::map<std::string, HierarchicalData_ifs*> getMap() const = 0;
 };
+
+
+
+
 
 #endif

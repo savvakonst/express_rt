@@ -1,6 +1,8 @@
 
 
 #include "Device/Device.h"
+#include "Device/Module_ifs.h"
+#include "Device/ModuleStream_ifs.h"
 
 Device::Device(/* args */) {}
 

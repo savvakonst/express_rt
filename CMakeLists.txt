@@ -14,7 +14,7 @@ endif()
 add_library(ConversionTemplate SHARED
         src/convtemplate/ConversionTemplate.cpp
         src/device/Device.cpp
-)
+        src/modules/A01_Module.cpp include/device/KsdModule.h)
 
 target_include_directories(ConversionTemplate PUBLIC include )
 target_compile_definitions(ConversionTemplate PRIVATE COMMON_CREATE_SHARED_LIBRARY)
