@@ -1,0 +1,293 @@
+
+#ETHERNET_ADDRESS
+uint8_t	mac[6]	MAC-адрес
+uint8_t	port[2]	Номер порта
+uint8_t	ip_b[4]	IP-адрес
+uint8_t	reserved[4]	Резерв
+
+#SETTINGS_OUT_ETHERNET
+uint32_t	flags	Флаги: 0 бит - состояние: 0 - передача данных выкл., 1 - вкл.	
+ETHERNET_ADDRESS	dst	Адрес назначения	
+ETHERNET_ADDRESS	src	Адрес источника	
+
+#0x5F31304D
+MODULE_HEADER	header	Заголовок модуля: header.id = 0x5F31304D или ..., header.size = 200
+uint8_t	frequency	Двоичная степень частоты меток времени, = 10
+uint8_t	reserved_a[2]	Резерв
+uint8_t	flags	Флаги: 0 бит - привязка меток времени: 0 - относительная, 1 - абсолютная
+SETTINGS_OUT_ETHERNET	out	Задание выхода Ethernet контроллера сбора
+uint32_t	slave_id	Идентификатор ведомого блока сбора: CH04, CH06, CH08, CH10. C06M - ведомый блок сбора не подключен
+uint8_t	reserved_b[124]	Резерв
+
+
+
+#CHANNEL_A_01
+uint8_t	frequency	Двоичная степень частоты регистрации, 0xFF - не регистрируется
+uint8_t	reserved[2]	Резерв
+uint8_t	flags	Флаги: не используются
+int32_t	rangeH	Значение верхней границы измерительного диапазона, мкВ
+int32_t	rangeL	Значение верхней границы измерительного диапазона, мкВ
+uint32_t	ureserved	Резерв
+
+#0x5F313041
+MODULE_HEADER	header	Заголовок модуля: header.id = 0x5F313041, header.size = 544
+CHANNEL_A_01	cnl[32]	Задания входов 1...32 модуля
+
+
+
+
+#CHANNEL_A_02
+uint8_t	frequency	Двоичная степень частоты регистрации, 0xFF - не регистрируется
+uint8_t	reserved[2]	Резерв
+uint8_t	flags	Флаги: 0 бит - питание ICP: 0 - выкл., 1 - вкл.
+int32_t	range	Значение амплитуды измерительного диапазона, мкВ
+uint32_t	ureserved[2]	Резерв
+
+#0x5F323041
+MODULE_HEADER	header	Заголовок модуля: header.id = 0x5F323041, header.size = 288
+CHANNEL_A_02	cnl[12]	Задания входов 1...12 модуля
+uint8_t	reserved[64]	Резерв
+
+
+
+
+#CHANNEL_A_03
+uint8_t	frequency	Двоичная степень частоты регистрации, 0xFF - не регистрируется
+uint8_t	reserved[2]	Резерв
+uint8_t	flags	Флаги: не используются
+int32_t	range	Значение амплитуды измерительного диапазона, мкВ
+int32_t	current	Значение тока источника, мкА. !!! Только в 1-ом и 2-ом входах, в остальных не используется !!!
+int32_t	offset	Значение напряжения смещения нуля, мкВ
+
+#0x5F333041
+MODULE_HEADER	header	Заголовок модуля: header.id = 0x5F333041, header.size = 288
+CHANNEL_A_03	cnl[16]	Задания входов 1...16 модуля
+
+
+
+
+#CHANNEL_A_04
+uint8_t	frequency	Двоичная степень частоты регистрации, 0xFF - не регистрируется
+uint8_t	reserved[2]	Резерв
+uint8_t	flags	Флаги: не используются
+int32_t	range	Значение верхней границы измерительного диапазона, Ом
+uint32_t	ureserved[2]	Резерв
+
+#0x5F343041
+MODULE_HEADER	header	Заголовок модуля: header.id = 0x5F343041, header.size = 288
+CHANNEL_A_04	cnl[12]	Задания входов 1...12 модуля
+uint8_t	reserved[64]	Резерв
+
+
+
+
+#CHANNEL_A_05
+uint8_t	frequency	Двоичная степень частоты регистрации, 0xFF - не регистрируется
+uint8_t	reserved[2]	Резерв
+uint8_t	flags	Флаги: не используются
+int32_t	range	Значение амплитуды измерительного диапазона, мкВ
+uint32_t	ureserved[2]	Резерв
+
+#0x5F353041
+MODULE_HEADER	header	Заголовок модуля: header.id = 0x5F353041, header.size = 288
+CHANNEL_A_05	cnl[9]	Задания входов 1...9 модуля
+uint8_t	reserved[112]	Резерв
+
+
+
+
+#CHANNEL_A_06
+uint8_t	frequency	Двоичная степень частоты регистрации, 0xFF - не регистрируется
+uint8_t	reserved[2]	Резерв
+uint8_t	flags	Флаги: 0 бит - автоматическое смещение: 0 - выкл., 1 - вкл.
+int32_t	range	Значение амплитуды измерительного диапазона, мкВ
+int32_t	current	Значение тока источника, мкА
+int32_t	offset	Значение напряжения смещения нуля, мкВ
+
+#0x5F363041
+MODULE_HEADER	header	Заголовок модуля: header.id = 0x5F363041, header.size = 288
+CHANNEL_A_06	cnl[10]	Задания входов 1...10 модуля
+uint8_t	reserved[96]	Резерв
+
+
+
+
+#CHANNEL_A_07
+uint8_t	frequency	Двоичная степень частоты регистрации, 0xFF - не регистрируется
+uint8_t	reserved[2]	Резерв
+uint8_t	flags	Флаги: не используются
+int32_t	range	Значение амплитуды измерительного диапазона, мкВ
+int32_t	current	Значение тока источника, мкА
+uint32_t	ureserved	Резерв
+
+#0x5F373041
+MODULE_HEADER	header	Заголовок модуля: header.id = 0x5F373041, header.size = 288
+CHANNEL_A_07	cnl[8]	Задания входов 1...8 модуля
+uint8_t	reserved[128]	Резерв
+
+
+
+
+#CHANNEL_A_08
+uint8_t	frequency	Двоичная степень частоты регистрации, 0xFF - не регистрируется
+uint8_t	reserved[2]	Резерв
+uint8_t	flags	Флаги: не используются
+int32_t	range	Значение амплитуды измерительного диапазона, мкВ
+uint32_t	ureserved[2]	Резерв
+
+#0x5F383041
+MODULE_HEADER	header	Заголовок модуля: header.id = 0x5F383041, header.size = 288
+CHANNEL_A_08	cnl[9]	Задания входов 1...9 модуля
+uint8_t	reserved[112]	Резерв
+
+
+
+
+#CHANNEL_A_09
+uint8_t	frequency	Двоичная степень частоты регистрации, 0xFF - не регистрируется
+uint8_t	reserved[2]	Резерв
+uint8_t	flags	Флаги: 0 бит - тип схемы
+int32_t	range	Значение амплитуды измерительного диапазона, мкВ
+int32_t	reference	Значение амплитуды контроля питания, мкВ
+int32_t	sinRange	Значение амплитуды напряжения питания датчика, мкВ
+int32_t	sinFreq	Значение частоты напряжения питания датчика, Hz
+
+#0x5F393041
+MODULE_HEADER	header	Заголовок модуля: header.id = 0x5F393041, header.size = 192
+CHANNEL_A_09	cnl[6]	Задания входов 1...6 модуля
+uint8_t	reserved[40]	Резерв
+
+
+
+
+#CHANNEL_A_10
+uint8_t	frequency	Двоичная степень частоты регистрации мгновенного значения напряжения, 0xFF - не регистрируется
+uint8_t	frequency2	Двоичная степень частоты регистрации действующего значения напряжения, 0xFF - не регистрируется
+uint8_t	frequency3	Двоичная степень частоты регистрации частоты (?) входного сигнала, 0xFF - не регистрируется
+uint8_t	flags	Флаги: не используются
+int32_t	range	Значение верхней границы измерительного диапазона, мкВ (256...16 - с ЭП1; 12,8 - 0,4 - без)
+int32_t	waves	Количество периодов (0...256)
+int32_t	hysteresis	Гистерезис (0...10 [1 / 131072 ед.])
+
+#0x5F303141
+MODULE_HEADER	header	Заголовок модуля: header.id = 0x5F303141, header.size = 288
+CHANNEL_A_10	cnl[18]	Задания входов 1...18 модуля
+uint8_t	reserved[224]	Резерв
+
+
+
+
+#CHANNEL_A_11
+uint8_t	frequency	Двоичная степень частоты регистрации, 0xFF - не регистрируется
+uint8_t	reserved[2]	Резерв
+uint8_t	flags	Флаги: 0 бит - тип: 0 - СКТ, 1 - Сельсин
+int32_t	range	Значение амплитуды измерительного диапазона, мкВ
+uint32_t	reference	Значение напряжения обмотки возбуждения, мкВ
+uint32_t	ureserved	Резерв
+
+#0x5F313141
+MODULE_HEADER	header	Заголовок модуля: header.id = 0x5F313141, header.size = 96
+CHANNEL_A_11	cnl[3]	Задания входов 1...3 модуля
+uint8_t	reserved[16]	Резерв
+
+
+
+#CHANNEL_COUNTER
+uint8_t	flags	Флаги: не используются
+int32_t	voltageP	Значение напряжения порога нарастающего фронта, мкВ
+int32_t	voltageN	Значение напряжения порога спадающего фронта, мкВ
+int32_t	filter	Значение фильтра, мкс
+
+#0x5F313044
+MODULE_HEADER	header	Заголовок модуля: header.id = 0x5F313044, header.size = 288
+CHANNEL_COUNTER	cnl[16]	Задания входов 1...16
+
+
+
+#CHANNEL_D
+uint8_t	frequency	Двоичная степень частоты регистрации, 0xFF - не регистрируется
+uint8_t	reserved[2]	Резерв
+uint8_t	flags	Флаги: 0 бит: 0 - 27 В, 1 - сухой контакт 
+int32_t	filter	Значение фильтра, мкс
+
+#0x5F323044
+MODULE_HEADER	header	Заголовок модуля: header.id = 0x5F323044, header.size = 416
+CHANNEL_D	cnl[24]	Задания входов
+
+
+
+
+#IMIT_CHANNEL_D
+uint8_t	state	Состояние
+uint8_t	reservedA	Резерв
+uint16_t	onCode	Код Uвкл. 0,0...30,0 - 0...4095
+uint16_t	offCode	Код Uвыкл. 0,0...30,0 - 0...4095
+uint16_t	width	Ширина импульса, 50... 1000 мкс
+uint16_t	frequency	Двоичная степень частоты следования
+uint8_t	record	Резерв
+uint8_t	reservedB	Резерв
+
+#0x32304449
+MODULE_HEADER	header	Заголовок модуля: header.id = 0x32304449, header.size = 56
+IMIT_CHANNEL_D	out[2]	Задания групп входов (1...12, 13...24)
+
+
+
+#0x5F363043
+MODULE_HEADER	header	Заголовок модуля: header.id = 0x5F363043, header.size = 40
+uint8_t	inputs	Состояния входов, побитно: 0 - выключен, 1 - регистрируется
+uint8_t	reserved[31]	Резерв
+
+
+#0x4D363043
+MODULE_HEADER	header	Заголовок модуля: header.id = 0x5F363043, header.size = 40
+uint8_t	inputs	Состояния входов, побитно: 0 - выключен, 1 - регистрируется
+uint8_t	reserved[31]	Резерв
+
+
+#CHANNEL_IRIG
+uint8_t	formatNumber	Номер формата
+uint8_t	dataBits	Количество бит данных
+uint8_t	parity	Тип чётности
+uint8_t	syncBits	Количество бит синхрослова
+uint64_t	syncWord	Значение синхрослова
+uint16_t	frameLength	Длина минорного фрейма, слов
+uint8_t	typeOfCode	Состояние входа: 0 - выкл. 1 - регистрируется
+uint8_t	reserved	Резерв
+
+
+#CHANNEL_RS
+uint32_t	frequency	Скорость, бод
+uint8_t	dataLength	Количество бит данных
+uint8_t	stopLength	Количество стоп-бит: 0 - 1, 1 - 1,5, 2 - 2
+uint8_t	parity	Тип чётности: 0 - б/ч, 1 доп. до нечётности, 2 - доп до чётности, 3 - всегда 1, 4 - всегда 0
+uint8_t	typeOfCode	Состояние входа: 0 - выкл. 1 - регистрируется
+
+
+#0x5F333043
+MODULE_HEADER	header	Заголовок модуля: header.id = 0x5F333043, header.size = 360
+uint32_t	active	Состояние входов, побитно, 0...3 - линии IRIG, 4 - RS: 0 - выключены, 1 - регистрируются
+uint32_t	irigMode	Режим работы входа управления номером формата IRIG: 0 - 4-разрядный (общий), 1 - 1-разрядный (индивидуальный)
+CHANNEL_IRIG	ir[4][4]	Задания входов 1...4 (подзаданий 1...4) IRIG
+CHANNEL_RS	rs[12]	Задания входов RS: 1...4 - RS-232, 5...8 - RS-422/485, 9...12 - запас
+
+
+
+#CHANNEL_CAN
+uint32_t	frequency	Скорость, бит/с. 0 - выключен
+
+#CHANNEL_RS
+uint32_t	frequency	Скорость, бод
+uint8_t	dataLength	Количество бит данных
+uint8_t	stopLength	Количество стоп-бит: 0 - 1, 1 - 1,5, 2 - 2
+uint8_t	parity	Тип чётности: 0 - б/ч, 1 доп. до нечётности, 2 - доп до чётности, 3 - всегда 1, 4 - всегда 0
+uint8_t	typeOfCode	Состояние входа: 0 - выкл. 1 - регистрируется
+
+#0x5F343043
+MODULE_HEADER	header	Заголовок модуля: header.id = 0x5F343043 , header.size = 120
+uint32_t	active	Состояние входов, побитно, 0 - линии CAN, 1 - RS: 0 - выключены, 1 - регистрируются
+CHANNEL_CAN	can[6]	Задания входов 1...6 CAN
+CHANNEL_RS	rs[12]	Задания входов RS: 1...4 - RS-232, 5...12 - RS-422/485
+
+
+

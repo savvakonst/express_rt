@@ -11,19 +11,20 @@ endif()
 
 
 
-add_library(ConversionTemplate SHARED
+add_library(CommonLib SHARED
         src/convtemplate/ConversionTemplate.cpp
         src/device/Device.cpp
-        src/modules/A01_Module.cpp include/device/KsdModule.h)
+        )
 
-target_include_directories(ConversionTemplate PUBLIC include )
-target_compile_definitions(ConversionTemplate PRIVATE COMMON_CREATE_SHARED_LIBRARY)
+target_include_directories(CommonLib PUBLIC include )
+target_compile_definitions(CommonLib PRIVATE COMMON_CREATE_SHARED_LIBRARY)
 
 
 add_subdirectory(src/baseio)
+add_subdirectory(src/modules)
 
 if(MSVC)
-    target_compile_options(ConversionTemplate PUBLIC  /wd4251)
+    target_compile_options(CommonLib PUBLIC  /wd4251)
 endif()
 
 

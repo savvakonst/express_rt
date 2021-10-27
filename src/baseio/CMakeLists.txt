@@ -26,7 +26,7 @@ add_subdirectory ("../../../yaml-cpp" yaml-cpp_ EXCLUDE_FROM_ALL)
 
 
 target_link_libraries(DefaultBaseIO yaml-cpp)
-target_link_libraries(DefaultBaseIO ConversionTemplate)
+target_link_libraries(DefaultBaseIO CommonLib)
 
 set_target_properties(DefaultBaseIO PROPERTIES CXX_STANDARD_REQUIRED ON OUTPUT_NAME DefaultBaseIO)
 
