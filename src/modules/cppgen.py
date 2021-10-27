@@ -30,14 +30,14 @@ define_txt = """
 
 # include <map>
 # include <cstdint>
-# include "KSDModule_ifs.h"
+# include "KSDModule.h"
 # include "device/ModuleStream_ifs.h"
 
 """
 
 
 template = """
-class Module_{0:s} : public KSDModule_ifs {{
+class Module_{0:s} : public KSDModule {{
 
    protected:
 # pragma pack(1)
@@ -45,10 +45,11 @@ class Module_{0:s} : public KSDModule_ifs {{
 # pragma pop()
 
     {1:s} task_;
-    TaskMapper field_map_;
+    
    public:
 
-    Module_{0:s}():field_map_({3:s}){{
+    Module_{0:s}():KSDModule(//
+        {3:s}){{
         field_map_.setReferencePtr(&task_);
     }}
 
@@ -65,13 +66,13 @@ class Module_{0:s} : public KSDModule_ifs {{
     std::string getID() const override {{ return "{0:s}"; }}
 
 
-    const InfoList& getPropertiesInfoList() override;
+    //const InfoList& getPropertiesInfoList() override;
 
-    const ResValue_ifs* getProperty(const std::string& prop_path) const override;
-    const std::string getPropertyAsTxt(const std::string& prop_path) const override;
+    //const ResValue_ifs* getProperty(const std::string& prop_path) const override;
+    //const std::string getPropertyAsTxt(const std::string& prop_path) const override;
 
-    bool setProperty(const std::string& prop_path, const Value value) override;
-    bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override;
+    //bool setProperty(const std::string& prop_path, const Value value) override;
+    //bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override;
 
 
     const void* getTaskPtr() const override {{ return (const void*)&task_; }}
@@ -196,6 +197,6 @@ for i in pattern_list:
 
         # print(new_complex)
         print()
-        complex_types = {"MODULE_HEADER": "u32"}
+        complex_types = {"MODULE_HEADER": "header_map_"}
 
         other_structs = ""

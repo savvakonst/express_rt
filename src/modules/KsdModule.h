@@ -20,7 +20,7 @@ class TaskMapper : public HierarchicalData_ifs {
 
     TaskMapper(DataType type) : struct_type_(StructType::value), type_(type) { size_ = getTSize(type_); }
 
-    TaskMapper(size_t len,const TaskMapper &value) : struct_type_(StructType::array) {
+    TaskMapper(size_t len, const TaskMapper &value) : struct_type_(StructType::array) {
         vector_.reserve(len);
         for (size_t i = 0; i < len; i++) {
             vector_.push_back(value);
@@ -107,8 +107,15 @@ class TaskMapper : public HierarchicalData_ifs {
     std::map<std::string, HierarchicalData_ifs *> map_;
 };
 
-class KSDModule_ifs : public Module_ifs {
+/*
+ *
+ *
+ *
+ */
+class KSDModule : public Module_ifs {
    protected:
+    KSDModule(const TaskMapper &field_map) : field_map_(field_map) {}
+
 #pragma pack(1)
     struct MODULE_HEADER {
         uint32_t size;
@@ -123,6 +130,29 @@ class KSDModule_ifs : public Module_ifs {
         uint8_t reserved[12];
     };
 #pragma pop()
+
+    TaskMapper header_map_ =  //
+        TaskMapper({{"size", u32},
+                    {"id", u32},
+                    {"sub", u8},
+                    {"slot", u8},
+                    {"version", u16},
+                    {"checkSum", u16},
+                    {"flag", u16},
+                    {"dimension", u16},
+                    {"syncMode", u16},
+                    {"reserved", {12, u8}}});
+
+    TaskMapper field_map_;
+
+   public:
+    // const InfoList& getPropertiesInfoList() override;
+
+    const ResValue_ifs *getProperty(const std::string &prop_path) const override;
+    const std::string getPropertyAsTxt(const std::string &prop_path) const override;
+
+    bool setProperty(const std::string &prop_path, const Value value) override;
+    bool setPropertyAsTxt(const std::string &prop_path, const std::string &valie) override;
 };
 
 #endif

@@ -5,10 +5,10 @@
 #include <cstdint>
 #include <map>
 
-#include "KSDModule_ifs.h"
+#include "KSDModule.h"
 #include "device/ModuleStream_ifs.h"
 
-class Module_ID02 : public KSDModule_ifs {
+class Module_ID02 : public KSDModule {
    protected:
 #pragma pack(1)
 
@@ -31,20 +31,20 @@ class Module_ID02 : public KSDModule_ifs {
 #pragma pop()
 
     Task task_;
-    TaskMapper field_map_;
 
    public:
     Module_ID02()
-        : field_map_(TaskMapper({{"header", u32},
-                                 {"out",
-                                  {2, TaskMapper({{"state", u8},
-                                                  {"reservedA", u8},
-                                                  {"onCode", u16},
-                                                  {"offCode", u16},
-                                                  {"width", u16},
-                                                  {"frequency", u16},
-                                                  {"record", u8},
-                                                  {"reservedB", u8}})}}})) {
+        : KSDModule(  //
+              TaskMapper({{"header", header_map_},
+                          {"out",
+                           {2, TaskMapper({{"state", u8},
+                                           {"reservedA", u8},
+                                           {"onCode", u16},
+                                           {"offCode", u16},
+                                           {"width", u16},
+                                           {"frequency", u16},
+                                           {"record", u8},
+                                           {"reservedB", u8}})}}})) {
         field_map_.setReferencePtr(&task_);
     }
 
@@ -59,13 +59,13 @@ class Module_ID02 : public KSDModule_ifs {
 
     std::string getID() const override { return "ID02"; }
 
-    const InfoList& getPropertiesInfoList() override;
+    // const InfoList& getPropertiesInfoList() override;
 
-    const ResValue_ifs* getProperty(const std::string& prop_path) const override;
-    const std::string getPropertyAsTxt(const std::string& prop_path) const override;
+    // const ResValue_ifs* getProperty(const std::string& prop_path) const override;
+    // const std::string getPropertyAsTxt(const std::string& prop_path) const override;
 
-    bool setProperty(const std::string& prop_path, const Value value) override;
-    bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override;
+    // bool setProperty(const std::string& prop_path, const Value value) override;
+    // bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override;
 
     const void* getTaskPtr() const override { return (const void*)&task_; }
     size_t getTaskSize() const override { return sizeof(Task); }
