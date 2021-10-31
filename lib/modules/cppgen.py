@@ -36,7 +36,7 @@ define_txt = """
 """
 
 
-template = """
+h_template = """
 class Module_{0:s} : public KSDModule {{
 
    protected:
@@ -48,12 +48,48 @@ class Module_{0:s} : public KSDModule {{
     
    public:
 
-    Module_{0:s}():KSDModule(//
+    Module_{0:s}();
+
+    Module_{0:s}(const void * ptr, size_t size, DeviceBuildingContext_ifs* context);
+
+    ~Module_{0:s}();
+
+    std::string getID() const override {{ return "{0:s}"; }}
+
+
+    const InfoList* getPropertiesInfoList() override;
+
+    ResValue getProperty(const std::string& prop_path) const override ;
+    std::string getPropertyAsTxt(const std::string& prop_path) const override;
+
+    bool setProperty(const std::string& prop_path, Value value) override;
+    bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override;
+
+
+    const void* getTaskPtr() const override {{ return (const void*)&task_; }}
+    size_t getTaskSize() const override {{ return sizeof({1:s}); }}
+
+    ModuleStream_ifs* createModuleStream() override ;
+
+    const ErrorInfo_ifs *getErrorInfo(void) const override ;
+
+}};
+
+# endif
+"""
+
+
+cpp_template = """
+
+    #include "Module_{0:s}.h"
+
+    Module_{0:s}::Module_{0:s}():KSDModule(//
         {3:s}){{
         field_map_.setReferencePtr(&task_);
     }}
 
-    Module_{0:s}(const void * ptr, size_t size, DeviceBuildingContext_ifs* context):Module_{0:s}(){{
+
+    Module_{0:s}::Module_{0:s}(const void * ptr, size_t size, DeviceBuildingContext_ifs* context):Module_{0:s}(){{
         if (size!=getTaskSize()){{
             // print error or throw error
         }}
@@ -61,33 +97,28 @@ class Module_{0:s} : public KSDModule {{
     }}
 
 
-    ~Module_{0:s}(){{ }}
-
-    std::string getID() const override {{ return "{0:s}"; }}
+    Module_{0:s}::~Module_{0:s}(){{ }}
 
 
-    //const InfoList& getPropertiesInfoList() override;
+    const InfoList* Module_{0:s}::getPropertiesInfoList() {{ return nullptr;}}
 
-    //const ResValue_ifs* getProperty(const std::string& prop_path) const override;
-    //const std::string getPropertyAsTxt(const std::string& prop_path) const override;
-
-    //bool setProperty(const std::string& prop_path, Value value) override;
-    //bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override;
+    ResValue Module_{0:s}::getProperty(const std::string& prop_path) const  {{ return KSDModule::getProperty(prop_path); }}
+    std::string Module_{0:s}::getPropertyAsTxt(const std::string& prop_path) const {{ return KSDModule::getPropertyAsTxt(prop_path);}}
 
 
-    const void* getTaskPtr() const override {{ return (const void*)&task_; }}
-    size_t getTaskSize() const override {{ return sizeof({1:s}); }}
+    bool Module_{0:s}::setProperty(const std::string& prop_path, Value value)  {{return KSDModule::setProperty(prop_path, value); }}
+    bool Module_{0:s}::setPropertyAsTxt(const std::string& prop_path, const std::string& value)  {{return KSDModule::setPropertyAsTxt(prop_path, value); }}
 
-    ModuleStream_ifs* createModuleStream() override {{
+
+
+    ModuleStream_ifs* Module_{0:s}::createModuleStream()  {{
         error_mesadge_ = "The createModuleStream function is not realised yet";
         return nullptr;
     }};
 
-    const ErrorInfo_ifs *getErrorInfo(void) const override {{ return nullptr; }}
+    const ErrorInfo_ifs *Module_{0:s}::getErrorInfo(void) const  {{ return nullptr; }}
 
-}};
 
-# endif
 """
 
 
@@ -136,10 +167,6 @@ for i in pattern_list:
         id = struct2string(ctypes.c_uint32(
             int(m.group(1), base=0))).decode("utf-8")
 
-        if file:
-            file.close()
-        fpath = "Module_"+id+".h"
-        file = open(fpath, "w")
         list_of_modules.append(id)
 
         struct_name = "Task"
@@ -197,12 +224,17 @@ for i in pattern_list:
         s = genMap(new_complex)
         print(s)
 
+        file = open("Module_"+id+".h", "w")
         file.write(
             define_txt.format(id) +
-            template.format(id, "Task", other_structs, s))
+            h_template.format(id, "Task", other_structs, s))
 
         file.close()
-        file = None
+        file = open("Module_"+id+".cpp", "w")
+
+        file.write(
+            cpp_template.format(id, "Task", other_structs, s))
+        file.close()
 
         # print(new_complex)
         print()

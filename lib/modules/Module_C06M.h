@@ -23,40 +23,28 @@ class Module_C06M : public KSDModule {
     Task task_;
 
    public:
-    Module_C06M()
-        : KSDModule(  //
-              TaskMapper({{"header", header_map_}, {"inputs", u8}, {"reserved", {31, u8}}})) {
-        field_map_.setReferencePtr(&task_);
-    }
+    Module_C06M();
 
-    Module_C06M(const void* ptr, size_t size, DeviceBuildingContext_ifs* context) : Module_C06M() {
-        if (size != getTaskSize()) {
-            // print error or throw error
-        }
-        task_ = *((Task*)ptr);
-    }
+    Module_C06M(const void* ptr, size_t size, DeviceBuildingContext_ifs* context);
 
-    ~Module_C06M() {}
+    ~Module_C06M();
 
     std::string getID() const override { return "C06M"; }
 
-    // const InfoList& getPropertiesInfoList() override;
+    const InfoList* getPropertiesInfoList() override;
 
-    // const ResValue_ifs* getProperty(const std::string& prop_path) const override;
-    // const std::string getPropertyAsTxt(const std::string& prop_path) const override;
+    ResValue getProperty(const std::string& prop_path) const override;
+    std::string getPropertyAsTxt(const std::string& prop_path) const override;
 
-    // bool setProperty(const std::string& prop_path, Value value) override;
-    // bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override;
+    bool setProperty(const std::string& prop_path, Value value) override;
+    bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override;
 
     const void* getTaskPtr() const override { return (const void*)&task_; }
     size_t getTaskSize() const override { return sizeof(Task); }
 
-    ModuleStream_ifs* createModuleStream() override {
-        error_mesadge_ = "The createModuleStream function is not realised yet";
-        return nullptr;
-    };
+    ModuleStream_ifs* createModuleStream() override;
 
-    const ErrorInfo_ifs* getErrorInfo(void) const override { return nullptr; }
+    const ErrorInfo_ifs* getErrorInfo(void) const override;
 };
 
 #endif

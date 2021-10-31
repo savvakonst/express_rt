@@ -100,8 +100,6 @@ class KSDModule : public Module_ifs {
     const TaskMapper *getBranch(const std::string &prop_path) const;
 
    public:
-    // const InfoList& getPropertiesInfoList() override;
-
     const InfoList *getPropertiesInfoList() override {
         error_mesadge_ = "The getPropertiesInfoList function is not realised yet";
         return nullptr;

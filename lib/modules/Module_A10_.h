@@ -33,49 +33,28 @@ class Module_A10_ : public KSDModule {
     Task task_;
 
    public:
-    Module_A10_()
-        : KSDModule(  //
-              TaskMapper({{"header", header_map_},
-                          {"cnl",
-                           {18, TaskMapper({{"frequency", u8},
-                                            {"frequency2", u8},
-                                            {"frequency3", u8},
-                                            {"flags", u8},
-                                            {"range", i32},
-                                            {"waves", i32},
-                                            {"hysteresis", i32}})}},
-                          {"reserved", {224, u8}}})) {
-        field_map_.setReferencePtr(&task_);
-    }
+    Module_A10_();
 
-    Module_A10_(const void* ptr, size_t size, DeviceBuildingContext_ifs* context) : Module_A10_() {
-        if (size != getTaskSize()) {
-            // print error or throw error
-        }
-        task_ = *((Task*)ptr);
-    }
+    Module_A10_(const void* ptr, size_t size, DeviceBuildingContext_ifs* context);
 
-    ~Module_A10_() {}
+    ~Module_A10_();
 
     std::string getID() const override { return "A10_"; }
 
-    // const InfoList& getPropertiesInfoList() override;
+    const InfoList* getPropertiesInfoList() override;
 
-    // const ResValue_ifs* getProperty(const std::string& prop_path) const override;
-    // const std::string getPropertyAsTxt(const std::string& prop_path) const override;
+    ResValue getProperty(const std::string& prop_path) const override;
+    std::string getPropertyAsTxt(const std::string& prop_path) const override;
 
-    // bool setProperty(const std::string& prop_path, Value value) override;
-    // bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override;
+    bool setProperty(const std::string& prop_path, Value value) override;
+    bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override;
 
     const void* getTaskPtr() const override { return (const void*)&task_; }
     size_t getTaskSize() const override { return sizeof(Task); }
 
-    ModuleStream_ifs* createModuleStream() override {
-        error_mesadge_ = "The createModuleStream function is not realised yet";
-        return nullptr;
-    };
+    ModuleStream_ifs* createModuleStream() override;
 
-    const ErrorInfo_ifs* getErrorInfo(void) const override { return nullptr; }
+    const ErrorInfo_ifs* getErrorInfo(void) const override;
 };
 
 #endif
