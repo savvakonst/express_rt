@@ -4,13 +4,27 @@
 
 #include "common/BaseClass_ifs.h"
 #include "common/Port.h"
+#include "device/Module_ifs.h"
 
 class Module_ifs;
 
+class DeviceBuildingContext_ifs {
+   public:
+    DeviceBuildingContext_ifs() {}
+    virtual moduleConstructor_f getConstructor() = 0;
+
+    virtual Module_ifs* createMdule(const std::string& module_id, const void* ptr, size_t size,
+                                    DeviceBuildingContext_ifs* context) {
+        return context->getConstructor()(ptr, size, context);
+    }
+};
+
 class COMMON_API_ Device : public BaseClass_ifs {
    private:
+    std::vector<Module_ifs*> modules_;
+    //
    public:
-    Device(/* args */);
+    Device(const void* ptr, size_t size, DeviceBuildingContext_ifs* context);
 
     ~Device();
 

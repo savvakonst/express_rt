@@ -24,15 +24,17 @@ class EnumInfo {
     }
 
     bool addValue(std::string key, std::string val) {
+        bool status = false;
         enum_keys_.push_back(key);
-        enum_vals_.push_back(createArbitraryData(val, type_));
-        return true;
+        enum_vals_.push_back(createArbitraryData(val, type_, status));
+        return status;
     }
 
     bool addValue(std::string val) {
+        bool status = false;
         enum_keys_.push_back(val);
-        enum_vals_.push_back(createArbitraryData(val, type_));
-        return true;
+        enum_vals_.push_back(createArbitraryData(val, type_, status));
+        return status;
     }
 
     std::vector<std::string> enum_keys_;
@@ -105,27 +107,12 @@ class InfoList : public std::vector<FieldInfo *> {
 
 typedef size_t StatusFlags;
 
-typedef struct {
-    FieldInfo* field_info_;
-    StatusFlags data_status_;
-    size_t size_;
-    char* value_;
-} ResValue_ifs;
+struct ResValue : Value {
+    ResValue() : Value() {}
+    ResValue(const Value &arg) : Value(arg) {}
 
-struct SelfValue : ResValue_ifs {
-    /*   SelfValue(FieldInfo* field_info) {
-           field_info_ = field_info;
-           if (field_info_->default_value_) {
-               size_  = field_info_->default_value_size_;
-               value_ = new char[size_];
-               memcpy(value_, field_info_->default_value_, size_);
-           } else {
-               isNum()
-           }
-       }
-       ~SelfValue() { delete[] value; }
-       */
+    FieldInfo *field_info_ = nullptr;
+    StatusFlags data_status_ = 0;
 };
-
 
 #endif

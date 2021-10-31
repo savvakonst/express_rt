@@ -1,5 +1,6 @@
-cd src/modules 
+cd lib/modules 
 cppgen.py
 cd ../..
 
-clang-format src/modules/*.cpp -i
+clang-format lib/modules/*.cpp -i
+clang-format lib/modules/*.h -i

@@ -1,0 +1,17 @@
+uint32_t	taskSize	Общий размер задания, Б
+uint32_t	headerSize	Размер заголовка задания, = 64 Б
+uint16_t	taskVersion	Версия задания
+uint16_t	checkSumm	Контрольная сумма задания
+char	planeType[16]	Идентификатор борта
+DEVICE_DATE	rdDate	Дата
+uint8_t	reserved_a[4]	Резерв
+uint32_t	planeNo	Номер борта
+uint16_t	flightNo	Номер полёта
+uint16_t	minVersion	Минимальная версия
+uint32_t	deviceID	Идентификатор устройства сбора (режима функционирования)
+uint16_t	syncSrc	Номер слота источника синхронизации
+uint8_t	reserved_c[14]	Резерв
+
+
+MODULE_HEADER	header	Заголовок модуля: header.id = CH04, CH06, CH08, CH10, F01_, F02_, F03_, F04_, G01_, header.size = 36
+char[]	task_data	Задания контроллера сбора и блока модулей, расположенных в блоке

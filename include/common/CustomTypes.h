@@ -39,7 +39,7 @@ union ArbitraryData {
 
     void* none_v;
 
-    u8_t u8;
+    u8_t u8{};
     u16_t u16;
     u32_t u32;
     u64_t u64;
@@ -112,7 +112,7 @@ inline std::string getString(str_v_t data) {  //
 
 inline str_v_t createStrV(const std::string& str) {  //
     size_t size = str.size();
-    str_v_t data = new char[size + sizeof(size_t)];
+    auto data = new char[size + sizeof(size_t)];
     *((size_t*)data) = size;
     memcpy((void*)(data + sizeof(size_t)), str.c_str(), size);
     return data;
@@ -144,12 +144,10 @@ case arg:           \
     case bool_v:
         return (data.bool_v) ? "true" : "false";
     case str_v:
-        return getString(data.str_v);
     case lstr_v:
         return getString(data.str_v);
 
     case none_v:
-        break;
     default:
         break;
     }
@@ -178,9 +176,10 @@ inline std::string toString(DataType type) {
     return "none_v";
 }
 
-inline ArbitraryData createArbitraryData(const std::string& str, DataType type) {
+inline ArbitraryData createArbitraryData(const std::string& str, DataType type, bool& status) {
     ArbitraryData res;
-    res.i64 = 0;
+
+    res.u64 = 0;
     switch (type) {
     case i8:
         res.i8 = (i8_t)stoi(str);
@@ -216,17 +215,14 @@ inline ArbitraryData createArbitraryData(const std::string& str, DataType type) 
         break;
 
     case bool_v:
-        res.bool_v = (str == "true") ? true : false;
+        res.bool_v = (str == "true");
         break;
     case str_v:
-        res.str_v = createStrV(str);
-        break;
     case lstr_v:
         res.str_v = createStrV(str);
         break;
 
     case none_v:
-        break;
     default:
         break;
     }
@@ -253,12 +249,21 @@ inline ArbitraryData copyArbitraryData(const void* ptr, DataType type) {
 struct Value {
     Value() : type_(DataType::none_v) {}
     Value(const Value& value) : value_(copyArbitraryData(value.value_, value.type_)), type_(value.type_) {}
+
+    explicit Value(bool a) : type_(DataType::bool_v) { value_.bool_v = a; }
+    explicit Value(double a) : type_(DataType::f64) { value_.f64 = a; }
+    explicit Value(int64_t a) : type_(DataType::f64) { value_.i64 = a; }
+    explicit Value(const std::string& a) : type_(DataType::str_v) { value_.str_v = createStrV(a); }
+
     Value(const void* ptr, DataType type) : value_(copyArbitraryData(ptr, type)), type_(type) {}
-    Value(bool a) : type_(DataType::bool_v) { value_.bool_v = a; }
-    Value(double a) : type_(DataType::f64) { value_.f64 = a; }
-    Value(int64_t a) : type_(DataType::f64) { value_.i64 = a; }
-    Value(const std::string& a) : type_(DataType::str_v) { value_.str_v = createStrV(a); }
-    Value(const std::string& str, DataType type) : value_(createArbitraryData(str, type)), type_(type) {}
+    Value(const std::string& str, DataType type) : type_(DataType::none_v) {
+        bool status = false;
+        value_ = createArbitraryData(str, type, status);
+        if (status) type_ = type;
+    }
+
+    explicit operator bool() const { return type_ != none_v; }
+    bool operator!() const { return type_ == none_v; }
 
     ~Value() {
         if (isPtr(type_)) delete[] value_.str_v;
@@ -268,21 +273,21 @@ struct Value {
     DataType type_;
 };
 
-class HierarchicalData_ifs;
-
 class COMMON_API_ HierarchicalData_ifs {
    public:
-    virtual bool isArray() const = 0;
-    virtual bool isMap() const = 0;
-    virtual bool isValue() const = 0;
+    virtual ~HierarchicalData_ifs(){};
 
-    virtual Value getValue() const = 0;
+    [[nodiscard]] virtual bool isArray() const = 0;
+    [[nodiscard]] virtual bool isMap() const = 0;
+    [[nodiscard]] virtual bool isValue() const = 0;
 
-    virtual std::vector<HierarchicalData_ifs*> getArray() const = 0;
-    virtual std::map<std::string, HierarchicalData_ifs*> getMap() const = 0;
+    [[nodiscard]] virtual Value getValue() const = 0;
 
-    virtual HierarchicalData_ifs* getArrayUint(size_t) const = 0;
-    virtual HierarchicalData_ifs* getMapUint(std::string) const = 0;
+    [[nodiscard]] virtual std::vector<HierarchicalData_ifs*> getArray() const = 0;
+    [[nodiscard]] virtual std::map<std::string, HierarchicalData_ifs*> getMap() const = 0;
+
+    [[nodiscard]] virtual HierarchicalData_ifs* getArrayUint(size_t) const = 0;
+    [[nodiscard]] virtual HierarchicalData_ifs* getMapUint(std::string) const = 0;
 };
 
 #endif

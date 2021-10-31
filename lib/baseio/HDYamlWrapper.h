@@ -1,0 +1,36 @@
+#ifndef HIERARCHICALDATAYAMLWRAPPER_H
+#define HIERARCHICALDATAYAMLWRAPPER_H
+
+#include "common/CustomTypes.h"
+#include "yaml-cpp/yaml.h"
+
+/*
+ * The RdHierarchicalData class realize wrapper for yaml-cpp
+ */
+class HierarchicalDataYamlWrapper : public HierarchicalData_ifs {
+    // better to create move constructor
+   public:
+    explicit HierarchicalDataYamlWrapper(const YAML::Node &value);
+
+    ~HierarchicalDataYamlWrapper() override;
+
+    bool isArray() const override;
+    bool isMap() const override;
+    bool isValue() const override;
+
+    Value getValue() const override;
+    std::vector<HierarchicalData_ifs *> getArray() const override;
+    std::map<std::string, HierarchicalData_ifs *> getMap() const override;
+
+    HierarchicalData_ifs *getArrayUint(size_t) const override;
+    HierarchicalData_ifs *getMapUint(std::string) const override;
+
+   private:
+    union {
+        std::vector<HierarchicalData_ifs *> *vector_;
+        std::map<std::string, HierarchicalData_ifs *> *map_;
+    };
+    const YAML::Node value_;
+};
+
+#endif

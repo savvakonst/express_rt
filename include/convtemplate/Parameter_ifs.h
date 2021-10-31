@@ -8,10 +8,6 @@
 
 class PrmBuffer_ifs;
 
-
-
-
-
 class COMMON_API_ Parameter_ifs : public BaseClass_ifs {
    public:
     Parameter_ifs(const std::string& name) : name_(name){};
@@ -22,13 +18,11 @@ class COMMON_API_ Parameter_ifs : public BaseClass_ifs {
 
     virtual const InfoList& getPropertiesInfoList() = 0;
 
-    virtual const ResValue_ifs* getProperty(const std::string& prop_path) const = 0;
+    virtual const ResValue* getProperty(const std::string& prop_path) const = 0;
     virtual const std::string getPropertyAsTxt(const std::string& prop_path) const = 0;
 
     virtual bool setProperty(const std::string& prop_path, const Value value) = 0;
     virtual bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) = 0;
-
-
 
     virtual const bool isValid() const = 0;
     bool isLocked() const { return (bool)prm_buffer_; }
