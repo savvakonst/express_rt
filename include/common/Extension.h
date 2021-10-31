@@ -23,4 +23,6 @@ struct ExtensionInfo {
     ExtensionUint* uints;
 };
 
+typedef ExtensionInfo* (*ExtensionInitFunction)(void);
+
 #endif

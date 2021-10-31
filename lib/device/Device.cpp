@@ -5,11 +5,15 @@
 #include <regex>
 
 #include "Device/ModuleStream_ifs.h"
-#include "Device/Module_ifs.h"
 
-// Device::Device(const void* ptr, size_t size) {
+Device::Device(const void* ptr, size_t size, DeviceBuildingContext_ifs* context) {
+    if (size < sizeof(TASK_HEADER)) {
+        error_mesadge_ = "task size is too small";
+    }
 
-//}
+    task_header_ = *(TASK_HEADER*)ptr;
+
+}
 
 Device::~Device() {}
 

@@ -24,27 +24,27 @@
 #include "common/Extension.h"
 
 static ExtensionUint g_modules_extension_uint[] = {
-    {"M01_", "module", "M01_ ksd module", (void*)createModule<Module_M01_>},
-    {"A01_", "module", "A01_ ksd module", (void*)createModule<Module_A01_>},
-    {"A02_", "module", "A02_ ksd module", (void*)createModule<Module_A02_>},
-    {"A03_", "module", "A03_ ksd module", (void*)createModule<Module_A03_>},
-    {"A04_", "module", "A04_ ksd module", (void*)createModule<Module_A04_>},
-    {"A05_", "module", "A05_ ksd module", (void*)createModule<Module_A05_>},
-    {"A06_", "module", "A06_ ksd module", (void*)createModule<Module_A06_>},
-    {"A07_", "module", "A07_ ksd module", (void*)createModule<Module_A07_>},
-    {"A08_", "module", "A08_ ksd module", (void*)createModule<Module_A08_>},
-    {"A09_", "module", "A09_ ksd module", (void*)createModule<Module_A09_>},
-    {"A10_", "module", "A10_ ksd module", (void*)createModule<Module_A10_>},
-    {"A11_", "module", "A11_ ksd module", (void*)createModule<Module_A11_>},
-    {"D01_", "module", "D01_ ksd module", (void*)createModule<Module_D01_>},
-    {"D02_", "module", "D02_ ksd module", (void*)createModule<Module_D02_>},
-    {"ID02", "module", "ID02 ksd module", (void*)createModule<Module_ID02>},
-    {"C06_", "module", "C06_ ksd module", (void*)createModule<Module_C06_>},
-    {"C06M", "module", "C06M ksd module", (void*)createModule<Module_C06M>},
-    {"C03_", "module", "C03_ ksd module", (void*)createModule<Module_C03_>},
-    {"C04_", "module", "C04_ ksd module", (void*)createModule<Module_C04_>},
-    nullptr};
+    {"M01_", "module", "M01_ ksd module", (void*)createModule<Module_M01_>, 0x00},
+    {"A01_", "module", "A01_ ksd module", (void*)createModule<Module_A01_>, 0x00},
+    {"A02_", "module", "A02_ ksd module", (void*)createModule<Module_A02_>, 0x00},
+    {"A03_", "module", "A03_ ksd module", (void*)createModule<Module_A03_>, 0x00},
+    {"A04_", "module", "A04_ ksd module", (void*)createModule<Module_A04_>, 0x00},
+    {"A05_", "module", "A05_ ksd module", (void*)createModule<Module_A05_>, 0x00},
+    {"A06_", "module", "A06_ ksd module", (void*)createModule<Module_A06_>, 0x00},
+    {"A07_", "module", "A07_ ksd module", (void*)createModule<Module_A07_>, 0x00},
+    {"A08_", "module", "A08_ ksd module", (void*)createModule<Module_A08_>, 0x00},
+    {"A09_", "module", "A09_ ksd module", (void*)createModule<Module_A09_>, 0x00},
+    {"A10_", "module", "A10_ ksd module", (void*)createModule<Module_A10_>, 0x00},
+    {"A11_", "module", "A11_ ksd module", (void*)createModule<Module_A11_>, 0x00},
+    {"D01_", "module", "D01_ ksd module", (void*)createModule<Module_D01_>, 0x00},
+    {"D02_", "module", "D02_ ksd module", (void*)createModule<Module_D02_>, 0x00},
+    {"ID02", "module", "ID02 ksd module", (void*)createModule<Module_ID02>, 0x00},
+    {"C06_", "module", "C06_ ksd module", (void*)createModule<Module_C06_>, 0x00},
+    {"C06M", "module", "C06M ksd module", (void*)createModule<Module_C06M>, 0x00},
+    {"C03_", "module", "C03_ ksd module", (void*)createModule<Module_C03_>, 0x00},
+    {"C04_", "module", "C04_ ksd module", (void*)createModule<Module_C04_>, 0x00},
+    {nullptr, nullptr, nullptr, nullptr, 0}};
 
 static ExtensionInfo g_modules_extension_info = {"Modules_extensiln", 0x01, g_modules_extension_uint};
 
-InitExtension(ExtensionInfo*) init_Modules(void) { return &g_modules_extension_info; }
+InitExtension(ExtensionInfo*) initModules(void) { return &g_modules_extension_info; }
