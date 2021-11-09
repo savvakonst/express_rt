@@ -13,7 +13,7 @@ endif ()
 add_library(CommonLib SHARED
         convtemplate/ConversionTemplate.cpp
         device/Device.cpp
-        )
+        ../include/common/TimeRepresentation.h)
 
 target_include_directories(CommonLib PUBLIC ../include)
 target_compile_definitions(CommonLib PRIVATE COMMON_CREATE_SHARED_LIBRARY)

@@ -1,5 +1,5 @@
-#ifndef EXTENSION_IFS_H_
-#define EXTENSION_IFS_H_
+#ifndef EXRT_EXTENSION_IFS_H_
+#define EXRT_EXTENSION_IFS_H_
 
 #if defined(__cplusplus)
 #    define InitExtension(RTYPE) extern "C" __declspec(dllexport) RTYPE

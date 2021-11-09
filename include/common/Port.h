@@ -1,5 +1,5 @@
-#ifndef EXO_PORT_H
-#define EXO_PORT_H
+#ifndef EXRT_PORT_H
+#define EXRT_PORT_H
 
 #ifdef _MSC_VER
 #    if COMMON_CREATE_SHARED_LIBRARY

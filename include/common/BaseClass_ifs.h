@@ -22,7 +22,7 @@ class COMMON_API_ BaseClass_ifs {
 
     /*
      *  common voids
-     *  perhaps it will be good to create parent class with following members
+     *  TODO: perhaps it will be good to create parent class with following members
      */
 
     void emit() {

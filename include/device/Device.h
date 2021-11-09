@@ -19,13 +19,12 @@ class DeviceBuildingContext_ifs {
     }
 };
 
-// i thin it will be better to inherit this class from Module_ifs
-// and use task mapper.it needs change name TaskMapper to PackedStructMapper.
-// and i think it is possiple to remove all task structures by replacing them with PackedStructMapper
+// TODO: i think it will be better to inherit this class from Module_ifs
+//  and use task mapper.it needs change name TaskMapper to PackedStructMapper.
+//  and i think it is possiple to remove all task structures by replacing them with PackedStructMapper
 
 class COMMON_API_ Device : public BaseClass_ifs {
    private:
-
     struct DEVICE_DATE {
         uint8_t day;
         uint8_t month;

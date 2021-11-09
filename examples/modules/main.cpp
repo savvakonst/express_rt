@@ -12,7 +12,7 @@
 #include "common/BaseClass_ifs.h"
 #include "common/Extension.h"
 
-// class ExtensionManager :public BaseClass_ifs{
+
 class ExtensionManager {
    public:
     std::vector<std::string> getAvalibleExtensionTypes(std::string type) { return {}; }
@@ -22,6 +22,8 @@ class ExtensionManager {
 
     Module_ifs* getModuleExtensionUint() { return nullptr; }
     Module_ifs* getParameterExtensionUint() { return nullptr; }
+
+
 };
 
 int main(void) {
