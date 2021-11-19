@@ -25,9 +25,9 @@ class COMMON_API_ BaseClass_ifs {
      *  TODO: perhaps it will be good to create parent class with following members
      */
 
-    void emit() {
+    void emit_() {
         for (auto i : signals_) {
-            i->emit();
+            i->emit_();
         }
     }
 
@@ -47,7 +47,8 @@ class COMMON_API_ BaseClass_ifs {
     }
 
    public:
-    virtual const ErrorInfo_ifs* getErrorInfo() const = 0;
+    // TODO it might be worth to remove this function
+    virtual const ErrorInfo_ifs* getErrorInfo() const { return nullptr; };
 
     virtual bool hasError() const { return !error_mesadge_.empty(); }
     virtual const std::string& getErrorMessage() const { return error_mesadge_; }

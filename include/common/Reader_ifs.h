@@ -26,7 +26,9 @@ class Reader_ifs {
         AbsoluteTime end;
         bool belongsTo(const Borders& cm) const { return (cm.begin <= begin) && (end <= cm.end); }
         RelativeTime getInterval() const { return end - begin; }
-        Borders operator+(const RelativeTime& time_interval) const { return Borders(begin +time_interval ,end +time_interval);}
+        Borders operator+(const RelativeTime& time_interval) const {
+            return Borders(begin + time_interval, end + time_interval);
+        }
     };
 
     struct Point {
@@ -58,6 +60,9 @@ class Reader_ifs {
 
         Inerval* next_ = nullptr;
     };
+
+    virtual bool lock(bool arg) = 0;
+    virtual bool isLock() = 0;
 
     virtual Inerval getPoints(const Borders& begin, Point* ptr, size_t point_count) = 0;
 

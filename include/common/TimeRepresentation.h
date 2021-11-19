@@ -51,6 +51,16 @@ inline bool operator>=(const AbsoluteTime& left, const AbsoluteTime& right) {
 
 inline bool operator==(const RelativeTime& left, const RelativeTime& right) { return (left.time == right.time); }
 
+inline bool operator<(const RelativeTime& left, const RelativeTime& right) {
+    if (left.ls_ineger < right.ls_ineger) return true;
+    return (left.ls_ineger == right.ls_ineger) && (left.ms_fractional < right.ms_fractional);
+}
+
+inline bool operator>(const RelativeTime& left, const RelativeTime& right) {
+    if (left.ls_ineger > right.ls_ineger) return true;
+    return (left.ls_ineger == right.ls_ineger) && (left.ms_fractional > right.ms_fractional);
+}
+
 inline RelativeTime operator-(const AbsoluteTime& left, const AbsoluteTime& right) {
     RelativeTime ret = {0};
 

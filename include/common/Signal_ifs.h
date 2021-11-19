@@ -3,7 +3,7 @@
 
 class Signal_ifs {
    public:
-    virtual void emit() = 0;
+    virtual void emit_() = 0;
 };
 
 #endif
