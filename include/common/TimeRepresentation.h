@@ -20,7 +20,7 @@ struct AbsoluteTime {
             uint32_t ls_fractional;
             uint32_t ms_fractional;
         };
-        int64_t long_fractional;
+        uint64_t long_fractional;
     };
     int64_t unix_time;
 };
@@ -65,8 +65,9 @@ inline RelativeTime operator-(const AbsoluteTime& left, const AbsoluteTime& righ
     RelativeTime ret = {0};
 
     ret.ms_fractional = left.ms_fractional - right.ms_fractional;
-    ret.ls_ineger = int32_t(left.unix_time - right.unix_time);  // unsafe
-    ret.ls_ineger += (left.long_fractional < right.long_fractional);
+    ret.ls_ineger =
+        int32_t(left.unix_time) - int32_t(right.unix_time) - (left.long_fractional < right.long_fractional);  // unsafe
+    // ret.ls_ineger -= (left.long_fractional < right.long_fractional) ? 1 : 0;
     return ret;
 }
 
@@ -101,5 +102,25 @@ inline RelativeTime operator-(const RelativeTime& left, const RelativeTime& righ
     ret.time = left.time - right.time;
     return ret;
 }
+
+struct Borders {
+    inline Borders(const AbsoluteTime& a, const AbsoluteTime& b) {
+        begin = a;
+        end = b;
+    }
+    explicit inline Borders(const AbsoluteTime& a, const RelativeTime& b) {
+        begin = a;
+        end = a + b;
+    }
+
+    AbsoluteTime begin;
+    AbsoluteTime end;
+
+    inline bool belongsTo(const Borders& cm) const { return (cm.begin <= begin) && (end <= cm.end); }
+    inline RelativeTime getInterval() const { return end - begin; }
+    inline Borders operator+(const RelativeTime& time_interval) const {
+        return Borders(begin + time_interval, end + time_interval);
+    }
+};
 
 #endif

@@ -1,6 +1,7 @@
 #ifndef EXRT_READER_IFS_H
 #define EXRT_READER_IFS_H
 #include <cstdint>
+#include <memory>
 #include <string>
 
 #include "TimeRepresentation.h"
@@ -12,39 +13,33 @@ class Reader_ifs {
 
     typedef double ReaderData;
 
-    struct Borders {
-        inline Borders(const AbsoluteTime& a, const AbsoluteTime& b) {
-            begin = a;
-            end = b;
-        }
-        explicit inline Borders(const AbsoluteTime& a, const RelativeTime& b) {
-            begin = a;
-            end = a + b;
-        }
-
-        AbsoluteTime begin;
-        AbsoluteTime end;
-        bool belongsTo(const Borders& cm) const { return (cm.begin <= begin) && (end <= cm.end); }
-        RelativeTime getInterval() const { return end - begin; }
-        Borders operator+(const RelativeTime& time_interval) const {
-            return Borders(begin + time_interval, end + time_interval);
-        }
-    };
-
     struct Point {
-        RelativeTime pos;
+        uint64_t pos;
         ReaderData sum;
         ReaderData max;
         ReaderData min;
     };
 
-    class Inerval {
+    class Chunk {
        public:
-        Inerval() : borders_(AbsoluteTime(), AbsoluteTime()){};
-        Inerval(const Inerval& prototype) = delete;
+        enum Status : size_t
+        {
+            success = 0,
+            out_of_borders = 1,
+            no_valid_data = 2,
+            no_connection = 3,
+        };
 
-        ~Inerval() {
-            while (Inerval* current = next_) {
+        inline Chunk()  //
+            : borders_(AbsoluteTime(), AbsoluteTime()){};
+
+        inline Chunk(const Borders& borders, Point* first_point, size_t number_of_points)  //
+            : borders_(borders), first_point_(first_point), number_of_points_(number_of_points) {}
+
+        // Chunk(const Chunk& prototype) = delete;
+
+        ~Chunk() {
+            while (Chunk* current = next_) {
                 next_ = next_->next_;
                 current->next_ = nullptr;
                 delete current;
@@ -53,18 +48,18 @@ class Reader_ifs {
 
         Borders borders_;
 
-        size_t number_of_points_;
-        Point* first_point_;
+        Point* first_point_ = nullptr;
+        size_t number_of_points_ = 0;
 
-        std::string error_mesadge_;
+        Chunk::Status error_code_ = Status::success;
 
-        Inerval* next_ = nullptr;
+        Chunk* next_ = nullptr;
     };
 
     virtual bool lock(bool arg) = 0;
     virtual bool isLock() = 0;
 
-    virtual Inerval getPoints(const Borders& begin, Point* ptr, size_t point_count) = 0;
+    virtual std::unique_ptr<Chunk> getPoints(const Borders& begin, Point* ptr, size_t point_count) = 0;
 
     virtual Borders getAvailableBorders() = 0;
 };
