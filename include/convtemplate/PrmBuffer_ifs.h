@@ -33,6 +33,9 @@ class PrmBuffer_ifs {
 
     virtual void setData(char* data, size_t length, DataStatus status) = 0;
 
+    virtual bool lock(bool arg) = 0;
+    virtual bool isLock() = 0;
+
     const Parameter_ifs* parameter_ = nullptr;
 };
 
