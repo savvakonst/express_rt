@@ -13,11 +13,11 @@ struct RelativeTime {
     };
     double toDouble() const {
         double d = ls_integer;
-        d  += (static_cast<double>(ms_fractional) / (1 << 31));
+        d  += (static_cast<double>(ms_fractional) / (1ull << 32));
         return d;
     }
     void fromDouble(const double val){
-        time = static_cast<int64_t>(val * (1ull << 31));
+        time = static_cast<int64_t>(val * (1ull << 32));
     }
 };
 
