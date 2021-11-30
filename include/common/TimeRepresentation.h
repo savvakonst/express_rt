@@ -16,15 +16,15 @@ struct RelativeTime {
         d  += (static_cast<double>(ms_fractional) / (1 << 31));
         return d;
     }
-    void fromDouble(const double &val){
-        ls_integer = static_cast<int32_t>(val);
-        ms_fractional = static_cast<uint32_t>((1 << 32) * (val - ls_integer));
+    void fromDouble(const double val){
+        time = static_cast<int64_t>(val * (1ull << 31));
     }
 };
 
 /*inline RelativeTimeFrom(double arg){
-    RelativeTime
-    return ()
+    RelativeTime t;
+
+    return (t)
 }*/
 
 
