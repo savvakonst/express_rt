@@ -11,12 +11,22 @@ struct RelativeTime {
         };
         int64_t time;
     };
-    double toDouble(){
+    double toDouble() const {
         double d = ls_integer;
         d  += (static_cast<double>(ms_fractional) / (1 << 31));
         return d;
     }
+    void fromDouble(const double &val){
+        ls_integer = static_cast<int32_t>(val);
+        ms_fractional = static_cast<uint32_t>((1 << 32) * (val - ls_integer));
+    }
 };
+
+/*inline RelativeTimeFrom(double arg){
+    RelativeTime
+    return ()
+}*/
+
 
 struct AbsoluteTime {
     explicit AbsoluteTime() : long_fractional(0), unix_time(0) {}
