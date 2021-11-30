@@ -118,7 +118,7 @@ inline RelativeTime operator+(const RelativeTime& left, const RelativeTime& righ
     return ret;
 }
 
-// TODO: Check result
+// TODO: Check result ::Don't work
 inline RelativeTime operator+=(const RelativeTime& left, const RelativeTime& right) {
     RelativeTime ret;
     ret.time = left.time + right.time;
