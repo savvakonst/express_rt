@@ -1,0 +1,109 @@
+
+ext_type: parameter
+ext_set: 
+  - name: "common"
+    set:
+      - name: "name"
+        type: "string"
+        description: "имя параметра"
+
+      - name: "identifier"
+        type: "string"
+        description: "идентификатор"
+
+      - name: "units"
+        type: "string"
+        description: "ед. измерения"
+
+      - name: "category"
+        type: "string"
+        description: "категория"
+
+      - name: "system"
+        type: "string"
+        description: "система"
+
+      - name: "department"
+        type: "string"
+        description: "отдел"
+
+      - name: "description"
+        type: "long_string"
+        description: "описание"
+
+      - name: "path"
+        type: "string"
+        description: "физический адрес параметра"
+
+      - name: "approximation"
+        description: 
+        array: 
+          - type:
+              - name: "x"
+                type: "f64"
+              - name: "y"
+                type: "f64"
+            
+        
+  - name: "ethernet"
+    include: "common"
+    set:
+      - name: "source"
+        description: "источник"
+        set: 
+          - name: "ip"
+            type: "u32"
+            description: "ip"
+
+          - name: "port"
+            type: "i16"
+            description: "порт"
+
+      - name: "destenation"
+        description: "порт"
+        set: 
+          - name: "ip"
+            type: "u32"
+            description: "ip"
+
+          - name: "port"
+            type: "i16"
+            description: "порт"
+
+      - name: "offset"
+        type: "int"
+        description: "смещение"
+
+      - name: "type"
+        type: "string"
+        description: "тип/размер" 
+        enum: ["i8", "i16", "i32", "i64", "f32", "f64"]
+
+      - name: "byte_ordr"
+        type: "string"
+        description: "порядок байт"
+        enum:  ["BE", "LE"]
+
+      - name: "msb"
+        type: "string"
+        description: "старший разряд"
+        enum: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+
+      - name: "bit_depth"
+        type: "i16"
+        description: "длинна бит"
+        #validator: "lambda x: 10 < x and x < 100 and x % 2 = 0"
+
+      - name: "sign"
+        type: "bool"
+        description: "знак"
+        enum: { true: есть, false: нет }
+
+      - name: "scale_a1"
+        type: "i32"
+        description: "коэф. масштаба (a1)"
+
+      - name: "offset_a2"
+        type: "i32"
+        description: "коэф. смещения (a2)" 
+
