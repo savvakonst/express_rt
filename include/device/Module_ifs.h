@@ -8,6 +8,7 @@
 #include "common/FieldInfo.h"
 
 class ModuleStream_ifs;
+class PrmBuffer_ifs;
 class DeviceBuildingContext_ifs;
 
 class COMMON_API_ Module_ifs : public BaseClass_ifs {
@@ -16,29 +17,42 @@ class COMMON_API_ Module_ifs : public BaseClass_ifs {
    public:
     virtual ~Module_ifs(){};
 
+    virtual bool hasTransceiver() const = 0;
+
+    virtual EthernetSettings getSrcAddress() const = 0;
+
+    virtual bool isAvailable() const = 0;
+
     [[nodiscard]] virtual std::string getID() const = 0;
 
-    virtual const InfoList* getPropertiesInfoList() = 0;
+    virtual std::map<std::string, PrmBuffer_ifs*> getPrmBufferMap() { return std::map<std::string, PrmBuffer_ifs*>(); }
 
-    [[nodiscard]] virtual ResValue getProperty(const std::string& prop_path) const = 0;
-    [[nodiscard]] virtual std::string getPropertyAsTxt(const std::string& prop_path) const = 0;
+    virtual const InfoList *getPropertiesInfoList() = 0;
 
-    virtual bool setProperty(const std::string& prop_path, Value value) = 0;
-    virtual bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) = 0;
+    [[nodiscard]] virtual std::string printProperties(const std::string &indent = "") const = 0;
 
-    [[nodiscard]] virtual const void* getTaskPtr() const = 0;
+    [[nodiscard]] virtual ResValue getProperty(const std::string &prop_path) const = 0;
+
+    [[nodiscard]] virtual std::string getPropertyAsTxt(const std::string &prop_path) const = 0;
+
+    virtual bool setProperty(const std::string &prop_path, Value value) = 0;
+
+    virtual bool setPropertyAsTxt(const std::string &prop_path, const std::string &valie) = 0;
+
+    [[nodiscard]] virtual const void *getTaskPtr() const = 0;
+
     [[nodiscard]] virtual size_t getTaskSize() const = 0;
 
-    virtual Module_ifs* getSubModule() { return nullptr; }
+    virtual Module_ifs *getSubModule() { return nullptr; }
 
-    virtual ModuleStream_ifs* createModuleStream() = 0;
+    virtual ModuleStream_ifs *createModuleStream() = 0;
 };
 
 template <class T>
-Module_ifs* createModule(const void* ptr, size_t size, DeviceBuildingContext_ifs* context) {
+Module_ifs *createModule(const void *ptr, size_t size, DeviceBuildingContext_ifs *context) {
     return new T(ptr, size, context);
 }
 
-typedef Module_ifs* (*moduleConstructor_f)(const void* ptr, size_t size, DeviceBuildingContext_ifs* context);
+typedef Module_ifs *(*moduleConstructor_f)(const void *ptr, size_t size, DeviceBuildingContext_ifs *context);
 
 #endif

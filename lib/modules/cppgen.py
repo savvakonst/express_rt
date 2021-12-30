@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-import re
 import ctypes
+import re
 
 
 def struct2string(cbw):
@@ -11,8 +11,7 @@ def struct2string(cbw):
 file = open("m.txt", "r", encoding='UTF-8')
 s = file.read()
 file.close()
-del(file)
-
+del (file)
 
 c_exp = re.compile('#[^#]*')
 
@@ -22,19 +21,17 @@ c_exp_dims = re.compile(r"\[([0-9]*)\]")
 
 pattern_list = c_exp.findall(s)
 
-
 define_txt = """
-# ifndef EXRT_KSDMMODULE{0:s}_H
-# define EXRT_KSDMMODULE{0:s}_H
+#ifndef EXRT_KSDMMODULE{0:s}_H
+#define EXRT_KSDMMODULE{0:s}_H
 
 
-# include <map>
-# include <cstdint>
-# include "KSDModule.h"
-# include "device/ModuleStream_ifs.h"
-
+#include <map>
+#include <cstdint>
+#include "KSDModule.h"
+#include "device/ModuleStream_ifs.h"
+#include "Module_DCU_.h"
 """
-
 
 h_template = """
 class Module_{0:s} : public KSDModule {{
@@ -77,7 +74,6 @@ class Module_{0:s} : public KSDModule {{
 
 # endif
 """
-
 
 h_template_old = """
 class Module_{0:s} : public KSDModule {{
@@ -133,7 +129,6 @@ class Module_{0:s} : public KSDModule {{
 # endif
 """
 
-
 cpp_template = """
 
     #include "Module_{0:s}.h"
@@ -176,10 +171,9 @@ cpp_template = """
 
 """
 
-
 file = None
 
-sizes = [8*2**x for x in range(4)]
+sizes = [8 * 2 ** x for x in range(4)]
 uint_types = {"uint{0:d}_t".format(i): "u{0:d}".format(i) for i in sizes}
 int_types = {"int{0:d}_t".format(i): "i{0:d}".format(i) for i in sizes}
 
@@ -211,7 +205,6 @@ complex_types = {
     "MODULE_HEADER": "i32"
 }
 
-
 list_of_modules = []
 
 for i in pattern_list:
@@ -233,7 +226,6 @@ for i in pattern_list:
     fields_list = []
     new_complex = []
     for i in x:
-
         f_type, f_name, arr_dim, f_descr = (i[0], i[1], i[2], i[6])
         dim_vals = [int(i) for i in c_exp_dims.findall(arr_dim)]
 
@@ -247,7 +239,7 @@ for i in pattern_list:
 
     complex_types[struct_name] = new_complex
 
-    fields = "{\n\t\t" + ";\n\t\t".join(fields_list) + ";};"+"\n"
+    fields = "{\n\t\t" + ";\n\t\t".join(fields_list) + ";};" + "\n"
     other_structs += "\n\tstruct {0:s} {1:s}".format(struct_name, fields)
 
     if id:
@@ -258,34 +250,37 @@ for i in pattern_list:
         if new_complex is None:
             break
 
+
         def genArr(type_, dims=[]):
-            if(len(dims)):
+            if (len(dims)):
                 dim = dims.pop()
                 return '{{{0:d},{1:s}}}'.format(dim, genArr(type_, dims))
             else:
                 return type_
 
+
         def genMap(struct):
             fields = []
             for key, type_ in struct:
 
-                if not(type(type_) is str):
+                if not (type(type_) is str):
                     type_ = genMap(type_)
                 s = '{{"{0:s}",{1:s} }}'.format(
                     key.name, genArr(type_, key.dims))
                 fields.append(s)
             return "TaskMapper({{\n{0:s} }})".format(",\n".join(fields))
 
+
         s = genMap(new_complex)
         print(s)
 
-        file = open("Module_"+id+".h", "w")
+        file = open("Module_" + id + ".h", "w")
         file.write(
             define_txt.format(id) +
             h_template.format(id, "Task", other_structs, s))
 
         file.close()
-        file = open("Module_"+id+".cpp", "w")
+        file = open("Module_" + id + ".cpp", "w")
 
         file.write(
             cpp_template.format(id, "Task", other_structs, s))
@@ -296,7 +291,6 @@ for i in pattern_list:
         complex_types = {"MODULE_HEADER": "header_map_"}
 
         other_structs = ""
-
 
 extension = """
 
@@ -316,13 +310,11 @@ static const ExtensionInfo g_modules_extension_info = {{
 
 """
 
-
 includes = "\n".join(
     ['#include "Module_{0:s}.h"'.format(i) for i in list_of_modules])
 
 ext_list = ",\n    ".join(
     ['{{ "{0:s}","module","{0:s} ksd module",createModule<Module_{0:s}> }}'.format(i) for i in list_of_modules])
-
 
 extension = extension.format(includes, ext_list)
 print(extension)

@@ -9,14 +9,14 @@
 #include "extensions/PDefaultBaseIO_ifs.h"
 #include "yaml-cpp/yaml.h"
 
-template <typename Ta, typename Tb>
-std::stringstream& operator<<(std::stringstream& out, const std::pair<Ta, Tb>& v) {
+template<typename Ta, typename Tb>
+std::stringstream &operator<<(std::stringstream &out, const std::pair<Ta, Tb> &v) {
     out << v.first << ": " << v.second;
     return out;
 }
 
-template <typename T>
-std::stringstream& operator<<(std::stringstream& out, const std::vector<T>& v) {
+template<typename T>
+std::stringstream &operator<<(std::stringstream &out, const std::vector<T> &v) {
     if (!v.empty()) {
         out << '[';
         std::copy(v.begin(), v.end(), std::ostream_iterator<T>(out, ", "));
@@ -25,14 +25,14 @@ std::stringstream& operator<<(std::stringstream& out, const std::vector<T>& v) {
     return out;
 }
 
-std::stringstream& operator<<(std::stringstream& out, const YAML::Mark& v) {
+std::stringstream &operator<<(std::stringstream &out, const YAML::Mark &v) {
     out << "line: " << v.line << ", column: " << v.column << ", pos: " << v.pos;
     return out;
 }
 
-void saveAsJson(const YAML::Node& node, std::stringstream& s, const std::string& indentation = "");
+void saveAsJson(const YAML::Node &node, std::stringstream &s, const std::string &indentation = "");
 
-void saveAsJson(const YAML::Node& node, std::stringstream& s, const std::string& indentation) {
+void saveAsJson(const YAML::Node &node, std::stringstream &s, const std::string &indentation) {
     if (node.IsScalar()) {
         std::string val = node.Scalar();
 
@@ -50,10 +50,10 @@ void saveAsJson(const YAML::Node& node, std::stringstream& s, const std::string&
 
     const std::string next_indentation = indentation + "    ";
 
-    const char* separator = "";
+    const char *separator = "";
     if (node.IsMap()) {
         s << "{";
-        for (const auto& i : node) {
+        for (const auto &i: node) {
             s << separator << "\n" << next_indentation << "\"" << i.first.as<std::string>() << "\": ";
             separator = ",";
             saveAsJson(i.second, s, next_indentation);
@@ -61,7 +61,7 @@ void saveAsJson(const YAML::Node& node, std::stringstream& s, const std::string&
         s << "\n" << indentation << "}";
     } else if (node.IsSequence()) {
         s << "[";
-        for (const auto& i : node) {
+        for (const auto &i: node) {
             s << separator << "\n" << next_indentation;
             separator = ",";
             saveAsJson(i, s, next_indentation);
@@ -72,27 +72,27 @@ void saveAsJson(const YAML::Node& node, std::stringstream& s, const std::string&
 
 std::string getStrID(uint32_t id) {
     uint64_t u64_id = uint64_t(id) & 0xffffffff;
-    return std::string((char*)&u64_id);
+    return std::string((char *) &u64_id);
 }
 
 DefaultBaseIO::DefaultBaseIO() {}
 
 DefaultBaseIO::~DefaultBaseIO() {}
 
-YAML::Node findParametersSubInformation(const std::string& parameter_name, const YAML::Node& node) {
-    for (auto& i : node) {
+YAML::Node findParametersSubInformation(const std::string &parameter_name, const YAML::Node &node) {
+    for (auto &i: node) {
         if (parameter_name == i[" Name"].as<std::string>()) return i;
     }
     return YAML::Node();
 }
 
-YAML::Node get(std::string key, const YAML::Node& node) {
+YAML::Node get(std::string key, const YAML::Node &node) {
     auto res = node[key];
     if (!res) throw YAML::Exception(node.Mark(), "cant find field with key: \"" + key + "\"");
     return node;
 }
 
-ConversionTemplate* DefaultBaseIO::parseDocument(const std::string& str) {
+ConversionTemplate *DefaultBaseIO::parseDocument(const std::string &str) {
     std::unique_ptr<ConversionTemplate> conv_teplate(new ConversionTemplate());
 
     try {
@@ -110,7 +110,7 @@ ConversionTemplate* DefaultBaseIO::parseDocument(const std::string& str) {
         conv_teplate->changeName(get("Base. Name", doc).as<std::string>());
 
 
-        for (auto& i : get("Device.Modules.List", doc)) {
+        for (auto &i: get("Device.Modules.List", doc)) {
             const std::string module_name = getStrID(get("Module.ID", i).as<uint32_t>());
             const std::string module = module_name + ":" + std::to_string(get("Module.Slot", i).as<uint32_t>());
 
@@ -121,20 +121,20 @@ ConversionTemplate* DefaultBaseIO::parseDocument(const std::string& str) {
                 }
         }
 
-        for (auto& header : get("Parameters.List", doc)) {
+        for (auto &header: get("Parameters.List", doc)) {
             const uint32_t parameter_type = get("Type", header).as<uint32_t>();
             const std::string parameter_name = get(" Name", header).as<std::string>();
 
             auto list = getPPBMList(parameter_type);
-            if (list && ((bool)list->size())) {  // this is too slow
+            if (list && ((bool) list->size())) {  // this is too slow
                 const YAML::Node additional_list = doc[list->front()->getTypeIdentifier()];
                 const YAML::Node other = findParametersSubInformation(parameter_name, additional_list);
 
                 auto hd_header = HierarchicalDataYamlWrapper(header);
                 auto hd_other = HierarchicalDataYamlWrapper(other);
 
-                for (auto i : *list) {
-                    Parameter_ifs* prm = i->Parse(&hd_header, &hd_other);
+                for (auto i: *list) {
+                    Parameter_ifs *prm = i->Parse(&hd_header, &hd_other);
                     if (prm) {
                         conv_teplate->addParameter(prm);
                         break;
@@ -157,9 +157,9 @@ ConversionTemplate* DefaultBaseIO::parseDocument(const std::string& str) {
     return nullptr;
 }
 
-const std::string DefaultBaseIO::createDocument(const ConversionTemplate* conv_templ) { return std::string(); }
+const std::string DefaultBaseIO::createDocument(const ConversionTemplate *conv_templ) { return std::string(); }
 
-inline void DefaultBaseIO::addPPBM(PDefaultBaseIO_ifs* p) {
+inline void DefaultBaseIO::addPPBM(PDefaultBaseIO_ifs *p) {
     auto PP = PPBMap_.find(p->getPrmType());
     if (PP == PPBMap_.end()) {
         PPBMap_[p->getPrmType()] = new PPBList{p};
@@ -168,7 +168,7 @@ inline void DefaultBaseIO::addPPBM(PDefaultBaseIO_ifs* p) {
     }
 }
 
-inline const DefaultBaseIO::PPBList* DefaultBaseIO::getPPBMList(uint32_t type) const {
+inline const DefaultBaseIO::PPBList *DefaultBaseIO::getPPBMList(uint32_t type) const {
     auto PP = PPBMap_.find(type);
     if (PP == PPBMap_.end()) {
         return nullptr;

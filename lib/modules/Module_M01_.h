@@ -8,7 +8,31 @@
 #include "KSDModule.h"
 #include "device/ModuleStream_ifs.h"
 
+class Module_M01_;
+
+class EthernetM01_Stream : public ModuleStream_ifs {
+   public:
+    EthernetM01_Stream(Module_M01_* module);
+
+    ~EthernetM01_Stream() {}
+
+    void readFramePeace(ModuleStreamContext_ifs* context, char* ptr, size_t size) override;
+
+    int getStatistic() override {
+        // TODO:
+
+        return 0;
+    }
+
+    const Module_ifs* getModule() override { return module_; }
+
+   protected:
+    Module_ifs* module_;
+};
+
 class Module_M01_ : public KSDModule {
+    friend EthernetM01_Stream;
+
    protected:
 #pragma pack(1)
 
@@ -39,12 +63,25 @@ class Module_M01_ : public KSDModule {
 
     Task task_;
 
+    EthernetM01_Stream* ethernet_stream_ = nullptr;
+
    public:
     Module_M01_();
 
     Module_M01_(const void* ptr, size_t size, DeviceBuildingContext_ifs* context);
 
     ~Module_M01_();
+
+    bool hasTransceiver() const override {
+        bool b = (task_.out.flags & 0x01) == 0x01;
+        return b;
+    }
+
+    EthernetSettings getSrcAddress() const override {
+        if (!hasTransceiver()) return EthernetSettings();
+        EthernetSettings e{*((EthernetAddress*)&task_.out.dst), *((EthernetAddress*)&task_.out.src)};
+        return e;
+    }
 
     std::string getID() const override { return "M01_"; }
 

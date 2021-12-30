@@ -1,7 +1,7 @@
 //
 // Created by SVK on 31.10.2021.
 //
-#include <stdio.h>
+
 #include <windows.h>
 
 #include <iostream>
@@ -14,22 +14,23 @@
 
 
 class ExtensionManager {
-   public:
+public:
     std::vector<std::string> getAvalibleExtensionTypes(std::string type) { return {}; }
+
     std::vector<std::string> getExtensionsByType(std::string type) { return {}; }
 
-    ExtensionUint* getLastVersionExtensionUint(std::string name, std::string type) { return nullptr; }
+    ExtensionUint *getLastVersionExtensionUint(std::string name, std::string type) { return nullptr; }
 
-    Module_ifs* getModuleExtensionUint() { return nullptr; }
-    Module_ifs* getParameterExtensionUint() { return nullptr; }
+    Module_ifs *getModuleExtensionUint() { return nullptr; }
 
+    Module_ifs *getParameterExtensionUint() { return nullptr; }
 
 };
 
 int main(void) {
     const std::string module_name = "Modules";
 
-    ExtensionInfo* extension_info = nullptr;
+    ExtensionInfo *extension_info = nullptr;
     ExtensionInitFunction initFunction = nullptr;
     HINSTANCE hinst_lib;
 
@@ -46,7 +47,7 @@ int main(void) {
     // If the handle is valid, try to get the function address.
 
     if (hinst_lib != nullptr) {
-        initFunction = (ExtensionInitFunction)GetProcAddress(hinst_lib, init_function_name.c_str());
+        initFunction = (ExtensionInitFunction) GetProcAddress(hinst_lib, init_function_name.c_str());
 
         // If the function address is valid, call the function.
         if (nullptr != initFunction) {
@@ -59,7 +60,7 @@ int main(void) {
 
     if (extension_info) {
         std::cout << "run initFunction success\n";
-        for (ExtensionUint* uint = extension_info->uints; uint->name != nullptr; uint++) {
+        for (ExtensionUint *uint = extension_info->uints; uint->name != nullptr; uint++) {
             std::cout << "name: " << uint->name << ", type: " << uint->type << ", description: " << uint->description
                       << "\n";
         }

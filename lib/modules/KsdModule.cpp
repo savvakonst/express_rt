@@ -40,9 +40,13 @@ std::vector<HierarchicalData_ifs*> TaskMapper::getArray() const {
 }
 
 std::map<std::string, HierarchicalData_ifs*> TaskMapper::getMap() const {
+    // std::map<std::string, HierarchicalData_ifs*> ret;
+    // for (auto& i : map_) {
+    //     ret[i.first] = i.second;
+    // }
     std::map<std::string, HierarchicalData_ifs*> ret;
-    for (auto& i : map_) {
-        ret[i.first] = (TaskMapper*)&i;
+    for (auto& i : vecmap_) {
+        ret[i.first] = (HierarchicalData_ifs*)&i.second;
     }
     return ret;
 }
@@ -120,6 +124,35 @@ const TaskMapper* KSDModule::getBranch(const std::string& prop_path) const {
     return (const TaskMapper*)tree;
 }
 
+std::string printPropertys_(const TaskMapper* h_data, const std::string& indent) {
+    std::string res;
+    if (h_data->isMap()) {
+        auto array = h_data->getMap();
+        res = "\n";
+        for (auto& i : array) {
+            if (i.second == nullptr) return res;
+            res += indent + i.first + ": " + printPropertys_((TaskMapper*)i.second, indent + "  ");
+        }
+    }
+    if (h_data->isArray()) {
+        auto array = h_data->getArray();
+        int k = 0;
+        res = "\n";
+        for (auto& i : array) {
+            res += indent + "[" + std::to_string(k) + "] :" + printPropertys_((TaskMapper*)i, indent + "  ");
+        }
+    }
+    if (h_data->isValue()) {
+        res = h_data->getValue().asString() + "\n";
+    }
+    return res;
+}
+
+std::string KSDModule::printProperties(const std::string& indent) const {
+    const TaskMapper* h_data = &field_map_;
+    return printPropertys_(h_data, indent + "  ");
+}
+
 ResValue KSDModule::getProperty(const std::string& prop_path) const {
     auto tree = getBranch(prop_path);
     if (tree->isValue()) return ResValue(tree->getValue());
@@ -140,3 +173,15 @@ bool KSDModule::setPropertyAsTxt(const std::string& prop_path, const std::string
     auto tree = (TaskMapper*)getBranch(prop_path);
     return tree->setValue(value);
 }
+
+const TaskMapper KSDModule::header_map_ =  //
+    TaskMapper({{"size", u32},
+                {"id", u32},
+                {"sub", u8},
+                {"slot", u8},
+                {"version", u16},
+                {"checkSum", u16},
+                {"flag", u16},
+                {"dimension", u16},
+                {"syncMode", u16},
+                {"reserved", {12, u8}}});

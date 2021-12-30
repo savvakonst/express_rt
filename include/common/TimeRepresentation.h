@@ -13,12 +13,17 @@ struct RelativeTime {
     };
     double toDouble() const {
         double d = ls_integer;
-        d  += (static_cast<double>(ms_fractional) / (1ull << 32));
+        d += (static_cast<double>(ms_fractional) / (1ull << 32));
         return d;
     }
-    void fromDouble(const double val){
-        time = static_cast<int64_t>(val * (1ull << 32));
+    double toInt() const {
+        double d = ls_integer;
+        d += (static_cast<double>(ms_fractional) / (1ull << 32));
+        return time;
     }
+
+    void fromDouble(const double val) { time = static_cast<int64_t>(val * (1ull << 32)); }
+    void fromInt(const uint64_t val) { time = static_cast<int64_t>(time); }
 };
 
 /*inline RelativeTimeFrom(double arg){
@@ -26,7 +31,6 @@ struct RelativeTime {
 
     return (t)
 }*/
-
 
 struct AbsoluteTime {
     explicit AbsoluteTime() : long_fractional(0), unix_time(0) {}
@@ -75,7 +79,6 @@ inline bool operator>(const RelativeTime& left, const RelativeTime& right) {
     if (left.ls_integer > right.ls_integer) return true;
     return (left.ls_integer == right.ls_integer) && (left.ms_fractional > right.ms_fractional);
 }
-
 
 inline bool operator>=(const RelativeTime& left, const RelativeTime& right) {
     if (left.ls_integer > right.ls_integer) return true;

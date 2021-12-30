@@ -29,7 +29,9 @@ class TaskMapper : public HierarchicalData_ifs {
     ~TaskMapper() override;
 
     [[nodiscard]] bool isArray() const override { return struct_type_ == StructType::array; };
+
     [[nodiscard]] bool isMap() const override { return struct_type_ == StructType::map; };
+
     [[nodiscard]] bool isValue() const override { return struct_type_ == StructType::value; };
 
     [[nodiscard]] Value getValue() const override {  // necessarry to add guard
@@ -83,32 +85,34 @@ class KSDModule : public Module_ifs {
     };
 #pragma pack()
 
-    TaskMapper header_map_ =  //
-        TaskMapper({{"size", u32},
-                    {"id", u32},
-                    {"sub", u8},
-                    {"slot", u8},
-                    {"version", u16},
-                    {"checkSum", u16},
-                    {"flag", u16},
-                    {"dimension", u16},
-                    {"syncMode", u16},
-                    {"reserved", {12, u8}}});
+    static const TaskMapper header_map_;
 
     TaskMapper field_map_;
 
     const TaskMapper *getBranch(const std::string &prop_path) const;
 
    public:
+
+
+
+    bool hasTransceiver() const override { return false; }
+
+    EthernetSettings getSrcAddress() const override { return EthernetSettings(); }
+
+    bool isAvailable() const override { return true; }
+
     const InfoList *getPropertiesInfoList() override {
         error_mesadge_ = "The getPropertiesInfoList function is not realised yet";
         return nullptr;
     }
+    [[nodiscard]] virtual std::string printProperties(const std::string &indent = "") const override;
 
     [[nodiscard]] ResValue getProperty(const std::string &prop_path) const override;
+
     [[nodiscard]] std::string getPropertyAsTxt(const std::string &prop_path) const override;
 
     bool setProperty(const std::string &prop_path, Value value) override;
+
     bool setPropertyAsTxt(const std::string &prop_path, const std::string &valie) override;
 };
 

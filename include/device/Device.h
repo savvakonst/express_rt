@@ -1,5 +1,6 @@
 #ifndef EXO_DEVICE_H
 #define EXO_DEVICE_H
+
 #include <string>
 
 #include "common/BaseClass_ifs.h"
@@ -8,15 +9,20 @@
 
 class Module_ifs;
 
-class DeviceBuildingContext_ifs {
-   public:
-    DeviceBuildingContext_ifs() {}
-    virtual moduleConstructor_f getConstructor() = 0;
+inline std::string stringId(uint32_t id) {
+    char char_id[5] = {0, 0, 0, 0, 0};
+    *((uint32_t *)char_id) = id;
+    return std::string(char_id);
+}
 
-    virtual Module_ifs* createMdule(const std::string& module_id, const void* ptr, size_t size,
-                                    DeviceBuildingContext_ifs* context) {
-        return context->getConstructor()(ptr, size, context);
-    }
+class COMMON_API_ DeviceBuildingContext_ifs {
+   public:
+    ~DeviceBuildingContext_ifs() {}
+
+    virtual moduleConstructor_f getConstructor(const std::string &module_id) = 0;
+
+    virtual Module_ifs *createModule(const std::string &module_id, const void *ptr, size_t size,
+                                     DeviceBuildingContext_ifs *context) = 0;
 };
 
 // TODO: i think it will be better to inherit this class from Module_ifs
@@ -47,26 +53,36 @@ class COMMON_API_ Device : public BaseClass_ifs {
         uint8_t reserved_c[14];  //Резерв
     };
 
-    std::vector<Module_ifs*> modules_;
+    std::vector<Module_ifs *> modules_;
 
     TASK_HEADER task_header_;
 
+    size_t size_ = 0;
+
    public:
-    Device(const void* ptr, size_t size, DeviceBuildingContext_ifs* context);
+    Device(const void *ptr, size_t size, DeviceBuildingContext_ifs *context);
 
     ~Device();
 
-    exo_container<const Module_ifs*> getAllModules();
+    // TODO : remove this
+    Module_ifs *getTopModule() {
+        if (modules_.size()) return modules_.front();
+        return nullptr;
+    }
 
-    const Module_ifs* getModuleFromPath(std::string name);
+    exo_container<const Module_ifs *> getAllModules();
 
-    exo_container<const Module_ifs*> getLineFromPath(std::string path);
+    const Module_ifs *getModuleFromPath(std::string name);
+
+    exo_container<const Module_ifs *> getLineFromPath(std::string path);
 
     status checkValExistence(std::string path);
 
-    status isTranciverEnabled();
+    virtual size_t getTaskSize() const;
 
-    std::string getSrcAddress();
+    status hasTransceiver() const;
+
+    EthernetSettings getSrcAddress() const;
 };
 
 #endif

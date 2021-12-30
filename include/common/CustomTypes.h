@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "common/Port.h"
+//#include "iostream"
 
 #define exo_container std::list
 #define exo_map std::map
@@ -14,8 +15,8 @@
 
 enum status : bool
 {
-    succes = false,
-    failure = true
+    succes = true,
+    failure = false
 };
 
 typedef uint8_t u8_t;
@@ -32,12 +33,12 @@ typedef float f32_t;
 typedef double f64_t;
 
 typedef bool bool_v_t;
-typedef char* str_v_t;
+typedef char *str_v_t;
 
 union ArbitraryData {
     ArbitraryData() { none_v = nullptr; }
 
-    void* none_v;
+    void *none_v;
 
     u8_t u8{};
     u16_t u16;
@@ -101,25 +102,29 @@ static const std::map<DataType, std::string> g_types_str_map = {MAP_DEF};
 #define COMMON_PTR 0x3000
 
 inline size_t getTSize(DataType type) { return (size_t)0xf & (size_t)type; }
+
 inline bool isNum(DataType type) { return (bool)(COMMON_NUM & (size_t)type); }
+
 inline bool isBool(DataType type) { return (bool)(DataType::bool_v == type); }
+
 inline bool isString(DataType type) { return (bool)(COMMON_STR & (size_t)type); }
+
 inline bool isPtr(DataType type) { return (bool)(COMMON_PTR & (size_t)type); }
 
 inline std::string getString(str_v_t data) {  //
-    return std::string(data + sizeof(size_t), *((size_t*)data));
+    return std::string(data + sizeof(size_t), *((size_t *)data));
 }
 
-inline str_v_t createStrV(const std::string& str) {  //
+inline str_v_t createStrV(const std::string &str) {  //
     size_t size = str.size();
     auto data = new char[size + sizeof(size_t)];
-    *((size_t*)data) = size;
-    memcpy((void*)(data + sizeof(size_t)), str.c_str(), size);
+    *((size_t *)data) = size;
+    memcpy((void *)(data + sizeof(size_t)), str.c_str(), size);
     return data;
 }
 
 inline size_t getSize(const ArbitraryData data, DataType type) {
-    return isPtr(type) ? *((size_t*)data.str_v) : getTSize(type);
+    return isPtr(type) ? *((size_t *)data.str_v) : getTSize(type);
 }
 
 inline std::string asString(const ArbitraryData data, DataType type) {
@@ -155,7 +160,7 @@ case arg:           \
 #undef TO_STR
 }
 
-inline DataType createDataType(const std::string& str) {
+inline DataType createDataType(const std::string &str) {
     auto val = g_str_types_map.find(str);
     if (val != g_str_types_map.end()) return val->second;
 
@@ -176,9 +181,9 @@ inline std::string toString(DataType type) {
     return "none_v";
 }
 
-inline ArbitraryData createArbitraryData(const std::string& str, DataType type, bool& status) {
+inline ArbitraryData createArbitraryData(const std::string &str, DataType type, bool &status) {
     ArbitraryData res;
-
+    status = true;
     res.u64 = 0;
     switch (type) {
     case i8:
@@ -224,23 +229,24 @@ inline ArbitraryData createArbitraryData(const std::string& str, DataType type, 
 
     case none_v:
     default:
+        status = false;
         break;
     }
 
     return res;
 }
 
-inline ArbitraryData copyArbitraryData(const ArbitraryData& data, DataType type) {
+inline ArbitraryData copyArbitraryData(const ArbitraryData &data, DataType type) {
     ArbitraryData res = data;
     if (isPtr(type)) {
-        size_t size = *((size_t*)data.str_v);
-        res.str_v = new char[size + sizeof(size_t)];
+        size_t size = (*((size_t *)data.str_v)) + sizeof(size_t);
+        res.str_v = new char[size];
         memcpy(res.str_v, data.str_v, size);
     }
     return res;
 }
 
-inline ArbitraryData copyArbitraryData(const void* ptr, DataType type) {
+inline ArbitraryData copyArbitraryData(const void *ptr, DataType type) {
     ArbitraryData res = ArbitraryData();
     if (!isPtr(type)) memcpy(&res.u64, ptr, getTSize(type));
     return res;
@@ -248,24 +254,43 @@ inline ArbitraryData copyArbitraryData(const void* ptr, DataType type) {
 
 struct Value {
     Value() : type_(DataType::none_v) {}
-    Value(const Value& value) : value_(copyArbitraryData(value.value_, value.type_)), type_(value.type_) {}
+
+    Value(const Value &value) : value_(copyArbitraryData(value.value_, value.type_)), type_(value.type_) {}
+
+    explicit Value(const char *a) : type_(DataType::str_v) { value_.str_v = createStrV(a); }
+
+    explicit Value(const std::string &a) : type_(DataType::str_v) { value_.str_v = createStrV(a); }
 
     explicit Value(bool a) : type_(DataType::bool_v) { value_.bool_v = a; }
-    explicit Value(double a) : type_(DataType::f64) { value_.f64 = a; }
-    explicit Value(int64_t a) : type_(DataType::f64) { value_.i64 = a; }
-    explicit Value(const std::string& a) : type_(DataType::str_v) { value_.str_v = createStrV(a); }
 
-    Value(const void* ptr, DataType type) : value_(copyArbitraryData(ptr, type)), type_(type) {}
-    Value(const std::string& str, DataType type) : type_(DataType::none_v) {
+    explicit Value(double a) : type_(DataType::f64) { value_.f64 = a; }
+
+    explicit Value(int64_t a) : type_(DataType::i64) { value_.i64 = a; }
+
+    Value(const void *ptr, DataType type) : value_(copyArbitraryData(ptr, type)), type_(type) {}
+
+    Value(const std::string &str, DataType type) : type_(DataType::none_v) {
+        bool status = false;
+        value_ = createArbitraryData(str, type, status);
+        if (status) type_ = type;
+    }
+
+    Value(const std::string &str, const std::string &str_type) : type_(DataType::none_v) {
+        auto type = createDataType(str_type);
+
         bool status = false;
         value_ = createArbitraryData(str, type, status);
         if (status) type_ = type;
     }
 
     explicit operator bool() const { return type_ != none_v; }
+
     bool operator!() const { return type_ == none_v; }
 
+    std::string asString() { return ::asString(value_, type_); }
+
     ~Value() {
+        // std::cout << "del Value\n";
         if (isPtr(type_)) delete[] value_.str_v;
     }
 
@@ -273,21 +298,39 @@ struct Value {
     DataType type_;
 };
 
+struct EthernetAddress {
+    uint8_t mac[6];
+    uint8_t port[2];
+    uint8_t ip_b[4];
+};
+
+struct EthernetSettings {
+    EthernetSettings() { memset(this, 0, sizeof(EthernetSettings)); }
+    EthernetSettings(const EthernetAddress &dst, const EthernetAddress &src) : src_(src), dst_(dst) {}
+
+    EthernetAddress dst_;
+    EthernetAddress src_;
+};
+
 class COMMON_API_ HierarchicalData_ifs {
    public:
     virtual ~HierarchicalData_ifs(){};
 
     [[nodiscard]] virtual bool isArray() const = 0;
+
     [[nodiscard]] virtual bool isMap() const = 0;
+
     [[nodiscard]] virtual bool isValue() const = 0;
 
     [[nodiscard]] virtual Value getValue() const = 0;
 
-    [[nodiscard]] virtual std::vector<HierarchicalData_ifs*> getArray() const = 0;
-    [[nodiscard]] virtual std::map<std::string, HierarchicalData_ifs*> getMap() const = 0;
+    [[nodiscard]] virtual std::vector<HierarchicalData_ifs *> getArray() const = 0;
 
-    [[nodiscard]] virtual HierarchicalData_ifs* getArrayUint(size_t) const = 0;
-    [[nodiscard]] virtual HierarchicalData_ifs* getMapUint(std::string) const = 0;
+    [[nodiscard]] virtual std::map<std::string, HierarchicalData_ifs *> getMap() const = 0;
+
+    [[nodiscard]] virtual HierarchicalData_ifs *getArrayUint(size_t) const = 0;
+
+    [[nodiscard]] virtual HierarchicalData_ifs *getMapUint(std::string) const = 0;
 };
 
 #endif
