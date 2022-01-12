@@ -16,7 +16,7 @@ class COMMON_API_ Parameter_ifs : public BaseClass_ifs {
     virtual PrmBuffer_ifs* createBuffer() const = 0;
     virtual const std::string getType() const = 0;
 
-    virtual const InfoList& getPropertiesInfoList() = 0;
+    virtual const DataSchema_ifs* getPropertiesInfoList() = 0;
 
     virtual const ResValue* getProperty(const std::string& prop_path) const = 0;
     virtual const std::string getPropertyAsTxt(const std::string& prop_path) const = 0;

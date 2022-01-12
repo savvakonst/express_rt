@@ -20,11 +20,13 @@ public:
 
     const ErrorInfo_ifs *getErrorInfo() const override { return nullptr; };
 
+    void addPPBM(PDefaultBaseIO_ifs *p);
+
 private:
     typedef std::vector<const PDefaultBaseIO_ifs *> PPBList;
     std::map<uint32_t, PPBList *> PPBMap_;
 
-    void addPPBM(PDefaultBaseIO_ifs *p);
+
 
     const PPBList *getPPBMList(uint32_t type) const;
 };
