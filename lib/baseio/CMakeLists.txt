@@ -2,7 +2,7 @@ include_directories(.)
 
 file(GLOB Headers *.h)
 file(GLOB Sources *.cpp)
-add_library(DefaultBaseIO #SHARED
+add_library(DefaultBaseIO SHARED
         ${Sources}
         ${Headers}
         )

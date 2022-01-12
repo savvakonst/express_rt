@@ -21,3 +21,4 @@ target_compile_definitions(CommonLib PRIVATE COMMON_CREATE_SHARED_LIBRARY)
 
 add_subdirectory(baseio)
 add_subdirectory(modules)
+add_subdirectory(bindings)
