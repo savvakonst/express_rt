@@ -16,5 +16,4 @@ set_property(TARGET Modules PROPERTY OUTPUT_NAME Modules)
 target_link_libraries(Modules Reader)
 target_link_libraries(Modules CommonLib)
 
-add_definitions(-DH5_BUILT_AS_DYNAMIC_LIB)
 set_target_properties(Modules PROPERTIES CXX_STANDARD_REQUIRED ON OUTPUT_NAME Modules)

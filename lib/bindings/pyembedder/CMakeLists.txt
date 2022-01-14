@@ -1,12 +1,15 @@
 
+set(PYEMBEDDER_NAME PyEmbedder)
 
-add_library(pyembedder
+add_library(${PYEMBEDDER_NAME} SHARED
         embedder.cpp
         )
 
-add_dependencies(pyembedder pybinder)
+add_dependencies(${PYEMBEDDER_NAME} pybinder)
 
 
-target_include_directories(pyembedder PUBLIC ../../../../pybindings/lib)
-target_link_libraries(pyembedder PUBLIC pybind11::embed)
-target_link_libraries(pyembedder PRIVATE CommonLib)
+target_include_directories(${PYEMBEDDER_NAME} PUBLIC ../../../../pybindings/lib)
+target_link_libraries(${PYEMBEDDER_NAME} PUBLIC pybind11::embed)
+target_link_libraries(${PYEMBEDDER_NAME} PRIVATE CommonLib)
+
+target_compile_definitions(${PYEMBEDDER_NAME} PRIVATE PY_EMBEDDER_LIB_NAME=${PYEMBEDDER_NAME})

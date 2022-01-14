@@ -7,6 +7,9 @@
 #    define InitExtension(RTYPE) __declspec(dllexport) RTYPE
 #endif /* __cplusplus */
 
+#define CONCATENATOR(LEFT, RIGHT) LEFT##RIGHT
+#define POST_CONCATENATOR(A, B) CONCATENATOR(A, B)
+
 typedef size_t version_t;
 
 struct ExtensionUint {

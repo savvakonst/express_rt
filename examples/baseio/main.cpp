@@ -58,7 +58,7 @@ int main() {
     vec.push_back(unique_pb_t(new AnalogParserBuilder));
     vec.push_back(unique_pb_t(new AnalogVibroParserBuilder));
     vec.push_back(unique_pb_t(new AnalogVoltageParserBuilder));
-    vec.push_back(unique_pb_t(new EthernetUDParserBuilder));
+    vec.push_back(unique_pb_t(new EthernetUdParserBuilder));
 
     for (auto& i : vec) base_io.addPPBM(i.get());
 

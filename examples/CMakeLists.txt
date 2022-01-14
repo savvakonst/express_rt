@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_subdirectory(baseio)
 
 if (MSVC)
-    add_subdirectory(modules)
+    add_subdirectory(linker)
 endif ()
 
 

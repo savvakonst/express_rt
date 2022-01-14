@@ -6,16 +6,16 @@
 
 #include "extensions/PDefaultBaseIO_ifs.h"
 
-class EthernetUDPParameter : public Parameter_ifs {
-    EthernetUDPParameter(const std::string& name) : Parameter_ifs(name){};
-    ~EthernetUDPParameter(){};
+class [[maybe_unused]] EthernetUdpParameter : public Parameter_ifs {
+    EthernetUdpParameter(const std::string& name) : Parameter_ifs(name){};
+    ~EthernetUdpParameter(){};
 
     virtual PrmBuffer_ifs* createBuffer() const override {
         // TODO: to implement this function
         return nullptr;
     }
 
-    virtual const std::string getType() const override { return "EthernetUDP"; }
+    virtual const std::string getType() const override { return "EthernetUdp"; }
 
     virtual const DataSchema_ifs* getPropertiesInfoList() override { return nullptr; }
 
@@ -30,9 +30,9 @@ class EthernetUDPParameter : public Parameter_ifs {
 };
 
 #define ETHERNET_UDP_PB 500
-class EthernetUDParserBuilder : public PDefaultBaseIO_ifs {
+class EthernetUdParserBuilder : public PDefaultBaseIO_ifs {
    public:
-    std::string getTypeIdentifier() const override { return "Parameters.List.Analog.Voltage"; }
+    std::string getTypeIdentifier() const override { return "Parameters.List.Ethernet.UDP"; }
     int getPrmType() const override { return ETHERNET_UDP_PB; }
 
     Parameter_ifs* Parse(HierarchicalData_ifs* header, HierarchicalData_ifs* other) const override {

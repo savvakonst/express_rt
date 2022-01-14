@@ -15,16 +15,6 @@ if (NOT hasParent)
 endif ()
 
 
-#execute_process(COMMAND pybind11-config --cmakedir OUTPUT_VARIABLE pybind11_DIR)
-#string(REGEX REPLACE "\n$" "" pybind11_DIR "${pybind11_DIR}")
-#message(STATUS "pybind11_DIR: " ${pybind11_DIR})
-
-
-#find_package(Python COMPONENTS Interpreter Development)
-#find_package(pybind11 CONFIG)
-#message(STATUS "pybind11_INCLUDE_DIRS: " ${pybind11_INCLUDE_DIRS})
-
-
 add_subdirectory(lib)
 add_subdirectory(examples)
 
