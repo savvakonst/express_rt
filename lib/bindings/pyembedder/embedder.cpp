@@ -1,5 +1,5 @@
 #ifndef PY_EMBEDDER_LIB_NAME
-#    define PY_EMBEDDER_LIB_NAME PyEmbedder
+#    error "PY_EMBEDDER_LIB_NAME undefined"
 #endif
 
 #include <pybind11/embed.h>
@@ -26,7 +26,7 @@ DataSchema_ifs *newDataSchema(py::module_ &bind, const std::string &name) {
 
 typedef std::vector<DataSchema_ifs *> bindList_t;
 
-static ExtensionUint *g_pyembedder_units = nullptr;
+static ExtensionUnit *g_pyembedder_units = nullptr;
 
 static ExtensionInfo g_pyembedder_info = {"python bindings", 0x01, g_pyembedder_units};
 
@@ -36,7 +36,6 @@ InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, PY_EMBEDDER_LIB_NAME)(voi
     g_guard = new py::scoped_interpreter{};
     py::module_ bind = py::module_::import("expressbind");
     bindList_t ds_list;
-
     {
         py::list py_cat = bind.attr("loadConfig")();
         for (auto i : py_cat) {
@@ -53,12 +52,13 @@ InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, PY_EMBEDDER_LIB_NAME)(voi
         }
     }
 
-    g_pyembedder_units = new ExtensionUint[ds_list.size() + 1];
+    g_pyembedder_units = new ExtensionUnit[ds_list.size() + 1];
     auto tmp_units = g_pyembedder_units;
-    for (auto i : ds_list)  //{"CH04", "module", "CH04 ksd module", (void *)&createCH04Module, 0x00},
+    for (auto i : ds_list) {  //{"CH04", "module", "CH04 ksd module", (void *)&createCH04Module, 0x00},
         *(tmp_units++) = {i->name_.c_str(), "data_schema", i->description_.c_str(), (void *)i, 0x00};
+    }
     *(tmp_units) = {nullptr, nullptr, nullptr, nullptr, 0};
-
+    g_pyembedder_info.units = g_pyembedder_units;
     return &g_pyembedder_info;
 }
 

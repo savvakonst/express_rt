@@ -1,3 +1,7 @@
+#ifndef DEFAULT_PARAMETERS_LIB_NAME
+#    error "DEFAULT_PARAMETERS_NAME undefined"
+#endif
+
 #include <clocale>
 #include <fstream>
 #include <iostream>
@@ -5,67 +9,61 @@
 
 #include "SpecificPParserBuilder.h"
 #include "baseio/DefaultBaseIO.h"
-#include "yaml-cpp/yaml.h"
+#include "common/Extension.h"
+#include "common/ExtensionManager.h"
+//
+#include "EthernetUDP.h"
 
-YAML::Node get2(std::string key, const YAML::Node& node) {
-    auto res = node[key];
-    if (!res) throw YAML::Exception(node.Mark(), "cant find field with key: \"" + key + "\"");
-    return node;
-}
-/*
-int main() {
-    try {
-        YAML::Node config = YAML::LoadFile("test.base");
-        std::cout << "file reding successful\n\n";
-
-
-
-        for (const auto& i : config) {
-            // std::cout << "\t  enum: " << enum_v.size() << "\n";
-            if (i.second.IsScalar()) {
-                std::cout << i.first.Scalar() << " : " << i.second.Scalar() << "\n";
-            }
-        }
-
-        get2("Base. Namea", config).as<std::string>();
-
-    } catch (YAML::Exception e) {
-        std::cout << "\n" << e.msg << "\n\t";  //<< e.mark;
-    }
-
-    return 0;
-}
- */
-
-typedef std::unique_ptr<PDefaultBaseIO_ifs> unique_pb_t;
-
-int main() {
+int initDefaultBaseIO(ExtensionManager *manager) {
     std::setlocale(LC_ALL, "en_US.UTF-8");
 
-    std::fstream in("test.base", std::ios_base::in | std::ios::binary);
-    if (!in) return 1;
-
     std::string contents;
-    in.seekg(0, std::ios::end);
-    contents.resize(in.tellg());
-    in.seekg(0, std::ios::beg);
-    in.read(&contents[0], contents.size());
-    in.close();
+    {
+        std::fstream in("analog.base", std::ios_base::in | std::ios::binary);
+        if (!in) return 1;
 
+        in.seekg(0, std::ios::end);
+        contents.resize(in.tellg());
+        in.seekg(0, std::ios::beg);
+        in.read(&contents[0], contents.size());
+        in.close();
+    }
+    
     DefaultBaseIO base_io;
 
-    std::vector<std::unique_ptr<PDefaultBaseIO_ifs>> vec;
-    vec.push_back(unique_pb_t(new AnalogParserBuilder));
-    vec.push_back(unique_pb_t(new AnalogVibroParserBuilder));
-    vec.push_back(unique_pb_t(new AnalogVoltageParserBuilder));
-    vec.push_back(unique_pb_t(new EthernetUdParserBuilder));
+    auto set = manager->getLastVersionExtensionUintsByType("prm_parser_builder");
+    for (auto &i : set) base_io.addPPBM((PDefaultBaseIO_ifs *)i->ptr);
 
-    for (auto& i : vec) base_io.addPPBM(i.get());
-
-    base_io.parseDocument(contents);
+    base_io.parseDocument(manager, contents);
     std::cout << base_io.getErrorMessage();
     return 0;
 }
+
+static ExtensionUnit g_default_parameters_units[] = {
+    {"EthernetUdp", "parameter", "parameter for processing Ethernet UDP",
+     (void *)&createParameter<EthernetUdpParameter>, 0x00},
+    {"EthernetUdp", "prm_parser_builder", "module for parsing and building EthernetUdp ",
+     (void *)(new EthernetUdParserBuilder), 0x00},
+    {"Analog", "prm_parser_builder", "module for parsing and building parameter", (void *)(new AnalogParserBuilder),
+     0x00},
+    {"AnalogVibro", "prm_parser_builder", "module for parsing and building parameter",
+     (void *)(new AnalogVibroParserBuilder), 0x00},
+    {"AnalogVoltage", "prm_parser_builder", "module for parsing and building parameter",
+     (void *)(new AnalogVoltageParserBuilder), 0x00},
+    {"DefaultBaseIO", "init",
+     "unit with type \"init\" are functions which are running after all modules initialization",
+     (void *)initDefaultBaseIO, 0x00},
+    {nullptr, nullptr, nullptr, nullptr, 0}};
+
+static ExtensionInfo g_default_parameters_info = {"default parameters", 0x01, g_default_parameters_units};
+
+InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, DEFAULT_PARAMETERS_LIB_NAME)(void) {
+    return &g_default_parameters_info;
+}
+
+/*
+typedef std::unique_ptr<PDefaultBaseIO_ifs> unique_pb_t;
+
 /*
 
 " File.About": str,

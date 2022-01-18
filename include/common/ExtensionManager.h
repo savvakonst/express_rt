@@ -12,21 +12,25 @@
 
 #include "Extension.h"
 
+#ifdef DEBUG_
+#    include <iostream>
+#endif
+
 class ExtensionManager {
    private:
     struct VersionCmp {
-        constexpr bool operator()(const ExtensionUint *lhs, const ExtensionUint *rhs) const {
+        constexpr bool operator()(const ExtensionUnit *lhs, const ExtensionUnit *rhs) const {
             return lhs->version < rhs->version;
         }
-        constexpr bool operator()(const ExtensionUint *lhs, const version_t rhs) const { return lhs->version < rhs; }
-        constexpr bool operator()(const version_t lhs, const ExtensionUint *rhs) const { return lhs < rhs->version; }
+        constexpr bool operator()(const ExtensionUnit *lhs, const version_t rhs) const { return lhs->version < rhs; }
+        constexpr bool operator()(const version_t lhs, const ExtensionUnit *rhs) const { return lhs < rhs->version; }
     };
 
     template <typename T>
     using map_t = std::map<std::string, T>;
 
    public:
-    typedef std::set<ExtensionUint *, VersionCmp> versionList_t;
+    typedef std::set<ExtensionUnit *, VersionCmp> versionList_t;
 
     std::list<std::string> getAvailableExtensionTypes(std::string type) {
         std::list<std::string> ret;
@@ -34,15 +38,15 @@ class ExtensionManager {
         return ret;
     }
 
-    std::list<ExtensionUint *> getLastVersionExtensionUintsByType(std::string type) {
-        std::list<ExtensionUint *> ret;
+    std::list<ExtensionUnit *> getLastVersionExtensionUintsByType(std::string type) {
+        std::list<ExtensionUnit *> ret;
         auto item = tree_.find(type);
         if (item != tree_.end())
             for (auto &i : item->second) ret.push_back(*(i.second.begin()));
         return ret;
     }
 
-    const std::set<ExtensionUint *, VersionCmp> *getExtensionUintSet(std::string name,
+    const std::set<ExtensionUnit *, VersionCmp> *getExtensionUintSet(std::string name,
                                                                      std::string type) {  // it is unsafe
         auto item = tree_.find(type);
         if (item != tree_.end()) {
@@ -52,7 +56,7 @@ class ExtensionManager {
         return nullptr;
     }
 
-    const ExtensionUint *getLastVersionExtensionUint(std::string name,
+    const ExtensionUnit *getLastVersionExtensionUint(std::string name,
                                                      std::string type) {  // it is unsafe
         auto set = getExtensionUintSet(name, type);
         if (set == nullptr) return nullptr;
@@ -61,15 +65,19 @@ class ExtensionManager {
     }
 
     void insertExtensionInfo(ExtensionInfo *arg) {
-        // std::cout << "description: " << arg->description << "\n";
-        for (ExtensionUint *uint = arg->uints; uint->name != nullptr; uint++) {
-            insertExtensionUint(uint);
-            // std::cout << "name: " << uint->name << ", type: " << uint->type << ", description: " << uint->description
-            //           << "\n";
+#ifdef DEBUG_
+        std::cout << "description: " << arg->description << "\n";
+#endif
+        for (ExtensionUnit *uint = arg->units; uint->name != nullptr; uint++) {
+            insertExtensionUnit(uint);
+#ifdef DEBUG_
+            std::cout << "name: " << uint->name << ", type: " << uint->type << ", description: " << uint->description
+                      << "\n";
+#endif
         }
     }
 
-    void insertExtensionUint(ExtensionUint *arg) {
+    void insertExtensionUnit(ExtensionUnit *arg) {
         std::map<std::string, std::string> p;
 
         auto item = tree_.find(arg->type);
@@ -83,5 +91,7 @@ class ExtensionManager {
    private:
     map_t<map_t<versionList_t>> tree_;
 };
+
+[[maybe_unused]] typedef int (*initUnit_t)(ExtensionManager *);
 
 #endif  // EXRT_EXTENSIONMANAGER_H

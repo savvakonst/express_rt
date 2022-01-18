@@ -12,7 +12,7 @@
 
 typedef size_t version_t;
 
-struct ExtensionUint {
+struct ExtensionUnit {
     const char* name;
     const char* type;
     const char* description;
@@ -23,7 +23,7 @@ struct ExtensionUint {
 struct ExtensionInfo {
     const char* description;
     version_t version;
-    ExtensionUint* uints;
+    ExtensionUnit* units;
 };
 
 typedef ExtensionInfo* (*ExtensionInitFunction)(void);

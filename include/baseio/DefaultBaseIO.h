@@ -4,31 +4,29 @@
 #include "common/BaseClass_ifs.h"
 #include "common/Fieldinfo.h"
 
+class ExtensionManager;
 class PDefaultBaseIO_ifs;
-
 class ConversionTemplate;
 
 class DefaultBaseIO : public BaseClass_ifs {
-public:
+   public:
     DefaultBaseIO();
 
     ~DefaultBaseIO();
 
-    ConversionTemplate *parseDocument(const std::string &str);
+    ConversionTemplate *parseDocument(ExtensionManager *manager, const std::string &str);
 
-    const std::string createDocument(const ConversionTemplate *conv_template);
+    std::string createDocument(const ConversionTemplate *conv_template);
 
-    const ErrorInfo_ifs *getErrorInfo() const override { return nullptr; };
+    [[nodiscard]] const ErrorInfo_ifs *getErrorInfo() const override { return nullptr; };
 
     void addPPBM(PDefaultBaseIO_ifs *p);
 
-private:
+   private:
     typedef std::vector<const PDefaultBaseIO_ifs *> PPBList;
     std::map<uint32_t, PPBList *> PPBMap_;
 
-
-
-    const PPBList *getPPBMList(uint32_t type) const;
+    [[nodiscard]] const PPBList *getPPBMList(uint32_t type) const;
 };
 
 #endif  // !DEFAULTPARSERBUILDER_H

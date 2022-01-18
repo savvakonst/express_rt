@@ -1,7 +1,13 @@
+
 #ifndef SPECIFICPARSERBUILDER_H
 #define SPECIFICPARSERBUILDER_H
 
-#include <iostream>
+#ifdef DEBUG_
+#    include <iostream>
+#    define PRINT_DEBUG_INFO(X) std::cout << X
+#else
+#    define PRINT_DEBUG_INFO(X)
+#endif
 
 #include "extensions/PDefaultBaseIO_ifs.h"
 
@@ -11,8 +17,9 @@ class AnalogParserBuilder : public PDefaultBaseIO_ifs {
     std::string getTypeIdentifier() const override { return "Parameters.List.Analog"; }
     int getPrmType() const override { return ANALOG_PB; }
 
-    Parameter_ifs* Parse(HierarchicalData_ifs* header, HierarchicalData_ifs* other) const override {
-        std::cout << "AnalogParserBuilder";
+    Parameter_ifs* parse(ExtensionManager* manager, HierarchicalData_ifs* other,
+                         HierarchicalData_ifs* header) const override {
+        PRINT_DEBUG_INFO("Parameters.List.Analog\n");
         return nullptr;
     }
 };
@@ -23,7 +30,11 @@ class AnalogVibroParserBuilder : public PDefaultBaseIO_ifs {
     std::string getTypeIdentifier() const override { return "Parameters.List.Analog.Vibro"; }
     int getPrmType() const override { return ANALOG_VIBRO_PB; }
 
-    Parameter_ifs* Parse(HierarchicalData_ifs* header, HierarchicalData_ifs* other) const override { return nullptr; }
+    Parameter_ifs* parse(ExtensionManager* manager, HierarchicalData_ifs* other,
+                         HierarchicalData_ifs* header) const override {
+        PRINT_DEBUG_INFO("Parameters.List.Analog.Vibro\n");
+        return nullptr;
+    }
 };
 
 #define ANALOG_VOLTAGE_PB 8
@@ -32,19 +43,25 @@ class AnalogVoltageParserBuilder : public PDefaultBaseIO_ifs {
     std::string getTypeIdentifier() const override { return "Parameters.List.Analog.Voltage"; }
     int getPrmType() const override { return ANALOG_VOLTAGE_PB; }
 
-    Parameter_ifs* Parse(HierarchicalData_ifs* header, HierarchicalData_ifs* other) const override { return nullptr; }
+    Parameter_ifs* parse(ExtensionManager* manager, HierarchicalData_ifs* other,
+                         HierarchicalData_ifs* header) const override {
+        PRINT_DEBUG_INFO("Parameters.List.Analog.Voltage\n");
+        return nullptr;
+    }
 };
-
+/*
 #define ETHERNET_UDP_PB 500
 class EthernetUdParserBuilder : public PDefaultBaseIO_ifs {
    public:
     std::string getTypeIdentifier() const override { return "Parameters.List.Analog.Voltage"; }
     int getPrmType() const override { return ETHERNET_UDP_PB; }
 
-    Parameter_ifs* Parse(HierarchicalData_ifs* header, HierarchicalData_ifs* other) const override {
+    Parameter_ifs* parse(HierarchicalData_ifs* header, HierarchicalData_ifs* other) const override {
         std::cout << "EthernetUDParserBuilder";
         return nullptr;
     }
 };
+*/
 
+#undef PRINT_DEBUG_INFO
 #endif

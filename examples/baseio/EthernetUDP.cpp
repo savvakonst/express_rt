@@ -2,41 +2,41 @@
 // Created by SVK on 12.01.2022.
 //
 
+#include "EthernetUDP.h"
+
 #include <iostream>
 
-#include "extensions/PDefaultBaseIO_ifs.h"
+#include "common/ExtensionManager.h"
 
-class [[maybe_unused]] EthernetUdpParameter : public Parameter_ifs {
-    EthernetUdpParameter(const std::string& name) : Parameter_ifs(name){};
-    ~EthernetUdpParameter(){};
+EthernetUdpParameter::EthernetUdpParameter(ExtensionManager* manager, const std::string& name) : Parameter_ifs(name) {
+    auto ext = manager->getLastVersionExtensionUint("data_schema", "ethernet");
+}
 
-    virtual PrmBuffer_ifs* createBuffer() const override {
-        // TODO: to implement this function
-        return nullptr;
-    }
+EthernetUdpParameter::~EthernetUdpParameter() {}
 
-    virtual const std::string getType() const override { return "EthernetUdp"; }
+PrmBuffer_ifs* EthernetUdpParameter::createBuffer() const {
+    // TODO: to implement this function
+    return nullptr;
+}
 
-    virtual const DataSchema_ifs* getPropertiesInfoList() override { return nullptr; }
+std::string EthernetUdpParameter::getType() const { return "EthernetUdp"; }
 
-    virtual const ResValue* getProperty(const std::string& prop_path) const override {}
-    virtual const std::string getPropertyAsTxt(const std::string& prop_path) const override {}
+const DataSchema_ifs* EthernetUdpParameter::getPropertiesInfoList() { return nullptr; }
 
-    virtual bool setProperty(const std::string& prop_path, const Value value) override {}
-    virtual bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override {}
+const ResValue* EthernetUdpParameter::getProperty(const std::string& prop_path) const { return nullptr; }
 
-    virtual const bool isValid() const override;
-    bool isLocked() const { return (bool)prm_buffer_; }
-};
+std::string EthernetUdpParameter::getPropertyAsTxt(const std::string& prop_path) const { return std::string(); }
 
-#define ETHERNET_UDP_PB 500
-class EthernetUdParserBuilder : public PDefaultBaseIO_ifs {
-   public:
-    std::string getTypeIdentifier() const override { return "Parameters.List.Ethernet.UDP"; }
-    int getPrmType() const override { return ETHERNET_UDP_PB; }
+bool EthernetUdpParameter::setProperty(const std::string& prop_path, const Value& value) { return false; }
 
-    Parameter_ifs* Parse(HierarchicalData_ifs* header, HierarchicalData_ifs* other) const override {
-        std::cout << "EthernetUDParserBuilder";
-        return nullptr;
-    }
-};
+bool EthernetUdpParameter::setPropertyAsTxt(const std::string& prop_path, const std::string& value) { return false; }
+
+bool EthernetUdpParameter::isValid() const { return false; }
+
+Parameter_ifs* EthernetUdParserBuilder::parse(ExtensionManager* manager, HierarchicalData_ifs* other,
+                                              HierarchicalData_ifs* header) const {
+    std::cout << "Parameters.List.Ethernet.UDP\n";
+    std::cout << toString(header, "  ") << "\n";
+    auto item = new EthernetUdpParameter(manager, "pass");
+    return item;
+}

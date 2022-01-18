@@ -333,4 +333,28 @@ class COMMON_API_ HierarchicalData_ifs {
     [[nodiscard]] virtual HierarchicalData_ifs *getMapUint(std::string) const = 0;
 };
 
+inline std::string toString(const HierarchicalData_ifs *h_data, const std::string &indent) {
+    std::string res;
+    if (h_data->isMap()) {
+        auto array = h_data->getMap();
+        res = "\n";
+        for (auto &i : array) {
+            if (i.second == nullptr) return res;
+            res += indent + i.first + ": " + toString(i.second, indent + "  ");
+        }
+    }
+    if (h_data->isArray()) {
+        auto array = h_data->getArray();
+        int k = 0;
+        res = "\n";
+        for (auto &i : array) {
+            res += indent + "[" + std::to_string(k) + "] :" + toString(i, indent + "  ");
+        }
+    }
+    if (h_data->isValue()) {
+        res = h_data->getValue().asString() + "\n";
+    }
+    return res;
+}
+
 #endif

@@ -7,7 +7,6 @@
 #include "HDYamlWrapper.h"
 #include "convtemplate/ConversionTemplate.h"
 #include "extensions/PDefaultBaseIO_ifs.h"
-#include "yaml-cpp/yaml.h"
 
 template <typename Ta, typename Tb>
 std::stringstream &operator<<(std::stringstream &out, const std::pair<Ta, Tb> &v) {
@@ -92,12 +91,11 @@ YAML::Node get(std::string key, const YAML::Node &node) {
     return res;
 }
 
-ConversionTemplate *DefaultBaseIO::parseDocument(const std::string &str) {
-    std::unique_ptr<ConversionTemplate> conv_teplate(new ConversionTemplate());
+ConversionTemplate *DefaultBaseIO::parseDocument(ExtensionManager *manager, const std::string &str) {
+    std::unique_ptr<ConversionTemplate> conv_template(new ConversionTemplate());
 
     try {
         YAML::Node doc = YAML::Load(str);
-
 
         if (!doc.IsMap()) {
             error_mesadge_ = "invalid structure\n";
@@ -106,22 +104,22 @@ ConversionTemplate *DefaultBaseIO::parseDocument(const std::string &str) {
 
         auto node = get("Parameters.List", doc);
 
-        conv_teplate->changeName(get("Base. Name", doc).as<std::string>());
+        conv_template->changeName(get("Base. Name", doc).as<std::string>());
 
         for (const auto &i : get("Device.Modules.List", doc)) {
             const std::string module_name = getStrID(get("Module.ID", i).as<uint32_t>());
             const std::string module = module_name + ":" + std::to_string(get("Module.Slot", i).as<uint32_t>());
 
             if (module_name != "CALC")
-                if (!conv_teplate->addModule(module)) {
-                    warning_mesadges_.push_back(conv_teplate->getErrorMessage());
-                    conv_teplate->clearErrorMessage();
+                if (!conv_template->addModule(module)) {
+                    warning_mesadges_.push_back(conv_template->getErrorMessage());
+                    conv_template->clearErrorMessage();
                 }
         }
 
         for (const auto &header : get("Parameters.List", doc)) {
-            const uint32_t parameter_type = get("Type", header).as<uint32_t>();
-            const std::string parameter_name = get(" Name", header).as<std::string>();
+            const auto parameter_type = get("Type", header).as<uint32_t>();
+            const auto parameter_name = get(" Name", header).as<std::string>();
 
             auto list = getPPBMList(parameter_type);
             if (list && ((bool)list->size())) {  // TODO: this section is slow
@@ -132,9 +130,9 @@ ConversionTemplate *DefaultBaseIO::parseDocument(const std::string &str) {
                 auto hd_other = HierarchicalDataYamlWrapper(other);
 
                 for (auto i : *list) {
-                    Parameter_ifs *prm = i->Parse(&hd_header, &hd_other);
+                    Parameter_ifs *prm = i->parse(manager, &hd_other, &hd_header);
                     if (prm) {
-                        conv_teplate->addParameter(prm);
+                        conv_template->addParameter(prm);
                         break;
                     }
                 }
@@ -143,7 +141,7 @@ ConversionTemplate *DefaultBaseIO::parseDocument(const std::string &str) {
                 warning_mesadges_.push_back("unknown parameter type: " + std::to_string(parameter_type));
             }
         }
-    } catch (YAML::Exception e) {
+    } catch (YAML::Exception &e) {
         std::stringstream st;
         st << "\n" << e.msg << "\n\t";
         st << e.mark << "\n";
@@ -155,7 +153,7 @@ ConversionTemplate *DefaultBaseIO::parseDocument(const std::string &str) {
     return nullptr;
 }
 
-const std::string DefaultBaseIO::createDocument(const ConversionTemplate *conv_templ) { return std::string(); }
+std::string DefaultBaseIO::createDocument(const ConversionTemplate *conv_template) { return std::string(); }
 
 void DefaultBaseIO::addPPBM(PDefaultBaseIO_ifs *p) {
     auto PP = PPBMap_.find(p->getPrmType());

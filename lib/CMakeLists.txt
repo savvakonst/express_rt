@@ -16,8 +16,8 @@ add_library(CommonLib SHARED
 
 
 target_include_directories(CommonLib PUBLIC ../include)
+target_compile_definitions(CommonLib PUBLIC DEBUG_)
 target_compile_definitions(CommonLib PRIVATE COMMON_CREATE_SHARED_LIBRARY)
-
 
 add_subdirectory(baseio)
 add_subdirectory(modules)

@@ -124,33 +124,9 @@ const TaskMapper* KSDModule::getBranch(const std::string& prop_path) const {
     return (const TaskMapper*)tree;
 }
 
-std::string printPropertys_(const TaskMapper* h_data, const std::string& indent) {
-    std::string res;
-    if (h_data->isMap()) {
-        auto array = h_data->getMap();
-        res = "\n";
-        for (auto& i : array) {
-            if (i.second == nullptr) return res;
-            res += indent + i.first + ": " + printPropertys_((TaskMapper*)i.second, indent + "  ");
-        }
-    }
-    if (h_data->isArray()) {
-        auto array = h_data->getArray();
-        int k = 0;
-        res = "\n";
-        for (auto& i : array) {
-            res += indent + "[" + std::to_string(k) + "] :" + printPropertys_((TaskMapper*)i, indent + "  ");
-        }
-    }
-    if (h_data->isValue()) {
-        res = h_data->getValue().asString() + "\n";
-    }
-    return res;
-}
-
 std::string KSDModule::printProperties(const std::string& indent) const {
     const TaskMapper* h_data = &field_map_;
-    return printPropertys_(h_data, indent + "  ");
+    return toString(h_data, indent + "  ");
 }
 
 ResValue KSDModule::getProperty(const std::string& prop_path) const {

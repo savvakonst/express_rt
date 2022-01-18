@@ -70,11 +70,11 @@ char scanForwardBits(char max_val, unsigned long arg) {
 #define new_arr(TYPE, LEN) new TYPE[(LEN)]
 
 static std::vector<char> getList(const std::vector<int>& vec) {
-    /* Parse arguments */
+    /* parse arguments */
 
     int int_list_len = 0;
 
-    int_list_len = vec.size();
+    int_list_len = (int)vec.size();
     if (int_list_len <= 0) return std::vector<char>();
 
     long* int_arr = new_arr(long, int_list_len);
@@ -134,21 +134,18 @@ EthernetA01_Stream::EthernetA01_Stream(Module_A01_* module) : module_(module) {
 
     std::string name = "A01_[" + std::to_string(module->task_.header.slot) + "]";
 
+    buffers_ = new double*[32];
+    size_buffers_ = new size_t[32];
+    current_buffers_ = new double*[32];
 
-    buffers_ = new  double* [32];
-    size_buffers_ = new  size_t [32];
-    current_buffers_ = new  double* [32];
-
-    auto temp_buffers_= buffers_;
-    auto temp_size_buffers_= size_buffers_;
-    auto temp_current_buffers_= current_buffers_;
-
+    auto temp_buffers_ = buffers_;
+    auto temp_size_buffers_ = size_buffers_;
+    auto temp_current_buffers_ = current_buffers_;
 
     for (size_t i = 0; i < 32; i++) {
         int fr = (int)module->task_.cnl[i].frequency;
 
         if (0xff != fr) {
-
             active_freq.push_back(fr);
 
             auto buffer = new PseudoSyncPrmBuffer(nullptr, fr, nullptr);
@@ -156,16 +153,14 @@ EthernetA01_Stream::EthernetA01_Stream(Module_A01_* module) : module_(module) {
             prm_buff_vec_.push_back(buffer);
             prm_buffer_map_[name + channel] = buffer;
 
+            auto temp_size = 1 << (fr - 10);
 
-            auto temp_size = 1<<(fr-10);
-
-            double * d_ptr = new double [temp_size];
-            *(temp_buffers_++)=d_ptr;
-            *(temp_size_buffers_++)=temp_size;
-            *(temp_current_buffers_++)=d_ptr;
+            double* d_ptr = new double[temp_size];
+            *(temp_buffers_++) = d_ptr;
+            *(temp_size_buffers_++) = temp_size;
+            *(temp_current_buffers_++) = d_ptr;
         }
     }
-
 
     vec_ = getList(active_freq);
     prm_buff_ptr_ = prm_buff_vec_.data();
@@ -176,8 +171,8 @@ EthernetA01_Stream::EthernetA01_Stream(Module_A01_* module) : module_(module) {
 }
 #include <iostream>
 void EthernetA01_Stream::readFramePeace(ModuleStreamContext_ifs* context, char* ptr, size_t size) {
-    int16_t * c_ptr = (int16_t *)ptr;
-    int16_t * end_ptr = c_ptr + size;
+    int16_t* c_ptr = (int16_t*)ptr;
+    int16_t* end_ptr = c_ptr + size;
 
     char* map_ptr = current_ptr_;
 
@@ -185,26 +180,23 @@ void EthernetA01_Stream::readFramePeace(ModuleStreamContext_ifs* context, char* 
     auto temp_size_buffers_ = size_buffers_;
     auto temp_current_buffers_ = current_buffers_;
 
-    //std::cout<<"ret";
+    // std::cout<<"ret";
     while (c_ptr < end_ptr) {
-        //prm_buff_ptr_[*(map_ptr)]->setData(ptr, 1, DataStatus::success);
+        // prm_buff_ptr_[*(map_ptr)]->setData(ptr, 1, DataStatus::success);
 
         auto k = *(map_ptr++);
-        *((temp_current_buffers_[k])++) = double(*(c_ptr++))/(1<<16);
+        *((temp_current_buffers_[k])++) = double(*(c_ptr++)) / (1 << 16);
 
-        if (map_ptr == channels_map_end_)
-            map_ptr = channels_map_;
-
+        if (map_ptr == channels_map_end_) map_ptr = channels_map_;
     }
 
-    temp_current_buffers_= current_buffers_;
+    temp_current_buffers_ = current_buffers_;
 
     auto temp_prm = prm_buff_ptr_;
-    while (temp_prm<prm_buff_end_ptr_){
+    while (temp_prm < prm_buff_end_ptr_) {
         *(temp_current_buffers_++) = *temp_buffers_;
-        (*temp_prm++)->setData((char*)*(temp_buffers_++),*(temp_size_buffers_++),DataStatus::success) ;
+        (*temp_prm++)->setData((char*)*(temp_buffers_++), *(temp_size_buffers_++), DataStatus::success);
     }
-
 
     current_ptr_ = map_ptr;
 }

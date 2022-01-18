@@ -44,7 +44,7 @@ M_createDCU_Module(CH06);
 M_createDCU_Module(CH08);
 M_createDCU_Module(CH10);
 
-static ExtensionUint g_modules_extension_uint[] = {
+static ExtensionUnit g_modules_extension_uint[] = {
     {"CH04", "module", "CH04 ksd module", (void *)&createCH04Module, 0x00},
     {"CH06", "module", "CH06 ksd module", (void *)&createCH06Module, 0x00},
     {"CH08", "module", "CH08 ksd module", (void *)&createCH08Module, 0x00},

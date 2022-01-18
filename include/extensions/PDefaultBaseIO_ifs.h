@@ -15,7 +15,8 @@ class PDefaultBaseIO_ifs {
     virtual std::string getTypeIdentifier() const = 0;
     virtual int getPrmType() const = 0;
 
-    virtual Parameter_ifs* Parse(HierarchicalData_ifs* header, HierarchicalData_ifs* other) const = 0;
+    virtual Parameter_ifs* parse(ExtensionManager* manager, HierarchicalData_ifs* other,
+                                 HierarchicalData_ifs* header) const = 0;
 };
 
 #endif

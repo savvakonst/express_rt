@@ -1,8 +1,9 @@
 //
 // Created by SVK on 31.10.2021.
 //
-
 #include <windows.h>
+
+#include <clocale>
 ///
 #include <process.h>
 #include <psapi.h>
@@ -86,6 +87,8 @@ HINSTANCE tryToLinkSharedLibrary(ExtensionManager *em, const std::string &path, 
 }
 
 int main(void) {
+    std::setlocale(LC_ALL, "en_US.UTF-8");
+
     ExtensionManager manager;
 
     const std::string module_name = "Modules";
@@ -104,6 +107,10 @@ int main(void) {
         std::cout << "\n";
     }
 
+    auto init_set = manager.getLastVersionExtensionUintsByType("init");
+    for (auto i : init_set) ((initUnit_t)i->ptr)(&manager);
+
+    std::cout << "\n----------------------------------------------------------\n";
     for (auto hinstance : hinstance_list)
         if (hinstance != nullptr) {
             // Free the DLL module.
