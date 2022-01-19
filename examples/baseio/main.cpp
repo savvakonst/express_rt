@@ -28,7 +28,7 @@ int initDefaultBaseIO(ExtensionManager *manager) {
         in.read(&contents[0], contents.size());
         in.close();
     }
-    
+
     DefaultBaseIO base_io;
 
     auto set = manager->getLastVersionExtensionUintsByType("prm_parser_builder");

@@ -92,16 +92,13 @@ class KSDModule : public Module_ifs {
     const TaskMapper *getBranch(const std::string &prop_path) const;
 
    public:
-
-
-
     bool hasTransceiver() const override { return false; }
 
     EthernetSettings getSrcAddress() const override { return EthernetSettings(); }
 
     bool isAvailable() const override { return true; }
 
-    const InfoList *getPropertiesInfoList() override {
+    const DataSchema_ifs *getPropertiesInfoList() override {
         error_mesadge_ = "The getPropertiesInfoList function is not realised yet";
         return nullptr;
     }

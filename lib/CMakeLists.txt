@@ -22,3 +22,10 @@ target_compile_definitions(CommonLib PRIVATE COMMON_CREATE_SHARED_LIBRARY)
 add_subdirectory(baseio)
 add_subdirectory(modules)
 add_subdirectory(bindings)
+
+
+add_subdirectory("Reader")
+add_subdirectory("ReaderExample")
+add_subdirectory("Receiver")
+add_subdirectory("Ping")
+add_subdirectory("GUI")

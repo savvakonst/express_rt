@@ -340,7 +340,7 @@ inline std::string toString(const HierarchicalData_ifs *h_data, const std::strin
         res = "\n";
         for (auto &i : array) {
             if (i.second == nullptr) return res;
-            res += indent + i.first + ": " + toString(i.second, indent + "  ");
+            res += indent + "\"" + i.first + "\": " + toString(i.second, indent + "  ");
         }
     }
     if (h_data->isArray()) {

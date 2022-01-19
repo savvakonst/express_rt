@@ -58,7 +58,7 @@ EthernetSettings Module_DCU_::getSrcAddress() const {
     return EthernetSettings();
 }
 
-const InfoList *Module_DCU_::getPropertiesInfoList() { return nullptr; }
+const DataSchema_ifs *Module_DCU_::getPropertiesInfoList() { return nullptr; }
 
 ResValue Module_DCU_::getProperty(const std::string &prop_path) const { return KSDModule::getProperty(prop_path); }
 
@@ -124,12 +124,9 @@ void EthernetDCU_Stream::readFramePeace(ModuleStreamContext_ifs *context, char *
 
     uint16_t *data_ptr = (uint16_t *)(ptr + data_offset_);
     while (cnt != cnt_end) {
-
-        if ((*cnt != 0) && (*module_ptr != nullptr))
-            (*module_ptr)->readFramePeace(context, ( char *)data_ptr, *(cnt));
+        if ((*cnt != 0) && (*module_ptr != nullptr)) (*module_ptr)->readFramePeace(context, (char *)data_ptr, *(cnt));
         module_ptr++;
         data_ptr += *cnt;
         cnt++;
-
     }
 }

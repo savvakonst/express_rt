@@ -17,7 +17,7 @@ Module_C06M::Module_C06M(const void* ptr, size_t size, DeviceBuildingContext_ifs
 
 Module_C06M::~Module_C06M() {}
 
-const InfoList* Module_C06M::getPropertiesInfoList() { return nullptr; }
+const DataSchema_ifs* Module_C06M::getPropertiesInfoList() { return nullptr; }
 
 ResValue Module_C06M::getProperty(const std::string& prop_path) const { return KSDModule::getProperty(prop_path); }
 std::string Module_C06M::getPropertyAsTxt(const std::string& prop_path) const {

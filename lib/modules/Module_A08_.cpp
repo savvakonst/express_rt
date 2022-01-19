@@ -24,7 +24,7 @@ Module_A08_::Module_A08_(const void* ptr, size_t size, DeviceBuildingContext_ifs
 
 Module_A08_::~Module_A08_() {}
 
-const InfoList* Module_A08_::getPropertiesInfoList() { return nullptr; }
+const DataSchema_ifs* Module_A08_::getPropertiesInfoList() { return nullptr; }
 
 ResValue Module_A08_::getProperty(const std::string& prop_path) const { return KSDModule::getProperty(prop_path); }
 std::string Module_A08_::getPropertyAsTxt(const std::string& prop_path) const {

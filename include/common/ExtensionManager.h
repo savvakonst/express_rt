@@ -32,13 +32,13 @@ class ExtensionManager {
    public:
     typedef std::set<ExtensionUnit *, VersionCmp> versionList_t;
 
-    std::list<std::string> getAvailableExtensionTypes(std::string type) {
+    std::list<std::string> getAvailableExtensionTypes(const std::string &type) {
         std::list<std::string> ret;
         for (auto i : tree_) ret.push_back(i.first);
         return ret;
     }
 
-    std::list<ExtensionUnit *> getLastVersionExtensionUintsByType(std::string type) {
+    std::list<ExtensionUnit *> getLastVersionExtensionUintsByType(const std::string &type) {
         std::list<ExtensionUnit *> ret;
         auto item = tree_.find(type);
         if (item != tree_.end())
@@ -46,19 +46,19 @@ class ExtensionManager {
         return ret;
     }
 
-    const std::set<ExtensionUnit *, VersionCmp> *getExtensionUintSet(std::string name,
-                                                                     std::string type) {  // it is unsafe
+    const std::set<ExtensionUnit *, VersionCmp> *getExtensionUintSet(const std::string &type,
+                                                                     const std::string &name) {  // it is unsafe
         auto item = tree_.find(type);
         if (item != tree_.end()) {
             auto sub_item = item->second.find(name);
-            if (sub_item == item->second.end()) return &sub_item->second;
+            if (sub_item != item->second.end()) return &(sub_item->second);
         }
         return nullptr;
     }
 
-    const ExtensionUnit *getLastVersionExtensionUint(std::string name,
-                                                     std::string type) {  // it is unsafe
-        auto set = getExtensionUintSet(name, type);
+    const ExtensionUnit *getLastVersionExtensionUint(const std::string &type,
+                                                     const std::string &name) {  // it is unsafe
+        auto set = getExtensionUintSet(type, name);
         if (set == nullptr) return nullptr;
         auto ret = *(set->begin());  // there must be no situations with an empty set by design.
         return ret;

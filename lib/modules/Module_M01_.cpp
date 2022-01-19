@@ -3,26 +3,20 @@
 #include "Module_M01_.h"
 
 Module_M01_::Module_M01_()
-        : KSDModule(  //
-        TaskMapper(
-                {{"header",     header_map_},
-                 {"frequency",  u8},
-                 {"reserved_a", {2,   u8}},
-                 {"flags",      u8},
-                 {"out",
-                                TaskMapper(
-                                        {{"flags", u32},
-                                         {"dst",
-                                                   TaskMapper({{"mac",      {6, u8}},
-                                                               {"port",     {2, u8}},
-                                                               {"ip_b",     {4, u8}},
-                                                               {"reserved", {4, u8}}})},
-                                         {"lib",   TaskMapper({{"mac",      u8},
-                                                               {"port",     u8},
-                                                               {"ip_b",     u8},
-                                                               {"reserved", u8}})}})},
-                 {"slave_id",   u32},
-                 {"reserved_b", {124, u8}}})) {
+    : KSDModule(  //
+          TaskMapper(
+              {{"header", header_map_},
+               {"frequency", u8},
+               {"reserved_a", {2, u8}},
+               {"flags", u8},
+               {"out",
+                TaskMapper(
+                    {{"flags", u32},
+                     {"dst",
+                      TaskMapper({{"mac", {6, u8}}, {"port", {2, u8}}, {"ip_b", {4, u8}}, {"reserved", {4, u8}}})},
+                     {"lib", TaskMapper({{"mac", u8}, {"port", u8}, {"ip_b", u8}, {"reserved", u8}})}})},
+               {"slave_id", u32},
+               {"reserved_b", {124, u8}}})) {
     field_map_.setReferencePtr(&task_);
 }
 
@@ -30,13 +24,13 @@ Module_M01_::Module_M01_(const void *ptr, size_t size, DeviceBuildingContext_ifs
     if (size != getTaskSize()) {
         error_mesadge_ = "invalid size";
     }
-    task_ = *((Task *) ptr);
+    task_ = *((Task *)ptr);
     return;
 }
 
 Module_M01_::~Module_M01_() {}
 
-const InfoList *Module_M01_::getPropertiesInfoList() { return nullptr; }
+const DataSchema_ifs *Module_M01_::getPropertiesInfoList() { return nullptr; }
 
 ResValue Module_M01_::getProperty(const std::string &prop_path) const { return KSDModule::getProperty(prop_path); }
 

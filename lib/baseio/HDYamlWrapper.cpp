@@ -42,11 +42,12 @@ Value HierarchicalDataYamlWrapper::getValue() const {
         static const std::regex int_exp("[ ]*(\\+|\\-)?([0-9]+)");
 
         if (std::regex_match(val, num_exp)) {
-            return Value();
+
+            if (std::regex_match(val, int_exp)) return Value(val, DataType::i64);
+            return Value(val, DataType::f64);
         } else if (std::regex_match(val, spec_exp)) {
             if (std::regex_match(val, null_exp)) {
-                if (std::regex_match(val, int_exp)) return Value(val, DataType::i64);
-                return Value(val, DataType::f64);
+                return Value();
             } else {
                 return Value(val, DataType::bool_v);
             }
@@ -93,6 +94,41 @@ std::map<std::string, HierarchicalData_ifs *> HierarchicalDataYamlWrapper::getMa
     return *map_;
 }
 
-HierarchicalData_ifs *HierarchicalDataYamlWrapper::getArrayUint(size_t) const { return nullptr; }
+HierarchicalData_ifs *HierarchicalDataYamlWrapper::getArrayUint(size_t index) const {
+    if (!isArray()) return nullptr;
 
-HierarchicalData_ifs *HierarchicalDataYamlWrapper::getMapUint(std::string) const { return nullptr; }
+    if (!vector_) {
+        auto arr = value_;
+
+        auto vector_ptr = (std::vector<HierarchicalData_ifs *> **)&vector_;
+        (*vector_ptr) = new std::vector<HierarchicalData_ifs *>();
+        (*vector_ptr)->reserve(arr.size());
+
+        for (const auto &i : arr) {
+            (*vector_ptr)->push_back(new HierarchicalDataYamlWrapper(i));
+        }
+    }
+
+    if (index < vector_->size()) return (*vector_)[index];
+
+    return nullptr;
+}
+
+HierarchicalData_ifs *HierarchicalDataYamlWrapper::getMapUint(std::string field) const {
+    if (!isMap()) return nullptr;
+
+    if (!map_) {
+        auto obj = value_;
+
+        auto map_ptr = (std::map<std::string, HierarchicalData_ifs *> **)&map_;
+        (*map_ptr) = new std::map<std::string, HierarchicalData_ifs *>();
+        for (auto i : obj) {
+            (**map_ptr)[i.first.as<std::string>()] = new HierarchicalDataYamlWrapper(i.second);
+        }
+    }
+
+    auto item = map_->find(field);
+    if (item != map_->end()) return item->second;
+
+    return nullptr;
+}

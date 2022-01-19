@@ -13,6 +13,7 @@ Parameter_ifs *createParameter(ExtensionManager *context, const std::string &nam
 
 [[maybe_unused]] typedef Parameter_ifs *(*parameterConstructor_f)(ExtensionManager *context, const std::string &name);
 */
+class ExtensionUnit;
 
 class [[maybe_unused]] EthernetUdpParameter : public Parameter_ifs {
    public:
@@ -33,6 +34,9 @@ class [[maybe_unused]] EthernetUdpParameter : public Parameter_ifs {
     bool setPropertyAsTxt(const std::string& prop_path, const std::string& value) override;
 
     [[nodiscard]] bool isValid() const override;
+
+   private:
+    DataSchema_ifs* data_schema_;
 };
 
 #define ETHERNET_UDP_PB 500

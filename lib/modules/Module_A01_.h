@@ -41,11 +41,9 @@ class EthernetA01_Stream : public ModuleStream_ifs {
     char* channels_map_end_ = nullptr;
     char* current_ptr_ = nullptr;
 
-
-
-    double **buffers_= nullptr;
-    size_t *size_buffers_= 0;
-    double **current_buffers_= nullptr;
+    double** buffers_ = nullptr;
+    size_t* size_buffers_ = 0;
+    double** current_buffers_ = nullptr;
 };
 
 class Module_A01_ : public KSDModule {
@@ -88,7 +86,7 @@ class Module_A01_ : public KSDModule {
 
     std::string getID() const override { return "A01_"; }
 
-    const InfoList* getPropertiesInfoList() override;
+    const DataSchema_ifs* getPropertiesInfoList() override;
 
     ResValue getProperty(const std::string& prop_path) const override;
     std::string getPropertyAsTxt(const std::string& prop_path) const override;

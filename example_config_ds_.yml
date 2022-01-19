@@ -1,8 +1,7 @@
-
-ext_type: parameter
-ext_set: 
+ext_type: "parameter  "
+ext_set:
   - name: "common"
-    set:
+    type:
       - name: "name"
         type: "string"
         description: "имя параметра"
@@ -36,39 +35,35 @@ ext_set:
         description: "физический адрес параметра"
 
       - name: "approximation"
-        description: 
-        array: 
-          - type:
-              - name: "x"
-                type: "f64"
-              - name: "y"
-                type: "f64"
-            
-        
+        description: "pass"
+        dims: [ ]
+        type:
+          - name: "x"
+            type: "f64"
+          - name: "y"
+            type: "f64"
+
   - name: "ethernet"
-    include: "common"
-    set:
+    type:
+      - name: "common"
+        include: "common"
+
       - name: "source"
         description: "источник"
-        set: 
+        type: &address
           - name: "ip"
             type: "u32"
             description: "ip"
+            representation: "ip"
 
           - name: "port"
             type: "i16"
             description: "порт"
+            default: 4660
 
-      - name: "destenation"
+      - name: "destination"
         description: "порт"
-        set: 
-          - name: "ip"
-            type: "u32"
-            description: "ip"
-
-          - name: "port"
-            type: "i16"
-            description: "порт"
+        type: *address
 
       - name: "offset"
         type: "int"
@@ -76,18 +71,18 @@ ext_set:
 
       - name: "type"
         type: "string"
-        description: "тип/размер" 
-        enum: ["i8", "i16", "i32", "i64", "f32", "f64"]
+        description: "тип/размер"
+        enum: [ "i8", "i16", "i32", "i64", "f32", "f64" ]
 
-      - name: "byte_ordr"
+      - name: "byte_order"
         type: "string"
         description: "порядок байт"
-        enum:  ["BE", "LE"]
+        enum: [ "BE", "LE" ]
 
       - name: "msb"
         type: "string"
         description: "старший разряд"
-        enum: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+        enum: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ]
 
       - name: "bit_depth"
         type: "i16"
@@ -97,7 +92,7 @@ ext_set:
       - name: "sign"
         type: "bool"
         description: "знак"
-        enum: { true: есть, false: нет }
+        enum: { есть: true, нет: false }
 
       - name: "scale_a1"
         type: "i32"

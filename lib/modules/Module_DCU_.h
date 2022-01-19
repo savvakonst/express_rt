@@ -80,7 +80,7 @@ class Module_DCU_ : public KSDModule {
 
     std::string getID() const override { return module_id_; }
 
-    const InfoList *getPropertiesInfoList() override;
+    const DataSchema_ifs *getPropertiesInfoList() override;
 
     ResValue getProperty(const std::string &prop_path) const override;
 

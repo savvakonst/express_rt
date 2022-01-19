@@ -26,7 +26,7 @@ Module_ID02::Module_ID02(const void* ptr, size_t size, DeviceBuildingContext_ifs
 
 Module_ID02::~Module_ID02() {}
 
-const InfoList* Module_ID02::getPropertiesInfoList() { return nullptr; }
+const DataSchema_ifs* Module_ID02::getPropertiesInfoList() { return nullptr; }
 
 ResValue Module_ID02::getProperty(const std::string& prop_path) const { return KSDModule::getProperty(prop_path); }
 std::string Module_ID02::getPropertyAsTxt(const std::string& prop_path) const {

@@ -31,7 +31,7 @@ class Module_C06M : public KSDModule {
 
     std::string getID() const override { return "C06M"; }
 
-    const InfoList* getPropertiesInfoList() override;
+    const DataSchema_ifs* getPropertiesInfoList() override;
 
     ResValue getProperty(const std::string& prop_path) const override;
     std::string getPropertyAsTxt(const std::string& prop_path) const override;

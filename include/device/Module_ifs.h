@@ -25,9 +25,11 @@ class COMMON_API_ Module_ifs : public BaseClass_ifs {
 
     [[nodiscard]] virtual std::string getID() const = 0;
 
-    virtual std::map<std::string, PrmBuffer_ifs*> getPrmBufferMap() { return std::map<std::string, PrmBuffer_ifs*>(); }
+    virtual std::map<std::string, PrmBuffer_ifs *> getPrmBufferMap() {
+        return std::map<std::string, PrmBuffer_ifs *>();
+    }
 
-    virtual const InfoList *getPropertiesInfoList() = 0;
+    virtual const DataSchema_ifs *getPropertiesInfoList() = 0;
 
     [[nodiscard]] virtual std::string printProperties(const std::string &indent = "") const = 0;
 

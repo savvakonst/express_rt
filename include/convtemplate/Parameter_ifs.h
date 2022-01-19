@@ -50,6 +50,4 @@ class COMMON_API_ Parameter_ifs : public BaseClass_ifs {
     PrmBuffer_ifs *prm_buffer_ = nullptr;
 };
 
-extern std::vector<FieldInfo *> g_common_parameter_fields;
-
 #endif
