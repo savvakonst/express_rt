@@ -3,8 +3,8 @@
 
 #include "MainWindow.h"
 
+#include <WinSock2.h>
 #include <qgraphicsscene.h>
-#include <winsock2.h>
 
 #include <QFrame>
 #include <QGraphicsSceneWheelEvent>
@@ -13,11 +13,11 @@
 #include <QKeyEvent>
 #include <QTimer>
 
-#include "Device/Device.h"
 #include "Ping/ksdconnected.h"
 #include "ReaderExample/ReaderExample.h"
 #include "Receiver/Receiver.h"
-#include "common/extension.h"
+#include "common/Extension.h"
+#include "device/Device.h"
 
 bool initWSA();
 
