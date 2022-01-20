@@ -10,5 +10,5 @@ ClionBuild/
 cmake-build-debug/
 
 
-tools/set_x64_env.bat
+tools/set_*_env.bat
 tools/set_x86_env.bat
