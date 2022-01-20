@@ -2,7 +2,7 @@
 #define EXRT_TIMEREPRESENTATION_H
 
 #include <cstdint>
-
+#include <cmath>
 struct RelativeTime {
     union {
         struct {
@@ -18,9 +18,10 @@ struct RelativeTime {
     }
 
     int32_t toInt() const {
-        int32_t result = ls_integer + lround(static_cast<double>(ms_fractional) / (1ull << 32));
+        int32_t result = ls_integer + std::lround(static_cast<double>(ms_fractional) / (1ull << 32));
         return result;
     }
+
     void fromDouble(const double val) { time = static_cast<int64_t>(val * (1ull << 32)); }
     void fromInt(const int32_t val) { time = static_cast<int64_t>(val * (1ull << 32)); }
 };

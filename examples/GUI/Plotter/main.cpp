@@ -2,14 +2,12 @@
 
 #include <QtWidgets/QApplication>
 
-#include "MainWindow.h"
-
-
+#include "TopWindow.h"
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
-    MainWindow window;
+    TopWindow window;
 
     window.show();
 

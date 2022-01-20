@@ -17,11 +17,11 @@ class QGraphicsView;
 
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow {
+class TopWindow : public QMainWindow {
     Q_OBJECT
    public:
-    MainWindow(QWidget* parent = 0, double signal_frequency = 0.1);
-    ~MainWindow();
+    TopWindow(QWidget* parent = 0, double signal_frequency = 0.1);
+    ~TopWindow();
     void redraw();
 
    private:

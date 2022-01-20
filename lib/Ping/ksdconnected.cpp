@@ -155,7 +155,7 @@ bool validateDBW(void *p, int32_t received, uint16_t lun, uint16_t seqID, uint16
     result |= validateProto(&dbw->proto, DATA_BLOCK_WRAPPER_SIGNATURE, lun, seqID, seqCnt);
 
     received -= DATA_BLOCK_WRAPPER_SIZE;
-    if (dbw->dataTransferLength > received) result = true;
+    if ( int32_t(dbw->dataTransferLength)  > received) result = true;
 
     result |= static_cast<bool>(dbw->dataTransferLength - tranferSize);
     result |= static_cast<bool>(dbw->statusCode);

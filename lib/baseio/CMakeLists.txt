@@ -23,7 +23,6 @@ FetchContent_Declare( # TODO: need to set up a source code destination directory
 )
 FetchContent_MakeAvailable(yaml_cpp)
 
-#add_subdirectory("../../../yaml-cpp" yaml-cpp)
 
 target_link_libraries(DefaultBaseIO PRIVATE yaml-cpp)
 target_link_libraries(DefaultBaseIO PUBLIC CommonLib)

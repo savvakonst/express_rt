@@ -1,7 +1,7 @@
 //#include "chip.h"
 #define _USE_MATH_DEFINES
 
-#include "MainWindow.h"
+#include "TopWindow.h"
 
 #include <WinSock2.h>
 #include <qgraphicsscene.h>
@@ -59,7 +59,7 @@ InitExtension(ExtensionInfo *) initModules(void);
  *
  */
 
-MainWindow::MainWindow(QWidget *parent, double signal_frequency)
+TopWindow::TopWindow(QWidget *parent, double signal_frequency)
     : signal_frequency_(signal_frequency / (int64_t(1) << 32)) {
     sample_frequency_log2_ = 15;
 
@@ -69,15 +69,15 @@ MainWindow::MainWindow(QWidget *parent, double signal_frequency)
     setCentralWidget(view_);
 
     QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &MainWindow::redraw);
+    connect(timer, &QTimer::timeout, this, &TopWindow::redraw);
 
     redraw();
     timer->start(5);
 }
 
-MainWindow::~MainWindow() {}
+TopWindow::~TopWindow() {}
 
-void MainWindow::initScene() {
+void TopWindow::initScene() {
     initWSA();
 
     ExtensionInfo *extension_info = initModules();
@@ -129,7 +129,7 @@ void MainWindow::initScene() {
     view_->show();
 }
 
-void MainWindow::draw(QPainter &paint, Reader_ifs::Chunk *c_ptr, size_t offset) {
+void TopWindow::draw(QPainter &paint, Reader_ifs::Chunk *c_ptr, size_t offset) {
     paint.setPen(QColor(0, 100, 100));
     while (c_ptr) {
         Reader_ifs::Point *pb = c_ptr->first_point_;
@@ -143,7 +143,7 @@ void MainWindow::draw(QPainter &paint, Reader_ifs::Chunk *c_ptr, size_t offset) 
     paint.drawLine(0, (int)offset, (int)buffer_size_, (int)offset);
 }
 
-void MainWindow::redraw() {
+void TopWindow::redraw() {
     auto borders_1 = view_1_->getAvailableBorders();
     auto borders_2 = Borders{borders_1.begin + time_offset_, time_interval_};
 
@@ -165,7 +165,7 @@ void MainWindow::redraw() {
 void GraphicsScene::wheelEvent(QGraphicsSceneWheelEvent *event) {
     QGraphicsScene::wheelEvent(event);
 
-    MainWindow *p = ((MainWindow *)parent());
+    TopWindow *p = ((TopWindow *)parent());
     int64_t s = 100, ds = 5;
     auto delta = event->delta();
 
@@ -179,7 +179,7 @@ void GraphicsScene::wheelEvent(QGraphicsSceneWheelEvent *event) {
 
 void GraphicsScene::keyPressEvent(QKeyEvent *event) {
     QGraphicsScene::keyPressEvent(event);
-    MainWindow *p = ((MainWindow *)parent());
+    TopWindow *p = ((TopWindow *)parent());
     if (Qt::Key::Key_Minus == event->key()) {
         if (p->time_interval_ > RelativeTime{0, 1}) {
             p->time_interval_ = p->time_interval_ - RelativeTime{0, 1};
