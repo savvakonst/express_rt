@@ -3,7 +3,10 @@ include_directories(.)
 file(GLOB Headers *.h)
 file(GLOB Sources *.cpp)
 
-add_library(ExampleBaseIO SHARED
+
+set(EXAMPLE_BASE_IO ExampleBaseIO)
+
+add_library(${EXAMPLE_BASE_IO} SHARED
         ${Sources}
         ${Headers}
         )
@@ -12,8 +15,8 @@ source_group(src FILES ${Sources})
 source_group(headers FILES ${Headers})
 
 
-target_link_libraries(ExampleBaseIO PRIVATE DefaultBaseIO)
-set_target_properties(ExampleBaseIO PROPERTIES CXX_STANDARD_REQUIRED ON OUTPUT_NAME ExampleBaseIO)
-target_compile_definitions(ExampleBaseIO PRIVATE DEFAULT_PARAMETERS_LIB_NAME=ExampleBaseIO)
+target_link_libraries(${EXAMPLE_BASE_IO} PRIVATE DefaultBaseIO)
+set_target_properties(${EXAMPLE_BASE_IO} PROPERTIES CXX_STANDARD_REQUIRED ON OUTPUT_NAME ${EXAMPLE_BASE_IO})
+target_compile_definitions(${EXAMPLE_BASE_IO} PRIVATE DEFAULT_PARAMETERS_LIB_NAME=${EXAMPLE_BASE_IO})
 
 

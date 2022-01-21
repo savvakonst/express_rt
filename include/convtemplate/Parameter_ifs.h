@@ -18,6 +18,7 @@ Parameter_ifs *createParameter(ExtensionManager *manager, const std::string &nam
 
 [[maybe_unused]] typedef Parameter_ifs *(*parameterConstructor_f)(ExtensionManager *manager, const std::string &name);
 
+
 class COMMON_API_ Parameter_ifs : public BaseClass_ifs {
    public:
     explicit Parameter_ifs(const std::string &name) : name_(name){};

@@ -83,7 +83,7 @@ Parameter_ifs* EthernetUdParserBuilder::parse(ExtensionManager* manager, Hierarc
 
     auto item = new EthernetUdpParameter(manager, "pass");
 
-    // C06M
+
 
     item->setProperty("name", header->getMapUint(" Name")->getValue());
     item->setProperty("identifier", header->getMapUint("ShortID")->getValue());

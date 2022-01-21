@@ -1,6 +1,4 @@
-#ifndef DEFAULT_PARAMETERS_LIB_NAME
-#    error "DEFAULT_PARAMETERS_NAME undefined"
-#endif
+
 
 #include <clocale>
 #include <fstream>
@@ -38,6 +36,11 @@ int initDefaultBaseIO(ExtensionManager *manager) {
     std::cout << base_io.getErrorMessage();
     return 0;
 }
+
+
+#ifndef DEFAULT_PARAMETERS_LIB_NAME
+#    error "DEFAULT_PARAMETERS_NAME undefined"
+#endif
 
 static ExtensionUnit g_default_parameters_units[] = {
     {"EthernetUdp", "parameter", "parameter for processing Ethernet UDP",

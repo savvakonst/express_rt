@@ -49,19 +49,7 @@ class AnalogVoltageParserBuilder : public PDefaultBaseIO_ifs {
         return nullptr;
     }
 };
-/*
-#define ETHERNET_UDP_PB 500
-class EthernetUdParserBuilder : public PDefaultBaseIO_ifs {
-   public:
-    std::string getTypeIdentifier() const override { return "Parameters.List.Analog.Voltage"; }
-    int getPrmType() const override { return ETHERNET_UDP_PB; }
 
-    Parameter_ifs* parse(HierarchicalData_ifs* header, HierarchicalData_ifs* other) const override {
-        std::cout << "EthernetUDParserBuilder";
-        return nullptr;
-    }
-};
-*/
 
 #undef PRINT_DEBUG_INFO
 #endif

@@ -1,7 +1,27 @@
 
 #define _USE_MATH_DEFINES
 
-#include "TreeEditor.h"
+
+
+#include <QCheckBox>
+#include <QComboBox>
+#include <QLineEdit>
+
+
+#include <QStringList>
+#include <QTreeWidget>
+
+#include <iostream>
+
+
+
+#include "GUI/TreeEditor.h"
+#include "TreeTextEdit.h"
+
+TreeEditor::TreeEditor(DataSchema_ifs *data_schema, QWidget *parent) : TreeEditor(parent) {
+    data_schema_ = data_schema;
+    // setupProperties(data_schema_, nullptr);
+}
 
 TreeEditor::TreeEditor(QWidget *parent) : QTreeWidget(parent), update_signal_(this) {
     this->setAutoFillBackground(true);
@@ -19,13 +39,20 @@ TreeEditor::TreeEditor(QWidget *parent) : QTreeWidget(parent), update_signal_(th
 
     this->setAlternatingRowColors(true);
 }
+void TreeEditor::setupProperties() {
+    setupProperties(data_schema_);
+}
 
 void TreeEditor::setupProperties(DataSchema_ifs *ds, QTreeWidgetItem *parent_item) {
+    data_schema_ = ds;
+
     auto item = parent_item ? new QTreeWidgetItem(parent_item) : new QTreeWidgetItem(this);
 
     // item->setFlags(item->flags() | Qt::ItemIsEditable);
     // parent_item->setFlags(parent_item->flags() | Qt::ItemIsTristate |
     //                       Qt::ItemIsUserCheckable);
+
+
 
     auto name = ds->description_.c_str();
     item->setText(0, name);
@@ -69,6 +96,7 @@ void TreeEditor::setupProperties(DataSchema_ifs *ds, QTreeWidgetItem *parent_ite
             item->setText(1, QString::fromStdString(error));
         }
     }
+    expandAll();
 }
 void TreeEditor::addExtensionUint(ExtensionUnit *uint) {
     if (strcmp(uint->type, "tree_widget_wrapper")) return;
@@ -89,3 +117,170 @@ void TreeEditor::addExtensionUint(ExtensionUnit *uint) {
         }
     }
 }
+
+
+/*
+ *
+ *
+ */
+
+class TreeCheckBox : public QCheckBox {
+   public:
+    explicit TreeCheckBox(QWidget *parent = nullptr) : QCheckBox(parent) {}
+
+    explicit TreeCheckBox(const QString &text, QWidget *parent = nullptr)
+        :  //
+          QCheckBox(text, parent) {}
+
+    explicit TreeCheckBox(DataSchema_ifs *data_schema, QWidget *parent = nullptr)
+        :  //
+          QCheckBox(parent),
+          data_schema_(data_schema) {}
+
+    explicit TreeCheckBox(DataSchema_ifs *data_schema, const QString &str, QWidget *parent = nullptr)
+        :  //
+          QCheckBox(str, parent),
+          data_schema_(data_schema) {}
+
+    void setDataSchema(DataSchema_ifs *data_schema) { data_schema_ = data_schema; }
+
+    BaseSignalController signal_controller_;
+
+   private:
+    DataSchema_ifs *data_schema_ = nullptr;
+};
+
+/*
+ *
+ *
+ */
+
+class TreeLineEdit : public QLineEdit {
+   public:
+    explicit TreeLineEdit(QWidget *parent = nullptr) : QLineEdit(parent) { initSettings(); }
+
+    explicit TreeLineEdit(const QString &str, QWidget *parent = nullptr)
+        :  //
+          QLineEdit(str, parent) {
+        initSettings();
+    }
+
+    explicit TreeLineEdit(DataSchema_ifs *data_schema, QWidget *parent = nullptr)
+        :  //
+          QLineEdit(parent),
+          data_schema_(data_schema) {
+        initSettings();
+    }
+
+    explicit TreeLineEdit(DataSchema_ifs *data_schema, const QString &str, QWidget *parent = nullptr)
+        :  //
+          QLineEdit(str, parent),
+          data_schema_(data_schema) {
+        initSettings();
+    }
+
+    void setDataSchema(DataSchema_ifs *data_schema) { data_schema_ = data_schema; }
+
+    BaseSignalController signal_controller_;
+
+   private:
+    void initSettings() {}
+
+    DataSchema_ifs *data_schema_ = nullptr;
+};
+
+/*
+ *
+ *
+ */
+
+class TreeIPEdit : public TreeLineEdit {
+   public:
+    explicit TreeIPEdit(QWidget *parent = nullptr) : TreeLineEdit(parent) { initSettings(); }
+
+    explicit TreeIPEdit(const QString &str, QWidget *parent = nullptr) : TreeLineEdit(str, parent) { initSettings(); }
+
+    explicit TreeIPEdit(DataSchema_ifs *data_schema, QWidget *parent = nullptr) : TreeLineEdit(data_schema, parent) {
+        initSettings();
+    }
+
+    explicit TreeIPEdit(DataSchema_ifs *data_schema, const QString &str, QWidget *parent = nullptr)
+        : TreeLineEdit(data_schema, str, parent) {
+        initSettings();
+    }
+
+    ~TreeIPEdit() override { delete validator_; };
+
+    void setDataSchema(DataSchema_ifs *data_schema) { data_schema_ = data_schema; }
+
+   private:
+    void initSettings() {
+        QRegExp rx("((([01]\\d\\d)|(2[0-4]\\d)|(25[0-5])).){3}(([01]\\d\\d)|(2[0-4]\\d)|(25[0-5]))");
+        validator_ = new QRegExpValidator(rx);
+
+        setInputMask("000.000.000.000;0");
+        setValidator(validator_);
+    }
+    QValidator *validator_ = nullptr;
+    DataSchema_ifs *data_schema_ = nullptr;
+};
+
+/*
+ *
+ *
+ */
+
+class TreeComboBox : public QComboBox {
+   public:
+    explicit TreeComboBox(QWidget *parent = nullptr)
+        :  //
+          QComboBox(parent) {}
+
+    explicit TreeComboBox(DataSchema_ifs *data_schema, QWidget *parent = nullptr)
+        :  //
+          QComboBox(parent),
+          data_schema_(data_schema) {
+        for (auto i : data_schema_->enums_) addItem(i.first.c_str());
+    }
+
+    void setDataSchema(DataSchema_ifs *data_schema) {
+        data_schema_ = data_schema;
+        this->clear();
+        for (auto i : data_schema_->enums_) addItem(i.first.c_str());
+    }
+
+    BaseSignalController signal_controller_;
+
+   private:
+    DataSchema_ifs *data_schema_ = nullptr;
+};
+
+
+#ifndef TREE_EDITOR_LIB_NAME
+#    error "TREE_EDITOR_LIB_NAME undefined"
+#endif
+
+
+QWidget* newTreeEditor(QWidget* parent){
+    return new TreeEditor(parent);
+}
+
+
+static ExtensionUnit g_tree_widget_extension_uint[] = {
+    {"large_text", "tree_widget_wrapper", "return wrapper of TreeTextEdit", (void *)newTreeWidgetWrapper<TreeTextEdit>, 0x00},
+    {"bool", "tree_widget_wrapper", "return wrapper of TreeCheckBox", (void *)newTreeWidgetWrapper<TreeCheckBox>, 0x00},
+    {"text", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeLineEdit>, 0x00},
+    {"ip", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeIPEdit>, 0x00},
+    {"number", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeLineEdit>, 0x00},
+    {"enum", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeComboBox>, 0x00},
+    {"tree_editor", "tree_editor", "", (void *)newTreeEditor, 0x00},
+    {nullptr, nullptr, nullptr, nullptr, 0}};
+
+static ExtensionInfo g_tree_widget_extension_info = {"tree_widget_extension", 0x01, g_tree_widget_extension_uint};
+
+InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, TREE_EDITOR_LIB_NAME)(void) {
+    return &g_tree_widget_extension_info;
+}
+
+
+

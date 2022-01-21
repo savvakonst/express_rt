@@ -5,20 +5,11 @@
 #include <QtWidgets/QMainWindow>
 #include <iostream>
 
-#include "TreeEditor.h"
+#include "GUI/TreeEditor.h"
 
-static ExtensionUnit g_tree_widget_extension_uint[] = {
-    {"large_text", "tree_widget_wrapper", "return wrapper of TreeTextEdit", (void *)newTreeWW<TreeTextEdit>, 0x00},
-    {"bool", "tree_widget_wrapper", "return wrapper of TreeCheckBox", (void *)newTreeWW<TreeCheckBox>, 0x00},
-    {"text", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWW<TreeLineEdit>, 0x00},
-    {"ip", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWW<TreeIPEdit>, 0x00},
-    {"number", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWW<TreeLineEdit>, 0x00},
-    {"enum", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWW<TreeComboBox>, 0x00},
-    {nullptr, nullptr, nullptr, nullptr, 0}};
 
-static ExtensionInfo g_tree_widget_extension_info = {"tree_widget_extension", 0x01, g_tree_widget_extension_uint};
+InitExtension(ExtensionInfo *) initTreeEditor(void) ;
 
-InitExtension(ExtensionInfo *) initModules(void) { return &g_tree_widget_extension_info; }
 
 /*
  *
@@ -40,16 +31,31 @@ int main(int argc, char *argv[]) {
     std::vector<DataSchema_ifs *> ds_list = getConfig();
 
     printer_debug(ds_list.front());
-    TreeEditor top = TreeEditor(ds_list[1]);
+    TreeEditor *top = nullptr;
 
-    ExtensionUnit *uint = g_tree_widget_extension_uint;
+    auto x = initTreeEditor();
+
+    ExtensionUnit *uint = x->units;
     while (uint->name) {
-        top.addExtensionUint(uint++);
+        if (std::string(uint->type) == "tree_editor")
+            top = ((newTreeEditor_t)uint->ptr)(nullptr);
+        uint++;
     }
-    top.setupProperties();
-    top.show();
-    top.resize(500, 600);
-    top.setColumnWidth(0, 300);
+
+
+    if (top == nullptr)
+        std::cout<<"----------------\n";
+
+
+    uint = x->units;
+    while (uint->name) {
+        top->addExtensionUint(uint++);
+    }
+
+    top->setupProperties(ds_list[1]);
+    top->show();
+    top->resize(500, 600);
+    top->setColumnWidth(0, 300);
 
     return a.exec();
 }

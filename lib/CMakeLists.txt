@@ -12,7 +12,7 @@ endif ()
 add_library(CommonLib SHARED
         convtemplate/ConversionTemplate.cpp
         device/Device.cpp
-        )
+        convtemplate/ParameterFieldTree.cpp)
 
 
 target_include_directories(CommonLib PUBLIC ../include)
