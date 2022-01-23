@@ -34,24 +34,24 @@ static py::scoped_interpreter *g_guard = nullptr;
 
 InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, PY_EMBEDDER_LIB_NAME)(void) {
     g_guard = new py::scoped_interpreter{};
-    py::module_ bind = py::module_::import("expressbind");
     bindList_t ds_list;
-    {
-        py::list py_cat = bind.attr("loadConfig")();
-        for (auto i : py_cat) {
-            try {
+    try {
+        py::module_ bind = py::module_::import("expressbind");
+
+        {
+            py::list py_cat = bind.attr("loadConfig")();
+            for (auto i : py_cat) {
                 PyDataSchema *cpp_ds = i.cast<PyDataSchema *>();
                 cpp_ds->setOwnerShip(i);
                 i.inc_ref();
 
                 ds_list.push_back(cpp_ds);
-
-            } catch (const std::runtime_error &e) {
-                std::cout << e.what();
             }
         }
-    }
 
+    } catch (const std::runtime_error &e) {
+        std::cout << e.what();
+    }
     g_pyembedder_units = new ExtensionUnit[ds_list.size() + 1];
     auto tmp_units = g_pyembedder_units;
     for (auto i : ds_list) {  //{"CH04", "module", "CH04 ksd module", (void *)&createCH04Module, 0x00},

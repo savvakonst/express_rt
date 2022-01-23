@@ -36,7 +36,7 @@ ext_set:
 
       - name: "approximation"
         description: "pass"
-        dims: [ ]
+        dims: [ 0 ]
         type:
           - name: "x"
             type: "f64"

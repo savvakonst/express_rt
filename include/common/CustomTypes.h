@@ -8,13 +8,11 @@
 
 #include "common/Port.h"
 
-
 #define exo_container std::list
 #define exo_map std::map
 #define exo_set std::set
 
-enum status : bool
-{
+enum status : bool {
     succes = true,
     failure = false
 };
@@ -57,8 +55,7 @@ union ArbitraryData {
     str_v_t str_v;
 };
 
-enum DataType : size_t
-{
+enum DataType : size_t {
     none_v = 0x00,
 
     i8 = 0x101,
@@ -314,7 +311,7 @@ struct EthernetSettings {
 
 class COMMON_API_ HierarchicalData_ifs {
    public:
-    virtual ~HierarchicalData_ifs(){};
+    virtual ~HierarchicalData_ifs() = default;
 
     [[nodiscard]] virtual bool isArray() const = 0;
 
@@ -328,9 +325,13 @@ class COMMON_API_ HierarchicalData_ifs {
 
     [[nodiscard]] virtual std::map<std::string, HierarchicalData_ifs *> getMap() const = 0;
 
-    [[nodiscard]] virtual HierarchicalData_ifs *getArrayUint(size_t) const = 0;
+    [[nodiscard]] virtual HierarchicalData_ifs *getArrayUnit(size_t index) const = 0;
 
-    [[nodiscard]] virtual HierarchicalData_ifs *getMapUint(std::string) const = 0;
+    [[nodiscard]] virtual HierarchicalData_ifs *getMapUnit(std::string field_name) const = 0;
+
+    //[[nodiscard]] virtual bool removeArrayUnit(size_t index) const = 0;
+
+    //[[nodiscard]] virtual bool removeMapUnit(size_t field_name) const = 0;
 };
 
 inline std::string toString(const HierarchicalData_ifs *h_data, const std::string &indent) {

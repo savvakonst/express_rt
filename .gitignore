@@ -8,8 +8,9 @@ x64/
 cmake-build-debug-visual-studio/
 cmake-build-release-visual-studio/
 ClionBuild/
-cmake-build-debug/
+cmake-build*/
+debug*/
+release*/
 
 
 tools/set_*_env.bat
-tools/set_x86_env.bat

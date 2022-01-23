@@ -8,7 +8,7 @@ add_library(${PYEMBEDDER_NAME} SHARED
 add_dependencies(${PYEMBEDDER_NAME} pybinder)
 
 
-target_include_directories(${PYEMBEDDER_NAME} PUBLIC ../../../../pybindings/lib)
+target_include_directories(${PYEMBEDDER_NAME} PUBLIC ..)
 target_link_libraries(${PYEMBEDDER_NAME} PUBLIC pybind11::embed)
 target_link_libraries(${PYEMBEDDER_NAME} PRIVATE CommonLib)
 

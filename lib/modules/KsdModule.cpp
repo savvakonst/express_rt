@@ -51,18 +51,18 @@ std::map<std::string, HierarchicalData_ifs*> TaskMapper::getMap() const {
     return ret;
 }
 
-HierarchicalData_ifs* TaskMapper::getArrayUint(size_t id) const {
+HierarchicalData_ifs* TaskMapper::getArrayUnit(size_t id) const {
     if (id >= vector_.size()) return nullptr;
     return (TaskMapper*)&(vector_[id]);
 }
 
-HierarchicalData_ifs* TaskMapper::getMapUint(std::string id) const {
+HierarchicalData_ifs* TaskMapper::getMapUnit(std::string id) const {
     auto map_uint = map_.find(id);
     if (map_uint != map_.end()) return (TaskMapper*)&(map_uint->second);
     return nullptr;
 }
 
-bool TaskMapper::setValue(Value data) {
+bool TaskMapper::setValue(const Value& data) {
     if (isValue() && (data.type_ == type_)) {
         memcpy(ptr_, &data.value_.u64, getTSize(type_));
         return true;
@@ -70,7 +70,7 @@ bool TaskMapper::setValue(Value data) {
     return false;
 }
 
-bool TaskMapper::setValue(std::string data) {
+bool TaskMapper::setValue(const std::string& data) {
     if (isValue()) {
         auto d = Value(data, type_);
         if (!d) return false;
@@ -118,7 +118,7 @@ const TaskMapper* KSDModule::getBranch(const std::string& prop_path) const {
     for (std::sregex_iterator i = begin; i != end; ++i) {
         std::string match_str = i->str();
         tree =
-            std::regex_match(match_str, int_exp) ? tree->getArrayUint(stoul(match_str)) : tree->getMapUint(match_str);
+            std::regex_match(match_str, int_exp) ? tree->getArrayUnit(stoul(match_str)) : tree->getMapUnit(match_str);
         if (tree == nullptr) return nullptr;
     }
     return (const TaskMapper*)tree;

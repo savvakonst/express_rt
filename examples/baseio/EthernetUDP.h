@@ -3,8 +3,8 @@
 
 #include <iostream>
 
+#include "convtemplate/ParameterFieldTree.h"
 #include "extensions/PDefaultBaseIO_ifs.h"
-
 /*
 template <class T>
 Parameter_ifs *createParameter(ExtensionManager *context, const std::string &name) {
@@ -36,6 +36,7 @@ class [[maybe_unused]] EthernetUdpParameter : public Parameter_ifs {
     [[nodiscard]] bool isValid() const override;
 
    private:
+    ParameterFieldTree_ifs* parameter_field_tree_ = nullptr;
     DataSchema_ifs* data_schema_;
 };
 

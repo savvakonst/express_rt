@@ -10,15 +10,15 @@
 
 EthernetUdpParameter::EthernetUdpParameter(ExtensionManager* manager, const std::string& name) : Parameter_ifs(name) {
     auto unit = manager->getLastVersionExtensionUint("data_schema", "ethernet");
-    std::cout << "unit && unit->ptr: " << unit << "\n";
+
     if (unit && unit->ptr) {
-        std::cout << "unit && unit->ptr\n";
         data_schema_ = (DataSchema_ifs*)unit->ptr;
         data_schema_->init(manager);
     }
 
-    std::cout << "------------\n";
-    std::cout << toString(data_schema_, "--") << "\n";
+    parameter_field_tree_ = newParameterFieldTree(data_schema_);
+    // std::cout << "------------\n";
+    // std::cout << toString(data_schema_, "--") << "\n";
 }
 
 EthernetUdpParameter::~EthernetUdpParameter() {}
@@ -77,20 +77,18 @@ bool EthernetUdpParameter::isValid() const { return false; }
 
 Parameter_ifs* EthernetUdParserBuilder::parse(ExtensionManager* manager, HierarchicalData_ifs* other,
                                               HierarchicalData_ifs* header) const {
-    std::cout << "Parameters.List.Ethernet.UDP\n";
-    std::cout << "\nheader:" << toString(header, "  ") << "\n";
-    std::cout << "\nother:" << toString(other, "  ") << "\n";
+    // std::cout << "Parameters.List.Ethernet.UDP\n";
+    // std::cout << "\nheader:" << toString(header, "  ") << "\n";
+    // std::cout << "\nother:" << toString(other, "  ") << "\n";
 
     auto item = new EthernetUdpParameter(manager, "pass");
 
-
-
-    item->setProperty("name", header->getMapUint(" Name")->getValue());
-    item->setProperty("identifier", header->getMapUint("ShortID")->getValue());
-    item->setProperty("units", header->getMapUint("Dimension")->getValue());
-    item->setProperty("category", header->getMapUint("Category")->getValue());
-    item->setProperty("department", header->getMapUint("Department")->getValue());
-    item->setProperty("description", header->getMapUint("Description")->getValue());
+    item->setProperty("name", header->getMapUnit(" Name")->getValue());
+    item->setProperty("identifier", header->getMapUnit("ShortID")->getValue());
+    item->setProperty("units", header->getMapUnit("Dimension")->getValue());
+    item->setProperty("category", header->getMapUnit("Category")->getValue());
+    item->setProperty("department", header->getMapUnit("Department")->getValue());
+    item->setProperty("description", header->getMapUnit("Description")->getValue());
 
     // header->
 

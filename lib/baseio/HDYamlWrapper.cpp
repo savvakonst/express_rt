@@ -1,10 +1,8 @@
-
-#include "HDYamlWrapper.h"
-
 #include <regex>
 
 #include "common/CustomTypes.h"
-#include "yaml-cpp/yaml.h"
+//
+#include "HDYamlWrapper.h"
 
 /*
  * this class use lazy evalution fo building itself.
@@ -42,7 +40,6 @@ Value HierarchicalDataYamlWrapper::getValue() const {
         static const std::regex int_exp("[ ]*(\\+|\\-)?([0-9]+)");
 
         if (std::regex_match(val, num_exp)) {
-
             if (std::regex_match(val, int_exp)) return Value(val, DataType::i64);
             return Value(val, DataType::f64);
         } else if (std::regex_match(val, spec_exp)) {
@@ -94,7 +91,7 @@ std::map<std::string, HierarchicalData_ifs *> HierarchicalDataYamlWrapper::getMa
     return *map_;
 }
 
-HierarchicalData_ifs *HierarchicalDataYamlWrapper::getArrayUint(size_t index) const {
+HierarchicalData_ifs *HierarchicalDataYamlWrapper::getArrayUnit(size_t index) const {
     if (!isArray()) return nullptr;
 
     if (!vector_) {
@@ -114,7 +111,7 @@ HierarchicalData_ifs *HierarchicalDataYamlWrapper::getArrayUint(size_t index) co
     return nullptr;
 }
 
-HierarchicalData_ifs *HierarchicalDataYamlWrapper::getMapUint(std::string field) const {
+HierarchicalData_ifs *HierarchicalDataYamlWrapper::getMapUnit(std::string field) const {
     if (!isMap()) return nullptr;
 
     if (!map_) {

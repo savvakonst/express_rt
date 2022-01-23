@@ -10,8 +10,7 @@
 
 class TaskMapper : public HierarchicalData_ifs {
    public:
-    enum StructType
-    {
+    enum StructType {
         value,
         array,
         map,
@@ -42,13 +41,13 @@ class TaskMapper : public HierarchicalData_ifs {
 
     [[nodiscard]] std::map<std::string, HierarchicalData_ifs *> getMap() const override;
 
-    [[nodiscard]] HierarchicalData_ifs *getArrayUint(size_t id) const override;
+    [[nodiscard]] HierarchicalData_ifs *getArrayUnit(size_t id) const override;
 
-    [[nodiscard]] HierarchicalData_ifs *getMapUint(std::string id) const override;
+    [[nodiscard]] HierarchicalData_ifs *getMapUnit(std::string id) const override;
 
-    [[maybe_unused]] bool setValue(Value data);
+    [[maybe_unused]] bool setValue(const Value &data);
 
-    [[maybe_unused]] bool setValue(std::string data);
+    [[maybe_unused]] bool setValue(const std::string &data);
 
     void setReferencePtr(void *ptr);
 

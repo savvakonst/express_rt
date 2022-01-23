@@ -20,7 +20,7 @@ class DataSchema_ifs {
 
     virtual ~DataSchema_ifs() = default;
 
-    virtual void init(ExtensionManager* manager) = 0;
+    virtual void init(ExtensionManager *manager) = 0;
 
     [[nodiscard]] virtual std::string getType() const = 0;
 
@@ -37,8 +37,6 @@ class DataSchema_ifs {
     [[nodiscard]] virtual const std::vector<DataSchema_ifs *> getMapList() const = 0;
 
     virtual bool validate(HierarchicalData_ifs *data) const = 0;
-
-
 
     std::string name_;
     std::string description_;
@@ -67,18 +65,12 @@ inline std::string toString(DataSchema_ifs *arg, const std::string &intend) {
     return field_name;
 }
 
-
 typedef size_t StatusFlags;
 
-struct ResValue : Value {
-    ResValue() : Value() {}
-
-    ResValue(const Value &arg) : Value(arg) {}
-
-    DataSchema_ifs *field_info_ = nullptr;
-    StatusFlags data_status_ = 0;
+struct ResValue {
+    HierarchicalData_ifs *data_ = nullptr;
+    DataSchema_ifs *schema_ = nullptr;
+    unsigned char stage;
 };
-
-
 
 #endif

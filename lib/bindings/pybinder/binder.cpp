@@ -77,8 +77,8 @@ PYBIND11_MODULE(PY_BINDLIB_NAME, m) {
         .def("getValue", &HierarchicalData_ifs::getValue)
         .def("getArray", &HierarchicalData_ifs::getArray)
         .def("getMap", &HierarchicalData_ifs::getMap)
-        .def("getArrayUint", &HierarchicalData_ifs::getArrayUint)
-        .def("getMapUint", &HierarchicalData_ifs::getMapUint);
+        .def("getArrayUnit", &HierarchicalData_ifs::getArrayUnit)
+        .def("getMapUnit", &HierarchicalData_ifs::getMapUnit);
 
     m.def("isNum", [](std::string a) { return isNum(createDataType(a)); });
     m.def("normalizeType", [](std::string a) { return toString(createDataType(a)); });
