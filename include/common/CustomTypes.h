@@ -218,6 +218,7 @@ inline ArbitraryData createArbitraryData(const std::string &str, DataType type, 
 
     case bool_v:
         res.bool_v = (str == "true");
+
         break;
     case str_v:
     case lstr_v:
@@ -253,6 +254,15 @@ struct Value {
     Value() : type_(DataType::none_v) {}
 
     Value(const Value &value) : value_(copyArbitraryData(value.value_, value.type_)), type_(value.type_) {}
+
+    Value& operator=(const Value& value){
+        if (this == &value)
+            return *this;
+
+        value_ = copyArbitraryData(value.value_, value.type_);
+        type_ = value.type_ ;
+        return *this;
+    }
 
     explicit Value(const char *a) : type_(DataType::str_v) { value_.str_v = createStrV(a); }
 
@@ -311,6 +321,9 @@ struct EthernetSettings {
 
 class COMMON_API_ HierarchicalData_ifs {
    public:
+    //typedef std::map<std::string, HierarchicalData_ifs *> getMapReturn_t;
+    typedef std::vector<std::pair<std::string, HierarchicalData_ifs *>> getMapReturn_t;
+
     virtual ~HierarchicalData_ifs() = default;
 
     [[nodiscard]] virtual bool isArray() const = 0;
@@ -323,7 +336,7 @@ class COMMON_API_ HierarchicalData_ifs {
 
     [[nodiscard]] virtual std::vector<HierarchicalData_ifs *> getArray() const = 0;
 
-    [[nodiscard]] virtual std::map<std::string, HierarchicalData_ifs *> getMap() const = 0;
+    [[nodiscard]] virtual getMapReturn_t getMap() const = 0;
 
     [[nodiscard]] virtual HierarchicalData_ifs *getArrayUnit(size_t index) const = 0;
 
@@ -353,7 +366,7 @@ inline std::string toString(const HierarchicalData_ifs *h_data, const std::strin
         }
     }
     if (h_data->isValue()) {
-        res = h_data->getValue().asString() + "\n";
+        res = h_data->getValue().asString() +" (" +toString(h_data->getValue().type_)+ ")\n";
     }
     return res;
 }

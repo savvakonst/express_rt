@@ -60,7 +60,7 @@ EthernetSettings Module_DCU_::getSrcAddress() const {
 
 const DataSchema_ifs *Module_DCU_::getPropertiesInfoList() { return nullptr; }
 
-ResValue Module_DCU_::getProperty(const std::string &prop_path) const { return KSDModule::getProperty(prop_path); }
+const HierarchicalData_ifs *Module_DCU_::getProperty(const std::string &prop_path) const { return KSDModule::getProperty(prop_path); }
 
 std::string Module_DCU_::getPropertyAsTxt(const std::string &prop_path) const {
     return KSDModule::getPropertyAsTxt(prop_path);

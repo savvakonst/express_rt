@@ -76,8 +76,22 @@ std::vector<HierarchicalData_ifs *> HierarchicalDataYamlWrapper::getArray() cons
     return *vector_;
 }
 
-std::map<std::string, HierarchicalData_ifs *> HierarchicalDataYamlWrapper::getMap() const {
-    if (!isMap()) return std::map<std::string, HierarchicalData_ifs *>();
+HierarchicalData_ifs::getMapReturn_t HierarchicalDataYamlWrapper::getMap() const {
+
+    if (!isMap()) return getMapReturn_t();
+
+    /*
+if (!map_) {
+    auto obj = value_;
+
+    auto map_ptr = (getMapReturn_t **)&map_;
+    (*map_ptr) = new getMapReturn_t();
+    for (auto i : obj) {
+        (**map_ptr)[i.first.as<std::string>()] = new HierarchicalDataYamlWrapper(i.second);
+    }
+}
+return *map_;
+*/
 
     if (!map_) {
         auto obj = value_;
@@ -87,8 +101,17 @@ std::map<std::string, HierarchicalData_ifs *> HierarchicalDataYamlWrapper::getMa
         for (auto i : obj) {
             (**map_ptr)[i.first.as<std::string>()] = new HierarchicalDataYamlWrapper(i.second);
         }
+
     }
-    return *map_;
+
+    getMapReturn_t ret;
+    ret.reserve((*map_).size());
+    for (auto i : *map_)
+        ret.push_back({i.first,i.second});
+
+
+    return ret;
+
 }
 
 HierarchicalData_ifs *HierarchicalDataYamlWrapper::getArrayUnit(size_t index) const {

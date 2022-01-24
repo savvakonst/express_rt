@@ -26,7 +26,7 @@ Module_A02_::~Module_A02_() {}
 
 const DataSchema_ifs* Module_A02_::getPropertiesInfoList() { return nullptr; }
 
-ResValue Module_A02_::getProperty(const std::string& prop_path) const { return KSDModule::getProperty(prop_path); }
+const HierarchicalData_ifs* Module_A02_::getProperty(const std::string& prop_path) const { return KSDModule::getProperty(prop_path); }
 std::string Module_A02_::getPropertyAsTxt(const std::string& prop_path) const {
     return KSDModule::getPropertyAsTxt(prop_path);
 }

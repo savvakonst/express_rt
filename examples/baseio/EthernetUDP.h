@@ -27,7 +27,7 @@ class [[maybe_unused]] EthernetUdpParameter : public Parameter_ifs {
 
     const DataSchema_ifs* getPropertiesInfoList() override;
 
-    [[nodiscard]] const ResValue* getProperty(const std::string& prop_path) const override;
+    [[nodiscard]] const HierarchicalData_ifs* getProperty(const std::string& prop_path) const override;
     [[nodiscard]] std::string getPropertyAsTxt(const std::string& prop_path) const override;
 
     bool setProperty(const std::string& prop_path, const Value& value) override;

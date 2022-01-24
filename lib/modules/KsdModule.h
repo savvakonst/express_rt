@@ -39,7 +39,7 @@ class TaskMapper : public HierarchicalData_ifs {
 
     [[nodiscard]] std::vector<HierarchicalData_ifs *> getArray() const override;
 
-    [[nodiscard]] std::map<std::string, HierarchicalData_ifs *> getMap() const override;
+    [[nodiscard]] getMapReturn_t getMap() const override;
 
     [[nodiscard]] HierarchicalData_ifs *getArrayUnit(size_t id) const override;
 
@@ -103,7 +103,7 @@ class KSDModule : public Module_ifs {
     }
     [[nodiscard]] virtual std::string printProperties(const std::string &indent = "") const override;
 
-    [[nodiscard]] ResValue getProperty(const std::string &prop_path) const override;
+    [[nodiscard]] const HierarchicalData_ifs *getProperty(const std::string &prop_path) const override;
 
     [[nodiscard]] std::string getPropertyAsTxt(const std::string &prop_path) const override;
 

@@ -31,7 +31,9 @@ class COMMON_API_ Parameter_ifs : public BaseClass_ifs {
 
     virtual const DataSchema_ifs *getPropertiesInfoList() = 0;
 
-    [[nodiscard]] virtual const ResValue *getProperty(const std::string &prop_path) const = 0;
+    [[nodiscard]] virtual const HierarchicalData_ifs *getProperty(const std::string &prop_path) const = 0;
+
+    //[[nodiscard]] virtual ResValue getProperty(const std::string &prop_path) const = 0;
 
     [[nodiscard]] virtual std::string getPropertyAsTxt(const std::string &prop_path) const = 0;
 

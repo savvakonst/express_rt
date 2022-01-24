@@ -1,5 +1,5 @@
 #ifndef PY_BINDLIB_NAME
-#    define PY_BINDLIB_NAME test_pybind
+#    error "PY_BINDLIB_NAME undefined"
 #endif
 
 #include "binder.h"

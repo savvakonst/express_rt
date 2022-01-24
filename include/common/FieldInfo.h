@@ -68,6 +68,12 @@ inline std::string toString(DataSchema_ifs *arg, const std::string &intend) {
 typedef size_t StatusFlags;
 
 struct ResValue {
+    ResValue(){
+    }
+
+    ResValue(HierarchicalData_ifs * data):data_(data){
+    }
+
     HierarchicalData_ifs *data_ = nullptr;
     DataSchema_ifs *schema_ = nullptr;
     unsigned char stage;

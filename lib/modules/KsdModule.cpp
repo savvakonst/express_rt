@@ -9,6 +9,7 @@
  *
  *
  */
+
 TaskMapper::TaskMapper(DataType type) : struct_type_(StructType::value), type_(type) { size_ = getTSize(type_); }
 
 TaskMapper::TaskMapper(size_t len, const TaskMapper& value) : struct_type_(StructType::array) {
@@ -39,14 +40,14 @@ std::vector<HierarchicalData_ifs*> TaskMapper::getArray() const {
     return ret;
 }
 
-std::map<std::string, HierarchicalData_ifs*> TaskMapper::getMap() const {
+TaskMapper::getMapReturn_t TaskMapper::getMap() const {
     // std::map<std::string, HierarchicalData_ifs*> ret;
-    // for (auto& i : map_) {
-    //     ret[i.first] = i.second;
+    // for (auto& i : vecmap_) {
+    //     ret[i.first] = (HierarchicalData_ifs*)&i.second;
     // }
-    std::map<std::string, HierarchicalData_ifs*> ret;
+    getMapReturn_t ret;
     for (auto& i : vecmap_) {
-        ret[i.first] = (HierarchicalData_ifs*)&i.second;
+        ret.push_back({ i.first,(HierarchicalData_ifs*)&i.second});
     }
     return ret;
 }
@@ -129,15 +130,15 @@ std::string KSDModule::printProperties(const std::string& indent) const {
     return toString(h_data, indent + "  ");
 }
 
-ResValue KSDModule::getProperty(const std::string& prop_path) const {
-    auto tree = getBranch(prop_path);
-    if (tree->isValue()) return ResValue(tree->getValue());
-    return ResValue();
+const HierarchicalData_ifs* KSDModule::getProperty(const std::string& prop_path) const {
+    auto tree = (TaskMapper*)getBranch(prop_path);
+    //if (tree->isValue())
+    return tree;
 }
 
 std::string KSDModule::getPropertyAsTxt(const std::string& prop_path) const {
-    const ResValue res = getProperty(prop_path);
-    return asString(res.value_, res.type_);
+    auto res = getProperty(prop_path);
+    return toString(res,"");
 }
 
 bool KSDModule::setProperty(const std::string& prop_path, const Value value) {

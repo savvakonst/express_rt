@@ -81,10 +81,8 @@ class PyHierarchicalData : public HierarchicalData_ifs {
         PYBIND11_OVERRIDE_PURE(std::vector<HierarchicalData_ifs *>, HierarchicalData_ifs, getArray);
     }
 
-    typedef std::map<std::string, HierarchicalData_ifs *> getMapRet_t;
-
-    [[nodiscard]] std::map<std::string, HierarchicalData_ifs *> getMap() const override {
-        PYBIND11_OVERRIDE_PURE(getMapRet_t, HierarchicalData_ifs, getMap);
+    [[nodiscard]] getMapReturn_t getMap() const override {
+        PYBIND11_OVERRIDE_PURE(getMapReturn_t, HierarchicalData_ifs, getMap);
     }
 
     [[nodiscard]] HierarchicalData_ifs *getArrayUnit(size_t arg) const override {

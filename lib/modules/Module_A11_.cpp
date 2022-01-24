@@ -27,7 +27,7 @@ Module_A11_::~Module_A11_() {}
 
 const DataSchema_ifs* Module_A11_::getPropertiesInfoList() { return nullptr; }
 
-ResValue Module_A11_::getProperty(const std::string& prop_path) const { return KSDModule::getProperty(prop_path); }
+const HierarchicalData_ifs* Module_A11_::getProperty(const std::string& prop_path) const { return KSDModule::getProperty(prop_path); }
 std::string Module_A11_::getPropertyAsTxt(const std::string& prop_path) const {
     return KSDModule::getPropertyAsTxt(prop_path);
 }

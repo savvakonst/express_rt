@@ -19,8 +19,8 @@ class ParameterFieldTree_ifs : public HierarchicalData_ifs {
         return std::vector<HierarchicalData_ifs *>();
     }
 
-    [[nodiscard]] std::map<std::string, HierarchicalData_ifs *> getMap() const override {
-        return std::map<std::string, HierarchicalData_ifs *>();
+    [[nodiscard]] std::vector<std::pair<std::string, HierarchicalData_ifs *>> getMap() const override {
+        return getMapReturn_t();
     }
 
     [[nodiscard]] HierarchicalData_ifs *getArrayUnit(size_t id) const override { return nullptr; }
@@ -68,7 +68,7 @@ class ParameterFieldTree : public HierarchicalData_ifs {
 
     [[nodiscard]] std::vector<HierarchicalData_ifs *> getArray() const override;
 
-    [[nodiscard]] std::map<std::string, HierarchicalData_ifs *> getMap() const override;
+    [[nodiscard]] std::vector<std::pair<std::string, HierarchicalData_ifs *>> getMap() const override;
 
     [[nodiscard]] HierarchicalData_ifs *getArrayUnit(size_t id) const override;
 

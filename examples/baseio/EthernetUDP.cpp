@@ -17,6 +17,8 @@ EthernetUdpParameter::EthernetUdpParameter(ExtensionManager* manager, const std:
     }
 
     parameter_field_tree_ = newParameterFieldTree(data_schema_);
+    std::cout << "------------\n";
+    std::cout << toString(parameter_field_tree_,"")<< "\n";
     // std::cout << "------------\n";
     // std::cout << toString(data_schema_, "--") << "\n";
 }
@@ -32,7 +34,7 @@ std::string EthernetUdpParameter::getType() const { return "EthernetUdp"; }
 
 const DataSchema_ifs* EthernetUdpParameter::getPropertiesInfoList() { return nullptr; }
 
-const ResValue* EthernetUdpParameter::getProperty(const std::string& prop_path) const { return nullptr; }
+const HierarchicalData_ifs* EthernetUdpParameter::getProperty(const std::string& prop_path) const { return nullptr; }
 
 std::string EthernetUdpParameter::getPropertyAsTxt(const std::string& prop_path) const { return std::string(); }
 
@@ -78,8 +80,8 @@ bool EthernetUdpParameter::isValid() const { return false; }
 Parameter_ifs* EthernetUdParserBuilder::parse(ExtensionManager* manager, HierarchicalData_ifs* other,
                                               HierarchicalData_ifs* header) const {
     // std::cout << "Parameters.List.Ethernet.UDP\n";
-    // std::cout << "\nheader:" << toString(header, "  ") << "\n";
-    // std::cout << "\nother:" << toString(other, "  ") << "\n";
+     std::cout << "\nheader:" << toString(header, "  ") << "\n";
+     std::cout << "\nother:" << toString(other, "  ") << "\n";
 
     auto item = new EthernetUdpParameter(manager, "pass");
 

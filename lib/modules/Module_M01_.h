@@ -87,7 +87,7 @@ class Module_M01_ : public KSDModule {
 
     const DataSchema_ifs* getPropertiesInfoList() override;
 
-    ResValue getProperty(const std::string& prop_path) const override;
+    const HierarchicalData_ifs* getProperty(const std::string& prop_path) const override;
     std::string getPropertyAsTxt(const std::string& prop_path) const override;
 
     bool setProperty(const std::string& prop_path, Value value) override;

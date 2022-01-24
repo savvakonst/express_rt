@@ -33,7 +33,7 @@ class COMMON_API_ Module_ifs : public BaseClass_ifs {
 
     [[nodiscard]] virtual std::string printProperties(const std::string &indent = "") const = 0;
 
-    [[nodiscard]] virtual ResValue getProperty(const std::string &prop_path) const = 0;
+    [[nodiscard]] virtual const HierarchicalData_ifs *getProperty(const std::string &prop_path) const = 0;
 
     [[nodiscard]] virtual std::string getPropertyAsTxt(const std::string &prop_path) const = 0;
 
