@@ -92,6 +92,7 @@ class ExtensionManager {
     map_t<map_t<versionList_t>> tree_;
 };
 
+
 [[maybe_unused]] typedef int (*initUnit_t)(ExtensionManager *);
 
 #endif  // EXRT_EXTENSIONMANAGER_H

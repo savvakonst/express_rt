@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "convtemplate/ParameterFieldTree.h"
+#include "convtemplate/StandardParameter_ifs.h"
 #include "extensions/PDefaultBaseIO_ifs.h"
 /*
 template <class T>
@@ -15,7 +16,7 @@ Parameter_ifs *createParameter(ExtensionManager *context, const std::string &nam
 */
 class ExtensionUnit;
 
-class [[maybe_unused]] EthernetUdpParameter : public Parameter_ifs {
+class [[maybe_unused]] EthernetUdpParameter : public StandardParameter_ifs {
    public:
     EthernetUdpParameter(ExtensionManager* manager, const std::string& name);
 
@@ -25,19 +26,11 @@ class [[maybe_unused]] EthernetUdpParameter : public Parameter_ifs {
 
     [[nodiscard]] std::string getType() const override;
 
-    const DataSchema_ifs* getPropertiesInfoList() override;
-
-    [[nodiscard]] const HierarchicalData_ifs* getProperty(const std::string& prop_path) const override;
-    [[nodiscard]] std::string getPropertyAsTxt(const std::string& prop_path) const override;
-
-    bool setProperty(const std::string& prop_path, const Value& value) override;
-    bool setPropertyAsTxt(const std::string& prop_path, const std::string& value) override;
-
     [[nodiscard]] bool isValid() const override;
 
    private:
-    ParameterFieldTree_ifs* parameter_field_tree_ = nullptr;
-    DataSchema_ifs* data_schema_;
+    //ParameterFieldTree_ifs* parameter_field_tree_ = nullptr;
+    //DataSchema_ifs* data_schema_;
 };
 
 #define ETHERNET_UDP_PB 500

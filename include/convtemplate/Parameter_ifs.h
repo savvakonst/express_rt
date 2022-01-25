@@ -5,7 +5,7 @@
 
 #include "common/BaseClass_ifs.h"
 #include "common/CustomTypes.h"
-#include "common/FieldInfo.h"
+#include "common/DataSchema_ifs.h"
 
 class PrmBuffer_ifs;
 class Parameter_ifs;
@@ -38,6 +38,8 @@ class COMMON_API_ Parameter_ifs : public BaseClass_ifs {
     [[nodiscard]] virtual std::string getPropertyAsTxt(const std::string &prop_path) const = 0;
 
     virtual bool setProperty(const std::string &prop_path, const Value &value) = 0;
+
+    virtual bool setProperty(const std::string& prop_path, const HierarchicalData_ifs * hierarchical_data) = 0;
 
     virtual bool setPropertyAsTxt(const std::string &prop_path, const std::string &value) = 0;
 

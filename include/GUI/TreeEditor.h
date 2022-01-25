@@ -1,7 +1,6 @@
 #ifndef TREE_WIDGET_H
 #define TREE_WIDGET_H
 
-
 #include <QPainter>
 #include <QPalette>
 #include <QPlainTextEdit>
@@ -12,10 +11,8 @@
 #include <iostream>
 
 #include "common/BaseClass_ifs.h"
+#include "common/DataSchema_ifs.h"
 #include "common/Extension.h"
-#include "common/FieldInfo.h"
-
-
 
 class TreeWidgetWrapper_ifs {
    public:

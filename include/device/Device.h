@@ -70,15 +70,15 @@ class COMMON_API_ Device : public BaseClass_ifs {
         return nullptr;
     }
 
-    exo_container<const Module_ifs *> getAllModules();
+    [[maybe_unused]] exo_container<const Module_ifs *> getAllModules();
 
-    const Module_ifs *getModuleFromPath(std::string name);
+    [[maybe_unused]] const Module_ifs *getModuleFromPath(const std::string &name);
 
-    exo_container<const Module_ifs *> getLineFromPath(std::string path);
+    [[maybe_unused]] exo_container<const Module_ifs *> getLineFromPath(const std::string &path);
 
-    status checkValExistence(std::string path);
+    [[maybe_unused]] static status checkValExistence(const std::string &path);
 
-    virtual size_t getTaskSize() const;
+    [[maybe_unused]] virtual size_t getTaskSize() const;
 
     status hasTransceiver() const;
 

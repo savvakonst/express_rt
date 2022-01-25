@@ -2,7 +2,7 @@
 #define EXRT_DATASCHEMA_H
 
 #include "common/CustomTypes.h"
-#include "common/FieldInfo.h"
+#include "common/DataSchema_ifs.h"
 
 class DataSchema : public DataSchema_ifs {
    public:

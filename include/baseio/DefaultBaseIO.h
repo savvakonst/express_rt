@@ -2,7 +2,7 @@
 #define DEFAULTPARSERBUILDER_H
 
 #include "common/BaseClass_ifs.h"
-#include "common/Fieldinfo.h"
+#include "common/DataSchema_ifs.h"
 
 class ExtensionManager;
 class PDefaultBaseIO_ifs;

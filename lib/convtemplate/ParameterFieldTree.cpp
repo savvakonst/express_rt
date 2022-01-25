@@ -93,6 +93,7 @@ class ParameterFieldTreeValue : public ParameterFieldTree_ifs {
     [[nodiscard]] Value getValue() const override { return value_; }
 
     [[maybe_unused]] virtual bool setValue(const Value &data) override {
+
         value_ = data;
         return true;
     }

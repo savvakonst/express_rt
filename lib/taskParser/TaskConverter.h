@@ -2,7 +2,7 @@
 #define EXRT_TASKCONVERTER_H
 
 #include "common/BaseClass_ifs.h"
-#include "common/Fieldinfo.h"
+#include "common/DataSchema_ifs.h"
 
 class PDefaultBaseIO_ifs;
 class Device;

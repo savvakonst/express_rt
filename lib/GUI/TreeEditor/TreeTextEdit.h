@@ -5,17 +5,14 @@
 #ifndef EXRT_TREETEXTEDIT_H
 #define EXRT_TREETEXTEDIT_H
 
-
-
-
 #include <QPainter>
 #include <QPalette>
 #include <QPlainTextEdit>
-
 #include <QStringList>
+
 #include "common/BaseClass_ifs.h"
+#include "common/DataSchema_ifs.h"
 #include "common/Extension.h"
-#include "common/FieldInfo.h"
 
 class TreeTextEdit : public QPlainTextEdit {
     Q_OBJECT

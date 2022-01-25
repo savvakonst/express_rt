@@ -29,7 +29,7 @@ class COMMON_API_ ConversionTemplate : public BaseClass_ifs {
     status addParameter(Parameter_ifs*);
     const Parameter_ifs* getParameter(std::string name) const;
     const exo_container<const Parameter_ifs*> getSingleTypeParameters(std::string type) const;
-    const exo_container<const Parameter_ifs*> getParametersFromPath(std::string path) const;
+    const exo_container<const Parameter_ifs*> getParametersFromPath(std::string searching_path) const;
     status changeParameterName(std::string old, std::string new_name);
     status removeParameter(std::string name);
     status removeParametersFromPath(std::string path);

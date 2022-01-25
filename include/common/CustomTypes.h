@@ -12,7 +12,8 @@
 #define exo_map std::map
 #define exo_set std::set
 
-enum status : bool {
+enum status : bool
+{
     succes = true,
     failure = false
 };
@@ -55,7 +56,8 @@ union ArbitraryData {
     str_v_t str_v;
 };
 
-enum DataType : size_t {
+enum DataType : size_t
+{
     none_v = 0x00,
 
     i8 = 0x101,
@@ -80,15 +82,6 @@ enum DataType : size_t {
     PAIR(i8), PAIR(i16), PAIR(i32), PAIR(i64), PAIR(u8), PAIR(u16), PAIR(u32), PAIR(u64), PAIR(f32), PAIR(f64), \
         PAIR(bool_v), PAIR(str_v), PAIR(lstr_v)
 
-#define PAIR(X) \
-    { #X, X }
-static const std::map<std::string, DataType> g_str_types_map = {MAP_DEF};
-#undef PAIR
-#define PAIR(X) \
-    { X, #X }
-static const std::map<DataType, std::string> g_types_str_map = {MAP_DEF};
-#undef PAIR
-
 #define COMMON_SINT 0x100  // all int and uint
 #define COMMON_UINT 0x200  // signed int
 #define COMMON_INT 0x300   // unsigned int
@@ -101,6 +94,14 @@ static const std::map<DataType, std::string> g_types_str_map = {MAP_DEF};
 inline size_t getTSize(DataType type) { return (size_t)0xf & (size_t)type; }
 
 inline bool isNum(DataType type) { return (bool)(COMMON_NUM & (size_t)type); }
+
+inline bool isInt(DataType type) { return (bool)(COMMON_INT & (size_t)type); }
+
+inline bool isSInt(DataType type) { return (bool)(COMMON_SINT & (size_t)type); }
+
+inline bool isUnt(DataType type) { return (bool)(COMMON_UINT & (size_t)type); }
+
+inline bool isFloat(DataType type) { return (bool)(COMMON_FlOAT & (size_t)type); }
 
 inline bool isBool(DataType type) { return (bool)(DataType::bool_v == type); }
 
@@ -157,26 +158,9 @@ case arg:           \
 #undef TO_STR
 }
 
-inline DataType createDataType(const std::string &str) {
-    auto val = g_str_types_map.find(str);
-    if (val != g_str_types_map.end()) return val->second;
+COMMON_API_ DataType createDataType(const std::string &str);
 
-    if (str == "string") return DataType::str_v;
-    else if (str == "long_string")
-        return DataType::lstr_v;
-    else if (str == "bool")
-        return DataType::bool_v;
-    else if (str == "int")
-        return DataType::i32;
-
-    return DataType::none_v;
-}
-
-inline std::string toString(DataType type) {
-    auto val = g_types_str_map.find(type);
-    if (val != g_types_str_map.end()) return val->second;
-    return "none_v";
-}
+COMMON_API_ std::string toString(DataType type);
 
 inline ArbitraryData createArbitraryData(const std::string &str, DataType type, bool &status) {
     ArbitraryData res;
@@ -255,13 +239,35 @@ struct Value {
 
     Value(const Value &value) : value_(copyArbitraryData(value.value_, value.type_)), type_(value.type_) {}
 
-    Value& operator=(const Value& value){
-        if (this == &value)
-            return *this;
+    Value &operator=(const Value &value) {
+        if (this == &value) return *this;
 
         value_ = copyArbitraryData(value.value_, value.type_);
-        type_ = value.type_ ;
+        type_ = value.type_;
         return *this;
+    }
+
+    Value(const Value &arg, DataType target_type) : type_(DataType::none_v) {
+        if (arg.type_ == type_) {
+            value_ = copyArbitraryData(arg.value_, arg.type_);
+            type_ = arg.type_;
+        } else if (isInt(arg.type_)) {
+            if (!isInt(target_type)) return;
+        } else if (isString(arg.type_)) {
+            if (!isString(target_type)) return;
+            type_ = target_type;
+            value_ = copyArbitraryData(arg.value_, arg.type_);
+        } else if (isFloat(arg.type_)) {
+            if (!isFloat(target_type)) return;
+            type_ = target_type;
+            if (arg.type_ == DataType::f64) value_.f32 = (float)arg.value_.f64;
+            else if (arg.type_ == DataType::f32)
+                value_.f64 = (double)arg.value_.f32;
+        } else if (isBool(arg.type_)) {
+            if (!isString(target_type)) return;
+            type_ = target_type;
+            value_ = copyArbitraryData(arg.value_, arg.type_);
+        }
     }
 
     explicit Value(const char *a) : type_(DataType::str_v) { value_.str_v = createStrV(a); }
@@ -305,6 +311,8 @@ struct Value {
     DataType type_;
 };
 
+inline std::string toString(const Value &value) { return toString(value); }
+
 struct EthernetAddress {
     uint8_t mac[6];
     uint8_t port[2];
@@ -321,7 +329,6 @@ struct EthernetSettings {
 
 class COMMON_API_ HierarchicalData_ifs {
    public:
-    //typedef std::map<std::string, HierarchicalData_ifs *> getMapReturn_t;
     typedef std::vector<std::pair<std::string, HierarchicalData_ifs *>> getMapReturn_t;
 
     virtual ~HierarchicalData_ifs() = default;
@@ -340,35 +347,13 @@ class COMMON_API_ HierarchicalData_ifs {
 
     [[nodiscard]] virtual HierarchicalData_ifs *getArrayUnit(size_t index) const = 0;
 
+    /*  need provide access not only to map entries(units) also to array entries(units);
+     *  getMapUnit("10") is expected to behave like getArrayUnit(10). */
     [[nodiscard]] virtual HierarchicalData_ifs *getMapUnit(std::string field_name) const = 0;
-
-    //[[nodiscard]] virtual bool removeArrayUnit(size_t index) const = 0;
-
-    //[[nodiscard]] virtual bool removeMapUnit(size_t field_name) const = 0;
 };
 
-inline std::string toString(const HierarchicalData_ifs *h_data, const std::string &indent) {
-    std::string res;
-    if (h_data->isMap()) {
-        auto array = h_data->getMap();
-        res = "\n";
-        for (auto &i : array) {
-            if (i.second == nullptr) return res;
-            res += indent + "\"" + i.first + "\": " + toString(i.second, indent + "  ");
-        }
-    }
-    if (h_data->isArray()) {
-        auto array = h_data->getArray();
-        int k = 0;
-        res = "\n";
-        for (auto &i : array) {
-            res += indent + "[" + std::to_string(k) + "] :" + toString(i, indent + "  ");
-        }
-    }
-    if (h_data->isValue()) {
-        res = h_data->getValue().asString() +" (" +toString(h_data->getValue().type_)+ ")\n";
-    }
-    return res;
-}
+COMMON_API_ const HierarchicalData_ifs *getBranch(const HierarchicalData_ifs *h_data, const std::string path);
+
+COMMON_API_ std::string toString(const HierarchicalData_ifs *h_data, const std::string &indent);
 
 #endif

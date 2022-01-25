@@ -3,7 +3,7 @@
 
 #include "common/BaseClass_ifs.h"
 #include "common/CustomTypes.h"
-#include "common/FieldInfo.h"
+#include "common/DataSchema_ifs.h"
 
 class ParameterFieldTree_ifs : public HierarchicalData_ifs {
    public:
@@ -31,8 +31,6 @@ class ParameterFieldTree_ifs : public HierarchicalData_ifs {
 
     [[nodiscard]] virtual bool removeArrayUnit(size_t index) { return false; }
 
-    //[[nodiscard]] virtual bool setMapUnit(size_t field_name, HierarchicalData_ifs *data) { return false; }
-
     [[maybe_unused]] virtual bool setValue(const Value &data) { return false; }
 
     [[maybe_unused]] virtual bool setValue(const std::string &data) { return false; }
@@ -40,9 +38,10 @@ class ParameterFieldTree_ifs : public HierarchicalData_ifs {
 
 COMMON_API_ ParameterFieldTree_ifs *newParameterFieldTree(DataSchema_ifs *data_schema, size_t dim = 0);
 
-class ParameterFieldTree : public HierarchicalData_ifs {
+class COMMON_API_ ParameterFieldTree : public HierarchicalData_ifs {
    public:
-    enum StructType {
+    enum StructType
+    {
         value,
         array,
         map,

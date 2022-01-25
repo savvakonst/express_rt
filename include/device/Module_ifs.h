@@ -5,7 +5,7 @@
 
 #include "common/BaseClass_ifs.h"
 #include "common/CustomTypes.h"
-#include "common/FieldInfo.h"
+#include "common/DataSchema_ifs.h"
 
 class ModuleStream_ifs;
 class PrmBuffer_ifs;

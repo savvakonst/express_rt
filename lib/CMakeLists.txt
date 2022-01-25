@@ -10,9 +10,12 @@ endif ()
 
 
 add_library(CommonLib SHARED
-        convtemplate/ConversionTemplate.cpp
         device/Device.cpp
-        convtemplate/ParameterFieldTree.cpp)
+        common/CustomTypes.cpp
+        common/DataSchema_ifs.cpp
+        convtemplate/ConversionTemplate.cpp
+        convtemplate/ParameterFieldTree.cpp
+        convtemplate/StandardParameter_ifs.cpp)
 
 
 target_include_directories(CommonLib PUBLIC ../include)

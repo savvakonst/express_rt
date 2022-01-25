@@ -9,8 +9,8 @@
 #include <pybind11/stl.h>
 
 #include "common/CustomTypes.h"
+#include "common/DataSchema_ifs.h"
 #include "common/ExtensionManager.h"
-#include "common/FieldInfo.h"
 /* helper class definition
  *
  *
