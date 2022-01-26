@@ -19,11 +19,6 @@ EthernetUdpParameter::EthernetUdpParameter(ExtensionManager* manager, const std:
     }
 
     parameter_field_tree_ = newParameterFieldTree(data_schema_);
-    std::cout << "------------\n";
-    // std::cout << toString(parameter_field_tree_,"")<< "\n";
-    std::cout << toString(getBranch(parameter_field_tree_, "destination"), "") << "\n";
-    // std::cout << "------------\n";
-    // std::cout << toString(data_schema_, "--") << "\n";
 }
 
 EthernetUdpParameter::~EthernetUdpParameter() {}
@@ -55,10 +50,6 @@ struct PropBuilder {
 
 Parameter_ifs* EthernetUdParserBuilder::parse(ExtensionManager* manager, HierarchicalData_ifs* other,
                                               HierarchicalData_ifs* header) const {
-    // std::cout << "Parameters.List.Ethernet.UDP\n";
-    //std::cout << "\nheader:" << toString(header, "  ") << "\n";
-    //std::cout << "\nother:" << toString(other, "  ") << "\n";
-
     auto item = new EthernetUdpParameter(manager, "pass");
     PropBuilder builder = {item, header};
 
@@ -71,13 +62,14 @@ Parameter_ifs* EthernetUdParserBuilder::parse(ExtensionManager* manager, Hierarc
     builder.setData("common/department", "Department");
     builder.setData("common/description", "Description");
 
+    // TODO: need to  build path
+
     builder.header_ = other;
 
     builder.setData("source/ip", "Src.IP");
     builder.setData("source/port", "Src.Port");
     builder.setData("destination/ip", "Dst.IP");
     builder.setData("destination/port", "Dst.Port");
-
 
     static const std::map<int64_t, std::string> type_mapper{{1, "i8"},  {2, "i16"},    {3, "i32"},
                                                             {4, "i64"}, {0x24, "f32"}, {0x28, "f64"}};
@@ -112,7 +104,5 @@ Parameter_ifs* EthernetUdParserBuilder::parse(ExtensionManager* manager, Hierarc
     builder.setData("scale_a1", "A0");
     builder.setData("offset_a2", "A1");
 
-
-    //std::cout << toString(item->getProperty(""), "") << "\n";
     return item;
 }
