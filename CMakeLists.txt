@@ -21,7 +21,7 @@ endif ()
 
 add_subdirectory(lib)
 add_subdirectory(examples)
-
+add_subdirectory(doctest)
 
 if (MSVC)
     target_compile_options(CommonLib PUBLIC /wd4251)

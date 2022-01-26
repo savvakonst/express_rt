@@ -1,0 +1,2 @@
+add_executable(Doctest_tests_run ValueTest.cpp)
+target_link_libraries(Doctest_tests_run PUBLIC CommonLib)
