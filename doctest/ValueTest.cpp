@@ -76,6 +76,12 @@ TEST_CASE("CheckConversion") {  // 12/2/2020 -> 737761
         Value v(std::string("1256"), DataType::u16);
         LIST(v);
     }
+
+    SUBCASE("14353252321, DataType::i64") {
+        Value v(std::string("14353252321"), DataType::i64);
+        LIST(v);
+    }
+
     /*
     CHECK(gregDate.getAbsoluteDate() == 737761);
     */

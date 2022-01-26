@@ -12,7 +12,8 @@
 #define exo_map std::map
 #define exo_set std::set
 
-enum status : bool {
+enum status : bool
+{
     succes = true,
     failure = false
 };
@@ -55,7 +56,8 @@ union ArbitraryData {
     str_v_t str_v;
 };
 
-enum DataType : size_t {
+enum DataType : size_t
+{
     none_v = 0x00,
 
     i8 = 0x101,
@@ -256,6 +258,7 @@ struct Value {
             else
                 value_.i64 = 0;
             memcpy(&value_, &(arg.value_), s);
+            type_ = arg.type_;
 
         } else if (isString(arg.type_)) {
             if (!isString(target_type)) return;
@@ -268,7 +271,7 @@ struct Value {
             else if (arg.type_ == DataType::f32)
                 value_.f64 = (double)arg.value_.f32;
         } else if (isBool(arg.type_)) {
-            if (!isString(target_type)) return;
+            if (!isBool(target_type)) return;
             type_ = target_type;
             value_ = copyArbitraryData(arg.value_, arg.type_);
         }

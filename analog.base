@@ -1,7 +1,7 @@
 {
   " File.About": "KSD-Express Database File",
   " File.Company": "АО Элистех",
-  " File.Date": "2022.1.12",
+  " File.Date": "2022.1.26",
   " File.Version": "1.0.0.0",
   "Base. Name": "Новая база данных",
   "Base.Alteration.List": [
@@ -14,9 +14,34 @@
       "Date": "2022.01.12",
       "EditedBy": "Test",
       "Time": "11:35:59"
+    },
+    {
+      "Date": "2022.01.26",
+      "EditedBy": "Test",
+      "Time": "15:32:54"
+    },
+    {
+      "Date": "2022.01.26",
+      "EditedBy": "Test",
+      "Time": "15:33:19"
+    },
+    {
+      "Date": "2022.01.26",
+      "EditedBy": "Test",
+      "Time": "15:33:53"
+    },
+    {
+      "Date": "2022.01.26",
+      "EditedBy": "Test",
+      "Time": "16:00:45"
+    },
+    {
+      "Date": "2022.01.26",
+      "EditedBy": "Test",
+      "Time": "16:01:20"
     }
   ],
-  "Base.Alteration.Number": 2,
+  "Base.Alteration.Number": 7,
   "Base.CreatedBy": "Test",
   "Base.Date": "2022.01.12",
   "Base.Description": "",
@@ -120,7 +145,7 @@
   "Parameters.List": [
     {
       " Index": 0,
-      " Name": "параметр Ethernet",
+      " Name": "parameter_ethernet",
       "Category": "",
       "Control.Levels.Number": 0,
       "Delay": 0,
@@ -154,40 +179,7 @@
     },
     {
       " Index": 1,
-      " Name": "параметр Аналоговый",
-      "Category": "",
-      "Control.Levels.Number": 0,
-      "Delay": 0,
-      "Department": "",
-      "Description": "",
-      "Dimension": "",
-      "Formula": "x = param()\ny = x\nreturn double(y)\n",
-      "Method": 0,
-      "Module.ID": 1597059137,
-      "Module.Name": "КСД/А01",
-      "Module.Slot": 1,
-      "Points.Approximation": false,
-      "Points.Number": 0,
-      "Points.Polymon.List": [
-        {
-          "Index": 0,
-          "Value": 0
-        },
-        {
-          "Index": 1,
-          "Value": 0
-        }
-      ],
-      "Points.Polymon.Rank": 1,
-      "Precision2": false,
-      "Raw": false,
-      "ShortID": "tmp_analog_",
-      "System": "",
-      "Type": 1
-    },
-    {
-      " Index": 2,
-      " Name": "параметр Вибро",
+      " Name": "parameter_vibro",
       "Category": "",
       "Control.Levels.Number": 0,
       "Delay": 0,
@@ -217,17 +209,50 @@
       "ShortID": "tmp_analog_vibration",
       "System": "",
       "Type": 2
+    },
+    {
+      " Index": 2,
+      " Name": "parameter_analog",
+      "Category": "",
+      "Control.Levels.Number": 0,
+      "Delay": 0,
+      "Department": "",
+      "Description": "",
+      "Dimension": "",
+      "Formula": "x = param()\ny = x\nreturn double(y)\n",
+      "Method": 0,
+      "Module.ID": 1597059137,
+      "Module.Name": "КСД/А01",
+      "Module.Slot": 1,
+      "Points.Approximation": false,
+      "Points.Number": 0,
+      "Points.Polymon.List": [
+        {
+          "Index": 0,
+          "Value": 0
+        },
+        {
+          "Index": 1,
+          "Value": 0
+        }
+      ],
+      "Points.Polymon.Rank": 1,
+      "Precision2": false,
+      "Raw": false,
+      "ShortID": "tmp_analog_",
+      "System": "",
+      "Type": 1
     }
   ],
   "Parameters.List.Analog": [
     {
-      " Name": "параметр Аналоговый",
+      " Name": "parameter_analog",
       "Line": 0
     }
   ],
   "Parameters.List.Analog.Vibro": [
     {
-      " Name": "параметр Вибро",
+      " Name": "parameter_vibro",
       "Line": 0,
       "Type": 0,
       "Vibro.Description": "Напряжение",
@@ -237,18 +262,18 @@
   ],
   "Parameters.List.Ethernet.UDP": [
     {
-      " Name": "параметр Ethernet",
+      " Name": "parameter_ethernet",
       "A0": 0,
       "A1": 1,
       "Data.Endian": 0,
-      "Data.Type": 1,
-      "Dst.IP": 14353252321,
+      "Data.Type": 2,
+      "Dst.IP": 1869573999,
       "Dst.Port": 100,
       "Line": 0,
-      "MSB": 7,
+      "MSB": 0,
       "Offset.Bytes": 0,
-      "Rank": 8,
-      "Sign": false,
+      "Rank": 16,
+      "Sign": true,
       "Src.IP": 0,
       "Src.Port": 0
     }

@@ -16,7 +16,7 @@ source_group(headers FILES ${Headers})
 set(YAML_BUILD_SHARED_LIBS ON)
 set(YAML_CPP_BUILD_TESTS OFF)
 set(YAML_CPP_BUILD_TOOLS OFF)
-set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)
+
 
 include(FetchContent)
 FetchContent_Declare( # TODO: need to set up a source code destination directory to avoid source code duplication

@@ -42,7 +42,7 @@ class ParameterFieldTreeArray : public ParameterFieldTree_ifs {
 
 class ParameterFieldTreeMap : public ParameterFieldTree_ifs {
    public:
-    //typedef std::pair<std::string, HierarchicalData_ifs *> tuple_t;
+    // typedef std::pair<std::string, HierarchicalData_ifs *> tuple_t;
 
     ParameterFieldTreeMap(DataSchema_ifs *data_schema) {
         auto map_list = data_schema->getMapList();
@@ -55,11 +55,11 @@ class ParameterFieldTreeMap : public ParameterFieldTree_ifs {
     [[nodiscard]] bool isMap() const override { return true; }
 
     [[nodiscard]] std::vector<std::pair<std::string, HierarchicalData_ifs *>> getMap() const override {
-        //std::map<std::string, HierarchicalData_ifs *> ret;
-        //for (auto &i : vecmap_) {
-        //    ret[i.first] = i.second;
-        //}
-        //return ret
+        // std::map<std::string, HierarchicalData_ifs *> ret;
+        // for (auto &i : vecmap_) {
+        //     ret[i.first] = i.second;
+        // }
+        // return ret
         return vecmap_;
     }
 
@@ -78,12 +78,11 @@ class ParameterFieldTreeValue : public ParameterFieldTree_ifs {
    public:
     ParameterFieldTreeValue(DataSchema_ifs *data_schema) {
         type_ = createDataType(data_schema->getType());
-        //value_ = data_schema->default_value_;
+        // value_ = data_schema->default_value_;
         if (!value_) {
-            if(isString(type_)) {
+            if (isString(type_)) {
                 value_ = Value(std::string(""), DataType::str_v);
-            }
-            else
+            } else
                 value_ = Value(std::string("0"), type_);
         }
     }
@@ -93,14 +92,17 @@ class ParameterFieldTreeValue : public ParameterFieldTree_ifs {
     [[nodiscard]] Value getValue() const override { return value_; }
 
     [[maybe_unused]] virtual bool setValue(const Value &data) override {
-
-        value_ = data;
-        return true;
+        auto v = Value(data, type_);
+        auto status = bool(v);
+        if (status) value_ = v;
+        return status;
     }
 
     [[maybe_unused]] virtual bool setValue(const std::string &data) override {
-        value_ = Value(data, type_);
-        return true;
+        auto v = Value(data, type_);
+        auto status = bool(v);
+        if (status) value_ = v;
+        return status;
     }
 
    private:
@@ -168,7 +170,7 @@ ParameterFieldTree::getMapReturn_t ParameterFieldTree::getMap() const {
     getMapReturn_t ret;
     ret.reserve(ret.size());
     for (auto &i : vecmap_) {
-        ret.push_back({i.first,(HierarchicalData_ifs *)&i.second});
+        ret.push_back({i.first, (HierarchicalData_ifs *)&i.second});
     }
     return ret;
 }
@@ -186,7 +188,7 @@ HierarchicalData_ifs *ParameterFieldTree::getMapUnit(std::string id) const {
 
 bool ParameterFieldTree::setArrayUnit(size_t index, HierarchicalData_ifs *data) { return false; }
 
-//bool ParameterFieldTree::setMapUnit(size_t field_name, HierarchicalData_ifs *data) { return false; }
+// bool ParameterFieldTree::setMapUnit(size_t field_name, HierarchicalData_ifs *data) { return false; }
 
 bool ParameterFieldTree::setValue(Value data) { return false; }
 
