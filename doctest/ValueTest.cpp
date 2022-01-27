@@ -1,11 +1,12 @@
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Winvalid-token-paste"
+
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
 #include "doctest.h"
 //
 #include "common/CustomTypes.h"
 
+//#pragma clang diagnostic push
+//#pragma clang diagnostic ignored "-Winvalid-token-paste"
 #define LIST(SRC)    \
     CASE_(i8, SRC);  \
     CASE_(i16, SRC); \
@@ -58,7 +59,7 @@ ArbitraryData cast(ArbitraryData src, DataType src_type, DataType dst_type) {
         CHECK(test_v.value_.##DST == dst.##DST);                \
     }
 
-TEST_CASE("CheckConversion") {  // 12/2/2020 -> 737761
+TEST_CASE("Check conversion") {  // 12/2/2020 -> 737761
 
     SUBCASE("-1256, DataType::i32;") {
         Value v(std::string("-1256"), DataType::i32);
@@ -87,4 +88,4 @@ TEST_CASE("CheckConversion") {  // 12/2/2020 -> 737761
     */
 }
 
-#pragma clang diagnostic pop
+//#pragma clang diagnostic pop

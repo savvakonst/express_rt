@@ -15,6 +15,7 @@ file(GLOB Sources *.cpp)
 add_library(Reader
         ${Sources}
         ${Headers}
+        PseudoSyncPrmBuffer.cpp
         )
 
 target_include_directories(Reader PUBLIC ..)

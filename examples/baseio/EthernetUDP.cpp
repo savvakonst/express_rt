@@ -48,6 +48,37 @@ struct PropBuilder {
     }
 };
 
+/*
+" Name": "parameter_vibro",
+"Line": 0,
+"Type": 0,
+"Vibro.Description": "Напряжение",
+"Vibro.Length": 30,
+"Vibro.Ration": 50
+
+ " Name": "parameter_vibro",
+"Line": 0,
+"Type": 1,
+"Vibro.Description": "Ускорение",
+"Vibro.Length": 30,
+"Vibro.Ration": 50
+
+" Name": "parameter_vibro",
+"Line": 0,
+"Type": 2,
+"Vibro.Description": "Скорость",
+"Vibro.Length": 30,
+"Vibro.Ration": 50
+
+" Name": "parameter_vibro",
+"Line": 0,
+"Type": 3,
+"Vibro.Description": "Перемещение",
+"Vibro.Length": 30,
+"Vibro.Ration": 50
+
+ */
+
 Parameter_ifs* EthernetUdParserBuilder::parse(ExtensionManager* manager, HierarchicalData_ifs* other,
                                               HierarchicalData_ifs* header) const {
     auto item = new EthernetUdpParameter(manager, "pass");

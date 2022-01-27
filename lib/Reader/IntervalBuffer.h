@@ -15,15 +15,16 @@ class PseudoSyncPrmBuffer;
 class IntervalBuffer : public Reader_ifs {
    public:
     IntervalBuffer(PseudoSyncPrmBuffer *parent, const Borders &borders) : parent_(parent), borders_(borders){};
-    ~IntervalBuffer() override { delete[] data; }
+    ~IntervalBuffer() override { delete[] data_; }
 
     std::unique_ptr<Reader_ifs::Chunk> getPoints(const Borders &borders, Point *ptr, size_t target_len) override;
-    Borders getAvailableBorders();
+    Borders getAvailableBorders() override;
 
     bool lock(bool arg) override;
     bool isLock() override;
 
-    Reader_ifs::Point *data = nullptr;
+    Reader_ifs::Point *data_ = nullptr;
+    Reader_ifs::Point *data_ovf_ = nullptr;
 
     size_t seed_length_ = 0;
 
@@ -33,10 +34,10 @@ class IntervalBuffer : public Reader_ifs {
     size_t length_ = 0;
 
     /*    this is the pos in intervals buffer from witch starts intervals counting
-     * (pos of first interval in in buffer ) */
+     * (pos of first interval in buffer ) */
     size_t start_pos_ = 0;
 
-    Point *itrv_ = 0;
+    // Point *itrv_ = 0;
 
     /*    this is the number of points which are contained
      * in "intervals_borders_" */
@@ -44,12 +45,12 @@ class IntervalBuffer : public Reader_ifs {
 
     Borders borders_;  // = {AbsoluteTime(), AbsoluteTime()};
 
-    size_t ord_ = 0;
+    size_t remainder_ = 0;
     size_t step_ = 0;
-    size_t step_1_ = 0;
-    size_t step_2_ = 0;
+    // size_t step_1_ = 0;
+    size_t k_r_ = 0;
 
-    size_t buffer_pos_of_right_border_ = 0;
+    size_t pos_of_right_buffer_border_ = 0;
 
     PseudoSyncPrmBuffer *parent_;
 };

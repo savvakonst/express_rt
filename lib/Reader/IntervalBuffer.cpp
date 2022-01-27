@@ -10,7 +10,7 @@
 
 bool IntervalBuffer::lock(bool arg) { return parent_->lock(arg); }
 
-bool IntervalBuffer::isLock() { return parent_->is_locked; }
+bool IntervalBuffer::isLock() { return parent_->is_locked_; }
 
 Borders IntervalBuffer::getAvailableBorders() {
     // TODO  I'm not sure what is worth returning these boundaries. may be parent->borders_
@@ -19,7 +19,6 @@ Borders IntervalBuffer::getAvailableBorders() {
 
 std::unique_ptr<Reader_ifs::Chunk> IntervalBuffer::getPoints(const Borders &borders, Reader_ifs::Point *ptr,
                                                              size_t target_len) {
-
     while (false == parent_->lock(true)) {
     }
     Borders cr_borders = borders;
@@ -76,10 +75,11 @@ std::unique_ptr<Reader_ifs::Chunk> IntervalBuffer::getPoints(const Borders &bord
 
         step_ = (capacity_ / seed_length_);
         length_ = capacity_ / step_ + 2;
-        ord_ = capacity_ % step_;
+        data_ovf_ = data_ + length_;
+        remainder_ = capacity_ % step_;
 
         auto tmp = parent_->buffer_start_pos_ + begin;
-        buffer_pos_of_right_border_ = EXRT_remainder(tmp, parent_->buffer_length_);
+        pos_of_right_buffer_border_ = EXRT_remainder(tmp, parent_->buffer_length_);
         parent_->increasePoints(capacity_, this);
     }
 
@@ -98,13 +98,13 @@ std::unique_ptr<Reader_ifs::Chunk> IntervalBuffer::getPoints(const Borders &bord
     size_t last_index = begin_offset;
 
     Point *il = ptr - 1;
-    Point &buf_interval = data[last_index];
+    Point &buf_interval = data_[last_index];
 
     size_t pos = 0;
     size_t transition_index = begin_offset;
 
     for (size_t i = begin_offset; i < first_end_offset; i++) {
-        Point &val = data[i];
+        Point &val = data_[i];
         if (i == transition_index) {
             il++;
             pos++;
@@ -125,7 +125,7 @@ std::unique_ptr<Reader_ifs::Chunk> IntervalBuffer::getPoints(const Borders &bord
     begin_offset = length_ - begin_offset;
 
     for (size_t i = 0; i < second_end_offset; i++) {
-        Point &val = data[i];
+        Point &val = data_[i];
         if (i == transition_index) {
             il++;
             pos++;
@@ -152,7 +152,6 @@ std::unique_ptr<Reader_ifs::Chunk> IntervalBuffer::getPoints(const Borders &bord
     chunk_ptr->number_of_points_ = pos;
     chunk_ptr->borders_ = cr_borders;
     chunk_ptr->next_ = end_chunk;
-
 
     return ret;
 }
