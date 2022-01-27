@@ -37,7 +37,6 @@ int initDefaultBaseIO(ExtensionManager *manager) {
     return 0;
 }
 
-
 #ifndef DEFAULT_PARAMETERS_LIB_NAME
 #    error "DEFAULT_PARAMETERS_NAME undefined"
 #endif
@@ -63,9 +62,6 @@ static ExtensionInfo g_default_parameters_info = {"default parameters", 0x01, g_
 InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, DEFAULT_PARAMETERS_LIB_NAME)(void) {
     return &g_default_parameters_info;
 }
-
-/*
-typedef std::unique_ptr<PDefaultBaseIO_ifs> unique_pb_t;
 
 /*
 

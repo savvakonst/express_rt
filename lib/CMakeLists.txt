@@ -13,6 +13,7 @@ add_library(CommonLib SHARED
         device/Device.cpp
         common/CustomTypes.cpp
         common/DataSchema_ifs.cpp
+        common/ExtensionManager.cpp
         convtemplate/ConversionTemplate.cpp
         convtemplate/ParameterFieldTree.cpp
         convtemplate/StandardParameter_ifs.cpp)

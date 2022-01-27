@@ -1,21 +1,15 @@
 
 #define _USE_MATH_DEFINES
 
-
+#include "GUI/TreeEditor.h"
 
 #include <QCheckBox>
 #include <QComboBox>
 #include <QLineEdit>
-
-
 #include <QStringList>
 #include <QTreeWidget>
-
 #include <iostream>
 
-
-
-#include "GUI/TreeEditor.h"
 #include "TreeTextEdit.h"
 
 TreeEditor::TreeEditor(DataSchema_ifs *data_schema, QWidget *parent) : TreeEditor(parent) {
@@ -39,9 +33,7 @@ TreeEditor::TreeEditor(QWidget *parent) : QTreeWidget(parent), update_signal_(th
 
     this->setAlternatingRowColors(true);
 }
-void TreeEditor::setupProperties() {
-    setupProperties(data_schema_);
-}
+void TreeEditor::setupProperties() { setupProperties(data_schema_); }
 
 void TreeEditor::setupProperties(DataSchema_ifs *ds, QTreeWidgetItem *parent_item) {
     data_schema_ = ds;
@@ -51,8 +43,6 @@ void TreeEditor::setupProperties(DataSchema_ifs *ds, QTreeWidgetItem *parent_ite
     // item->setFlags(item->flags() | Qt::ItemIsEditable);
     // parent_item->setFlags(parent_item->flags() | Qt::ItemIsTristate |
     //                       Qt::ItemIsUserCheckable);
-
-
 
     auto name = ds->description_.c_str();
     item->setText(0, name);
@@ -73,6 +63,7 @@ void TreeEditor::setupProperties(DataSchema_ifs *ds, QTreeWidgetItem *parent_ite
             auto list = *(*cm).second;
             for (treeWidgetWrapperConstructor wrapperConstructor : list)
                 if (w = wrapperConstructor(ds, nullptr)) break;
+
             if (w) {
                 // if (!w->getWidget()->metaObject()->inherits(&QComboBox::staticMetaObject))
                 w->getWidget()->setStyleSheet(
@@ -117,7 +108,6 @@ void TreeEditor::addExtensionUint(ExtensionUnit *uint) {
         }
     }
 }
-
 
 /*
  *
@@ -255,23 +245,20 @@ class TreeComboBox : public QComboBox {
     DataSchema_ifs *data_schema_ = nullptr;
 };
 
-
 #ifndef TREE_EDITOR_LIB_NAME
 #    error "TREE_EDITOR_LIB_NAME undefined"
 #endif
 
-
-QWidget* newTreeEditor(QWidget* parent){
-    return new TreeEditor(parent);
-}
-
+QWidget *newTreeEditor(QWidget *parent) { return new TreeEditor(parent); }
 
 static ExtensionUnit g_tree_widget_extension_uint[] = {
-    {"large_text", "tree_widget_wrapper", "return wrapper of TreeTextEdit", (void *)newTreeWidgetWrapper<TreeTextEdit>, 0x00},
+    {"large_text", "tree_widget_wrapper", "return wrapper of TreeTextEdit", (void *)newTreeWidgetWrapper<TreeTextEdit>,
+     0x00},
     {"bool", "tree_widget_wrapper", "return wrapper of TreeCheckBox", (void *)newTreeWidgetWrapper<TreeCheckBox>, 0x00},
     {"text", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeLineEdit>, 0x00},
     {"ip", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeIPEdit>, 0x00},
-    {"number", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeLineEdit>, 0x00},
+    {"number", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeLineEdit>,
+     0x00},
     {"enum", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeComboBox>, 0x00},
     {"tree_editor", "tree_editor", "", (void *)newTreeEditor, 0x00},
     {nullptr, nullptr, nullptr, nullptr, 0}};
@@ -281,6 +268,3 @@ static ExtensionInfo g_tree_widget_extension_info = {"tree_widget_extension", 0x
 InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, TREE_EDITOR_LIB_NAME)(void) {
     return &g_tree_widget_extension_info;
 }
-
-
-

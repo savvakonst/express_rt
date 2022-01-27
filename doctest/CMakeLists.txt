@@ -1,4 +1,6 @@
-add_executable(Doctest_run ValueTest.cpp PseudoSyncPrmBufferTest.cpp)
+add_executable(PrmBufferAndValue_test ValueTest.cpp PseudoSyncPrmBufferTest.cpp)
+target_link_libraries(PrmBufferAndValue_test PUBLIC CommonLib Reader)
 
 
-target_link_libraries(Doctest_run PUBLIC CommonLib Reader)
+add_executable(ConversionTemplate_test ConversionTemplateTest.cpp)
+target_link_libraries(ConversionTemplate_test PUBLIC CommonLib)

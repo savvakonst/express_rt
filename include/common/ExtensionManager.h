@@ -11,12 +11,21 @@
 #include <string>
 
 #include "Extension.h"
+#include "Port.h"
 
 #ifdef DEBUG_
 #    include <iostream>
 #endif
 
-class ExtensionManager {
+typedef void *extensionResource_t;
+
+class COMMON_API_ ExtensionManager {
+   public:
+    ExtensionManager(bool init = true);
+
+    ~ExtensionManager();
+
+
    private:
     struct VersionCmp {
         constexpr bool operator()(const ExtensionUnit *lhs, const ExtensionUnit *rhs) const {
@@ -90,8 +99,8 @@ class ExtensionManager {
 
    private:
     map_t<map_t<versionList_t>> tree_;
+    extensionResource_t resource_ = nullptr;
 };
-
 
 [[maybe_unused]] typedef int (*initUnit_t)(ExtensionManager *);
 
