@@ -16,6 +16,8 @@ status ConversionTemplate::changeName(std::string name) {
 
 status ConversionTemplate::addHistoryInfo() { return status::failure; }
 
+const HierarchicalData_ifs* ConversionTemplate::getInfo(const std::string& path) const { return nullptr; }
+
 /*
  *
  *
@@ -29,19 +31,25 @@ status ConversionTemplate::addParameter(Parameter_ifs* parameter) {
     }
     return status::succes;
 }
-const Parameter_ifs* ConversionTemplate::getParameter(std::string name) const { return nullptr; }
 
-const exo_container<const Parameter_ifs*> ConversionTemplate::getSingleTypeParameters(std::string type) const {
+const Parameter_ifs* ConversionTemplate::getParameter(std::string name) const {
+    auto prm_iter = parameters_.find(name);
+    if (prm_iter != parameters_.end()) {
+        return prm_iter->second;
+    }
+    return nullptr;
+}
+
+exo_container<const Parameter_ifs*> ConversionTemplate::getSingleTypeParameters(std::string type) const {
     exo_container<const Parameter_ifs*> container;
     size_t path_len = type.size();
     for (const auto& param : parameters_) {
         if (param.second->getPropertyAsTxt("type") == type) container.push_back(param.second);
     }
-
     return container;
 }
 
-const exo_container<const Parameter_ifs*> ConversionTemplate::getParametersFromPath(std::string searching_path) const {
+exo_container<const Parameter_ifs*> ConversionTemplate::getParametersFromPath(std::string searching_path) const {
     exo_container<const Parameter_ifs*> container;
     size_t path_len = searching_path.size();
     for (const auto& param : parameters_) {
@@ -72,7 +80,7 @@ status ConversionTemplate::removeParameter(std::string name) {
 status ConversionTemplate::removeParametersFromPath(std::string path_to_delete) {
     std::list<std::string> names_to_remove;
     size_t path_len = path_to_delete.size();
-    for (const auto& param : parameters_) { 
+    for (const auto& param : parameters_) {
         const auto path = param.second->getPropertyAsTxt("path");
         if (path.size() >= path_len)
             if (path.substr(0, path_len) == path_to_delete) names_to_remove.push_back(param.first);
@@ -83,9 +91,7 @@ status ConversionTemplate::removeParametersFromPath(std::string path_to_delete) 
         parameters_.erase(name);
     }
 
-    if (names_to_remove.size())
-        return status::succes;
-
+    if (names_to_remove.size()) return status::succes;
 
     error_mesadge_ = "there are no parameters on \"" + path_to_delete + "\" path";
     return status::failure;
@@ -114,11 +120,9 @@ status ConversionTemplate::removeModulesFromPath(std::string path_to_delete) {
             if (path.substr(0, path_len) == path_to_delete) paths_to_remove.push_back(path);
     }
 
-    for (auto& path : paths_to_remove)
-        modules_.erase(path);
+    for (auto& path : paths_to_remove) modules_.erase(path);
 
-    if (paths_to_remove.size())
-        return status::succes;
+    if (paths_to_remove.size()) return status::succes;
 
     error_mesadge_ = "there are no modules on \"" + path_to_delete + "\" path";
     return status::failure;
@@ -140,3 +144,5 @@ const exo_container<std::string> ConversionTemplate::getModulesFromPath(std::str
  */
 
 const ErrorInfo_ifs* ConversionTemplate::getErrorInfo() const { return nullptr; }
+
+status ConversionTemplate::getModulesFromPath(std::string path) { return failure; }

@@ -14,7 +14,7 @@ add_executable(ExampleDockWindows
 
 target_link_libraries(ExampleDockWindows PUBLIC Qt5::Widgets)
 target_link_libraries(ExampleDockWindows PUBLIC Qt5::PrintSupport)
-#target_link_libraries(ExampleDockWindows PRIVATE CommonLib)
+target_link_libraries(ExampleDockWindows PRIVATE CommonLib)
 #target_link_libraries(ExampleDockWindows PRIVATE TreeEditor)
 target_link_libraries(ExampleDockWindows PUBLIC PyEmbedder)
 

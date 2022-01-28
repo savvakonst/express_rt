@@ -3,7 +3,6 @@
 
 #include <string>
 
-//#include "common/CustomTypes.h"
 #include "common/BaseClass_ifs.h"
 #include "common/Port.h"
 
@@ -21,15 +20,17 @@ class COMMON_API_ ConversionTemplate : public BaseClass_ifs {
     status changeName(std::string name);
     status addHistoryInfo();
 
+    [[nodiscard]] const HierarchicalData_ifs* getInfo(const std::string& path) const;
+
     /*
      *
      *
      */
 
     status addParameter(Parameter_ifs*);
-    const Parameter_ifs* getParameter(std::string name) const;
-    const exo_container<const Parameter_ifs*> getSingleTypeParameters(std::string type) const;
-    const exo_container<const Parameter_ifs*> getParametersFromPath(std::string searching_path) const;
+    [[nodiscard]] const Parameter_ifs* getParameter(std::string name) const;
+    [[nodiscard]] exo_container<const Parameter_ifs*> getSingleTypeParameters(std::string type) const;
+    [[nodiscard]] exo_container<const Parameter_ifs*> getParametersFromPath(std::string searching_path) const;
     status changeParameterName(std::string old, std::string new_name);
     status removeParameter(std::string name);
     status removeParametersFromPath(std::string path);
@@ -42,7 +43,7 @@ class COMMON_API_ ConversionTemplate : public BaseClass_ifs {
     status addModule(std::string path);
     status removeModulesFromPath(std::string path);
     status getModulesFromPath(std::string path);
-    const exo_container<std::string> getModulesFromPath(std::string path) const;
+    [[nodiscard]] const exo_container<std::string> getModulesFromPath(std::string path) const;
 
     const ErrorInfo_ifs* getErrorInfo() const override;
 

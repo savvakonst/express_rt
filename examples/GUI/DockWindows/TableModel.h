@@ -6,15 +6,30 @@
 #define EXRT_TABLEMODEL_H
 #include <QAbstractTableModel>
 
+#include "convtemplate/ConversionTemplate.h"
 
 class TableModel : public QAbstractTableModel {
-   private:
-    int rowCount(const QModelIndex &parent) const override {
-        return 5;  // сделаем фиксированно 5 строк в таблице
-        //если вы станете использовать скажем QList, то пишите return list.size();
+   public:
+
+    TableModel():conv_template_cnt_(0) {
     }
+
+    TableModel(std::list<ConversionTemplate* > &list ):conv_template_cnt_(list.size()) {
+        //conversion_template.
+    }
+
+
+    int rowCount(const QModelIndex &parent) const override {
+        return conv_template_cnt_;
+    }
+
     int columnCount(const QModelIndex &parent) const override {
-        return 4;  // количество колонок сделаем также фиксированным
+        return 4;
+    }
+
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
+        if (role == Qt::DisplayRole) return QString("column = ") + QString::number(section);
+        return QVariant();
     }
 
     QVariant data(const QModelIndex &index, int role) const {
@@ -26,8 +41,9 @@ class TableModel : public QAbstractTableModel {
         }
         return QVariant();
     }
+
+   protected:
+    size_t  conv_template_cnt_ = 0;
 };
-
-
 
 #endif  // EXRT_TABLEMODEL_H

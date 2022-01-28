@@ -74,6 +74,15 @@ std::string getStrID(uint32_t id) {
     return std::string((char *)&u64_id);
 }
 
+/*
+ *
+ *
+ *
+ *
+ */
+
+
+
 DefaultBaseIO::DefaultBaseIO() {}
 
 DefaultBaseIO::~DefaultBaseIO() {}
@@ -140,7 +149,10 @@ ConversionTemplate *DefaultBaseIO::parseDocument(ExtensionManager *manager, cons
             } else {
                 warning_mesadges_.push_back("unknown parameter type: " + std::to_string(parameter_type));
             }
+
         }
+
+
     } catch (YAML::Exception &e) {
         std::stringstream st;
         st << "\n" << e.msg << "\n\t";
