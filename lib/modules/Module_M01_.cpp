@@ -22,7 +22,7 @@ Module_M01_::Module_M01_()
 
 Module_M01_::Module_M01_(const void *ptr, size_t size, DeviceBuildingContext_ifs *context) : Module_M01_() {
     if (size != getTaskSize()) {
-        error_mesadge_ = "invalid size";
+        error_message_ = "invalid size";
     }
     task_ = *((Task *)ptr);
     return;
@@ -30,9 +30,11 @@ Module_M01_::Module_M01_(const void *ptr, size_t size, DeviceBuildingContext_ifs
 
 Module_M01_::~Module_M01_() {}
 
-const DataSchema_ifs *Module_M01_::getPropertiesInfoList() { return nullptr; }
+const DataSchema_ifs *Module_M01_::getPropertySchema() { return nullptr; }
 
-const HierarchicalData_ifs *Module_M01_::getProperty(const std::string &prop_path) const { return KSDModule::getProperty(prop_path); }
+const HierarchicalData_ifs *Module_M01_::getProperty(const std::string &prop_path) const {
+    return KSDModule::getProperty(prop_path);
+}
 
 std::string Module_M01_::getPropertyAsTxt(const std::string &prop_path) const {
     return KSDModule::getPropertyAsTxt(prop_path);

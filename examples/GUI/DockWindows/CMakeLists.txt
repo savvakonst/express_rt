@@ -9,7 +9,7 @@ set(CMAKE_AUTOUIC ON)
 add_executable(ExampleDockWindows
         main.cpp
         mainwindow.cpp
-        dockwidgets.qrc)
+        TableModel.cpp)
 
 
 target_link_libraries(ExampleDockWindows PUBLIC Qt5::Widgets)

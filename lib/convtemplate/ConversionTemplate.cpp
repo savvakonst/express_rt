@@ -1,22 +1,41 @@
+
+
 #include "convtemplate/ConversionTemplate.h"
 
+#include "common/ExtensionManager.h"
+#include "convtemplate/ParameterFieldTree.h"
 #include "convtemplate/Parameter_ifs.h"
-//#include <regex>
 
-ConversionTemplate::ConversionTemplate() {}
-/*
- *
- *
- */
+ConversionTemplate::ConversionTemplate(ExtensionManager* manager) {
+    auto unit = manager->getLastVersionExtensionUint("data_schema", "conversion_template");
 
-status ConversionTemplate::changeName(std::string name) {
-    name_ = name;
-    return status::succes;
+    if (unit && unit->ptr) {
+        info_schema_ = (DataSchema_ifs*)unit->ptr;
+        info_schema_->init(manager);
+    }
+    info_data_ = newParameterFieldTree(info_schema_);
 }
 
-status ConversionTemplate::addHistoryInfo() { return status::failure; }
+status ConversionTemplate::setName(std::string name) {
+    auto bool_status = ((ParameterFieldTree_ifs*)info_data_)->setValue("name", Value(name), error_message_);
+    return bool_status ? status::succes : status::failure;
+}
 
-const HierarchicalData_ifs* ConversionTemplate::getInfo(const std::string& path) const { return nullptr; }
+status ConversionTemplate::addInfo(const std::string& path, const Value& value) {
+    auto bool_status = ((ParameterFieldTree_ifs*)info_data_)->setValue(path, value, error_message_);
+    return bool_status ? status::succes : status::failure;
+}
+
+status ConversionTemplate::addInfo(const std::string& path, const std::string& value) {
+    // TODO: implement this member function
+    return failure;
+}
+
+const HierarchicalData_ifs* ConversionTemplate::getInfo(const std::string& path) const {
+    return getBranch(info_data_, path);
+}
+
+const DataSchema_ifs* ConversionTemplate::getInfoSchema() const { return info_schema_; }
 
 /*
  *
@@ -26,7 +45,7 @@ const HierarchicalData_ifs* ConversionTemplate::getInfo(const std::string& path)
 status ConversionTemplate::addParameter(Parameter_ifs* parameter) {
     auto name = parameter->getPropertyAsTxt("name");
     if (parameters_.find(name) == parameters_.end()) {
-        error_mesadge_ = "parameter \"" + name + "\" already exists";
+        error_message_ = "parameter \"" + name + "\" already exists";
         return status::failure;
     }
     return status::succes;
@@ -67,7 +86,7 @@ status ConversionTemplate::changeParameterName(std::string old, std::string new_
 
 status ConversionTemplate::removeParameter(std::string name) {
     if (parameters_.find(name) == parameters_.end()) {
-        error_mesadge_ = "parameter \"" + name + "\" doesn't exist";
+        error_message_ = "parameter \"" + name + "\" doesn't exist";
         return status::failure;
     }
 
@@ -93,7 +112,7 @@ status ConversionTemplate::removeParametersFromPath(std::string path_to_delete) 
 
     if (names_to_remove.size()) return status::succes;
 
-    error_mesadge_ = "there are no parameters on \"" + path_to_delete + "\" path";
+    error_message_ = "there are no parameters on \"" + path_to_delete + "\" path";
     return status::failure;
 }
 
@@ -104,7 +123,7 @@ status ConversionTemplate::removeParametersFromPath(std::string path_to_delete) 
 
 status ConversionTemplate::addModule(std::string path) {
     if (modules_.find(path) != modules_.end()) {
-        error_mesadge_ = "module \"" + path + "\" already exists";
+        error_message_ = "module \"" + path + "\" already exists";
         return status::failure;
     }
 
@@ -124,7 +143,7 @@ status ConversionTemplate::removeModulesFromPath(std::string path_to_delete) {
 
     if (paths_to_remove.size()) return status::succes;
 
-    error_mesadge_ = "there are no modules on \"" + path_to_delete + "\" path";
+    error_message_ = "there are no modules on \"" + path_to_delete + "\" path";
     return status::failure;
 }
 

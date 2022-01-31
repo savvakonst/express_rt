@@ -62,25 +62,3 @@ static ExtensionInfo g_default_parameters_info = {"default parameters", 0x01, g_
 InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, DEFAULT_PARAMETERS_LIB_NAME)(void) {
     return &g_default_parameters_info;
 }
-
-/*
-
-" File.About": str,
-" File.Company": str,
-" File.Date": str "year.month.day",
-" File.Version": str "\d+.\d+.\d+.\d+",
-"Base. Name": str,
-"Base.Alteration.List": list
-    "Date": str "year.month.day",
-    "EditedBy": str,
-    "Time": str "dd:dd:dd"
-
-"Base.Alteration.Number": depend_from "Base.Alteration.List",
-"Base.CreatedBy": str,
-"Base.Date": str "year.month.day",
-"Base.Description": str,
-"Base.Object": str,
-"Base.Time": str "dd:dd:dd",
-"Device.ID": uint32_t,
-
- */

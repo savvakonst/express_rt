@@ -16,7 +16,7 @@ class COMMON_API_ StandardParameter_ifs : public Parameter_ifs {
         if (parameter_field_tree_) delete parameter_field_tree_;
     };
 
-    const DataSchema_ifs* getPropertiesInfoList() override;
+    const DataSchema_ifs* getPropertySchema() override;
 
     [[nodiscard]] const HierarchicalData_ifs* getProperty(const std::string& prop_path) const override;
 

@@ -11,12 +11,12 @@
 #include "common\Port.h"
 
 class COMMON_API_ BaseSignalController {
-private:
+   private:
     std::list<Signal_ifs *> signals_;
-public:
 
+   public:
     void emit_() {
-        for (auto i: signals_) {
+        for (auto i : signals_) {
             i->emit_();
         }
     }
@@ -38,12 +38,12 @@ public:
 };
 
 class COMMON_API_ BaseClass_ifs {
-private:
+   private:
     /* data */
 
     std::list<Signal_ifs *> signals_;
 
-protected:
+   protected:
     BaseClass_ifs(/* args */) {}
 
     ~BaseClass_ifs() {}
@@ -54,7 +54,7 @@ protected:
      */
 
     void emit_() {
-        for (auto i: signals_) {
+        for (auto i : signals_) {
             i->emit_();
         }
     }
@@ -74,24 +74,24 @@ protected:
         return succes;
     }
 
-public:
+   public:
     // TODO it might be worth to remove this function
     virtual const ErrorInfo_ifs *getErrorInfo() const { return nullptr; };
 
-    virtual bool hasError() const { return !error_mesadge_.empty(); }
+    virtual bool hasError() const { return !error_message_.empty(); }
 
-    virtual const std::string &getErrorMessage() const { return error_mesadge_; }
+    virtual const std::string &getErrorMessage() const { return error_message_; }
 
-    virtual void clearErrorMessage() { error_mesadge_.clear(); }
+    virtual void clearErrorMessage() { error_message_.clear(); }
 
-    // a think,in future it will be transformed in non virtual functions
-    virtual const std::list<std::string> &getWarningMessages() const { return warning_mesadges_; }
+    // a think, in future it will be transformed in non virtual functions
+    virtual const std::list<std::string> &getWarningMessages() const { return warning_messages_; }
 
-    virtual void clearWarningMessages() { warning_mesadges_.clear(); }
+    virtual void clearWarningMessages() { warning_messages_.clear(); }
 
-protected:
-    std::string error_mesadge_;
-    std::list<std::string> warning_mesadges_;
+   protected:
+    std::string error_message_;
+    std::list<std::string> warning_messages_;
 };
 
 #endif

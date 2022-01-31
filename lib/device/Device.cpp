@@ -24,7 +24,7 @@ struct MODULE_HEADER {
 
 Device::Device(const void *ptr, size_t size, DeviceBuildingContext_ifs *context) {
     if (size < sizeof(TASK_HEADER)) {
-        error_mesadge_ = "task size is too small";
+        error_message_ = "task size is too small";
     }
 
     task_header_ = *(TASK_HEADER *)ptr;
@@ -38,7 +38,7 @@ Device::Device(const void *ptr, size_t size, DeviceBuildingContext_ifs *context)
         Module_ifs *module = context->createModule(stringId(header->id), current_ptr, (size_t)header->size, context);
 
         if (!module) {
-            error_mesadge_ = "cant find module with \"" + stringId(header->id) + "\" id";
+            error_message_ = "cant find module with \"" + stringId(header->id) + "\" id";
             return;
         }
 
@@ -47,7 +47,7 @@ Device::Device(const void *ptr, size_t size, DeviceBuildingContext_ifs *context)
     } while (offset < size_);
 
     if (offset != getTaskSize()) {
-        error_mesadge_ = "sum of module sizes is not equal \"taskSize\" ";
+        error_message_ = "sum of module sizes is not equal \"taskSize\" ";
     }
 
     // modules_.push_back()
@@ -56,7 +56,6 @@ Device::Device(const void *ptr, size_t size, DeviceBuildingContext_ifs *context)
 Device::~Device() {}
 
 exo_container<const Module_ifs *> Device::getAllModules() { return exo_container<const Module_ifs *>(); }
-
 
 const Module_ifs *Device::getModuleFromPath(const std::string &name) {
     static const std::regex validator(R"((([\w]+:[\w]+:[\w]+/)*)(\w+:[\w]))");
@@ -67,15 +66,15 @@ const Module_ifs *Device::getModuleFromPath(const std::string &name) {
         std::string terminal = matches[3];
 
         if (path_chunks.size()) {
-            error_mesadge_ = "module encapsulation is not supported yet";
+            error_message_ = "module encapsulation is not supported yet";
             return nullptr;
         }
     }
     return nullptr;
 }
 
-exo_container <const Module_ifs *> Device::getLineFromPath(const std::string &path) {
-    error_mesadge_ = "module encapsulation is not supported yet";
+exo_container<const Module_ifs *> Device::getLineFromPath(const std::string &path) {
+    error_message_ = "module encapsulation is not supported yet";
     return exo_container<const Module_ifs *>();
 }
 

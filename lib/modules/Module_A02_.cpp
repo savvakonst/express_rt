@@ -24,9 +24,11 @@ Module_A02_::Module_A02_(const void* ptr, size_t size, DeviceBuildingContext_ifs
 
 Module_A02_::~Module_A02_() {}
 
-const DataSchema_ifs* Module_A02_::getPropertiesInfoList() { return nullptr; }
+const DataSchema_ifs* Module_A02_::getPropertySchema() { return nullptr; }
 
-const HierarchicalData_ifs* Module_A02_::getProperty(const std::string& prop_path) const { return KSDModule::getProperty(prop_path); }
+const HierarchicalData_ifs* Module_A02_::getProperty(const std::string& prop_path) const {
+    return KSDModule::getProperty(prop_path);
+}
 std::string Module_A02_::getPropertyAsTxt(const std::string& prop_path) const {
     return KSDModule::getPropertyAsTxt(prop_path);
 }
@@ -39,7 +41,7 @@ bool Module_A02_::setPropertyAsTxt(const std::string& prop_path, const std::stri
 }
 
 ModuleStream_ifs* Module_A02_::createModuleStream() {
-    error_mesadge_ = "The createModuleStream function is not realised yet";
+    error_message_ = "The createModuleStream function is not realised yet";
     return nullptr;
 };
 

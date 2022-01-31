@@ -10,7 +10,7 @@
 #include "TableModel.h"
 #include "mainwindow.h"
 
-MainWindow::MainWindow() : text_edit_(new QTextEdit) {
+MainWindow::MainWindow(ExtensionManager *ctm) : text_edit_(new QTextEdit), ctm_(ctm) {
     setCentralWidget(text_edit_);
 
     createActions();
@@ -152,7 +152,6 @@ void MainWindow::about() {
 void MainWindow::createActions() {}
 
 void MainWindow::createStatusBar() {}
-#include <QAbstractItemView>
 
 #include "iostream"
 void MainWindow::createDockWindows() {
@@ -179,7 +178,7 @@ void MainWindow::createDockWindows() {
     //     "QTableView::item:alternate { background-color: #f6fafb; } QTableView::item { background-color: #D2DCDF; }");
     table_view_->setStyleSheet(
         "QHeaderView::section {background-color: #D2DCDF; alternate-background-color: #f6fafb;};");
-    table_view_->setModel(new TableModel());
+    table_view_->setModel(new TableModel(ctm_));
 
     dock->setWidget(table_view_);
     addDockWidget(Qt::LeftDockWidgetArea, dock);

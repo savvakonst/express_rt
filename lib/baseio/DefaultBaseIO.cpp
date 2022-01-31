@@ -81,8 +81,6 @@ std::string getStrID(uint32_t id) {
  *
  */
 
-
-
 DefaultBaseIO::DefaultBaseIO() {}
 
 DefaultBaseIO::~DefaultBaseIO() {}
@@ -101,19 +99,19 @@ YAML::Node get(std::string key, const YAML::Node &node) {
 }
 
 ConversionTemplate *DefaultBaseIO::parseDocument(ExtensionManager *manager, const std::string &str) {
-    std::unique_ptr<ConversionTemplate> conv_template(new ConversionTemplate());
+    std::unique_ptr<ConversionTemplate> conv_template(new ConversionTemplate(manager));
 
     try {
         YAML::Node doc = YAML::Load(str);
 
         if (!doc.IsMap()) {
-            error_mesadge_ = "invalid structure\n";
+            error_message_ = "invalid structure\n";
             return nullptr;
         }
 
         auto node = get("Parameters.List", doc);
 
-        conv_template->changeName(get("Base. Name", doc).as<std::string>());
+        conv_template->setName(get("Base. Name", doc).as<std::string>());
 
         for (const auto &i : get("Device.Modules.List", doc)) {
             const std::string module_name = getStrID(get("Module.ID", i).as<uint32_t>());
@@ -121,7 +119,7 @@ ConversionTemplate *DefaultBaseIO::parseDocument(ExtensionManager *manager, cons
 
             if (module_name != "CALC")
                 if (!conv_template->addModule(module)) {
-                    warning_mesadges_.push_back(conv_template->getErrorMessage());
+                    warning_messages_.push_back(conv_template->getErrorMessage());
                     conv_template->clearErrorMessage();
                 }
         }
@@ -147,18 +145,16 @@ ConversionTemplate *DefaultBaseIO::parseDocument(ExtensionManager *manager, cons
                 }
 
             } else {
-                warning_mesadges_.push_back("unknown parameter type: " + std::to_string(parameter_type));
+                warning_messages_.push_back("unknown parameter type: " + std::to_string(parameter_type));
             }
-
         }
-
 
     } catch (YAML::Exception &e) {
         std::stringstream st;
         st << "\n" << e.msg << "\n\t";
         st << e.mark << "\n";
 
-        error_mesadge_ = st.str();
+        error_message_ = st.str();
         return nullptr;
     }
 

@@ -1,12 +1,14 @@
 #ifndef EXRT_CONVERSIONTEMPLATEMANAGER_H
 #define EXRT_CONVERSIONTEMPLATEMANAGER_H
 
+#include <iterator>
 #include <string>
 
-#include "ConversionTemplate.h"
 #include "common/BaseClass_ifs.h"
 #include "common/CustomTypes.h"
 #include "common/DataSchema_ifs.h"
+
+class ConversionTemplate;
 
 class ConversionTemplateManager : public BaseClass_ifs {
    public:
@@ -15,12 +17,25 @@ class ConversionTemplateManager : public BaseClass_ifs {
         emit_();
     }
 
+    [[nodiscard]] size_t getEntriesNumber() const { return list_.size(); }
+
+    ConversionTemplate* getConversionTemplateByIndex(size_t index) {
+        if (index >= list_.size()) {
+            return nullptr;
+        }
+        auto it = list_.begin();
+        std::advance(it, index);
+        return *it;
+    }
+
     bool removeConversionTemplateByIndex(size_t index) {
         if (index >= list_.size()) {
-            error_mesadge_ = "index is out of range";
+            error_message_ = "index is out of range";
             return false;
         }
-        ConversionTemplate* conversion_template = list_[index];
+        auto it = list_.begin();
+        std::advance(it, index);
+        ConversionTemplate* conversion_template = *it;
         return removeConversionTemplate(conversion_template);
     }
 
@@ -31,7 +46,7 @@ class ConversionTemplateManager : public BaseClass_ifs {
         emit_();
     }
 
-    const std::list<ConversionTemplate*>& getConversionTemplateList() const { return list_; }
+    [[nodiscard]] const std::list<ConversionTemplate*>& getConversionTemplateList() const { return list_; }
 
    private:
     std::list<ConversionTemplate*> list_;

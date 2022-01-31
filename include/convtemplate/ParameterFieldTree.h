@@ -34,6 +34,8 @@ class ParameterFieldTree_ifs : public HierarchicalData_ifs {
     [[maybe_unused]] virtual bool setValue(const Value &data) { return false; }
 
     [[maybe_unused]] virtual bool setValue(const std::string &data) { return false; }
+
+    [[maybe_unused]] bool setValue(const std::string &prop_path, const Value &value, std::string &error_message);
 };
 
 COMMON_API_ ParameterFieldTree_ifs *newParameterFieldTree(DataSchema_ifs *data_schema, size_t dim = 0);

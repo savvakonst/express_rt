@@ -29,7 +29,7 @@ class COMMON_API_ Module_ifs : public BaseClass_ifs {
         return std::map<std::string, PrmBuffer_ifs *>();
     }
 
-    virtual const DataSchema_ifs *getPropertiesInfoList() = 0;
+    virtual const DataSchema_ifs *getPropertySchema() = 0;
 
     [[nodiscard]] virtual std::string printProperties(const std::string &indent = "") const = 0;
 

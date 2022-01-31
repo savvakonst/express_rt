@@ -6,22 +6,25 @@
 #include "common/BaseClass_ifs.h"
 #include "common/Port.h"
 
+class ExtensionManager;
 class Parameter_ifs;
+class DataSchema_ifs;
 
 class COMMON_API_ ConversionTemplate : public BaseClass_ifs {
    public:
-    ConversionTemplate();
+    ConversionTemplate(ExtensionManager* manager);
 
     /*
      *  base description voids
      *
      */
 
-    status changeName(std::string name);
-    status addHistoryInfo();
+    status setName(std::string name);
+    status addInfo(const std::string& path, const Value& value);
+    status addInfo(const std::string& path, const std::string& value);
 
     [[nodiscard]] const HierarchicalData_ifs* getInfo(const std::string& path) const;
-
+    [[nodiscard]] const DataSchema_ifs* getInfoSchema() const;
     /*
      *
      *
@@ -48,6 +51,9 @@ class COMMON_API_ ConversionTemplate : public BaseClass_ifs {
     const ErrorInfo_ifs* getErrorInfo() const override;
 
    private:
+    DataSchema_ifs* info_schema_ = nullptr;
+    HierarchicalData_ifs* info_data_ = nullptr;
+
     std::string name_;
     exo_set<std::string> modules_;
     exo_map<std::string, Parameter_ifs*> parameters_;

@@ -56,32 +56,32 @@ Receiver::Receiver(ModuleStream_ifs *m_stream, Sockaddr dst_address, Sockaddr sr
     WSADATA wsa;
     auto status = ::WSAStartup(MAKEWORD(2, 2), &wsa);
     if (status != 0) {
-        this->error_mesadge_ = "usage initialization of the Winsock DLL by a process has failed.";
+        this->error_message_ = "usage initialization of the Winsock DLL by a process has failed.";
         return;
     }
 
     sock_ = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (sock_ == INVALID_SOCKET) {
-        this->error_mesadge_ = getWSALastErrorText();
+        this->error_message_ = getWSALastErrorText();
         return;
     }
 
     status = ::setsockopt(sock_, SOL_SOCKET, SO_RCVBUF, (char *)&socket_buffer_size_, sizeof(socket_buffer_size_));
     if (status != 0) {
-        this->error_mesadge_ = getWSALastErrorText();
+        this->error_message_ = getWSALastErrorText();
         return;
     }
 
     bool val = true;
     status = ::setsockopt(sock_, SOL_SOCKET, SO_REUSEADDR, (char *)&val, sizeof(val));
     if (status != 0) {
-        this->error_mesadge_ = getWSALastErrorText();
+        this->error_message_ = getWSALastErrorText();
         return;
     }
 
     status = ::bind(sock_, (const sockaddr *)&dst_address_, sizeof(dst_address_));
     if (status != 0) {
-        this->error_mesadge_ = getWSALastErrorText();
+        this->error_message_ = getWSALastErrorText();
         return;
     }
 
@@ -141,21 +141,20 @@ void receiverThread(ModuleStream_ifs *m_stream, SOCKET sock_, char *data_buffer_
     int32_t source_address_length = sizeof(source_address);
 
     while (1) {
-        //std::cout << "received from: " << source_address.sin_addr << "\n";
+        // std::cout << "received from: " << source_address.sin_addr << "\n";
         auto length =
             recvfrom(sock_, data_buffer_, data_buffer_size_, 0, (sockaddr *)&source_address, &source_address_length);
-
 
         if (length == SOCKET_ERROR) {
             std::cout << getWSALastErrorText() << "\n";
             return;
         }
-        m_stream->readFramePeace(nullptr,data_buffer_,length);
-        //std::cout << "received from: " << source_address.sin_addr << "\n";
+        m_stream->readFramePeace(nullptr, data_buffer_, length);
+        // std::cout << "received from: " << source_address.sin_addr << "\n";
         if (cmd_) {
             return;
         }
-        //std::cout << "received from: " << source_address.sin_addr << "\n";
+        // std::cout << "received from: " << source_address.sin_addr << "\n";
     }
 }
 
@@ -163,7 +162,7 @@ void Receiver::start() {
     cmd_ = 0;
     thread_ = new std::thread(receiverThread, m_stream_, sock_, data_buffer_, data_buffer_size_, src_address_,
                               std::ref(cmd_));
-    //thread_->join();
+    // thread_->join();
 }
 
 void Receiver::stop() {

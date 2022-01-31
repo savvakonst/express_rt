@@ -54,7 +54,7 @@ class Module_{0:s} : public KSDModule {{
     std::string getID() const override {{ return "{0:s}"; }}
 
 
-    const DataSchema_ifs* getPropertiesInfoList() override;
+    const DataSchema_ifs* getPropertySchema() override;
 
     ResValue getProperty(const std::string& prop_path) const override ;
     std::string getPropertyAsTxt(const std::string& prop_path) const override;
@@ -250,12 +250,14 @@ for i in pattern_list:
         if new_complex is None:
             break
 
+
         def genArr(type_, dims=[]):
             if (len(dims)):
                 dim = dims.pop()
                 return '{{{0:d},{1:s}}}'.format(dim, genArr(type_, dims))
             else:
                 return type_
+
 
         def genMap(struct):
             fields = []
@@ -267,6 +269,7 @@ for i in pattern_list:
                     key.name, genArr(type_, key.dims))
                 fields.append(s)
             return "TaskMapper({{\n{0:s} }})".format(",\n".join(fields))
+
 
         s = genMap(new_complex)
         print(s)

@@ -10,7 +10,8 @@
 
 class TaskMapper : public HierarchicalData_ifs {
    public:
-    enum StructType {
+    enum StructType
+    {
         value,
         array,
         map,
@@ -97,8 +98,8 @@ class KSDModule : public Module_ifs {
 
     bool isAvailable() const override { return true; }
 
-    const DataSchema_ifs *getPropertiesInfoList() override {
-        error_mesadge_ = "The getPropertiesInfoList function is not realised yet";
+    const DataSchema_ifs *getPropertySchema() override {
+        error_message_ = "The getPropertySchema function is not realised yet";
         return nullptr;
     }
     [[nodiscard]] virtual std::string printProperties(const std::string &indent = "") const override;

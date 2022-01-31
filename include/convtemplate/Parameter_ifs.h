@@ -18,7 +18,6 @@ Parameter_ifs *createParameter(ExtensionManager *manager, const std::string &nam
 
 [[maybe_unused]] typedef Parameter_ifs *(*parameterConstructor_f)(ExtensionManager *manager, const std::string &name);
 
-
 class COMMON_API_ Parameter_ifs : public BaseClass_ifs {
    public:
     explicit Parameter_ifs(const std::string &name) : name_(name){};
@@ -29,7 +28,7 @@ class COMMON_API_ Parameter_ifs : public BaseClass_ifs {
 
     [[nodiscard]] virtual std::string getType() const = 0;
 
-    virtual const DataSchema_ifs *getPropertiesInfoList() = 0;
+    virtual const DataSchema_ifs *getPropertySchema() = 0;
 
     [[nodiscard]] virtual const HierarchicalData_ifs *getProperty(const std::string &prop_path) const = 0;
 
@@ -39,7 +38,7 @@ class COMMON_API_ Parameter_ifs : public BaseClass_ifs {
 
     virtual bool setProperty(const std::string &prop_path, const Value &value) = 0;
 
-    virtual bool setProperty(const std::string& prop_path, const HierarchicalData_ifs * hierarchical_data) = 0;
+    virtual bool setProperty(const std::string &prop_path, const HierarchicalData_ifs *hierarchical_data) = 0;
 
     virtual bool setPropertyAsTxt(const std::string &prop_path, const std::string &value) = 0;
 

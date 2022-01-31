@@ -2,8 +2,8 @@
 // Created by SVK on 27.01.2022.
 //
 
-#ifndef EXRT_TABLEMODEL_H
-#define EXRT_TABLEMODEL_H
+#ifndef EXRT_CONVTEMPLATELIST_H
+#define EXRT_CONVTEMPLATELIST_H
 #include <QAbstractTableModel>
 
 class ExtensionManager;

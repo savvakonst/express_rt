@@ -1,0 +1,31 @@
+ext_type: "parameter  "
+ext_set:
+  - name: "conversion_template"
+    type:
+      - name: "name"
+        type: "string"
+        description: "имя базы"
+
+      - name: "source"
+        type: "string"
+        description: "источник/путь"
+
+      - name: "company"
+        type: "string"
+        description: "имя компании"
+
+      - name: "changes"
+        dims: [ 0 ]
+        type:
+          - name: "by"
+            type: "string"
+            description: "кем"
+
+          - name: "unix_time"
+            type: "i32"
+            description: "время"
+        description: "дата создания/изменения"
+        representation: "first_element"
+
+
+

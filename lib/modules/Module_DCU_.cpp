@@ -26,11 +26,11 @@ Module_DCU_::Module_DCU_(const std::string &module_id, const void *ptr, size_t s
         Module_ifs *module = context->createModule(stringId(header->id), current_ptr, (size_t)header->size, context);
 
         if (module == nullptr) {
-            error_mesadge_ = "cant find module with \"" + stringId(header->id) + "\" id";
+            error_message_ = "cant find module with \"" + stringId(header->id) + "\" id";
             return;
         }
         if (module->hasError()) {
-            error_mesadge_ += "\n" + error_mesadge_;
+            error_message_ += "\n" + error_message_;
         }
         offset += (size_t)header->size;
         modules_.push_back(module);
@@ -38,7 +38,7 @@ Module_DCU_::Module_DCU_(const std::string &module_id, const void *ptr, size_t s
     } while (offset < size_);
 
     if (offset != getTaskSize()) {
-        error_mesadge_ = "module invalid task size of " + getID() + " module";
+        error_message_ = "module invalid task size of " + getID() + " module";
     }
 }
 
@@ -58,9 +58,11 @@ EthernetSettings Module_DCU_::getSrcAddress() const {
     return EthernetSettings();
 }
 
-const DataSchema_ifs *Module_DCU_::getPropertiesInfoList() { return nullptr; }
+const DataSchema_ifs *Module_DCU_::getPropertySchema() { return nullptr; }
 
-const HierarchicalData_ifs *Module_DCU_::getProperty(const std::string &prop_path) const { return KSDModule::getProperty(prop_path); }
+const HierarchicalData_ifs *Module_DCU_::getProperty(const std::string &prop_path) const {
+    return KSDModule::getProperty(prop_path);
+}
 
 std::string Module_DCU_::getPropertyAsTxt(const std::string &prop_path) const {
     return KSDModule::getPropertyAsTxt(prop_path);

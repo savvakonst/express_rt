@@ -10,3 +10,4 @@ endif ()
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
 add_subdirectory(TreeEditor)
+add_subdirectory(ConvTemplateList)

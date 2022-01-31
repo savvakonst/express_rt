@@ -193,3 +193,17 @@ bool ParameterFieldTree::setArrayUnit(size_t index, HierarchicalData_ifs *data) 
 bool ParameterFieldTree::setValue(Value data) { return false; }
 
 bool ParameterFieldTree::setValue(std::string data) { return false; }
+
+bool ParameterFieldTree_ifs::setValue(const std::string &prop_path, const Value &value, std::string &error_message) {
+    auto ptr = (ParameterFieldTree_ifs *)getBranch(this, prop_path);
+    if (ptr == nullptr || !ptr->isValue()) {
+        error_message = "non-existent path";
+        return false;
+    }
+
+    if (!ptr->setValue(value)) {
+        error_message = "incompatible types";
+        return false;
+    }
+    return true;
+}

@@ -59,6 +59,8 @@ class QListWidget;
 class QMenu;
 class QTextEdit;
 class QTableView;
+class ConversionTemplateManager;
+class ExtensionManager;
 QT_END_NAMESPACE
 
 //! [0]
@@ -66,7 +68,7 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
    public:
-    MainWindow();
+    MainWindow(ExtensionManager *ctm);
 
    private slots:
     void newLetter();
@@ -82,6 +84,7 @@ class MainWindow : public QMainWindow {
     void createStatusBar();
     void createDockWindows();
 
+    ExtensionManager *ctm_ = nullptr;
     QTextEdit *text_edit_ = nullptr;
     QTableView *table_view_ = nullptr;
     QMenu *view_menu_ = nullptr;
