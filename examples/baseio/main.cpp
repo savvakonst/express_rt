@@ -12,36 +12,14 @@
 //
 #include "EthernetUDP.h"
 
-int initDefaultBaseIO(ExtensionManager *manager) {
-    std::setlocale(LC_ALL, "en_US.UTF-8");
-
-    std::string contents;
-    {
-        std::fstream in("analog.base", std::ios_base::in | std::ios::binary);
-        if (!in) return 1;
-
-        in.seekg(0, std::ios::end);
-        contents.resize(in.tellg());
-        in.seekg(0, std::ios::beg);
-        in.read(&contents[0], contents.size());
-        in.close();
-    }
-
-    DefaultBaseIO base_io;
-
-    auto set = manager->getLastVersionExtensionUintsByType("prm_parser_builder");
-    for (auto &i : set) base_io.addPPBM((PDefaultBaseIO_ifs *)i->ptr);
-
-    base_io.parseDocument(manager, contents);
-    std::cout << base_io.getErrorMessage();
-    return 0;
-}
-
 #ifndef DEFAULT_PARAMETERS_LIB_NAME
 #    error "DEFAULT_PARAMETERS_NAME undefined"
 #endif
 
+static int initDefaultBaseIO(ExtensionManager *manager);
+
 static ExtensionUnit g_default_parameters_units[] = {
+    {"base_io", "io", "instance of class which provides reading \"*.base\" files", (void *)new DefaultBaseIO, 0x00},
     {"EthernetUdp", "parameter", "parameter for processing Ethernet UDP",
      (void *)&createParameter<EthernetUdpParameter>, 0x00},
     {"EthernetUdp", "prm_parser_builder", "module for parsing and building EthernetUdp ",
@@ -61,4 +39,18 @@ static ExtensionInfo g_default_parameters_info = {"default parameters", 0x01, g_
 
 InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, DEFAULT_PARAMETERS_LIB_NAME)(void) {
     return &g_default_parameters_info;
+}
+
+static int initDefaultBaseIO(ExtensionManager *manager) {
+    auto e_unit = search(g_default_parameters_units, "io", "base_io");
+    if (e_unit == nullptr) {
+        DEBUG_CERR("cant find \"base_io\" unit with \"io\" type\n");
+        return 1;
+    }
+    
+    DefaultBaseIO *base_io = (DefaultBaseIO *)e_unit->ptr;
+    auto set = manager->getLastVersionExtensionUintsByType("prm_parser_builder");
+    for (auto &i : set) base_io->addPPBM((PDefaultBaseIO_ifs *)i->ptr);
+
+    return 0;
 }

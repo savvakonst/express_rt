@@ -7,7 +7,6 @@
 #    endif
 #endif
 
-#include "TableModel.h"
 #include "mainwindow.h"
 
 MainWindow::MainWindow(ExtensionManager *ctm) : text_edit_(new QTextEdit), ctm_(ctm) {
@@ -153,6 +152,7 @@ void MainWindow::createActions() {}
 
 void MainWindow::createStatusBar() {}
 
+#include "common/ExtensionManager.h"
 #include "iostream"
 void MainWindow::createDockWindows() {
     QDockWidget *dock = nullptr;
@@ -163,22 +163,24 @@ void MainWindow::createDockWindows() {
 
     dock = new QDockWidget(tr("list of conversion templates"), this);
 
-    table_view_ = new QTableView(dock);
+    table_view_ = (QTableView *)ctm_->getLastVersionExtensionUint("widget", "conv_template_list")->ptr;
+    /*
+        table_view_ = new QTableView(dock);
 
-    QHeaderView *vertical_header = table_view_->verticalHeader();
+        QHeaderView *vertical_header = table_view_->verticalHeader();
 
-    vertical_header->setDefaultSectionSize(vertical_header->minimumSectionSize());  // 20 px height
-    vertical_header->sectionResizeMode(QHeaderView::Fixed);
-    vertical_header->hide();
+        vertical_header->setDefaultSectionSize(vertical_header->minimumSectionSize());  // 20 px height
+        vertical_header->sectionResizeMode(QHeaderView::Fixed);
+        vertical_header->hide();
 
-    table_view_->setSelectionBehavior(QAbstractItemView::SelectRows);
-    table_view_->setAlternatingRowColors(true);
+        table_view_->setSelectionBehavior(QAbstractItemView::SelectRows);
+        table_view_->setAlternatingRowColors(true);
 
-    // table_view_->setStyleSheet(
-    //     "QTableView::item:alternate { background-color: #f6fafb; } QTableView::item { background-color: #D2DCDF; }");
-    table_view_->setStyleSheet(
-        "QHeaderView::section {background-color: #D2DCDF; alternate-background-color: #f6fafb;};");
-    table_view_->setModel(new TableModel(ctm_));
+        // table_view_->setStyleSheet(
+        //     "QTableView::item:alternate { background-color: #f6fafb; } QTableView::item { background-color: #D2DCDF;
+       }"); table_view_->setStyleSheet( "QHeaderView::section {background-color: #D2DCDF; alternate-background-color:
+       #f6fafb;};"); table_view_->setModel(new TableModel(ctm_));
+    */
 
     dock->setWidget(table_view_);
     addDockWidget(Qt::LeftDockWidgetArea, dock);

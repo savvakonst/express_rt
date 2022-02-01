@@ -17,7 +17,28 @@
 #    include <iostream>
 #endif
 
+#ifdef DEBUG_
+#    define DEBUG_COUT(X) std::cout << X
+#    define DEBUG_CERR(X) std::cerr << X
+#else
+#    define DEBUG_COUT(X) ;
+#    define DEBUG_CERR(X) ;
+#endif
+
 typedef void *extensionResource_t;
+
+inline ExtensionUnit *search(ExtensionUnit *ptr, const std::string &type, const std::string &name) {
+    if (ptr == nullptr) return nullptr;
+    
+    auto chr_type = type.data();
+    auto chr_name = name.data();
+
+    while (ptr->name) {
+        if ((0 == std::strcmp(ptr->type, chr_type)) && (0 == std::strcmp(ptr->name, chr_name))) return ptr;
+        ptr++;
+    }
+    return nullptr;
+}
 
 class COMMON_API_ ExtensionManager {
    public:
@@ -25,6 +46,7 @@ class COMMON_API_ ExtensionManager {
 
     ~ExtensionManager();
 
+    void init();
 
    private:
     struct VersionCmp {

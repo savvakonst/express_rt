@@ -16,14 +16,6 @@
 
 namespace fs = std::filesystem;
 
-#ifdef DEBUG_
-#    define DEBUG_COUT(X) std::cout << X
-#    define DEBUG_CERR(X) std::cerr << X
-#else
-#    define DEBUG_COUT(X) ;
-#    define DEBUG_CERR(X) ;
-#endif
-
 std::string getExecutePath() {
     HANDLE process_handle = NULL;
     TCHAR file_name[MAX_PATH];
@@ -96,8 +88,6 @@ HINSTANCE tryToLinkSharedLibrary(ExtensionManager *em, const std::string &path, 
 }
 
 ExtensionManager::ExtensionManager(bool init) {
-    bool f_free_result;
-
     std::list<HINSTANCE> *hinstance_list = new std::list<HINSTANCE>;
     resource_ = (extensionResource_t)hinstance_list;
 
@@ -114,10 +104,14 @@ ExtensionManager::ExtensionManager(bool init) {
     }
 
     if (init) {
-        DEBUG_COUT("\n\n------------------running init modules---------------------\n");
-        auto init_set = getLastVersionExtensionUintsByType("init");
-        for (auto i : init_set) ((initUnit_t)i->ptr)(this);
+        this->init();
     }
+}
+
+void ExtensionManager::init() {
+    DEBUG_COUT("\n\n------------------running init modules---------------------\n");
+    auto init_set = getLastVersionExtensionUintsByType("init");
+    for (auto i : init_set) ((initUnit_t)i->ptr)(this);
 }
 
 ExtensionManager::~ExtensionManager() {

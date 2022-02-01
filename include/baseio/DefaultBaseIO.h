@@ -14,7 +14,7 @@ class DefaultBaseIO : public BaseClass_ifs {
 
     ~DefaultBaseIO();
 
-    ConversionTemplate *parseDocument(ExtensionManager *manager, const std::string &str);
+    virtual ConversionTemplate *parseDocument(ExtensionManager *manager, const std::string &str);
 
     std::string createDocument(const ConversionTemplate *conv_template);
 

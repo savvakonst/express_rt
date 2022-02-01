@@ -112,6 +112,11 @@ ConversionTemplate *DefaultBaseIO::parseDocument(ExtensionManager *manager, cons
         auto node = get("Parameters.List", doc);
 
         conv_template->setName(get("Base. Name", doc).as<std::string>());
+        conv_template->addInfo("company",Value(get(" File.Company", doc).as<std::string>()));
+        conv_template->addInfo("source",Value("*"));
+
+
+
 
         for (const auto &i : get("Device.Modules.List", doc)) {
             const std::string module_name = getStrID(get("Module.ID", i).as<uint32_t>());
@@ -149,6 +154,7 @@ ConversionTemplate *DefaultBaseIO::parseDocument(ExtensionManager *manager, cons
             }
         }
 
+
     } catch (YAML::Exception &e) {
         std::stringstream st;
         st << "\n" << e.msg << "\n\t";
@@ -158,7 +164,7 @@ ConversionTemplate *DefaultBaseIO::parseDocument(ExtensionManager *manager, cons
         return nullptr;
     }
 
-    return nullptr;
+    return conv_template.release();
 }
 
 std::string DefaultBaseIO::createDocument(const ConversionTemplate *conv_template) { return std::string(); }

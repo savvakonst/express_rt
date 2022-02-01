@@ -251,20 +251,30 @@ class TreeComboBox : public QComboBox {
 
 QWidget *newTreeEditor(QWidget *parent) { return new TreeEditor(parent); }
 
-static ExtensionUnit g_tree_widget_extension_uint[] = {
-    {"large_text", "tree_widget_wrapper", "return wrapper of TreeTextEdit", (void *)newTreeWidgetWrapper<TreeTextEdit>,
-     0x00},
-    {"bool", "tree_widget_wrapper", "return wrapper of TreeCheckBox", (void *)newTreeWidgetWrapper<TreeCheckBox>, 0x00},
-    {"text", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeLineEdit>, 0x00},
-    {"ip", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeIPEdit>, 0x00},
-    {"number", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeLineEdit>,
-     0x00},
-    {"enum", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeComboBox>, 0x00},
-    {"tree_editor", "tree_editor", "", (void *)newTreeEditor, 0x00},
-    {nullptr, nullptr, nullptr, nullptr, 0}};
+static ExtensionUnit *g_tree_widget_extension_uint;
+static ExtensionInfo g_tree_widget_extension_info;
 
-static ExtensionInfo g_tree_widget_extension_info = {"tree_widget_extension", 0x01, g_tree_widget_extension_uint};
+#include <QApplication>
 
 InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, TREE_EDITOR_LIB_NAME)(void) {
+    if (QCoreApplication::instance() == nullptr) return nullptr;
+
+    g_tree_widget_extension_uint = new ExtensionUnit[]{
+        {"large_text", "tree_widget_wrapper", "return wrapper of TreeTextEdit",
+         (void *)newTreeWidgetWrapper<TreeTextEdit>, 0x00},
+        {"bool", "tree_widget_wrapper", "return wrapper of TreeCheckBox", (void *)newTreeWidgetWrapper<TreeCheckBox>,
+         0x00},
+        {"text", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeLineEdit>,
+         0x00},
+        {"ip", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeIPEdit>, 0x00},
+        {"number", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeLineEdit>,
+         0x00},
+        {"enum", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeComboBox>,
+         0x00},
+        {"tree_editor", "tree_editor", "", (void *)newTreeEditor, 0x00},
+        {nullptr, nullptr, nullptr, nullptr, 0}};
+
+    g_tree_widget_extension_info = {"tree_widget_extension", 0x01, g_tree_widget_extension_uint};
+
     return &g_tree_widget_extension_info;
 }
