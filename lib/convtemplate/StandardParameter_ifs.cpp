@@ -13,7 +13,9 @@ const HierarchicalData_ifs* StandardParameter_ifs::getProperty(const std::string
 }
 
 std::string StandardParameter_ifs::getPropertyAsTxt(const std::string& prop_path) const {
-    return toString(getBranch(parameter_field_tree_, prop_path), "");
+    auto branch = getBranch(parameter_field_tree_, prop_path);
+    if (branch->isValue()) return branch->getValue().asString();
+    return toString(branch, "");
 }
 
 bool StandardParameter_ifs::setProperty(const std::string& prop_path, const Value& value) {

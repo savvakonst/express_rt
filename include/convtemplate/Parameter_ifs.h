@@ -20,7 +20,7 @@ Parameter_ifs *createParameter(ExtensionManager *manager, const std::string &nam
 
 class COMMON_API_ Parameter_ifs : public BaseClass_ifs {
    public:
-    explicit Parameter_ifs(const std::string &name) : name_(name){};
+    explicit Parameter_ifs(const std::string &name){};
 
     virtual ~Parameter_ifs() = default;
 
@@ -47,9 +47,6 @@ class COMMON_API_ Parameter_ifs : public BaseClass_ifs {
     [[nodiscard]] bool isLocked() const { return (bool)prm_buffer_; }
 
    protected:
-    std::string name_ = std::string("");
-    std::string path_ = std::string("");
-
     friend PrmBuffer_ifs;
     PrmBuffer_ifs *prm_buffer_ = nullptr;
 };

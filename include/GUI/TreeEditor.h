@@ -44,14 +44,12 @@ class TreeWidgetWrapper : public TreeWidgetWrapper_ifs {
     T *widget_;
 };
 
-
-
 /*
  *
  *
  */
 
-
+class ExtensionManager;
 
 class TreeEditor : public QTreeWidget {
    public:
@@ -75,7 +73,7 @@ class TreeEditor : public QTreeWidget {
 
    protected:
    public:
-    void addExtensionUint(ExtensionUnit *uint);
+    void addExtensionUint(ExtensionManager *);
 
    private:
     typedef TreeWidgetWrapper_ifs *(*treeWidgetWrapperConstructor)(DataSchema_ifs *, QWidget *);
@@ -96,6 +94,6 @@ TreeWidgetWrapper_ifs *newTreeWidgetWrapper(DataSchema_ifs *data_schema, QWidget
 }
 
 // TreeEditor(parent)
-typedef TreeEditor * (*newTreeEditor_t)(QWidget* );
+typedef TreeEditor *(*newTreeEditor_t)(QWidget *);
 
 #endif  // MAI

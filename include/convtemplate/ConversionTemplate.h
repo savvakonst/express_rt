@@ -30,7 +30,8 @@ class COMMON_API_ ConversionTemplate : public BaseClass_ifs {
      *
      */
 
-    status addParameter(Parameter_ifs*);
+    status addParameter(Parameter_ifs* prm);
+    [[nodiscard]] const exo_map<std::string, Parameter_ifs*>& getAllParameters() const { return parameters_; }
     [[nodiscard]] const Parameter_ifs* getParameter(std::string name) const;
     [[nodiscard]] exo_container<const Parameter_ifs*> getSingleTypeParameters(std::string type) const;
     [[nodiscard]] exo_container<const Parameter_ifs*> getParametersFromPath(std::string searching_path) const;

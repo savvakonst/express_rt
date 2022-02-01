@@ -1,15 +1,11 @@
 
 
-#include <QWidget>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QMainWindow>
 #include <iostream>
 
 #include "GUI/TreeEditor.h"
 
-
-InitExtension(ExtensionInfo *) initTreeEditor(void) ;
-
+InitExtension(ExtensionInfo *) initTreeEditor(void);
 
 /*
  *
@@ -22,37 +18,29 @@ bindList_t getConfig();
 
 std::string printer_debug(DataSchema_ifs *arg);
 
+#include "common/ExtensionManager.h"
+#include "convtemplate/ConversionTemplateManager.h"
 int main(int argc, char *argv[]) {
     // py::scoped_interpreter guard{};
     // py::module_ bind = py::module_::import("expressbind");
 
     QApplication a(argc, argv);
 
-    std::vector<DataSchema_ifs *> ds_list = getConfig();
+    ExtensionManager manager(false);
+    manager.insertExtensionInfo(initTreeEditor());
+    manager.insertExtensionUnit(new ExtensionUnit{"cnv_template_manager", "cnv_template_manager", "pass",
+                                                  (void *)new ConversionTemplateManager(), 0x00});
 
-    printer_debug(ds_list.front());
-    TreeEditor *top = nullptr;
+    TreeEditor *top =
+        ((newTreeEditor_t)manager.getLastVersionExtensionUint("tree_editor", "tree_editor")->ptr)(nullptr);
+    top->addExtensionUint(&manager);
 
-    auto x = initTreeEditor();
+    manager.init();
 
-    ExtensionUnit *uint = x->units;
-    while (uint->name) {
-        if (std::string(uint->type) == "tree_editor")
-            top = ((newTreeEditor_t)uint->ptr)(nullptr);
-        uint++;
-    }
+    auto ds = (DataSchema_ifs *)manager.getLastVersionExtensionUint("data_schema", "ethernet")->ptr;
+    ds->init(&manager);
+    top->setupProperties(ds);
 
-
-    if (top == nullptr)
-        std::cout<<"----------------\n";
-
-
-    uint = x->units;
-    while (uint->name) {
-        top->addExtensionUint(uint++);
-    }
-
-    top->setupProperties(ds_list[1]);
     top->show();
     top->resize(500, 600);
     top->setColumnWidth(0, 300);

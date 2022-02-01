@@ -4,7 +4,9 @@ set(CONV_TEMPLATE_LIST ConvTemplateList)
 
 add_library(${CONV_TEMPLATE_LIST} SHARED
         ConvTemplateList.cpp
-        ConvTemplateList.h)
+        ConvTemplateList.h
+
+        )
 
 # TODO: remove it
 target_include_directories(${CONV_TEMPLATE_LIST} PRIVATE .)

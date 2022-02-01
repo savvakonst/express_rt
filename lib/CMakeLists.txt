@@ -16,7 +16,8 @@ add_library(CommonLib SHARED
         common/ExtensionManager.cpp
         convtemplate/ConversionTemplate.cpp
         convtemplate/ParameterFieldTree.cpp
-        convtemplate/StandardParameter_ifs.cpp ../include/convtemplate/ConversionTemplateManager.h)
+        convtemplate/StandardParameter_ifs.cpp
+        ../include/convtemplate/ConversionTemplateManager.h)
 
 
 target_include_directories(CommonLib PUBLIC ../include)

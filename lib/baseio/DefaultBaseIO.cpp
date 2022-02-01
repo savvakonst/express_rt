@@ -116,8 +116,6 @@ ConversionTemplate *DefaultBaseIO::parseDocument(ExtensionManager *manager, cons
         conv_template->addInfo("source",Value("*"));
 
 
-
-
         for (const auto &i : get("Device.Modules.List", doc)) {
             const std::string module_name = getStrID(get("Module.ID", i).as<uint32_t>());
             const std::string module = module_name + ":" + std::to_string(get("Module.Slot", i).as<uint32_t>());

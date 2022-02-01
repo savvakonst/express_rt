@@ -43,11 +43,12 @@ const DataSchema_ifs* ConversionTemplate::getInfoSchema() const { return info_sc
  */
 
 status ConversionTemplate::addParameter(Parameter_ifs* parameter) {
-    auto name = parameter->getPropertyAsTxt("name");
-    if (parameters_.find(name) == parameters_.end()) {
+    auto name = parameter->getPropertyAsTxt("common/name");
+    if (parameters_.find(name) != parameters_.end()) {
         error_message_ = "parameter \"" + name + "\" already exists";
         return status::failure;
     }
+    parameters_[name] = parameter;
     return status::succes;
 }
 

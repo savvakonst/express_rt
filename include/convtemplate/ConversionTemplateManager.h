@@ -33,10 +33,20 @@ class ConversionTemplateManager : public BaseClass_ifs {
             error_message_ = "index is out of range";
             return false;
         }
+
         auto it = list_.begin();
         std::advance(it, index);
         ConversionTemplate* conversion_template = *it;
         return removeConversionTemplate(conversion_template);
+    }
+
+    size_t getIndex(ConversionTemplate* ptr) {
+        size_t index = 0;
+        for (auto i : list_) {
+            if (i == ptr) return index;
+            index++;
+        }
+        return std::numeric_limits<size_t>::max();
     }
 
     bool removeConversionTemplate(ConversionTemplate* conversion_template) {

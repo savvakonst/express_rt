@@ -3,7 +3,8 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
 add_executable(ExampleTreeEditor
         main.cpp
-        binder.cpp)
+        #binder.cpp
+        )
 
 target_link_libraries(ExampleTreeEditor PRIVATE Qt5::Widgets)
 target_link_libraries(ExampleTreeEditor PRIVATE CommonLib)

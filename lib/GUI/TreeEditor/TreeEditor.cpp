@@ -11,6 +11,7 @@
 #include <iostream>
 
 #include "TreeTextEdit.h"
+#include "common/ExtensionManager.h"
 
 TreeEditor::TreeEditor(DataSchema_ifs *data_schema, QWidget *parent) : TreeEditor(parent) {
     data_schema_ = data_schema;
@@ -89,22 +90,24 @@ void TreeEditor::setupProperties(DataSchema_ifs *ds, QTreeWidgetItem *parent_ite
     }
     expandAll();
 }
-void TreeEditor::addExtensionUint(ExtensionUnit *uint) {
-    if (strcmp(uint->type, "tree_widget_wrapper")) return;
 
-    QString str = QString::fromStdString(uint->name);
-    QStringList str_list = str.split('|');
+void TreeEditor::addExtensionUint(ExtensionManager *manager) {
+    auto unit_list= manager->getLastVersionExtensionUintsByType("tree_widget_wrapper");
 
-    for (auto &i : str_list) {
-        auto type = std::string(i.toStdString());
+    for(auto uint : unit_list){
+        QString str = QString::fromStdString(uint->name);
+        QStringList str_list = str.split('|');
+        for (auto &i : str_list) {
+            auto type = std::string(i.toStdString());
 
-        auto constructor_ptr = (treeWidgetWrapperConstructor)uint->ptr;
+            auto constructor_ptr = (treeWidgetWrapperConstructor)uint->ptr;
 
-        auto cm = constructors_map_.find(type);
-        if (cm == constructors_map_.end()) {
-            constructors_map_[type] = new constructorList_t{constructor_ptr};
-        } else {
-            (*cm).second->push_back(constructor_ptr);
+            auto cm = constructors_map_.find(type);
+            if (cm == constructors_map_.end()) {
+                constructors_map_[type] = new constructorList_t{constructor_ptr};
+            } else {
+                (*cm).second->push_back(constructor_ptr);
+            }
         }
     }
 }

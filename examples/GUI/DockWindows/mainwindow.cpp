@@ -179,7 +179,7 @@ void MainWindow::createDockWindows() {
         // table_view_->setStyleSheet(
         //     "QTableView::item:alternate { background-color: #f6fafb; } QTableView::item { background-color: #D2DCDF;
        }"); table_view_->setStyleSheet( "QHeaderView::section {background-color: #D2DCDF; alternate-background-color:
-       #f6fafb;};"); table_view_->setModel(new TableModel(ctm_));
+       #f6fafb;};"); table_view_->setModel(new ConvTempateTableModel(ctm_));
     */
 
     dock->setWidget(table_view_);
