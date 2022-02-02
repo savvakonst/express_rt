@@ -10,14 +10,16 @@ endif ()
 
 
 add_library(CommonLib SHARED
-        device/Device.cpp
+        common/main.cpp
         common/CustomTypes.cpp
         common/DataSchema_ifs.cpp
         common/ExtensionManager.cpp
+        device/Device.cpp
         convtemplate/ConversionTemplate.cpp
         convtemplate/ParameterFieldTree.cpp
         convtemplate/StandardParameter_ifs.cpp
-        ../include/convtemplate/ConversionTemplateManager.h)
+        #../include/convtemplate/ConversionTemplateManager.h
+        )
 
 
 target_include_directories(CommonLib PUBLIC ../include)

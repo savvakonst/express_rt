@@ -1,11 +1,8 @@
-//
-// Created by SVK on 12.01.2022.
+#include <iostream>
 //
 
 #include "EthernetUDP.h"
-
-#include <iostream>
-
+#include "SpecificPParserBuilder.h"
 #include "common/ExtensionManager.h"
 #include "common/StringProcessingTools.h"
 
@@ -32,67 +29,13 @@ std::string EthernetUdpParameter::getType() const { return "EthernetUdp"; }
 
 bool EthernetUdpParameter::isValid() const { return false; }
 
-struct PropBuilder {
-    Parameter_ifs* item_;
-    HierarchicalData_ifs* header_;
-
-    void setData(const std::string& dst, const std::string src) {
-        auto u = header_->getMapUnit(src);
-        if (u) {
-            if (!item_->setProperty(dst, u->getValue())) {
-                std::cout << "warning in \"" << dst << "\": " << item_->getErrorMessage() << "\n";
-                item_->clearErrorMessage();
-            }
-        } else
-            std::cout << "error: item_->setProperty(\"" << dst << "\", u->getValue());\n";
-    }
-};
-
-/*
-" Name": "parameter_vibro",
-"Line": 0,
-"Type": 0,
-"Vibro.Description": "Напряжение",
-"Vibro.Length": 30,
-"Vibro.Ration": 50
-
- " Name": "parameter_vibro",
-"Line": 0,
-"Type": 1,
-"Vibro.Description": "Ускорение",
-"Vibro.Length": 30,
-"Vibro.Ration": 50
-
-" Name": "parameter_vibro",
-"Line": 0,
-"Type": 2,
-"Vibro.Description": "Скорость",
-"Vibro.Length": 30,
-"Vibro.Ration": 50
-
-" Name": "parameter_vibro",
-"Line": 0,
-"Type": 3,
-"Vibro.Description": "Перемещение",
-"Vibro.Length": 30,
-"Vibro.Ration": 50
-
- */
-
 Parameter_ifs* EthernetUdParserBuilder::parse(ExtensionManager* manager, HierarchicalData_ifs* other,
                                               HierarchicalData_ifs* header) const {
     auto item = new EthernetUdpParameter(manager, "pass");
     PropBuilder builder = {item, header};
 
-    builder.setData("common/name", " Name");
-    builder.setData("common/identifier", "ShortID");
-    builder.setData("common/name", " Name");
-    builder.setData("common/identifier", "ShortID");
-    builder.setData("common/units", "Dimension");
-    builder.setData("common/category", "Category");
-    builder.setData("common/department", "Department");
-    builder.setData("common/description", "Description");
-
+    builder.setCommon();
+    
     // TODO: need to  build path
 
     builder.header_ = other;

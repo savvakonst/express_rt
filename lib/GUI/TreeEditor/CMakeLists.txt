@@ -1,9 +1,7 @@
 
 set(TREE_EDITOR TreeEditor)
 
-
-
-add_library(${TREE_EDITOR}
+add_library(${TREE_EDITOR} SHARED
         TreeEditor.cpp
         ../../../include/GUI/TreeEditor.h
         TreeTextEdit.h)

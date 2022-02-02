@@ -13,12 +13,7 @@
 #include "TreeTextEdit.h"
 #include "common/ExtensionManager.h"
 
-TreeEditor::TreeEditor(DataSchema_ifs *data_schema, QWidget *parent) : TreeEditor(parent) {
-    data_schema_ = data_schema;
-    // setupProperties(data_schema_, nullptr);
-}
-
-TreeEditor::TreeEditor(QWidget *parent) : QTreeWidget(parent), update_signal_(this) {
+TreeEditor::TreeEditor(ExtensionManager *manager, QWidget *parent) : QTreeWidget(parent), update_signal_(this) {
     this->setAutoFillBackground(true);
     this->setBackgroundRole(QPalette().Base);
     auto p = this->palette();
@@ -33,6 +28,8 @@ TreeEditor::TreeEditor(QWidget *parent) : QTreeWidget(parent), update_signal_(th
     );
 
     this->setAlternatingRowColors(true);
+
+    addExtensionUint(manager);
 }
 void TreeEditor::setupProperties() { setupProperties(data_schema_); }
 
@@ -92,9 +89,9 @@ void TreeEditor::setupProperties(DataSchema_ifs *ds, QTreeWidgetItem *parent_ite
 }
 
 void TreeEditor::addExtensionUint(ExtensionManager *manager) {
-    auto unit_list= manager->getLastVersionExtensionUintsByType("tree_widget_wrapper");
+    auto unit_list = manager->getLastVersionExtensionUintsByType("tree_widget_wrapper");
 
-    for(auto uint : unit_list){
+    for (auto uint : unit_list) {
         QString str = QString::fromStdString(uint->name);
         QStringList str_list = str.split('|');
         for (auto &i : str_list) {
@@ -252,7 +249,7 @@ class TreeComboBox : public QComboBox {
 #    error "TREE_EDITOR_LIB_NAME undefined"
 #endif
 
-QWidget *newTreeEditor(QWidget *parent) { return new TreeEditor(parent); }
+QWidget *newTreeEditor(ExtensionManager *manager, QWidget *parent) { return new TreeEditor(manager, parent); }
 
 static ExtensionUnit *g_tree_widget_extension_uint;
 static ExtensionInfo g_tree_widget_extension_info;

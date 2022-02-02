@@ -11,11 +11,10 @@
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
-    auto ctm = ConversionTemplateManager();
-    ExtensionManager manager(false);
-    manager.insertExtensionUnit(
-        new ExtensionUnit{"cnv_template_manager", "cnv_template_manager", "pass", (void *)&ctm, 0x00});
-    manager.init();
+    ExtensionManager manager;
+    auto ctm = (ConversionTemplateManager *)manager
+                   .getLastVersionExtensionUint("cnv_template_manager", "cnv_template_manager")
+                   ->ptr;
 
     {
         std::string contents;
@@ -38,8 +37,8 @@ int main(int argc, char *argv[]) {
         auto *base_io = (DefaultBaseIO *)(e_unit->ptr);
 
         auto conv_template = base_io->parseDocument(&manager, contents);
-        if (conv_template) ctm.addConversionTemplate(conv_template);
-        
+        if (conv_template) ctm->addConversionTemplate(conv_template);
+
         if (base_io->getErrorMessage().size()) std::cerr << base_io->getErrorMessage();
     }
     std::cout << "---------------------------------------------------------------------\n";
@@ -49,14 +48,14 @@ int main(int argc, char *argv[]) {
         conv_template->setName("first");
         conv_template->addInfo("source", Value("C:/another/virtual/path"));
         conv_template->addInfo("company", Value("АО ничего"));
-        ctm.addConversionTemplate(conv_template);
+        ctm->addConversionTemplate(conv_template);
     }
     {
         auto conv_template = new ConversionTemplate(&manager);
         conv_template->setName("second");
         conv_template->addInfo("source", Value("/virtual"));
         conv_template->addInfo("company", Value("АО Элистех"));
-        ctm.addConversionTemplate(conv_template);
+        ctm->addConversionTemplate(conv_template);
     }
 
     MainWindow main_win(&manager);

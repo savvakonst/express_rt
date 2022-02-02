@@ -102,5 +102,9 @@ ext_set:
 
       - name: "offset_a2"
         type: "i32"
-        description: "коэф. смещения (a2)" 
+        description: "коэф. смещения (a2)"
 
+  - name: "analog"
+    type:
+      - name: "common"
+        include: "common"

@@ -22,48 +22,7 @@ MainWindow::MainWindow(ExtensionManager *ctm) : text_edit_(new QTextEdit), ctm_(
     setUnifiedTitleAndToolBarOnMac(true);
 }
 
-void MainWindow::newLetter() {
-    text_edit_->clear();
-
-    QTextCursor cursor(text_edit_->textCursor());
-    cursor.movePosition(QTextCursor::Start);
-    QTextFrame *topFrame = cursor.currentFrame();
-    QTextFrameFormat topFrameFormat = topFrame->frameFormat();
-    topFrameFormat.setPadding(16);
-    topFrame->setFrameFormat(topFrameFormat);
-
-    QTextCharFormat textFormat;
-    QTextCharFormat boldFormat;
-    boldFormat.setFontWeight(QFont::Bold);
-    QTextCharFormat italicFormat;
-    italicFormat.setFontItalic(true);
-
-    QTextTableFormat tableFormat;
-    tableFormat.setBorder(1);
-    tableFormat.setCellPadding(16);
-    tableFormat.setAlignment(Qt::AlignRight);
-    cursor.insertTable(1, 1, tableFormat);
-    cursor.insertText("The Firm", boldFormat);
-    cursor.insertBlock();
-    cursor.insertText("321 City Street", textFormat);
-    cursor.insertBlock();
-    cursor.insertText("Industry Park");
-    cursor.insertBlock();
-    cursor.insertText("Some Country");
-    cursor.setPosition(topFrame->lastPosition());
-    cursor.insertText(QDate::currentDate().toString("d MMMM yyyy"), textFormat);
-    cursor.insertBlock();
-    cursor.insertBlock();
-    cursor.insertText("Dear ", textFormat);
-    cursor.insertText("NAME", italicFormat);
-    cursor.insertText(",", textFormat);
-    for (int i = 0; i < 3; ++i) cursor.insertBlock();
-    cursor.insertText(tr("Yours sincerely,"), textFormat);
-    for (int i = 0; i < 3; ++i) cursor.insertBlock();
-    cursor.insertText("The Boss", textFormat);
-    cursor.insertBlock();
-    cursor.insertText("ADDRESS", italicFormat);
-}
+void MainWindow::newLetter() { text_edit_->clear(); }
 
 void MainWindow::print() {
 #if QT_CONFIG(printdialog)
@@ -152,6 +111,7 @@ void MainWindow::createActions() {}
 
 void MainWindow::createStatusBar() {}
 
+#include "GUI/TreeEditor.h"
 #include "common/ExtensionManager.h"
 #include "iostream"
 void MainWindow::createDockWindows() {
@@ -161,29 +121,30 @@ void MainWindow::createDockWindows() {
      *
      */
 
-    dock = new QDockWidget(tr("list of conversion templates"), this);
+    dock = new QDockWidget(tr("parameter properties"), this);
 
-    table_view_ = (QTableView *)ctm_->getLastVersionExtensionUint("widget", "conv_template_list")->ptr;
+    auto constructor = (newTreeEditor_t)ctm_->getLastVersionExtensionUint("tree_editor", "tree_editor")->ptr;
+    auto ds = (DataSchema_ifs *)ctm_->getLastVersionExtensionUint("data_schema", "ethernet")->ptr;
+
+    TreeEditor *top = constructor(ctm_, nullptr);
+    top->setupProperties(ds);
+
+    dock->setWidget(top);
+    addDockWidget(Qt::RightDockWidgetArea, dock);
+
+    this->resize(750, 600 * 2);
+    top->setMinimumHeight(600);
+    top->setMinimumWidth(400);
+    top->setColumnWidth(0, 250);
+    // dock->swtMinimumSizeHint(250, 900);
     /*
-        table_view_ = new QTableView(dock);
+     *
+     */
 
-        QHeaderView *vertical_header = table_view_->verticalHeader();
-
-        vertical_header->setDefaultSectionSize(vertical_header->minimumSectionSize());  // 20 px height
-        vertical_header->sectionResizeMode(QHeaderView::Fixed);
-        vertical_header->hide();
-
-        table_view_->setSelectionBehavior(QAbstractItemView::SelectRows);
-        table_view_->setAlternatingRowColors(true);
-
-        // table_view_->setStyleSheet(
-        //     "QTableView::item:alternate { background-color: #f6fafb; } QTableView::item { background-color: #D2DCDF;
-       }"); table_view_->setStyleSheet( "QHeaderView::section {background-color: #D2DCDF; alternate-background-color:
-       #f6fafb;};"); table_view_->setModel(new ConvTempateTableModel(ctm_));
-    */
-
+    dock = new QDockWidget(tr("list of conversion templates"), this);
+    table_view_ = (QTableView *)ctm_->getLastVersionExtensionUint("widget", "conv_template_list")->ptr;
     dock->setWidget(table_view_);
-    addDockWidget(Qt::LeftDockWidgetArea, dock);
+    addDockWidget(Qt::RightDockWidgetArea, dock);
     /*
      *
      */

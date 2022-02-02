@@ -1,8 +1,6 @@
 #ifndef EXRT_ETHERNET_UDP
 #define EXRT_ETHERNET_UDP
 
-#include <iostream>
-
 #include "convtemplate/ParameterFieldTree.h"
 #include "convtemplate/StandardParameter_ifs.h"
 #include "extensions/PDefaultBaseIO_ifs.h"
@@ -28,9 +26,6 @@ class [[maybe_unused]] EthernetUdpParameter : public StandardParameter_ifs {
 
     [[nodiscard]] bool isValid() const override;
 
-   private:
-    //ParameterFieldTree_ifs* parameter_field_tree_ = nullptr;
-    //DataSchema_ifs* data_schema_;
 };
 
 #define ETHERNET_UDP_PB 500

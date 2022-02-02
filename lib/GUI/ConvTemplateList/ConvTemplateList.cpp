@@ -3,10 +3,11 @@
 #include <QTableView>
 //
 #include "ConvTemplateList.h"
+#include "QDebug"
 #include "common/ExtensionManager.h"
 #include "convtemplate/ConversionTemplate.h"
 #include "convtemplate/ConversionTemplateManager.h"
-#include "QDebug"
+
 ConvTempateTreeModel::ConvTempateTreeModel(ExtensionManager *manager) {
     auto unit = manager->getLastVersionExtensionUint("data_schema", "conversion_template");
     if (unit && unit->ptr) {
@@ -25,16 +26,12 @@ ConvTempateTreeModel::ConvTempateTreeModel(ExtensionManager *manager) {
 // TreeModel::TreeModel(const QString &data, QObject *parent) {}
 ConvTempateTreeModel::~ConvTempateTreeModel() = default;
 QVariant ConvTempateTreeModel::data(const QModelIndex &index, int role) const {
+    if (!index.isValid()) return QVariant();
 
-    if (!index.isValid())
-        return QVariant();
+    if (role != Qt::DisplayRole) return QVariant();
 
-    if (role != Qt::DisplayRole)
-        return QVariant();
-
-
-    auto ptr = (ConversionTemplate*)index.internalPointer();
-    if(ptr!= nullptr){
+    auto ptr = (ConversionTemplate *)index.internalPointer();
+    if (ptr != nullptr) {
         auto &prm_map = ptr->getAllParameters();
 
         auto it = prm_map.begin();
@@ -49,8 +46,7 @@ QVariant ConvTempateTreeModel::data(const QModelIndex &index, int role) const {
 }
 
 Qt::ItemFlags ConvTempateTreeModel::flags(const QModelIndex &index) const {
-    if (!index.isValid())
-        return Qt::NoItemFlags;
+    if (!index.isValid()) return Qt::NoItemFlags;
     return QAbstractItemModel::flags(index);
 }
 
@@ -62,20 +58,16 @@ QVariant ConvTempateTreeModel::headerData(int section, Qt::Orientation orientati
 }
 
 QModelIndex ConvTempateTreeModel::index(int row, int column, const QModelIndex &parent) const {
-    if (!hasIndex(row, column, parent))
-        return QModelIndex();
+    if (!hasIndex(row, column, parent)) return QModelIndex();
 
     if (!parent.isValid()) {
         auto conv_tmp = manager_->getConversionTemplateByIndex((size_t)row);
-        if (conv_tmp)
-            return createIndex(row,column, nullptr);
-    }
-    else{
+        if (conv_tmp) return createIndex(row, column, nullptr);
+    } else {
         auto conv_tmp = manager_->getConversionTemplateByIndex((size_t)parent.row());
-        //auto conv_tmp = (ConversionTemplate*)parent.internalPointer();
-        if(row < conv_tmp->getAllParameters().size() )
-            return createIndex(row,column, conv_tmp);
-        //auto &prm_map = conv_tmp->getAllParameters();
+        // auto conv_tmp = (ConversionTemplate*)parent.internalPointer();
+        if (row < conv_tmp->getAllParameters().size()) return createIndex(row, column, conv_tmp);
+        // auto &prm_map = conv_tmp->getAllParameters();
     }
 
     return QModelIndex();
@@ -84,9 +76,8 @@ QModelIndex ConvTempateTreeModel::index(int row, int column, const QModelIndex &
 QModelIndex ConvTempateTreeModel::parent(const QModelIndex &index) const {
     if (!index.isValid()) return QModelIndex();
 
-    auto ptr = (ConversionTemplate*)index.internalPointer();
-    if(ptr)
-        return createIndex(manager_->getIndex(ptr), 0, nullptr);
+    auto ptr = (ConversionTemplate *)index.internalPointer();
+    if (ptr) return createIndex(manager_->getIndex(ptr), 0, nullptr);
 
     return QModelIndex();
 }
@@ -94,8 +85,7 @@ QModelIndex ConvTempateTreeModel::parent(const QModelIndex &index) const {
 int ConvTempateTreeModel::rowCount(const QModelIndex &parent) const {
     if (parent.column() > 0) return 0;
 
-    if (!parent.isValid())
-        return (int)manager_->getEntriesNumber();
+    if (!parent.isValid()) return (int)manager_->getEntriesNumber();
 
     if (!parent.internalPointer()) {
         auto p = manager_->getConversionTemplateByIndex(parent.row());
@@ -105,7 +95,6 @@ int ConvTempateTreeModel::rowCount(const QModelIndex &parent) const {
     }
     return 0;
 }
-
 
 int ConvTempateTreeModel::columnCount(const QModelIndex &parent) const {
     if (parent.isValid()) return 1;
@@ -130,11 +119,12 @@ ConvTempateTableModel::ConvTempateTableModel(ExtensionManager *manager) {
     unit = manager->getLastVersionExtensionUint("cnv_template_manager", "cnv_template_manager");
     if (unit && unit->ptr) {
         manager_ = (ConversionTemplateManager *)unit->ptr;
-        std::cout << "manager_ = (ConversionTemplateManager *)unit->ptr;\n";
+        if (manager_ == nullptr) std::cerr << "ConvTempateTableModel::manager_ == nullptr;\n";
     }
 }
 
 int ConvTempateTableModel::rowCount(const QModelIndex &parent) const { return (int)manager_->getEntriesNumber(); }
+
 int ConvTempateTableModel::columnCount(const QModelIndex &parent) const { return (int)list_of_entries_.size(); }
 
 QVariant ConvTempateTableModel::headerData(int section, Qt::Orientation orientation, int role) const {
@@ -161,11 +151,10 @@ QVariant ConvTempateTableModel::data(const QModelIndex &index, int role) const {
  *
  */
 
-
 ParameterTableModel::ParameterTableModel(ExtensionManager *manager) {
     auto p_unit = manager->getLastVersionExtensionUint("widget", "conv_template_list");
-    auto model = ((QAbstractItemView *)p_unit->ptr);//->model();
-    //model->
+    auto model = ((QAbstractItemView *)p_unit->ptr);  //->model();
+    // model->
 
     auto unit = manager->getLastVersionExtensionUint("data_schema", "conversion_template");
     if (unit && unit->ptr) {
@@ -214,13 +203,13 @@ QVariant ParameterTableModel::data(const QModelIndex &index, int role) const {
 #include <QTreeView>
 QWidget *newConvTemplateList(QWidget *parent) {
     auto table_view = new QTreeView();
-/*
-    QHeaderView *vertical_header = table_view->verticalHeader();
+    /*
+        QHeaderView *vertical_header = table_view->verticalHeader();
 
-    vertical_header->setDefaultSectionSize(vertical_header->minimumSectionSize());  // 20 px height
-    vertical_header->sectionResizeMode(QHeaderView::Fixed);
-    vertical_header->hide();
-*/
+        vertical_header->setDefaultSectionSize(vertical_header->minimumSectionSize());  // 20 px height
+        vertical_header->sectionResizeMode(QHeaderView::Fixed);
+        vertical_header->hide();
+    */
     table_view->setSelectionBehavior(QAbstractItemView::SelectRows);
     table_view->setAlternatingRowColors(true);
 
@@ -234,8 +223,9 @@ static int initConvTemplateListWidget(ExtensionManager *manager);
 static ExtensionUnit *g_conv_template_list_extension_uint = nullptr;
 static ExtensionInfo g_conv_template_list_extension_info;
 
-#include <QApplication>
 #include <qfile.h>
+
+#include <QApplication>
 InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, CONV_TEMPLATE_LIST_LIB_NAME)(void) {
     if (QCoreApplication::instance() == nullptr) return nullptr;
 
@@ -251,9 +241,6 @@ InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, CONV_TEMPLATE_LIST_LIB_NA
 
     return &g_conv_template_list_extension_info;
 }
-
-
-
 
 static int initConvTemplateListWidget(ExtensionManager *manager) {
     auto p_unit = search(g_conv_template_list_extension_uint, "widget", "conv_template_list");

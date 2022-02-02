@@ -14,6 +14,8 @@
 #include "common/DataSchema_ifs.h"
 #include "common/Extension.h"
 
+class ExtensionManager;
+
 class TreeWidgetWrapper_ifs {
    public:
     virtual ~TreeWidgetWrapper_ifs() = default;
@@ -49,15 +51,11 @@ class TreeWidgetWrapper : public TreeWidgetWrapper_ifs {
  *
  */
 
-class ExtensionManager;
-
 class TreeEditor : public QTreeWidget {
    public:
-    explicit TreeEditor(QWidget *parent = nullptr);
+    explicit TreeEditor(ExtensionManager *manager, QWidget *parent = nullptr);
 
-    explicit TreeEditor(DataSchema_ifs *data_schema, QWidget *parent = nullptr);
-
-    void setupProperties(DataSchema_ifs *ds, QTreeWidgetItem *parent_item = nullptr);
+    virtual void setupProperties(DataSchema_ifs *ds, QTreeWidgetItem *parent_item = nullptr);
 
     void setupProperties();
 
@@ -72,7 +70,6 @@ class TreeEditor : public QTreeWidget {
     };
 
    protected:
-   public:
     void addExtensionUint(ExtensionManager *);
 
    private:
@@ -94,6 +91,6 @@ TreeWidgetWrapper_ifs *newTreeWidgetWrapper(DataSchema_ifs *data_schema, QWidget
 }
 
 // TreeEditor(parent)
-typedef TreeEditor *(*newTreeEditor_t)(QWidget *);
+typedef TreeEditor *(*newTreeEditor_t)(ExtensionManager *, QWidget *);
 
 #endif  // MAI
