@@ -1,4 +1,7 @@
+
 #include "SpecificPParserBuilder.h"
+
+#include "Analog.h"
 
 #ifdef DEBUG_
 #    include <iostream>
@@ -6,8 +9,6 @@
 #else
 #    define PRINT_DEBUG_INFO(X)
 #endif
-
-
 
 /*
 " Name": "parameter_vibro",
@@ -40,31 +41,52 @@
 
 */
 
-
 Parameter_ifs *AnalogParserBuilder::parse(ExtensionManager *manager, HierarchicalData_ifs *other,
                                           HierarchicalData_ifs *header) const {
     PRINT_DEBUG_INFO("Parameters.List.Analog\n");
-    return nullptr;
+
+    Parameter_ifs * item = new AnalogParameter(manager);
+    PropBuilder builder = {item, header};
+    builder.setCommon();
+
+    return item;
 }
 
 Parameter_ifs *AnalogVibroParserBuilder::parse(ExtensionManager *manager, HierarchicalData_ifs *other,
                                                HierarchicalData_ifs *header) const {
+    PRINT_DEBUG_INFO("Parameters.List.Analog.Vibro\n");
     auto u = other->getMapUnit("Type");
 
+    i64_t vibro_type = -1;
     if (u) {
-        auto vibro_type = u->getValue().value_.i64;
-        if (vibro_type ==0 )
-
-
-
-
-    } else
+        vibro_type = u->getValue().value_.i64;
+    } else {
         std::cout << "cant find field type in Base\n";
+        return nullptr;
+    }
 
-    u->getValue()
+    Parameter_ifs *item = nullptr;
+    switch (vibro_type) {
+    case 0: {
+        item = new AnalogParameter(manager);
+        PropBuilder builder = {item, header};
+        builder.setCommon();
+        break;
+    }
+    case 1: {
+        item = new AccelerationParameter(manager);
+        PropBuilder builder = {item, header};
+        builder.setCommon();
+        builder.setData("conversion_factor", Value(1.0));
+        break;
+    }
+    case 2:
+        break;
+    case 3:
+        break;
+    }
 
-        PRINT_DEBUG_INFO("Parameters.List.Analog.Vibro\n");
-    return nullptr;
+    return item;
 }
 
 Parameter_ifs *AnalogVoltageParserBuilder::parse(ExtensionManager *manager, HierarchicalData_ifs *other,

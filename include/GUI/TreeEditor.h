@@ -57,9 +57,9 @@ class TreeEditor : public QTreeWidget {
 
     virtual void setupProperties(DataSchema_ifs *ds, QTreeWidgetItem *parent_item = nullptr);
 
-    void setupProperties();
-
    private:
+    void addProperty(DataSchema_ifs *ds, QTreeWidgetItem *parent_item = nullptr);
+
     class UpdateSignal : public Signal_ifs {
        public:
         explicit UpdateSignal(TreeEditor *tree_widget) : tree_widget_(tree_widget) {}

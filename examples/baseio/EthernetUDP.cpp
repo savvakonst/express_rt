@@ -6,9 +6,8 @@
 #include "common/ExtensionManager.h"
 #include "common/StringProcessingTools.h"
 
-EthernetUdpParameter::EthernetUdpParameter(ExtensionManager* manager, const std::string& name)
-    : StandardParameter_ifs(name) {
-    auto unit = manager->getLastVersionExtensionUint("data_schema", "ethernet");
+EthernetUdpParameter::EthernetUdpParameter(ExtensionManager* manager) {
+    auto unit = manager->getLastVersionExtensionUint("data_schema", "ethernet_udp");
 
     if (unit && unit->ptr) {
         data_schema_ = (DataSchema_ifs*)unit->ptr;
@@ -25,17 +24,17 @@ PrmBuffer_ifs* EthernetUdpParameter::createBuffer() const {
     return nullptr;
 }
 
-std::string EthernetUdpParameter::getType() const { return "EthernetUdp"; }
+std::string EthernetUdpParameter::getType() const { return "ethernet_udp"; }
 
 bool EthernetUdpParameter::isValid() const { return false; }
 
 Parameter_ifs* EthernetUdParserBuilder::parse(ExtensionManager* manager, HierarchicalData_ifs* other,
                                               HierarchicalData_ifs* header) const {
-    auto item = new EthernetUdpParameter(manager, "pass");
+    auto item = new EthernetUdpParameter(manager);
     PropBuilder builder = {item, header};
 
     builder.setCommon();
-    
+
     // TODO: need to  build path
 
     builder.header_ = other;

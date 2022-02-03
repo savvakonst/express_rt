@@ -9,7 +9,7 @@ class ExtensionUnit;
 
 class [[maybe_unused]] AnalogParameter : public StandardParameter_ifs {
    public:
-    AnalogParameter(ExtensionManager* manager, const std::string& name);
+    explicit AnalogParameter(ExtensionManager* manager);
 
     ~AnalogParameter() override;
 
@@ -20,10 +20,9 @@ class [[maybe_unused]] AnalogParameter : public StandardParameter_ifs {
     [[nodiscard]] bool isValid() const override;
 };
 
-/*
 class [[maybe_unused]] AccelerationParameter : public StandardParameter_ifs {
    public:
-    AccelerationParameter(ExtensionManager* manager, const std::string& name);
+    explicit AccelerationParameter(ExtensionManager* manager);
 
     ~AccelerationParameter() override;
 
@@ -33,5 +32,5 @@ class [[maybe_unused]] AccelerationParameter : public StandardParameter_ifs {
 
     [[nodiscard]] bool isValid() const override;
 };
-*/
+
 #endif  // EXRT_ANALOG_H

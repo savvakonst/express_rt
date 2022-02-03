@@ -73,7 +73,7 @@ class ParameterFieldTreeMap : public ParameterFieldTree_ifs {
     getMapReturn_t vecmap_;
     std::map<std::string, HierarchicalData_ifs *> map_;
 };
-#include "iostream"
+
 class ParameterFieldTreeValue : public ParameterFieldTree_ifs {
    public:
     ParameterFieldTreeValue(DataSchema_ifs *data_schema) {
@@ -111,6 +111,7 @@ class ParameterFieldTreeValue : public ParameterFieldTree_ifs {
 };
 
 ParameterFieldTree_ifs *newParameterFieldTree(DataSchema_ifs *data_schema, size_t dim) {
+    if (data_schema == nullptr) return nullptr;
     if (data_schema->isArray()) return new ParameterFieldTreeArray(data_schema, dim);
     if (data_schema->isMap()) return new ParameterFieldTreeMap(data_schema);
     return new ParameterFieldTreeValue(data_schema);

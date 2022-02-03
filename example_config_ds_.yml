@@ -44,7 +44,7 @@ ext_set:
           - name: "y"
             type: "f64"
 
-  - name: "ethernet"
+  - name: "ethernet_udp"
     type:
       - name: "common"
         include: "common"
@@ -108,3 +108,12 @@ ext_set:
     type:
       - name: "common"
         include: "common"
+
+  - name: "acceleration"
+    type:
+      - name: "common"
+        include: "common"
+
+      - name: "conversion_factor"
+        type: "f64"
+        description: "коэф. преобразования V~a"

@@ -21,6 +21,13 @@ struct PropBuilder {
             std::cout << "error: item_->setProperty(\"" << dst << "\", u->getValue());\n";
     }
 
+    void setData(const std::string& dst, const Value& value) const {
+        if (!item_->setProperty(dst, value)) {
+            std::cout << "warning in \"" << dst << "\": " << item_->getErrorMessage() << "\n";
+            item_->clearErrorMessage();
+        }
+    }
+
     [[maybe_unused]] void setCommon() const {
         setData("common/name", " Name");
         setData("common/identifier", "ShortID");

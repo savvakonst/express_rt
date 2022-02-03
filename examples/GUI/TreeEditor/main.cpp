@@ -13,7 +13,8 @@ int main(int argc, char *argv[]) {
     TreeEditor *top =
         ((newTreeEditor_t)manager.getLastVersionExtensionUint("tree_editor", "tree_editor")->ptr)(&manager, nullptr);
 
-    auto ds = (DataSchema_ifs *)manager.getLastVersionExtensionUint("data_schema", "ethernet")->ptr;
+    // auto ds = (DataSchema_ifs *)manager.getLastVersionExtensionUint("data_schema", "ethernet_udp")->ptr;
+    auto ds = (DataSchema_ifs *)manager.getLastVersionExtensionUint("data_schema", "acceleration")->ptr;
     ds->init(&manager);
     top->setupProperties(ds);
 

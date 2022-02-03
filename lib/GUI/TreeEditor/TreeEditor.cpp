@@ -31,16 +31,23 @@ TreeEditor::TreeEditor(ExtensionManager *manager, QWidget *parent) : QTreeWidget
 
     addExtensionUint(manager);
 }
-void TreeEditor::setupProperties() { setupProperties(data_schema_); }
+
 
 void TreeEditor::setupProperties(DataSchema_ifs *ds, QTreeWidgetItem *parent_item) {
     data_schema_ = ds;
 
-    auto item = parent_item ? new QTreeWidgetItem(parent_item) : new QTreeWidgetItem(this);
+    if (ds->isMap()) {
+        auto map_list = ds->getMapList();
+        for (auto i : map_list) {
+            addProperty(i, nullptr);
+        }
+    }
+    expandAll();
+}
 
-    // item->setFlags(item->flags() | Qt::ItemIsEditable);
-    // parent_item->setFlags(parent_item->flags() | Qt::ItemIsTristate |
-    //                       Qt::ItemIsUserCheckable);
+void TreeEditor::addProperty(DataSchema_ifs *ds, QTreeWidgetItem *parent_item) {
+
+    auto item = parent_item ? new QTreeWidgetItem(parent_item) : new QTreeWidgetItem(this);
 
     auto name = ds->description_.c_str();
     item->setText(0, name);
@@ -48,7 +55,7 @@ void TreeEditor::setupProperties(DataSchema_ifs *ds, QTreeWidgetItem *parent_ite
     if (ds->isMap()) {
         auto map_list = ds->getMapList();
         for (auto i : map_list) {
-            setupProperties(i, item);
+            addProperty(i, item);
         }
     } else if (ds->isArray()) {
         // TODO: realise this branch of logic
@@ -85,7 +92,6 @@ void TreeEditor::setupProperties(DataSchema_ifs *ds, QTreeWidgetItem *parent_ite
             item->setText(1, QString::fromStdString(error));
         }
     }
-    expandAll();
 }
 
 void TreeEditor::addExtensionUint(ExtensionManager *manager) {
@@ -108,6 +114,7 @@ void TreeEditor::addExtensionUint(ExtensionManager *manager) {
         }
     }
 }
+
 
 /*
  *

@@ -1,337 +1,337 @@
 {
-    " File.About": "KSD-Express Database File",
-    " File.Company": "АО Элистех",
-    " File.Date": "2022.1.26",
-    " File.Version": "1.0.0.0",
-    "Base. Name": "Новая база данных",
-    "Base.Alteration.List": [
+  " File.About": "KSD-Express Database File",
+  " File.Company": "АО Элистех",
+  " File.Date": "2022.1.26",
+  " File.Version": "1.0.0.0",
+  "Base. Name": "Новая база данных",
+  "Base.Alteration.List": [
+    {
+      "Date": "2022.01.12",
+      "EditedBy": "Test",
+      "Time": "11:33:43"
+    },
+    {
+      "Date": "2022.01.12",
+      "EditedBy": "Test",
+      "Time": "11:35:59"
+    },
+    {
+      "Date": "2022.01.26",
+      "EditedBy": "Test",
+      "Time": "15:32:54"
+    },
+    {
+      "Date": "2022.01.26",
+      "EditedBy": "Test",
+      "Time": "15:33:19"
+    },
+    {
+      "Date": "2022.01.26",
+      "EditedBy": "Test",
+      "Time": "15:33:53"
+    },
+    {
+      "Date": "2022.01.26",
+      "EditedBy": "Test",
+      "Time": "16:00:45"
+    },
+    {
+      "Date": "2022.01.26",
+      "EditedBy": "Test",
+      "Time": "16:01:20"
+    },
+    {
+      "Date": "2022.01.26",
+      "EditedBy": "Test",
+      "Time": "16:44:24"
+    },
+    {
+      "Date": "2022.01.26",
+      "EditedBy": "Test",
+      "Time": "16:45:29"
+    },
+    {
+      "Date": "2022.01.26",
+      "EditedBy": "Test",
+      "Time": "16:47:26"
+    },
+    {
+      "Date": "2022.01.26",
+      "EditedBy": "Test",
+      "Time": "16:51:02"
+    },
+    {
+      "Date": "2022.01.26",
+      "EditedBy": "Test",
+      "Time": "16:54:56"
+    },
+    {
+      "Date": "2022.01.26",
+      "EditedBy": "Test",
+      "Time": "16:55:13"
+    },
+    {
+      "Date": "2022.01.26",
+      "EditedBy": "Test",
+      "Time": "16:55:36"
+    },
+    {
+      "Date": "2022.01.26",
+      "EditedBy": "Test",
+      "Time": "20:59:22"
+    }
+  ],
+  "Base.Alteration.Number": 15,
+  "Base.CreatedBy": "Test",
+  "Base.Date": "2022.01.12",
+  "Base.Description": "",
+  "Base.Object": "",
+  "Base.Time": "11:32:36",
+  "Device.ID": 1279546187,
+  "Device.Modules.List": [
+    {
+      "Module.ID": 1597059149,
+      "Module.Name": "КСД/КСЛ1",
+      "Module.Slot": 0
+    },
+    {
+      "Module.ID": 1295396931,
+      "Module.Name": "КСД/Ethernet",
+      "Module.Slot": 0,
+      "Module.Subslot": 1
+    },
+    {
+      "Module.ID": 1597059137,
+      "Module.Name": "КСД/А01",
+      "Module.Slot": 1
+    },
+    {
+      "Module.ID": 1597124673,
+      "Module.Name": "КСД/А02",
+      "Module.Slot": 2
+    },
+    {
+      "Module.Block": 255,
+      "Module.ID": 1129070915,
+      "Module.Name": "КСД/Рассчётный",
+      "Module.Slave": 255,
+      "Module.Slot": 255,
+      "Module.Subslot": 255
+    }
+  ],
+  "Device.Modules.Type.ARINC.Number": 0,
+  "Device.Modules.Type.IRIG.Number": 0,
+  "Device.Modules.Type.SNS.Number": 0,
+  "Device.Modules.Type.TermoCouple.Number": 0,
+  "Device.Name": "КСД/КСД",
+  "List.Categories": [
+  ],
+  "List.Departments": [
+  ],
+  "List.Dimensions": [
+    "ед",
+    "мкВ",
+    "мВ",
+    "В",
+    "кВ",
+    "мкс",
+    "мс",
+    "с",
+    "мин",
+    "ч",
+    "Гц",
+    "кГц",
+    "МГц",
+    "об/мин",
+    "об/ч",
+    "мм",
+    "м",
+    "км",
+    "м/с",
+    "км/с",
+    "км/ч",
+    "g",
+    "М",
+    "°",
+    "рад",
+    "°C",
+    "Ом",
+    "кОм",
+    "МОм",
+    "мкА",
+    "мА",
+    "А",
+    "дБ",
+    "л",
+    "л/с",
+    "л/мин",
+    "л/час"
+  ],
+  "List.Systems": [
+  ],
+  "LocalCoord.PZ90.B": 0,
+  "LocalCoord.PZ90.H": 0,
+  "LocalCoord.PZ90.L": 0,
+  "LocalCoord.PZ90.X": 0,
+  "LocalCoord.PZ90.Y": 0,
+  "LocalCoord.PZ90.Z": 0,
+  "LocalCoord.Type": false,
+  "LocalCoord.WGS84.B": 0,
+  "LocalCoord.WGS84.H": 0,
+  "LocalCoord.WGS84.L": 0,
+  "LocalCoord.WGS84.X": 0,
+  "LocalCoord.WGS84.Y": 0,
+  "LocalCoord.WGS84.Z": 0,
+  "Parameters.List": [
+    {
+      " Index": 0,
+      " Name": "parameter_ethernet",
+      "Category": "",
+      "Control.Levels.Number": 0,
+      "Delay": 0,
+      "Department": "",
+      "Description": "",
+      "Dimension": "",
+      "Formula": "x = param()\ny = x\nreturn double(y)\n",
+      "Method": 0,
+      "Module.ID": 1295396931,
+      "Module.Name": "КСД/Ethernet",
+      "Module.Slot": 0,
+      "Module.Subslot": 1,
+      "Points.Approximation": false,
+      "Points.Number": 0,
+      "Points.Polymon.List": [
         {
-            "Date": "2022.01.12",
-            "EditedBy": "Test",
-            "Time": "11:33:43"
+          "Index": 0,
+          "Value": 0
         },
         {
-            "Date": "2022.01.12",
-            "EditedBy": "Test",
-            "Time": "11:35:59"
-        },
-        {
-            "Date": "2022.01.26",
-            "EditedBy": "Test",
-            "Time": "15:32:54"
-        },
-        {
-            "Date": "2022.01.26",
-            "EditedBy": "Test",
-            "Time": "15:33:19"
-        },
-        {
-            "Date": "2022.01.26",
-            "EditedBy": "Test",
-            "Time": "15:33:53"
-        },
-        {
-            "Date": "2022.01.26",
-            "EditedBy": "Test",
-            "Time": "16:00:45"
-        },
-        {
-            "Date": "2022.01.26",
-            "EditedBy": "Test",
-            "Time": "16:01:20"
-        },
-        {
-            "Date": "2022.01.26",
-            "EditedBy": "Test",
-            "Time": "16:44:24"
-        },
-        {
-            "Date": "2022.01.26",
-            "EditedBy": "Test",
-            "Time": "16:45:29"
-        },
-        {
-            "Date": "2022.01.26",
-            "EditedBy": "Test",
-            "Time": "16:47:26"
-        },
-        {
-            "Date": "2022.01.26",
-            "EditedBy": "Test",
-            "Time": "16:51:02"
-        },
-        {
-            "Date": "2022.01.26",
-            "EditedBy": "Test",
-            "Time": "16:54:56"
-        },
-        {
-            "Date": "2022.01.26",
-            "EditedBy": "Test",
-            "Time": "16:55:13"
-        },
-        {
-            "Date": "2022.01.26",
-            "EditedBy": "Test",
-            "Time": "16:55:36"
-        },
-        {
-            "Date": "2022.01.26",
-            "EditedBy": "Test",
-            "Time": "20:59:22"
+          "Index": 1,
+          "Value": 0
         }
-    ],
-    "Base.Alteration.Number": 15,
-    "Base.CreatedBy": "Test",
-    "Base.Date": "2022.01.12",
-    "Base.Description": "",
-    "Base.Object": "",
-    "Base.Time": "11:32:36",
-    "Device.ID": 1279546187,
-    "Device.Modules.List": [
+      ],
+      "Points.Polymon.Rank": 1,
+      "Precision2": false,
+      "Raw": false,
+      "ShortID": "",
+      "System": "",
+      "Type": 500
+    },
+    {
+      " Index": 1,
+      " Name": "parameter_vibro",
+      "Category": "",
+      "Control.Levels.Number": 0,
+      "Delay": 0,
+      "Department": "",
+      "Description": "",
+      "Dimension": "",
+      "Formula": "x = param()\ny = x\nreturn double(y)\n",
+      "Method": 0,
+      "Module.ID": 1597124673,
+      "Module.Name": "КСД/А02",
+      "Module.Slot": 2,
+      "Points.Approximation": false,
+      "Points.Number": 0,
+      "Points.Polymon.List": [
         {
-            "Module.ID": 1597059149,
-            "Module.Name": "КСД/КСЛ1",
-            "Module.Slot": 0
+          "Index": 0,
+          "Value": 0
         },
         {
-            "Module.ID": 1295396931,
-            "Module.Name": "КСД/Ethernet",
-            "Module.Slot": 0,
-            "Module.Subslot": 1
-        },
-        {
-            "Module.ID": 1597059137,
-            "Module.Name": "КСД/А01",
-            "Module.Slot": 1
-        },
-        {
-            "Module.ID": 1597124673,
-            "Module.Name": "КСД/А02",
-            "Module.Slot": 2
-        },
-        {
-            "Module.Block": 255,
-            "Module.ID": 1129070915,
-            "Module.Name": "КСД/Рассчётный",
-            "Module.Slave": 255,
-            "Module.Slot": 255,
-            "Module.Subslot": 255
+          "Index": 1,
+          "Value": 0
         }
-    ],
-    "Device.Modules.Type.ARINC.Number": 0,
-    "Device.Modules.Type.IRIG.Number": 0,
-    "Device.Modules.Type.SNS.Number": 0,
-    "Device.Modules.Type.TermoCouple.Number": 0,
-    "Device.Name": "КСД/КСД",
-    "List.Categories": [
-    ],
-    "List.Departments": [
-    ],
-    "List.Dimensions": [
-        "ед",
-        "мкВ",
-        "мВ",
-        "В",
-        "кВ",
-        "мкс",
-        "мс",
-        "с",
-        "мин",
-        "ч",
-        "Гц",
-        "кГц",
-        "МГц",
-        "об/мин",
-        "об/ч",
-        "мм",
-        "м",
-        "км",
-        "м/с",
-        "км/с",
-        "км/ч",
-        "g",
-        "М",
-        "°",
-        "рад",
-        "°C",
-        "Ом",
-        "кОм",
-        "МОм",
-        "мкА",
-        "мА",
-        "А",
-        "дБ",
-        "л",
-        "л/с",
-        "л/мин",
-        "л/час"
-    ],
-    "List.Systems": [
-    ],
-    "LocalCoord.PZ90.B": 0,
-    "LocalCoord.PZ90.H": 0,
-    "LocalCoord.PZ90.L": 0,
-    "LocalCoord.PZ90.X": 0,
-    "LocalCoord.PZ90.Y": 0,
-    "LocalCoord.PZ90.Z": 0,
-    "LocalCoord.Type": false,
-    "LocalCoord.WGS84.B": 0,
-    "LocalCoord.WGS84.H": 0,
-    "LocalCoord.WGS84.L": 0,
-    "LocalCoord.WGS84.X": 0,
-    "LocalCoord.WGS84.Y": 0,
-    "LocalCoord.WGS84.Z": 0,
-    "Parameters.List": [
+      ],
+      "Points.Polymon.Rank": 1,
+      "Precision2": false,
+      "Raw": false,
+      "ShortID": "tmp_analog_vibration",
+      "System": "",
+      "Type": 2
+    },
+    {
+      " Index": 2,
+      " Name": "parameter_analog",
+      "Category": "",
+      "Control.Levels.Number": 0,
+      "Delay": 0,
+      "Department": "",
+      "Description": "",
+      "Dimension": "",
+      "Formula": "x = param()\ny = x\nreturn double(y)\n",
+      "Method": 0,
+      "Module.ID": 1597059137,
+      "Module.Name": "КСД/А01",
+      "Module.Slot": 1,
+      "Points.Approximation": false,
+      "Points.Number": 0,
+      "Points.Polymon.List": [
         {
-            " Index": 0,
-            " Name": "parameter_ethernet",
-            "Category": "",
-            "Control.Levels.Number": 0,
-            "Delay": 0,
-            "Department": "",
-            "Description": "",
-            "Dimension": "",
-            "Formula": "x = param()\ny = x\nreturn double(y)\n",
-            "Method": 0,
-            "Module.ID": 1295396931,
-            "Module.Name": "КСД/Ethernet",
-            "Module.Slot": 0,
-            "Module.Subslot": 1,
-            "Points.Approximation": false,
-            "Points.Number": 0,
-            "Points.Polymon.List": [
-                {
-                    "Index": 0,
-                    "Value": 0
-                },
-                {
-                    "Index": 1,
-                    "Value": 0
-                }
-            ],
-            "Points.Polymon.Rank": 1,
-            "Precision2": false,
-            "Raw": false,
-            "ShortID": "",
-            "System": "",
-            "Type": 500
+          "Index": 0,
+          "Value": 0
         },
         {
-            " Index": 1,
-            " Name": "parameter_vibro",
-            "Category": "",
-            "Control.Levels.Number": 0,
-            "Delay": 0,
-            "Department": "",
-            "Description": "",
-            "Dimension": "",
-            "Formula": "x = param()\ny = x\nreturn double(y)\n",
-            "Method": 0,
-            "Module.ID": 1597124673,
-            "Module.Name": "КСД/А02",
-            "Module.Slot": 2,
-            "Points.Approximation": false,
-            "Points.Number": 0,
-            "Points.Polymon.List": [
-                {
-                    "Index": 0,
-                    "Value": 0
-                },
-                {
-                    "Index": 1,
-                    "Value": 0
-                }
-            ],
-            "Points.Polymon.Rank": 1,
-            "Precision2": false,
-            "Raw": false,
-            "ShortID": "tmp_analog_vibration",
-            "System": "",
-            "Type": 2
-        },
-        {
-            " Index": 2,
-            " Name": "parameter_analog",
-            "Category": "",
-            "Control.Levels.Number": 0,
-            "Delay": 0,
-            "Department": "",
-            "Description": "",
-            "Dimension": "",
-            "Formula": "x = param()\ny = x\nreturn double(y)\n",
-            "Method": 0,
-            "Module.ID": 1597059137,
-            "Module.Name": "КСД/А01",
-            "Module.Slot": 1,
-            "Points.Approximation": false,
-            "Points.Number": 0,
-            "Points.Polymon.List": [
-                {
-                    "Index": 0,
-                    "Value": 0
-                },
-                {
-                    "Index": 1,
-                    "Value": 0
-                }
-            ],
-            "Points.Polymon.Rank": 1,
-            "Precision2": false,
-            "Raw": false,
-            "ShortID": "tmp_analog_",
-            "System": "",
-            "Type": 1
+          "Index": 1,
+          "Value": 0
         }
-    ],
-    "Parameters.List.Analog": [
-        {
-            " Name": "parameter_analog",
-            "Line": 0
-        }
-    ],
-    "Parameters.List.Analog.Vibro": [
-        {
-            " Name": "parameter_vibro",
-            "Line": 0,
-            "Type": 4,
-            "Vibro.Description": "Напряжение",
-            "Vibro.Length": 30,
-            "Vibro.Ration": 50
-        }
-    ],
-    "Parameters.List.Ethernet.UDP": [
-        {
-            " Name": "parameter_ethernet",
-            "A0": 0,
-            "A1": 1,
-            "Data.Endian": 0,
-            "Data.Type": 2,
-            "Dst.IP": 1869573999,
-            "Dst.Port": 100,
-            "Line": 0,
-            "MSB": 0,
-            "Offset.Bytes": 0,
-            "Rank": 16,
-            "Sign": true,
-            "Src.IP": 0,
-            "Src.Port": 0
-        }
-    ],
-    "Parameters.Number": 3,
-    "Parameters.Number.ARINC": 0,
-    "Parameters.Number.Analog": 1,
-    "Parameters.Number.Analog.TermResistance": 0,
-    "Parameters.Number.Analog.TermoCouple": 0,
-    "Parameters.Number.Analog.Vibro": 1,
-    "Parameters.Number.Analog.Voltage": 0,
-    "Parameters.Number.CAN": 0,
-    "Parameters.Number.Counter": 0,
-    "Parameters.Number.Discrete": 0,
-    "Parameters.Number.Ethernet.UDP": 1,
-    "Parameters.Number.FC-AE-ASM": 0,
-    "Parameters.Number.IRIG": 0,
-    "Parameters.Number.MIL-STD": 0,
-    "Parameters.Number.SNS": 0,
-    "Parameters.Number.SysInfo": 0
+      ],
+      "Points.Polymon.Rank": 1,
+      "Precision2": false,
+      "Raw": false,
+      "ShortID": "tmp_analog_",
+      "System": "",
+      "Type": 1
+    }
+  ],
+  "Parameters.List.Analog": [
+    {
+      " Name": "parameter_analog",
+      "Line": 0
+    }
+  ],
+  "Parameters.List.Analog.Vibro": [
+    {
+      " Name": "parameter_vibro",
+      "Line": 0,
+      "Type": 1,
+      "Vibro.Description": "Напряжение",
+      "Vibro.Length": 30,
+      "Vibro.Ration": 50
+    }
+  ],
+  "Parameters.List.Ethernet.UDP": [
+    {
+      " Name": "parameter_ethernet",
+      "A0": 0,
+      "A1": 1,
+      "Data.Endian": 0,
+      "Data.Type": 2,
+      "Dst.IP": 1869573999,
+      "Dst.Port": 100,
+      "Line": 0,
+      "MSB": 0,
+      "Offset.Bytes": 0,
+      "Rank": 16,
+      "Sign": true,
+      "Src.IP": 0,
+      "Src.Port": 0
+    }
+  ],
+  "Parameters.Number": 3,
+  "Parameters.Number.ARINC": 0,
+  "Parameters.Number.Analog": 1,
+  "Parameters.Number.Analog.TermResistance": 0,
+  "Parameters.Number.Analog.TermoCouple": 0,
+  "Parameters.Number.Analog.Vibro": 1,
+  "Parameters.Number.Analog.Voltage": 0,
+  "Parameters.Number.CAN": 0,
+  "Parameters.Number.Counter": 0,
+  "Parameters.Number.Discrete": 0,
+  "Parameters.Number.Ethernet.UDP": 1,
+  "Parameters.Number.FC-AE-ASM": 0,
+  "Parameters.Number.IRIG": 0,
+  "Parameters.Number.MIL-STD": 0,
+  "Parameters.Number.SNS": 0,
+  "Parameters.Number.SysInfo": 0
 }

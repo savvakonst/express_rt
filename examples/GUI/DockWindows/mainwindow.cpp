@@ -124,7 +124,7 @@ void MainWindow::createDockWindows() {
     dock = new QDockWidget(tr("parameter properties"), this);
 
     auto constructor = (newTreeEditor_t)ctm_->getLastVersionExtensionUint("tree_editor", "tree_editor")->ptr;
-    auto ds = (DataSchema_ifs *)ctm_->getLastVersionExtensionUint("data_schema", "ethernet")->ptr;
+    auto ds = (DataSchema_ifs *)ctm_->getLastVersionExtensionUint("data_schema", "ethernet_udp")->ptr;
 
     TreeEditor *top = constructor(ctm_, nullptr);
     top->setupProperties(ds);

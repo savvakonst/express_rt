@@ -10,8 +10,6 @@
 
 class COMMON_API_ StandardParameter_ifs : public Parameter_ifs {
    public:
-    explicit StandardParameter_ifs(const std::string& name) : Parameter_ifs(name){};
-
     ~StandardParameter_ifs() override {
         if (parameter_field_tree_) delete parameter_field_tree_;
     };

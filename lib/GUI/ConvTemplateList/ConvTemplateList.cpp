@@ -213,9 +213,16 @@ QWidget *newConvTemplateList(QWidget *parent) {
     table_view->setSelectionBehavior(QAbstractItemView::SelectRows);
     table_view->setAlternatingRowColors(true);
 
-    table_view->setStyleSheet(
-        "QHeaderView::section {background-color: #D2DCDF; alternate-background-color: #f6fafb;};");
+    //table_view->setStyleSheet(
+    //    "QHeaderView::section {background-color: #D2DCDF; alternate-background-color: #f6fafb;};");
 
+    table_view->setAutoFillBackground(true);
+    table_view->setBackgroundRole(QPalette().Base);
+    auto p = table_view->palette();
+    p.setColor(table_view->backgroundRole(), QColor("#D2DCDF"));
+    table_view->setPalette(p);
+
+    table_view->setStyleSheet("QHeaderView::section {background-color: #D2DCDF; alternate-background-color: #f6fafb;};");
     return table_view;
 }
 

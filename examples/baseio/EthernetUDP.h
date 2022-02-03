@@ -16,7 +16,7 @@ class ExtensionUnit;
 
 class [[maybe_unused]] EthernetUdpParameter : public StandardParameter_ifs {
    public:
-    EthernetUdpParameter(ExtensionManager* manager, const std::string& name);
+    EthernetUdpParameter(ExtensionManager* manager);
 
     ~EthernetUdpParameter() override;
 
@@ -25,7 +25,6 @@ class [[maybe_unused]] EthernetUdpParameter : public StandardParameter_ifs {
     [[nodiscard]] std::string getType() const override;
 
     [[nodiscard]] bool isValid() const override;
-
 };
 
 #define ETHERNET_UDP_PB 500
