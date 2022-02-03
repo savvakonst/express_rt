@@ -5,18 +5,43 @@
 #ifndef EXRT_CONVTEMPLATELIST_H
 #define EXRT_CONVTEMPLATELIST_H
 #include <QAbstractTableModel>
+#include <QTreeView>
+
+#include "common/BaseClass_ifs.h"
+
+class DataSchema_ifs;
 
 class ExtensionManager;
 class ConversionTemplateManager;
-class DataSchema_ifs;
+class BaseSignalController;
 
-class ConvTempateTreeModel : public QAbstractItemModel {
+class TreeView : public QTreeView {
+    Q_OBJECT
+   public:
+    explicit TreeView(QWidget *parent = nullptr) : QTreeView(parent) {}
+    void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
+                     const QVector<int> &roles = QVector<int>()) override {
+        QTreeView::dataChanged(topLeft, bottomRight, roles);
+        repaint();
+    }
+    // repaint
+    BaseSignalController signal_controller_;
+
+   private:
+};
+
+/*
+ *
+ *
+ */
+
+class ConvTemplateTreeModel : public QAbstractItemModel {
     Q_OBJECT
 
    public:
-    explicit ConvTempateTreeModel(ExtensionManager *manager);
-    explicit ConvTempateTreeModel(const QString &data, QObject *parent = nullptr);
-    ~ConvTempateTreeModel() override;
+    explicit ConvTemplateTreeModel(ExtensionManager *manager);
+    explicit ConvTemplateTreeModel(const QString &data, QObject *parent = nullptr);
+    ~ConvTemplateTreeModel() override;
 
     [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
     [[nodiscard]] Qt::ItemFlags flags(const QModelIndex &index) const override;
@@ -39,6 +64,7 @@ class ConvTempateTreeModel : public QAbstractItemModel {
  */
 
 class ConvTempateTableModel : public QAbstractTableModel {
+    Q_OBJECT
    public:
     explicit ConvTempateTableModel(ExtensionManager *manager);
 
@@ -60,8 +86,11 @@ class ConvTempateTableModel : public QAbstractTableModel {
  *
  *
  */
+class ConversionTemplate;
+class QAbstractItemView;
 
 class ParameterTableModel : public QAbstractTableModel {
+    Q_OBJECT
    public:
     explicit ParameterTableModel(ExtensionManager *manager);
 
@@ -73,9 +102,15 @@ class ParameterTableModel : public QAbstractTableModel {
 
     [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
 
+   public slots:
+    void receiveRow(const QModelIndex &index);
+
    protected:
+    ConversionTemplate *getCurrentConversionTemplate() const;
+
     std::vector<DataSchema_ifs *> list_of_entries_;
     DataSchema_ifs *schema_ = nullptr;
+    QAbstractItemView *a_item_view_ = nullptr;
     ConversionTemplateManager *manager_ = nullptr;
 };
 

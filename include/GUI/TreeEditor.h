@@ -1,50 +1,16 @@
 #ifndef TREE_WIDGET_H
 #define TREE_WIDGET_H
 
-#include <QPainter>
-#include <QPalette>
-#include <QPlainTextEdit>
-#include <QSpinBox>
-#include <QStringList>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <iostream>
 
+#include "WidgetWrappers.h"
 #include "common/BaseClass_ifs.h"
 #include "common/DataSchema_ifs.h"
 #include "common/Extension.h"
-
 class ExtensionManager;
-
-class TreeWidgetWrapper_ifs {
-   public:
-    virtual ~TreeWidgetWrapper_ifs() = default;
-
-    virtual QWidget *getWidget() = 0;
-
-    virtual status addSignal(Signal_ifs *signal) = 0;
-};
-
-template <class T>
-class TreeWidgetWrapper : public TreeWidgetWrapper_ifs {
-   public:
-    explicit TreeWidgetWrapper(T *widget) : widget_(widget) {}
-
-    TreeWidgetWrapper(const TreeWidgetWrapper &) = delete;
-
-    TreeWidgetWrapper(const TreeWidgetWrapper &&) = delete;
-
-    ~TreeWidgetWrapper() override = default;
-
-    QWidget *getWidget() override { return widget_; }
-
-    status addSignal(Signal_ifs *signal) override { return widget_->signal_controller_.addSignal(signal); }
-
-    virtual void setDataSchema(DataSchema_ifs *ds) { widget_->setDataSchema(ds); }
-
-   private:
-    T *widget_;
-};
+class QTreeWidgetItem;
 
 /*
  *
@@ -73,7 +39,7 @@ class TreeEditor : public QTreeWidget {
     void addExtensionUint(ExtensionManager *);
 
    private:
-    typedef TreeWidgetWrapper_ifs *(*treeWidgetWrapperConstructor)(DataSchema_ifs *, QWidget *);
+    typedef WidgetWrapper_ifs *(*treeWidgetWrapperConstructor)(DataSchema_ifs *, QWidget *);
 
     typedef std::vector<treeWidgetWrapperConstructor> constructorList_t;
     std::map<std::string, constructorList_t *> constructors_map_;
@@ -86,7 +52,7 @@ class TreeEditor : public QTreeWidget {
 };
 
 template <class T>
-TreeWidgetWrapper_ifs *newTreeWidgetWrapper(DataSchema_ifs *data_schema, QWidget *parent = nullptr) {
+WidgetWrapper_ifs *newTreeWidgetWrapper(DataSchema_ifs *data_schema, QWidget *parent = nullptr) {
     return new TreeWidgetWrapper(new T(data_schema, parent));
 }
 

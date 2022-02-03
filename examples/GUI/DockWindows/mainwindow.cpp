@@ -141,10 +141,13 @@ void MainWindow::createDockWindows() {
      *
      */
 
-    dock = new QDockWidget(tr("list of conversion templates"), this);
-    table_view_ = (QTableView *)ctm_->getLastVersionExtensionUint("widget", "conv_template_list")->ptr;
-    dock->setWidget(table_view_);
-    addDockWidget(Qt::RightDockWidgetArea, dock);
+    auto units = ctm_->getLastVersionExtensionUintsByType("widget");
+    for (auto i : units) {
+        dock = new QDockWidget(tr(i->name), this);
+        auto widget = (QWidget *)i->ptr;  // ctm_->getLastVersionExtensionUint("widget", "conv_template_list")->ptr;
+        dock->setWidget(widget);
+        addDockWidget(Qt::BottomDockWidgetArea, dock);
+    }
     /*
      *
      */

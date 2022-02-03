@@ -32,7 +32,6 @@ TreeEditor::TreeEditor(ExtensionManager *manager, QWidget *parent) : QTreeWidget
     addExtensionUint(manager);
 }
 
-
 void TreeEditor::setupProperties(DataSchema_ifs *ds, QTreeWidgetItem *parent_item) {
     data_schema_ = ds;
 
@@ -46,7 +45,6 @@ void TreeEditor::setupProperties(DataSchema_ifs *ds, QTreeWidgetItem *parent_ite
 }
 
 void TreeEditor::addProperty(DataSchema_ifs *ds, QTreeWidgetItem *parent_item) {
-
     auto item = parent_item ? new QTreeWidgetItem(parent_item) : new QTreeWidgetItem(this);
 
     auto name = ds->description_.c_str();
@@ -64,7 +62,7 @@ void TreeEditor::addProperty(DataSchema_ifs *ds, QTreeWidgetItem *parent_item) {
         auto cm = constructors_map_.find(type);
 
         if (cm != constructors_map_.end()) {
-            TreeWidgetWrapper_ifs *w;
+            WidgetWrapper_ifs *w;
             auto list = *(*cm).second;
             for (treeWidgetWrapperConstructor wrapperConstructor : list)
                 if (w = wrapperConstructor(ds, nullptr)) break;
@@ -114,7 +112,6 @@ void TreeEditor::addExtensionUint(ExtensionManager *manager) {
         }
     }
 }
-
 
 /*
  *

@@ -15,7 +15,6 @@ int main(int argc, char *argv[]) {
     auto ctm = (ConversionTemplateManager *)manager
                    .getLastVersionExtensionUint("cnv_template_manager", "cnv_template_manager")
                    ->ptr;
-
     {
         std::string contents;
         {
