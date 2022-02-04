@@ -11,6 +11,7 @@
 #include "common/Extension.h"
 class ExtensionManager;
 class QTreeWidgetItem;
+class Parameter_ifs;
 
 /*
  *
@@ -21,10 +22,10 @@ class TreeEditor : public QTreeWidget {
    public:
     explicit TreeEditor(ExtensionManager *manager, QWidget *parent = nullptr);
 
-    virtual void setupProperties(DataSchema_ifs *ds, QTreeWidgetItem *parent_item = nullptr);
+    virtual void setupProperties(Parameter_ifs *parameter);
 
    private:
-    void addProperty(DataSchema_ifs *ds, QTreeWidgetItem *parent_item = nullptr);
+    void addProperty(DataSchema_ifs *ds, QTreeWidgetItem *parent_item = nullptr, const std::string &path = "");
 
     class UpdateSignal : public Signal_ifs {
        public:
@@ -39,7 +40,8 @@ class TreeEditor : public QTreeWidget {
     void addExtensionUint(ExtensionManager *);
 
    private:
-    typedef WidgetWrapper_ifs *(*treeWidgetWrapperConstructor)(DataSchema_ifs *, QWidget *);
+    typedef WidgetWrapper_ifs *(*treeWidgetWrapperConstructor)(Parameter_ifs *, DataSchema_ifs *, const std::string &,
+                                                               QWidget *);
 
     typedef std::vector<treeWidgetWrapperConstructor> constructorList_t;
     std::map<std::string, constructorList_t *> constructors_map_;
@@ -47,13 +49,15 @@ class TreeEditor : public QTreeWidget {
     UpdateSignal update_signal_;
 
     std::string error_message_;
-
-    DataSchema_ifs *data_schema_ = nullptr;
+    Parameter_ifs *parameter_ = nullptr;
+    // const DataSchema_ifs *data_schema_ = nullptr;
 };
 
 template <class T>
-WidgetWrapper_ifs *newTreeWidgetWrapper(DataSchema_ifs *data_schema, QWidget *parent = nullptr) {
-    return new TreeWidgetWrapper(new T(data_schema, parent));
+WidgetWrapper_ifs *newTreeWidgetWrapper(Parameter_ifs *parameter, DataSchema_ifs *data_schema, const std::string &path,
+                                        QWidget *parent = nullptr) {
+    std::cerr << path << "\n";
+    return new TreeWidgetWrapper(new T(parameter, data_schema, path, parent));
 }
 
 // TreeEditor(parent)

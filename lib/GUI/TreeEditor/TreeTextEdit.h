@@ -13,35 +13,20 @@
 #include "common/BaseClass_ifs.h"
 #include "common/DataSchema_ifs.h"
 #include "common/Extension.h"
+#include "convtemplate/Parameter_ifs.h"
 
 class TreeTextEdit : public QPlainTextEdit {
     Q_OBJECT
    public:
-    explicit TreeTextEdit(QWidget *parent = nullptr) : QPlainTextEdit(parent) { initSettings(); }
-
-    explicit TreeTextEdit(const QString &text, QWidget *parent = nullptr)
-        :  //
-          QPlainTextEdit(parent) {
-        insertPlainText(text);
-        initSettings();
-    }
-
-    explicit TreeTextEdit(DataSchema_ifs *data_schema, QWidget *parent = nullptr)
+    explicit TreeTextEdit(Parameter_ifs *parameter, DataSchema_ifs *data_schema, const std::string &path,
+                          QWidget *parent = nullptr)
         :  //
           QPlainTextEdit(parent),
-          data_schema_(data_schema) {
+          parameter_(parameter),
+          data_schema_(data_schema),
+          path_(path) {
         initSettings();
     }
-
-    explicit TreeTextEdit(DataSchema_ifs *data_schema, const QString &text, QWidget *parent = nullptr)
-        :  //
-          QPlainTextEdit(parent),
-          data_schema_(data_schema) {
-        insertPlainText(text);
-        initSettings();
-    }
-
-    void setDataSchema(DataSchema_ifs *data_schema) { data_schema_ = data_schema; }
 
     BaseSignalController signal_controller_;
    private slots:
@@ -55,15 +40,18 @@ class TreeTextEdit : public QPlainTextEdit {
         signal_controller_.emit_();
     }
 
-   private:
-    [[maybe_unused]] bool change_lock_ = true;
-
+   protected:
     void initSettings() {
         setTabStopWidth(24);
         connect(this, SIGNAL(textChanged()), this, SLOT(setHeight()));
         setHeight();
     }
 
+   private:
+    [[maybe_unused]] bool change_lock_ = true;
+
+    std::string path_;
+    Parameter_ifs *parameter_ = nullptr;
     DataSchema_ifs *data_schema_ = nullptr;
 };
 #endif  // EXRT_TREETEXTEDIT_H

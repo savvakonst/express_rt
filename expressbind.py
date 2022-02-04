@@ -28,6 +28,7 @@ class DataSchemaInst(DataSchema):
         DataSchema.__init__(self, name, description)
         self.name_ = name
         self.description_ = description
+        self.help_ = ""
         self.dims_ = []
         self.map_list_ = map_list
         self.type_ = normalizeType(ex_type)
@@ -92,6 +93,7 @@ def loadConfig():
         else:
             ds = DataSchemaInst(name, description, ex_type=dtype)
 
+        ds.help_ = getItem("help", "")
         ds.dims_ = getItem("dims", [])
         ds.representation_ = getItem("representation", None)
         ds.include_ = getItem("include", None)

@@ -19,6 +19,7 @@ add_dependencies(ExampleDockWindows Modules)
 add_dependencies(ExampleDockWindows PyEmbedder)
 add_dependencies(ExampleDockWindows ExampleBaseIO)
 add_dependencies(ExampleDockWindows ConvTemplateList)
+add_dependencies(ExampleDockWindows TreeEditor)
 
 if (MSVC)
     set_target_properties(ExampleDockWindows PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=%PATH%;${CMAKE_PREFIX_PATH}\\bin")

@@ -12,8 +12,9 @@ class Parameter_ifs;
 class ExtensionManager;
 
 template <class T>
-Parameter_ifs *createParameter(ExtensionManager *manager, const std::string &name) {
-    return new T(manager);
+Parameter_ifs *createParameter(ExtensionManager *manager) {
+    T *tmp = new T(manager);
+    return tmp;
 }
 
 [[maybe_unused]] typedef Parameter_ifs *(*parameterConstructor_f)(ExtensionManager *manager, const std::string &name);

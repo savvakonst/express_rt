@@ -70,16 +70,9 @@ class MainWindow : public QMainWindow {
    public:
     MainWindow(ExtensionManager *ctm);
 
-   private slots:
-    void newLetter();
-    void save();
-    void print();
-    void undo();
-    void about();
-    void insertCustomer(const QString &customer);
-    void addParagraph(const QString &paragraph);
-
    private:
+    void closeEvent(QCloseEvent *event) override;
+
     void createActions();
     void createStatusBar();
     void createDockWindows();

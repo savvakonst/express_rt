@@ -179,15 +179,6 @@ ParameterTableModel::ParameterTableModel(ExtensionManager *manager) {
     }
 
     QObject::connect(a_item_view_, &QAbstractItemView::activated, this, &ParameterTableModel::receiveRow);
-    // QObject::connect(a_item_view_, &QAbstractItemView::pressed, this, &ParameterTableModel::receiveRow);
-    // QObject::connect(a_item_view_, &QAbstractItemView::clicked, this, &ParameterTableModel::receiveRow);
-    // QObject::connect(a_item_view_, &QAbstractItemView::entered, this, &ParameterTableModel::receiveRow);
-    //  void pressed(const QModelIndex &index);
-    //  void clicked(const QModelIndex &index);
-    //  void doubleClicked(const QModelIndex &index);
-
-    // void activated(const QModelIndex &index);
-    // void entered(const QModelIndex &index);
 }
 
 int ParameterTableModel::rowCount(const QModelIndex &parent) const {

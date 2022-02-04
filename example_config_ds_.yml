@@ -6,6 +6,7 @@ ext_set:
       - name: "name"
         type: "string"
         description: "имя параметра"
+        help: "имя параметра"
 
       - name: "identifier"
         type: "string"
@@ -34,6 +35,7 @@ ext_set:
       - name: "path"
         type: "string"
         description: "физический адрес параметра"
+        help: "номер слота, канал и т.д"
 
       - name: "approximation"
         description: "точки аппроксимации"

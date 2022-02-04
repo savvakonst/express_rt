@@ -35,11 +35,9 @@ class WidgetWrapper : public WidgetWrapper_ifs {
 
     status addSignal(Signal_ifs *signal) override { return widget_->signal_controller_.addSignal(signal); }
 
-
    private:
     T *widget_;
 };
-
 
 template <class T>
 class TreeWidgetWrapper : public WidgetWrapper_ifs {
@@ -56,7 +54,7 @@ class TreeWidgetWrapper : public WidgetWrapper_ifs {
 
     status addSignal(Signal_ifs *signal) override { return widget_->signal_controller_.addSignal(signal); }
 
-    virtual void setDataSchema(DataSchema_ifs *ds) { widget_->setDataSchema(ds); }
+    // virtual void setDataSchema(DataSchema_ifs *ds) { widget_->setDataSchema(ds); }
 
    private:
     T *widget_;
