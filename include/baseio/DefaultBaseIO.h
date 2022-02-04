@@ -2,27 +2,29 @@
 #define DEFAULTPARSERBUILDER_H
 
 #include "common/BaseClass_ifs.h"
-#include "common/DataSchema_ifs.h"
-
+#include "common/IO_ifs.h"
 class ExtensionManager;
 class PDefaultBaseIO_ifs;
 class ConversionTemplate;
 
-class DefaultBaseIO : public BaseClass_ifs {
+class DefaultBaseIO : public IO_ifs {
    public:
     DefaultBaseIO();
 
-    ~DefaultBaseIO();
+    ~DefaultBaseIO() override;
 
-    virtual ConversionTemplate *parseDocument(ExtensionManager *manager, const std::string &str);
+    bool readDocument(ExtensionManager *manager, const std::string &source_path) override;
+    bool saveDocument(const std::string &id, const std::string &dst_path) override;
 
-    std::string createDocument(const ConversionTemplate *conv_template);
+    ConversionTemplate *parseDocument(ExtensionManager *manager, const std::string &str,
+                                      const std::string &source_path = "");
 
-    [[nodiscard]] const ErrorInfo_ifs *getErrorInfo() const override { return nullptr; };
-
-    void addPPBM(PDefaultBaseIO_ifs *p);
+    void addPpbm(PDefaultBaseIO_ifs *p);
 
    private:
+    virtual ConversionTemplate *readOrParseDocument(ExtensionManager *manager, bool is_file, const std::string &str,
+                                                    const std::string &source_path);
+
     typedef std::vector<const PDefaultBaseIO_ifs *> PPBList;
     std::map<uint32_t, PPBList *> PPBMap_;
 

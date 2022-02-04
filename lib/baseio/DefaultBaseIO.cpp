@@ -5,7 +5,10 @@
 #include <vector>
 
 #include "HDYamlWrapper.h"
+#include "common/DataSchema_ifs.h"
+#include "common/ExtensionManager.h"
 #include "convtemplate/ConversionTemplate.h"
+#include "convtemplate/ConversionTemplateManager.h"
 #include "extensions/PDefaultBaseIO_ifs.h"
 
 template <typename Ta, typename Tb>
@@ -74,6 +77,12 @@ std::string getStrID(uint32_t id) {
     return std::string((char *)&u64_id);
 }
 
+YAML::Node get(std::string key, const YAML::Node &node) {
+    auto res = node[key];
+    if (!res) throw YAML::Exception(node.Mark(), "cant find field with key: \"" + key + "\"");
+    return res;
+}
+
 /*
  *
  *
@@ -81,28 +90,43 @@ std::string getStrID(uint32_t id) {
  *
  */
 
-DefaultBaseIO::DefaultBaseIO() {}
+DefaultBaseIO::DefaultBaseIO() : IO_ifs("*.base", "express base file", "") {}
 
-DefaultBaseIO::~DefaultBaseIO() {}
+DefaultBaseIO::~DefaultBaseIO() = default;
 
 YAML::Node findParametersSubInformation(const std::string &parameter_name, const YAML::Node &node) {
     for (auto &i : node) {
         if (parameter_name == i[" Name"].as<std::string>()) return i;
     }
-    return YAML::Node();
+    return {};
 }
 
-YAML::Node get(std::string key, const YAML::Node &node) {
-    auto res = node[key];
-    if (!res) throw YAML::Exception(node.Mark(), "cant find field with key: \"" + key + "\"");
-    return res;
+bool DefaultBaseIO::readDocument(ExtensionManager *manager, const std::string &source_path) {
+    auto ctm = (ConversionTemplateManager *)manager
+                   ->getLastVersionExtensionUint("cnv_template_manager", "cnv_template_manager")
+                   ->ptr;
+
+    auto conv_template = readOrParseDocument(manager, true, "", source_path);
+    if (conv_template) {
+        ctm->addConversionTemplate(conv_template);
+        return true;
+    }
+    return false;
 }
 
-ConversionTemplate *DefaultBaseIO::parseDocument(ExtensionManager *manager, const std::string &str) {
+bool DefaultBaseIO::saveDocument(const std::string &id, const std::string &dst_path) { return false; }
+
+ConversionTemplate *DefaultBaseIO::parseDocument(ExtensionManager *manager, const std::string &str,
+                                                 const std::string &source_path) {
+    return readOrParseDocument(manager, false, str, source_path);
+}
+
+ConversionTemplate *DefaultBaseIO::readOrParseDocument(ExtensionManager *manager, bool is_file, const std::string &str,
+                                                       const std::string &source_path) {
     std::unique_ptr<ConversionTemplate> conv_template(new ConversionTemplate(manager));
 
     try {
-        YAML::Node doc = YAML::Load(str);
+        YAML::Node doc = is_file ? YAML::LoadFile(source_path) : YAML::Load(str);
 
         if (!doc.IsMap()) {
             error_message_ = "invalid structure\n";
@@ -112,9 +136,8 @@ ConversionTemplate *DefaultBaseIO::parseDocument(ExtensionManager *manager, cons
         auto node = get("Parameters.List", doc);
 
         conv_template->setName(get("Base. Name", doc).as<std::string>());
-        conv_template->addInfo("company",Value(get(" File.Company", doc).as<std::string>()));
-        conv_template->addInfo("source",Value("*"));
-
+        conv_template->addInfo("company", Value(get(" File.Company", doc).as<std::string>()));
+        conv_template->addInfo("source", Value(source_path));
 
         for (const auto &i : get("Device.Modules.List", doc)) {
             const std::string module_name = getStrID(get("Module.ID", i).as<uint32_t>());
@@ -152,7 +175,6 @@ ConversionTemplate *DefaultBaseIO::parseDocument(ExtensionManager *manager, cons
             }
         }
 
-
     } catch (YAML::Exception &e) {
         std::stringstream st;
         st << "\n" << e.msg << "\n\t";
@@ -165,9 +187,7 @@ ConversionTemplate *DefaultBaseIO::parseDocument(ExtensionManager *manager, cons
     return conv_template.release();
 }
 
-std::string DefaultBaseIO::createDocument(const ConversionTemplate *conv_template) { return std::string(); }
-
-void DefaultBaseIO::addPPBM(PDefaultBaseIO_ifs *p) {
+void DefaultBaseIO::addPpbm(PDefaultBaseIO_ifs *p) {
     auto PP = PPBMap_.find(p->getPrmType());
     if (PP == PPBMap_.end()) {
         PPBMap_[p->getPrmType()] = new PPBList{p};

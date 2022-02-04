@@ -42,15 +42,17 @@ InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, DEFAULT_PARAMETERS_LIB_NA
 }
 
 static int initDefaultBaseIO(ExtensionManager *manager) {
+    // TODO: add guard
+
     auto e_unit = search(g_default_parameters_units, "io", "base_io");
     if (e_unit == nullptr) {
         DEBUG_CERR("cant find \"base_io\" unit with \"io\" type\n");
         return 1;
     }
-    
+
     DefaultBaseIO *base_io = (DefaultBaseIO *)e_unit->ptr;
     auto set = manager->getLastVersionExtensionUintsByType("prm_parser_builder");
-    for (auto &i : set) base_io->addPPBM((PDefaultBaseIO_ifs *)i->ptr);
+    for (auto &i : set) base_io->addPpbm((PDefaultBaseIO_ifs *)i->ptr);
 
     return 0;
 }

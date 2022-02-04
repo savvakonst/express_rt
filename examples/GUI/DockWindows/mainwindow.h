@@ -55,7 +55,6 @@
 
 QT_BEGIN_NAMESPACE
 class QAction;
-class QListWidget;
 class QMenu;
 class QTextEdit;
 class QTableView;
@@ -77,7 +76,7 @@ class MainWindow : public QMainWindow {
     void createStatusBar();
     void createDockWindows();
 
-    ExtensionManager *ctm_ = nullptr;
+    ExtensionManager *manager_ = nullptr;
     QTextEdit *text_edit_ = nullptr;
     QTableView *table_view_ = nullptr;
     QMenu *view_menu_ = nullptr;

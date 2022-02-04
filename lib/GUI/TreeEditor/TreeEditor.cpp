@@ -13,7 +13,6 @@
 
 #include "TreeTextEdit.h"
 #include "common/ExtensionManager.h"
-#include "convtemplate/Parameter_ifs.h"
 
 TreeEditor::TreeEditor(ExtensionManager *manager, QWidget *parent) : QTreeWidget(parent), update_signal_(this) {
     this->setAutoFillBackground(true);
@@ -37,18 +36,17 @@ TreeEditor::TreeEditor(ExtensionManager *manager, QWidget *parent) : QTreeWidget
 void TreeEditor::setupProperties(Parameter_ifs *parameter) {
     const DataSchema_ifs *ds = parameter->getPropertySchema();
     parameter_ = parameter;
-    // data_schema_ = ds;
 
     if (ds->isMap()) {
         auto map_list = ds->getMapList();
         for (auto i : map_list) {
-            addProperty(i, nullptr,i->name_);
+            addProperty(i, nullptr, i->name_);
         }
     }
     expandAll();
 }
 
-void TreeEditor::addProperty(DataSchema_ifs *ds, QTreeWidgetItem *parent_item,const std::string &path) {
+void TreeEditor::addProperty(DataSchema_ifs *ds, QTreeWidgetItem *parent_item, const std::string &path) {
     auto item = parent_item ? new QTreeWidgetItem(parent_item) : new QTreeWidgetItem(this);
 
     auto name = ds->description_.c_str();
@@ -57,7 +55,7 @@ void TreeEditor::addProperty(DataSchema_ifs *ds, QTreeWidgetItem *parent_item,co
     if (ds->isMap()) {
         auto map_list = ds->getMapList();
         for (auto i : map_list) {
-            addProperty(i, item,path+"/"+i->name_);
+            addProperty(i, item, path + "/" + i->name_);
         }
     } else if (ds->isArray()) {
         // TODO: realise this branch of logic
@@ -71,7 +69,7 @@ void TreeEditor::addProperty(DataSchema_ifs *ds, QTreeWidgetItem *parent_item,co
 
             // search for appropriate constructor
             for (treeWidgetWrapperConstructor wrapper_constructor : list) {
-                wrapper = wrapper_constructor(parameter_, ds, path,nullptr);
+                wrapper = wrapper_constructor(parameter_, ds, path, nullptr);
                 if (wrapper) break;
             }
 

@@ -109,7 +109,7 @@ int ConvTemplateTreeModel::columnCount(const QModelIndex &parent) const {
  *
  */
 
-ConvTempateTableModel::ConvTempateTableModel(ExtensionManager *manager) {
+ConvTemplateTableModel::ConvTemplateTableModel(ExtensionManager *manager) {
     auto unit = manager->getLastVersionExtensionUint("data_schema", "conversion_template");
     if (unit && unit->ptr) {
         schema_ = (DataSchema_ifs *)unit->ptr;
@@ -122,20 +122,34 @@ ConvTempateTableModel::ConvTempateTableModel(ExtensionManager *manager) {
         manager_ = (ConversionTemplateManager *)unit->ptr;
         if (manager_ == nullptr) std::cerr << "ConvTempateTableModel::manager_ == nullptr;\n";
     }
+
+    class Delegate : public Signal_ifs{
+       public:
+        Delegate(ConvTemplateTableModel* parent):parent_(parent){}
+
+        void emit_() {
+            parent_->layoutChanged();
+        }
+
+       private:
+        ConvTemplateTableModel* parent_;
+    };
+
+    manager_->addSignal(new Delegate(this));
 }
 
-int ConvTempateTableModel::rowCount(const QModelIndex &parent) const { return (int)manager_->getEntriesNumber(); }
+int ConvTemplateTableModel::rowCount(const QModelIndex &parent) const { return (int)manager_->getEntriesNumber(); }
 
-int ConvTempateTableModel::columnCount(const QModelIndex &parent) const { return (int)list_of_entries_.size(); }
+int ConvTemplateTableModel::columnCount(const QModelIndex &parent) const { return (int)list_of_entries_.size(); }
 
-QVariant ConvTempateTableModel::headerData(int section, Qt::Orientation orientation, int role) const {
+QVariant ConvTemplateTableModel::headerData(int section, Qt::Orientation orientation, int role) const {
     if (role == Qt::DisplayRole) {
         return QString(list_of_entries_[section]->description_.data());
     }
     return {};
 }
 
-QVariant ConvTempateTableModel::data(const QModelIndex &index, int role) const {
+QVariant ConvTemplateTableModel::data(const QModelIndex &index, int role) const {
     if (role == Qt::DisplayRole) {
         auto conv_template = manager_->getConversionTemplateByIndex(index.row());
         auto name = list_of_entries_[index.column()]->name_;
@@ -299,7 +313,7 @@ static int initConvTemplateListWidget(ExtensionManager *manager) {
         DEBUG_CERR("cant init (name: " << p_unit->name << ", type: " << p_unit->type << ", ver.:" << p_unit->version
                                        << ") unit, since there is a newer unit.\n");
     } else
-        ((QAbstractItemView *)p_unit->ptr)->setModel(new ConvTempateTableModel(manager));
+        ((QAbstractItemView *)p_unit->ptr)->setModel(new ConvTemplateTableModel(manager));
 
     /*
      *

@@ -1,5 +1,6 @@
 
 #include <QApplication>
+#include <QTranslator>
 #include <fstream>
 //
 #include "baseio/DefaultBaseIO.h"
@@ -11,34 +12,23 @@
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
+    QTranslator my_translator;
+    my_translator.load("dictionary_ru");
+    app.installTranslator(&my_translator);
+
     ExtensionManager manager;
     auto ctm = (ConversionTemplateManager *)manager
                    .getLastVersionExtensionUint("cnv_template_manager", "cnv_template_manager")
                    ->ptr;
     {
-        std::string contents;
-        {
-            std::fstream in("analog.base", std::ios_base::in | std::ios::binary);
-            if (!in) return 1;
-
-            in.seekg(0, std::ios::end);
-            contents.resize(in.tellg());
-            in.seekg(0, std::ios::beg);
-            in.read(&contents[0], contents.size());
-            in.close();
-        }
-
         auto e_unit = manager.getLastVersionExtensionUint("io", "base_io");
         if (e_unit == nullptr) {
             DEBUG_CERR("cant find \"base_io\" unit with \"io\" type\n");
             return 1;
         }
-        auto *base_io = (DefaultBaseIO *)(e_unit->ptr);
-
-        auto conv_template = base_io->parseDocument(&manager, contents);
-        if (conv_template) ctm->addConversionTemplate(conv_template);
-
-        if (base_io->getErrorMessage().size()) std::cerr << base_io->getErrorMessage();
+        auto *base_io = (IO_ifs *)(e_unit->ptr);
+        if (base_io->readDocument(&manager, "analog.base"))
+            std::cerr << "error (base_io ): " << base_io->getErrorMessage();
     }
     std::cout << "---------------------------------------------------------------------\n";
 

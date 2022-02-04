@@ -9,20 +9,60 @@
 
 #include "GUI/TreeEditor.h"
 #include "common/ExtensionManager.h"
+#include "common/IO_ifs.h"
 #include "convtemplate/Parameter_ifs.h"
 #include "mainwindow.h"
+
 class Parameter_ifs;
 
-MainWindow::MainWindow(ExtensionManager *ctm) : text_edit_(new QTextEdit), ctm_(ctm) {
+class OpenAction : public QAction {
+   public:
+    explicit OpenAction(ExtensionManager *manager, IO_ifs *io, QObject *parent = nullptr)
+        : QAction(parent), manager_(manager), io_(io) {
+        setText(QObject::tr("&Open"));
+        //+ " " + io->file_type_.c_str()
+        connect(this, &QAction::triggered, this, &OpenAction::openFile);
+    }
+
+   protected slots:
+    void openFile() {
+        auto f_name =
+            QFileDialog::getOpenFileName(nullptr, /*caption*/ QString(), /*dir */ QString(),
+                                         /*filter*/ io_->filename_pattern_.c_str(), /*selectedFilter*/ nullptr,
+                                         /*options*/ QFileDialog::Options());
+
+        io_->readDocument(manager_, f_name.toStdString());
+    }
+
+   protected:
+    ExtensionManager *manager_ = nullptr;
+    IO_ifs *io_;
+};
+
+MainWindow::MainWindow(ExtensionManager *ctm) : text_edit_(new QTextEdit), manager_(ctm) {
     // etStyle("windows");QWindowsVistaStyle
     qDebug() << QStyleFactory::keys();
     QApplication::setStyle(QStyleFactory::create("Fusion"));
     setCentralWidget(text_edit_);
 
+    auto infoLabel =
+        new QLabel(tr("<i>Choose a menu option, or right-click to "
+                      "invoke a context menu</i>"));
+    infoLabel->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+
+    auto file_menu = menuBar()->addMenu(tr("&File"));
+
+    auto io_units = manager_->getLastVersionExtensionUintsByType("io");
+    for (auto i : io_units) {
+        if (i && i->ptr) {
+            auto new_base = new OpenAction(manager_, (IO_ifs *)i->ptr, this);
+            new_base->setStatusTip(tr("&Create a new file"));
+            file_menu->addAction(new_base);
+        }
+    }
+
     createDockWindows();
-
-    setWindowTitle(tr("Dock Widgets"));
-
+    setWindowTitle(tr("&Dock Widgets"));
     setUnifiedTitleAndToolBarOnMac(true);
 }
 
@@ -33,18 +73,18 @@ void MainWindow::createDockWindows() {
      *
      */
 
-    dock = new QDockWidget(tr("parameter properties"), this);
-    dock->setObjectName(tr("parameter properties"));
-    auto constructor = (newTreeEditor_t)ctm_->getLastVersionExtensionUint("tree_editor", "tree_editor")->ptr;
+    dock = new QDockWidget(tr("&parameter properties"), this);
+    dock->setObjectName(tr("&parameter properties"));
+    auto constructor = (newTreeEditor_t)manager_->getLastVersionExtensionUint("tree_editor", "tree_editor")->ptr;
     // auto ds = (DataSchema_ifs *)ctm_->getLastVersionExtensionUint("data_schema", "ethernet_udp")->ptr;
 
     typedef Parameter_ifs *(*create_parameter_t)(ExtensionManager * manager);
-    auto prmConstructor = (create_parameter_t)(ctm_->getLastVersionExtensionUint("parameter", "EthernetUdp")->ptr);
-    auto prm = prmConstructor(ctm_);
+    auto prmConstructor = (create_parameter_t)(manager_->getLastVersionExtensionUint("parameter", "EthernetUdp")->ptr);
+    auto prm = prmConstructor(manager_);
 
     qDebug() << toString(prm->getProperty(""), "").c_str();
 
-    TreeEditor *top = constructor(ctm_, nullptr);
+    TreeEditor *top = constructor(manager_, nullptr);
     top->setupProperties(prm);
 
     dock->setWidget(top);
@@ -60,7 +100,7 @@ void MainWindow::createDockWindows() {
      *
      */
 
-    auto units = ctm_->getLastVersionExtensionUintsByType("widget");
+    auto units = manager_->getLastVersionExtensionUintsByType("widget");
     for (auto i : units) {
         dock = new QDockWidget(tr(i->name), this);
 

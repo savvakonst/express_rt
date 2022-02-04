@@ -63,10 +63,10 @@ class ConvTemplateTreeModel : public QAbstractItemModel {
  *
  */
 
-class ConvTempateTableModel : public QAbstractTableModel {
+class ConvTemplateTableModel : public QAbstractTableModel {
     Q_OBJECT
    public:
-    explicit ConvTempateTableModel(ExtensionManager *manager);
+    explicit ConvTemplateTableModel(ExtensionManager *manager);
 
     [[nodiscard]] int rowCount(const QModelIndex &parent) const override;
 

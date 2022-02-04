@@ -11,6 +11,6 @@ ClionBuild/
 cmake-build*/
 debug*/
 release*/
-
+*_*.qm
 
 tools/set_*_env.bat

@@ -46,7 +46,7 @@ class COMMON_API_ BaseClass_ifs {
    protected:
     BaseClass_ifs(/* args */) {}
 
-    ~BaseClass_ifs() {}
+    virtual ~BaseClass_ifs() = default;
 
     /*
      *  common voids
@@ -59,6 +59,7 @@ class COMMON_API_ BaseClass_ifs {
         }
     }
 
+   public:
     status addSignal(Signal_ifs *signal) {
         signals_.push_back(signal);
         return status::succes;
@@ -74,7 +75,6 @@ class COMMON_API_ BaseClass_ifs {
         return succes;
     }
 
-   public:
     // TODO it might be worth to remove this function
     virtual const ErrorInfo_ifs *getErrorInfo() const { return nullptr; };
 
