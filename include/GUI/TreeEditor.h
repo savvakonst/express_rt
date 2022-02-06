@@ -9,9 +9,12 @@
 #include "common/BaseClass_ifs.h"
 #include "common/DataSchema_ifs.h"
 #include "common/Extension.h"
+
 class ExtensionManager;
-class QTreeWidgetItem;
+class ConversionTemplate;
 class Parameter_ifs;
+
+class QTreeWidgetItem;
 
 /*
  *
@@ -50,6 +53,9 @@ class TreeEditor : public QTreeWidget {
 
     std::string error_message_;
     Parameter_ifs *parameter_ = nullptr;
+
+    QAbstractItemView *parent_view_ = nullptr;
+    ConversionTemplate *conversion_template__ = nullptr;
     // const DataSchema_ifs *data_schema_ = nullptr;
 };
 

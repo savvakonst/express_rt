@@ -29,7 +29,7 @@ typedef void *extensionResource_t;
 
 inline ExtensionUnit *search(ExtensionUnit *ptr, const std::string &type, const std::string &name) {
     if (ptr == nullptr) return nullptr;
-    
+
     auto chr_type = type.data();
     auto chr_name = name.data();
 
@@ -93,6 +93,13 @@ class COMMON_API_ ExtensionManager {
         if (set == nullptr) return nullptr;
         auto ret = *(set->begin());  // there must be no situations with an empty set by design.
         return ret;
+    }
+
+    const void *getLastVersionExtensionObject(const std::string &type,
+                                              const std::string &name) {  // it is unsafe
+        auto set = getLastVersionExtensionUint(type, name);
+        if (set && set->ptr) return set->ptr;
+        return nullptr;
     }
 
     void insertExtensionInfo(ExtensionInfo *arg) {

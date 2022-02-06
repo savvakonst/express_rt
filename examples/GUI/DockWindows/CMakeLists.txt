@@ -8,7 +8,7 @@ set(CMAKE_AUTOUIC ON)
 
 
 #  set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION C:/Express_expr_compiler/nik/express_rt)
-set_source_files_properties(dictionary_ru.ts PROPERTIES OUTPUT_LOCATION C:/Express_expr_compiler/nik/express_rt)
+set_source_files_properties(dictionary_ru.ts PROPERTIES OUTPUT_LOCATION ${PROJECT_SOURCE_DIR})
 qt5_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} dictionary_ru.ts)
 
 
@@ -19,7 +19,7 @@ add_executable(ExampleDockWindows
         )
 
 
-message(STATUS "QM_FILES ${CMAKE_CURRENT_SOURCE_DIR}")
+message(STATUS "QM_FILES ${PROJECT_SOURCE_DIR}")
 
 
 message(STATUS "QM_FILES ${QM_FILES}")

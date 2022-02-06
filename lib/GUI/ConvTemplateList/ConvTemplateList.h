@@ -10,10 +10,11 @@
 #include "common/BaseClass_ifs.h"
 
 class DataSchema_ifs;
-
 class ExtensionManager;
 class ConversionTemplateManager;
 class BaseSignalController;
+
+class TreeEditor;
 
 class TreeView : public QTreeView {
     Q_OBJECT
@@ -110,8 +111,9 @@ class ParameterTableModel : public QAbstractTableModel {
 
     std::vector<DataSchema_ifs *> list_of_entries_;
     DataSchema_ifs *schema_ = nullptr;
-    QAbstractItemView *a_item_view_ = nullptr;
-    ConversionTemplateManager *manager_ = nullptr;
+    QAbstractItemView *parent_view_ = nullptr;
+    TreeEditor *child_view_ = nullptr;
+    ConversionTemplateManager *cnv_manager_ = nullptr;
 };
 
 #endif  // EXRT_TABLEMODEL_H

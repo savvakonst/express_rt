@@ -1,10 +1,11 @@
 
 #include <QHeaderView>
 #include <QTableView>
+#include "QDebug"
 //
 #include "ConvTemplateList.h"
 #include "GUI/WidgetWrappers.h"
-#include "QDebug"
+#include "GUI/TreeEditor.h"
 #include "common/ExtensionManager.h"
 #include "convtemplate/ConversionTemplate.h"
 #include "convtemplate/ConversionTemplateManager.h"
@@ -21,7 +22,7 @@ ConvTemplateTreeModel::ConvTemplateTreeModel(ExtensionManager *manager) {
     unit = manager->getLastVersionExtensionUint("cnv_template_manager", "cnv_template_manager");
     if (unit && unit->ptr) {
         manager_ = (ConversionTemplateManager *)unit->ptr;
-        std::cout << "manager_ = (ConversionTemplateManager *)unit->ptr;\n";
+        std::cout << "cnv_manager_ = (ConversionTemplateManager *)unit->ptr;\n";
     }
 }
 
@@ -120,7 +121,7 @@ ConvTemplateTableModel::ConvTemplateTableModel(ExtensionManager *manager) {
     unit = manager->getLastVersionExtensionUint("cnv_template_manager", "cnv_template_manager");
     if (unit && unit->ptr) {
         manager_ = (ConversionTemplateManager *)unit->ptr;
-        if (manager_ == nullptr) std::cerr << "ConvTempateTableModel::manager_ == nullptr;\n";
+        if (manager_ == nullptr) std::cerr << "ConvTempateTableModel::cnv_manager_ == nullptr;\n";
     }
 
     class Delegate : public Signal_ifs{
@@ -176,23 +177,27 @@ ParameterTableModel::ParameterTableModel(ExtensionManager *manager) {
         std::cerr << "can't find data_schema;\n";
     }
 
-    unit = manager->getLastVersionExtensionUint("widget", "conv_template_list");
-    if (unit && unit->ptr) {
-        a_item_view_ = (QAbstractItemView *)unit->ptr;
-        if (a_item_view_ == nullptr) std::cerr << "QAbstractItemView::manager_ == nullptr;\n";
-    } else {
+
+    parent_view_ = (QAbstractItemView *)manager->getLastVersionExtensionObject("widget", "conv_template_list");
+    if (parent_view_== nullptr)
         std::cerr << "can't find conv_template_list;\n";
-    }
 
-    unit = manager->getLastVersionExtensionUint("cnv_template_manager", "cnv_template_manager");
-    if (unit && unit->ptr) {
-        manager_ = (ConversionTemplateManager *)unit->ptr;
-        if (manager_ == nullptr) std::cerr << "ConvTempateTableModel::manager_ == nullptr;\n";
-    } else {
+
+    cnv_manager_ =  (ConversionTemplateManager *)manager->getLastVersionExtensionObject("cnv_template_manager", "cnv_template_manager");
+    if (cnv_manager_== nullptr)
         std::cerr << "can't find cnv_template_manager;\n";
-    }
 
-    QObject::connect(a_item_view_, &QAbstractItemView::activated, this, &ParameterTableModel::receiveRow);
+
+
+    auto constructor = (newTreeEditor_t)manager->getLastVersionExtensionObject("tree_editor", "tree_editor");
+    if (constructor== nullptr)
+        std::cerr << "can't find cnv_template_manager;\n";
+    else
+        child_view_ = constructor(manager, nullptr);
+
+
+    connect(parent_view_, &QAbstractItemView::activated, this, &ParameterTableModel::receiveRow);
+    connect(this, &QAbstractItemView::activated,,);
 }
 
 int ParameterTableModel::rowCount(const QModelIndex &parent) const {
@@ -231,13 +236,13 @@ QVariant ParameterTableModel::data(const QModelIndex &index, int role) const {
 }
 
 ConversionTemplate *ParameterTableModel::getCurrentConversionTemplate() const {
-    auto index = a_item_view_->currentIndex();
+    auto index = parent_view_->currentIndex();
 
     if (!index.isValid()) return nullptr;
 
     while (index.parent().isValid()) index = index.parent();
 
-    return manager_->getConversionTemplateByIndex((size_t)index.row());
+    return cnv_manager_->getConversionTemplateByIndex((size_t)index.row());
 }
 
 void ParameterTableModel::receiveRow(const QModelIndex &index) {

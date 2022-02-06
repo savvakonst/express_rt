@@ -15,6 +15,9 @@
 #include "common/ExtensionManager.h"
 
 TreeEditor::TreeEditor(ExtensionManager *manager, QWidget *parent) : QTreeWidget(parent), update_signal_(this) {
+
+
+
     this->setAutoFillBackground(true);
     this->setBackgroundRole(QPalette().Base);
     auto p = this->palette();
