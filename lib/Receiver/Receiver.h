@@ -24,8 +24,8 @@ class Receiver : public BaseClass_ifs {
         Sockaddr(EthernetAddress address) {
             sin_family = AF_INET;
 
-            sin_port = htons(*((uint16_t *)address.port));
-            sin_addr = *((uint32_t *)address.ip_b);
+            sin_port = htons(address.port);
+            sin_addr = address.ip;
             sin_zero = 0;
         }
 
@@ -36,7 +36,7 @@ class Receiver : public BaseClass_ifs {
     };
 
     explicit Receiver(ModuleStream_ifs *m_stream_,
-                      Sockaddr dst_address = {AF_INET, htons(4660), inet_addr("192.168.1.176"), 0},
+                      Sockaddr dst_address = {AF_INET, htons(4660), inet_addr("192.168.0.176"), 0},
                       const Sockaddr src_address = Sockaddr{0, 0, 0, 0});
 
     explicit Receiver(ModuleStream_ifs *m_stream, const EthernetSettings &ethernet_settings);

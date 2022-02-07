@@ -14,20 +14,6 @@ inline std::string stringId(uint32_t id) {
     return std::string(char_id);
 }
 
-class COMMON_API_ DeviceBuildingContext_ifs {
-   public:
-    ~DeviceBuildingContext_ifs() {}
-
-    virtual moduleConstructor_f getConstructor(const std::string &module_id) = 0;
-
-    virtual Module_ifs *createModule(const std::string &module_id, const void *ptr, size_t size,
-                                     DeviceBuildingContext_ifs *context) = 0;
-};
-
-// TODO: i think it will be better to inherit this class from Module_ifs
-//  and use task mapper.it needs change name TaskMapper to PackedStructMapper.
-//  and i think it is possible to remove all task structures by replacing them with PackedStructMapper
-
 class COMMON_API_ Device : public Module_ifs {
    private:
     struct DEVICE_DATE {
@@ -59,7 +45,7 @@ class COMMON_API_ Device : public Module_ifs {
     size_t size_ = 0;
 
    public:
-    Device(const void *ptr, size_t size, DeviceBuildingContext_ifs *context);
+    Device(const void *ptr, size_t size, ExtensionManager *context);
 
     ~Device() override;
 
@@ -67,38 +53,45 @@ class COMMON_API_ Device : public Module_ifs {
 
     [[nodiscard]] EthernetSettings getSrcAddress() const override;
 
+    [[nodiscard]] bool isAvailable() const override { return true; }
+
+    [[nodiscard]] std::string getID() const override { return "KSD"; }
+
     /* not yet implemented inherited members  begin*/
-    [[nodiscard]] virtual bool isAvailable() const = 0;
+    std::map<std::string, PrmBuffer_ifs *> getPrmBufferMap() override { return {}; }
 
-    [[nodiscard]] virtual std::string getID() const = 0;
+    const DataSchema_ifs *getPropertySchema() override { return nullptr; }
 
-    virtual std::map<std::string, PrmBuffer_ifs *> getPrmBufferMap() = 0;
+    [[nodiscard]] std::string printProperties(const std::string &indent) const override { return ""; }
 
-    const DataSchema_ifs *getPropertySchema() override = 0;
+    [[nodiscard]] const HierarchicalData_ifs *getProperty(const std::string &prop_path) const override {
+        return nullptr;
+    }
 
-    [[nodiscard]] virtual std::string printProperties(const std::string &indent = "") const = 0;
+    [[nodiscard]] std::string getPropertyAsTxt(const std::string &prop_path) const override { return ""; }
 
-    [[nodiscard]] const HierarchicalData_ifs *getProperty(const std::string &prop_path) const override = 0;
+    bool setProperty(const std::string &prop_path, const Value &value) override { return false; }
 
-    [[nodiscard]] std::string getPropertyAsTxt(const std::string &prop_path) const override = 0;
+    bool setProperty(const std::string &prop_path, const HierarchicalData_ifs *hierarchical_data) override {
+        return false;
+    }
 
-    bool setProperty(const std::string &prop_path, const Value &value) override = 0;
-
-    bool setProperty(const std::string &prop_path, const HierarchicalData_ifs *hierarchical_data) override = 0;
-
-    bool setPropertyAsTxt(const std::string &prop_path, const std::string &value) override = 0;
+    bool setPropertyAsTxt(const std::string &prop_path, const std::string &value) override { return false; }
 
     /* not yet implemented inherited members  end*/
 
+    [[nodiscard]] bool storeTaskToBuffer(void *pointer) const override { return false; }
+
+    [[nodiscard]] size_t getTaskSize() const override;
+
     [[nodiscard]] std::vector<std::pair<std::string, Module_ifs *>> getSubModules() const override;
 
+    ModuleStream_ifs *createModuleStream() override { return nullptr; }
+
+    /* */
     [[nodiscard]] std::vector<std::pair<std::string, Module_ifs *>> getModulesFromPath(const std::string &name);
 
     [[nodiscard]] static status checkValExistence(const std::string &path);
-
-    [[nodiscard]] const void *storeTaskToBuffer() const override;
-
-    [[nodiscard]] size_t getTaskSize() const override;
 
     // TODO : remove this
     Module_ifs *getTopModule() {

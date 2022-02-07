@@ -53,6 +53,8 @@ class TopWindow : public QMainWindow {
     Reader_ifs* view_1_ = nullptr;
     Reader_ifs* view_2_ = nullptr;
 
+    ExtensionManager *manager_ = nullptr;
+
     friend class GraphicsScene;
 };
 

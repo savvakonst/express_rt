@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "common/CustomTypes.h"
 #define MAX_INPUT_BUFFER_SIZE (1 << 15)
 
 const int32_t MAX_DEVICE_NUMBER = 16;
@@ -524,7 +525,7 @@ std::string format(const char *c, T arg) {
 void setError(std::string &error, const std::string &error_msg) { error += error_msg + "\n"; }
 
 //-------------------------------------------------------------------------
-std::list<KsdConnected *> devicePing(std::string &error_msg) {
+std::list<KsdConnected *> devicePing(const EthernetAddress &adapter_address, std::string &error_msg) {
     int32_t status = 0;
 
     SOCKET ping_socket = INVALID_SOCKET;
@@ -582,9 +583,11 @@ std::list<KsdConnected *> devicePing(std::string &error_msg) {
     sa_ping.sin_port = htons(DEFAULT_PORT);
 
     // TODO:
+
+
     struct sockaddr_in host_addr;
     host_addr.sin_family = AF_INET;
-    host_addr.sin_addr.s_addr = inet_addr("192.168.001.176");
+    host_addr.sin_addr.s_addr = adapter_address.ip;
     host_addr.sin_port = 0;
 
     bind(ping_socket, (SOCKADDR *)&host_addr, sizeof(host_addr));

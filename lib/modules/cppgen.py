@@ -47,7 +47,7 @@ class Module_{0:s} : public KSDModule {{
 
     Module_{0:s}();
 
-    Module_{0:s}(const void * ptr, size_t size, DeviceBuildingContext_ifs* context);
+    Module_{0:s}(const void * ptr, size_t size, ExtensionManager* manager);
 
     ~Module_{0:s}();
 
@@ -91,7 +91,7 @@ class Module_{0:s} : public KSDModule {{
         field_map_.setReferencePtr(&task_);
     }}
 
-    Module_{0:s}(const void * ptr, size_t size, DeviceBuildingContext_ifs* context):Module_{0:s}(){{
+    Module_{0:s}(const void * ptr, size_t size, ExtensionManager* manager):Module_{0:s}(){{
         if (size!=getTaskSize()){{
             // print error or throw error
         }}
@@ -113,7 +113,10 @@ class Module_{0:s} : public KSDModule {{
     //bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override;
 
 
-    const void* getTaskPtr() const override {{ return (const void*)&task_; }}
+    bool storeTaskToBuffer(void* pointer) const override {
+        memcpy(pointer, (void*)&task_, sizeof(Task));
+        return true;
+    }
     size_t getTaskSize() const override {{ return sizeof({1:s}); }}
 
     ModuleStream_ifs* createModuleStream() override {{
@@ -138,7 +141,7 @@ cpp_template = """
     }}
 
 
-    Module_{0:s}::Module_{0:s}(const void * ptr, size_t size, DeviceBuildingContext_ifs* context):Module_{0:s}(){{
+    Module_{0:s}::Module_{0:s}(const void * ptr, size_t size, ExtensionManager* manager):Module_{0:s}(){{
         if (size!=getTaskSize()){{
             // print error or throw error
         }}
@@ -249,14 +252,12 @@ for i in pattern_list:
         if new_complex is None:
             break
 
-
         def genArr(type_, dims=[]):
             if (len(dims)):
                 dim = dims.pop()
                 return '{{{0:d},{1:s}}}'.format(dim, genArr(type_, dims))
             else:
                 return type_
-
 
         def genMap(struct):
             fields = []
@@ -268,7 +269,6 @@ for i in pattern_list:
                     key.name, genArr(type_, key.dims))
                 fields.append(s)
             return "TaskMapper({{\n{0:s} }})".format(",\n".join(fields))
-
 
         s = genMap(new_complex)
         print(s)

@@ -21,38 +21,11 @@
 
 bool initWSA();
 
-class DeviceBuildingContext : public DeviceBuildingContext_ifs {
-   public:
-    ~DeviceBuildingContext() {}
-
-    bool addUint(ExtensionUnit *uint) {
-        if (std::string(uint->type) == "module") map_[uint->name] = (moduleConstructor_f)uint->ptr;
-        return true;
-    }
-
-    moduleConstructor_f getConstructor(const std::string &module_id) override {
-        auto e = map_.find(module_id);
-        if (e == map_.end()) {
-            return nullptr;
-        } else {
-            return e->second;
-        }
-    }
-
-    Module_ifs *createModule(const std::string &module_id, const void *ptr, size_t size,
-                             DeviceBuildingContext_ifs *context) override {
-        moduleConstructor_f constructor = context->getConstructor(module_id);
-        if (constructor) return constructor(ptr, size, context);
-        return nullptr;
-    }
-
-   private:
-    std::map<std::string, moduleConstructor_f> map_;
-};
 InitExtension(ExtensionInfo *) initModules(void);
 
 #include <iostream>
 
+#include "common/ExtensionManager.h"
 /*
  *
  *
@@ -75,7 +48,7 @@ TopWindow::TopWindow(QWidget *parent, double signal_frequency)
     timer->start(5);
 }
 
-TopWindow::~TopWindow() {}
+TopWindow::~TopWindow() { delete manager_; }
 
 void TopWindow::initScene() {
     initWSA();
@@ -83,14 +56,16 @@ void TopWindow::initScene() {
     ExtensionInfo *extension_info = initModules();
     auto uints = extension_info->units;
 
-    DeviceBuildingContext building_context;
-
-    while (uints->name) {
-        building_context.addUint(uints++);
-    }
+    manager_ = new ExtensionManager;
 
     std::string error_msg;
-    auto devices = devicePing(error_msg);
+
+    struct sockaddr_in host_addr;
+    host_addr.sin_family = AF_INET;
+    host_addr.sin_addr.s_addr = inet_addr("192.168.001.176");
+    host_addr.sin_port = 0;
+
+    auto devices = devicePing(host_addr,error_msg);
 
     if (error_msg.size()) {
         std::cout << error_msg;
@@ -98,7 +73,7 @@ void TopWindow::initScene() {
     }
     auto v = devices.front()->getTask();
 
-    Device device = Device(v.data(), v.size(), &building_context);
+    Device device = Device(v.data(), v.size(), manager_);
 
     if (device.hasTransceiver()) {
         ModuleStream_ifs *m_stream = device.getTopModule()->createModuleStream();

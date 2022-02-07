@@ -89,9 +89,7 @@ Receiver::Receiver(ModuleStream_ifs *m_stream, Sockaddr dst_address, Sockaddr sr
 }
 
 Receiver::Receiver(ModuleStream_ifs *m_stream, const EthernetSettings &ethernet_settings)
-    : Receiver(m_stream,
-               {AF_INET, (*((uint16_t *)ethernet_settings.dst_.port)), *((uint32_t *)ethernet_settings.dst_.ip_b), 0},
-               Sockaddr{0, 0, 0, 0}) {}
+    : Receiver(m_stream, {AF_INET, ethernet_settings.dst_.port, ethernet_settings.dst_.ip, 0}, Sockaddr{0, 0, 0, 0}) {}
 //{0, htons(*((uint16_t *)ethernet_settings.src_.port)), *((uint32_t *)ethernet_settings.src_.ip_b), 0}) {}
 
 Receiver::~Receiver() {

@@ -322,8 +322,14 @@ inline std::string toString(const Value &value) { return toString(value); }
 
 struct EthernetAddress {
     uint8_t mac[6];
-    uint8_t port[2];
-    uint8_t ip_b[4];
+    union {
+        uint8_t port_b[2];
+        uint16_t port;
+    };
+    union {
+        uint8_t ip_b[4];
+        uint32_t ip;
+    };
 };
 
 struct EthernetSettings {

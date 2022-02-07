@@ -7,7 +7,7 @@
 
 class ModuleStream_ifs;
 class PrmBuffer_ifs;
-class DeviceBuildingContext_ifs;
+class ExtensionManager;
 
 class COMMON_API_ Module_ifs : public Properties_ifs {
    public:
@@ -25,7 +25,7 @@ class COMMON_API_ Module_ifs : public Properties_ifs {
 
     const DataSchema_ifs *getPropertySchema() override = 0;
 
-    [[nodiscard]] virtual std::string printProperties(const std::string &indent = "") const = 0;
+    [[nodiscard]] virtual std::string printProperties(const std::string &indent) const = 0;
 
     [[nodiscard]] const HierarchicalData_ifs *getProperty(const std::string &prop_path) const override = 0;
 
@@ -37,7 +37,7 @@ class COMMON_API_ Module_ifs : public Properties_ifs {
 
     bool setPropertyAsTxt(const std::string &prop_path, const std::string &value) override = 0;
 
-    [[nodiscard]] virtual const void *storeTaskToBuffer() const = 0;
+    [[nodiscard]] virtual bool storeTaskToBuffer(void *pointer) const = 0;
 
     [[nodiscard]] virtual size_t getTaskSize() const = 0;
 
@@ -47,10 +47,10 @@ class COMMON_API_ Module_ifs : public Properties_ifs {
 };
 
 template <class T>
-Module_ifs *createModule(const void *ptr, size_t size, DeviceBuildingContext_ifs *context) {
-    return new T(ptr, size, context);
+Module_ifs *createModule(const void *ptr, size_t size, ExtensionManager *manager) {
+    return new T(ptr, size, manager);
 }
 
-typedef Module_ifs *(*moduleConstructor_f)(const void *ptr, size_t size, DeviceBuildingContext_ifs *context);
+typedef Module_ifs *(*moduleConstructor_f)(const void *ptr, size_t size, ExtensionManager *manager);
 
 #endif

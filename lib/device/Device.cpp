@@ -3,8 +3,8 @@
 //
 #include "Device/Device.h"
 #include "Device/ModuleStream_ifs.h"
+#include "common/ExtensionManager.h"
 #include "common/StringProcessingTools.h"
-
 // TODO:
 #pragma pack(1)
 struct MODULE_HEADER {
@@ -22,12 +22,12 @@ struct MODULE_HEADER {
 #pragma pack()
 #include "iostream"
 
-Device::Device(const void *ptr, size_t size, DeviceBuildingContext_ifs *context) {
+Device::Device(const void *ptr, size_t size, ExtensionManager *context) {
+    auto manager = (ExtensionManager *)context;
+
     if (size < sizeof(TASK_HEADER)) {
         error_message_ = "task size is too small";
     }
-
-
 
     task_header_ = *(TASK_HEADER *)ptr;
 
@@ -37,7 +37,9 @@ Device::Device(const void *ptr, size_t size, DeviceBuildingContext_ifs *context)
     do {
         char *current_ptr = (char *)ptr + offset;
         MODULE_HEADER *header = (MODULE_HEADER *)(current_ptr);
-        Module_ifs *module = context->createModule(stringId(header->id), current_ptr, (size_t)header->size, context);
+
+        auto constructor = (moduleConstructor_f)manager->getLastVersionExtensionObject("module", stringId(header->id));
+        Module_ifs *module = constructor(current_ptr, (size_t)header->size, manager);
 
         if (!module) {
             error_message_ = "cant find module with \"" + stringId(header->id) + "\" id";
@@ -55,7 +57,7 @@ Device::Device(const void *ptr, size_t size, DeviceBuildingContext_ifs *context)
     // modules_.push_back()
 }
 
-Device::~Device() {}
+Device::~Device() = default;
 
 std::vector<std::pair<std::string, Module_ifs *>> Device::getSubModules() const { return {}; }
 
@@ -91,7 +93,4 @@ EthernetSettings Device::getSrcAddress() const {
     return {};
 }
 
-const void *Device::storeTaskToBuffer() const { return nullptr; }
-
 size_t Device::getTaskSize() const { return size_; }
-

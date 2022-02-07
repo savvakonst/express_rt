@@ -10,7 +10,7 @@ Module_D01_::Module_D01_()
     field_map_.setReferencePtr(&task_);
 }
 
-Module_D01_::Module_D01_(const void* ptr, size_t size, DeviceBuildingContext_ifs* context) : Module_D01_() {
+Module_D01_::Module_D01_(const void* ptr, size_t size, ExtensionManager* context) : Module_D01_() {
     if (size != getTaskSize()) {
         // print error or throw error
     }

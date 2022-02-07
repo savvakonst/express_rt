@@ -29,14 +29,14 @@
 
 /*
 #define createDCU_Module(NAME)                                              \
-    ([](const void *ptr, size_t size, DeviceBuildingContext_ifs *context) { \
+    ([](const void *ptr, size_t size, ExtensionManager *context) { \
         return new Module_DCU_((NAME), ptr, size, context);                 \
     })
 */
 
-#define M_createDCU_Module(NAME)                                                                         \
-    Module_ifs *create##NAME##Module(const void *ptr, size_t size, DeviceBuildingContext_ifs *context) { \
-        return new Module_DCU_(#NAME, ptr, size, context);                                               \
+#define M_createDCU_Module(NAME)                                                                \
+    Module_ifs *create##NAME##Module(const void *ptr, size_t size, ExtensionManager *context) { \
+        return new Module_DCU_(#NAME, ptr, size, context);                                      \
     }
 
 M_createDCU_Module(CH04);

@@ -35,7 +35,7 @@ class Module_A09_ : public KSDModule {
    public:
     Module_A09_();
 
-    Module_A09_(const void* ptr, size_t size, DeviceBuildingContext_ifs* context);
+    Module_A09_(const void* ptr, size_t size, ExtensionManager* manager);
 
     ~Module_A09_();
 
@@ -49,7 +49,10 @@ class Module_A09_ : public KSDModule {
     bool setProperty(const std::string& prop_path, const Value& value) override;
     bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override;
 
-    const void* storeTaskToBuffer() const override { return (const void*)&task_; }
+    bool storeTaskToBuffer(void* pointer) const override {
+        memcpy(pointer, (void*)&task_, sizeof(Task));
+        return true;
+    }
     size_t getTaskSize() const override { return sizeof(Task); }
 
     ModuleStream_ifs* createModuleStream() override;

@@ -18,7 +18,6 @@ union ModuleAddress {
         uint8_t slave;
         uint8_t block;
     };
-
     bool operator==(const ModuleAddress &ref) const { return address == ref.address; }
 };
 
@@ -114,6 +113,6 @@ class KsdConnected {
     std::string error_msg_ = "";
 };
 
-std::list<KsdConnected *> devicePing(std::string &error_msg);
+std::list<KsdConnected *> devicePing(const EthernetAddress &host_addr, std::string &error_msg);
 
 #endif  // EXRT_KSDCONNECTED_H

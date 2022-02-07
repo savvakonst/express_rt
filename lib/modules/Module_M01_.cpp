@@ -20,7 +20,7 @@ Module_M01_::Module_M01_()
     field_map_.setReferencePtr(&task_);
 }
 
-Module_M01_::Module_M01_(const void *ptr, size_t size, DeviceBuildingContext_ifs *context) : Module_M01_() {
+Module_M01_::Module_M01_(const void *ptr, size_t size, ExtensionManager *manager) : Module_M01_() {
     if (size != getTaskSize()) {
         error_message_ = "invalid size";
     }

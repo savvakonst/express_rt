@@ -58,7 +58,7 @@ class Module_DCU_ : public KSDModule {
    public:
     Module_DCU_(const std::string &module_id);
 
-    Module_DCU_(const std::string &name, const void *ptr, size_t size, DeviceBuildingContext_ifs *context);
+    Module_DCU_(const std::string &name, const void *ptr, size_t size, ExtensionManager *context);
 
     ~Module_DCU_() override;
 
@@ -90,7 +90,10 @@ class Module_DCU_ : public KSDModule {
 
     bool setPropertyAsTxt(const std::string &prop_path, const std::string &valie) override;
 
-    [[nodiscard]] const void *storeTaskToBuffer() const override { return (const void *)&task_; }
+    [[nodiscard]] bool storeTaskToBuffer(void *pointer) const override {
+        // TODO: implement this method
+        return false;
+    }
 
     [[nodiscard]] size_t getTaskSize() const override;
 

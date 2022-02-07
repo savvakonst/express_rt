@@ -66,6 +66,9 @@ class TaskMapper : public HierarchicalData_ifs {
  *
  *
  */
+
+class ExtensionManager;
+
 class KSDModule : public Module_ifs {
    protected:
     explicit KSDModule(const TaskMapper &field_map) : field_map_(field_map) {}

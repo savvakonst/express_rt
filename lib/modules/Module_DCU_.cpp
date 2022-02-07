@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "Device/Device.h"
+#include "common/ExtensionManager.h"
 
 Module_DCU_::Module_DCU_(const std::string &module_id)
     : KSDModule(  //
@@ -13,7 +14,7 @@ Module_DCU_::Module_DCU_(const std::string &module_id)
     field_map_.setReferencePtr(&task_);
 }
 
-Module_DCU_::Module_DCU_(const std::string &module_id, const void *ptr, size_t size, DeviceBuildingContext_ifs *context)
+Module_DCU_::Module_DCU_(const std::string &module_id, const void *ptr, size_t size, ExtensionManager *manager)
     : Module_DCU_(module_id) {
     task_ = *((Task *)ptr);
 
@@ -23,7 +24,9 @@ Module_DCU_::Module_DCU_(const std::string &module_id, const void *ptr, size_t s
     do {
         char *current_ptr = (char *)ptr + offset;
         MODULE_HEADER *header = (MODULE_HEADER *)(current_ptr);
-        Module_ifs *module = context->createModule(stringId(header->id), current_ptr, (size_t)header->size, context);
+
+        auto constructor = (moduleConstructor_f)manager->getLastVersionExtensionObject("module", stringId(header->id));
+        Module_ifs *module = constructor(current_ptr, (size_t)header->size, manager);
 
         if (module == nullptr) {
             error_message_ = "cant find module with \"" + stringId(header->id) + "\" id";
@@ -34,7 +37,7 @@ Module_DCU_::Module_DCU_(const std::string &module_id, const void *ptr, size_t s
         }
         offset += (size_t)header->size;
         modules_.push_back(module);
-        std::cout << "\n" + stringId(header->id) << ":" << module->printProperties();
+        std::cout << "\n" + stringId(header->id) << ":" << module->printProperties("");
     } while (offset < size_);
 
     if (offset != getTaskSize()) {

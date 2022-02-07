@@ -8,7 +8,7 @@ Module_C06M::Module_C06M()
     field_map_.setReferencePtr(&task_);
 }
 
-Module_C06M::Module_C06M(const void* ptr, size_t size, DeviceBuildingContext_ifs* context) : Module_C06M() {
+Module_C06M::Module_C06M(const void* ptr, size_t size, ExtensionManager* manager) : Module_C06M() {
     if (size != getTaskSize()) {
         // print error or throw error
     }
