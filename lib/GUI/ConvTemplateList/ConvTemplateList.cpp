@@ -1,4 +1,4 @@
-
+#include <QAction>
 #include <QDebug>
 #include <QHeaderView>
 #include <QTableView>
@@ -125,9 +125,8 @@ ConvTemplateTableModel::ConvTemplateTableModel(ExtensionManager *manager) {
 
     class Delegate : public Signal_ifs {
        public:
-        Delegate(ConvTemplateTableModel *parent) : parent_(parent) {}
-
-        void emit_() { parent_->layoutChanged(); }
+        explicit Delegate(ConvTemplateTableModel *parent) : parent_(parent) {}
+        void emit_() override { parent_->layoutChanged(); }
 
        private:
         ConvTemplateTableModel *parent_;
@@ -171,12 +170,9 @@ QWidget *newTreeView(QWidget *parent) {
     auto table_view = new QTreeView();
 
     table_view->setAlternatingRowColors(true);
-
     table_view->setStyleSheet(
         "QTreeView {background-color: #D2DCDF; alternate-background-color: #f6fafb; show-decoration-selected: 1;}"
         "QHeaderView::section {background-color: #D2DCDF}");
-
-    std::cerr << table_view->style();
 
     return table_view;
 }
@@ -225,8 +221,14 @@ static int initConvTemplateListWidget(ExtensionManager *manager) {
     if (p_unit != manager->getLastVersionExtensionUint("widget", "conv_template_list")) {
         DEBUG_CERR("cant init (name: " << p_unit->name << ", type: " << p_unit->type << ", ver.:" << p_unit->version
                                        << ") unit, since there is a newer unit.\n");
-    } else
-        ((QAbstractItemView *)p_unit->ptr)->setModel(new ConvTemplateTableModel(manager));
+    } else {
+        auto view = (QAbstractItemView *)p_unit->ptr;
+
+        view->setModel(new ConvTemplateTableModel(manager));
+
+        auto remove_action = new QAction(QObject::tr("&remove_element"));
+        view->addAction(remove_action);
+    }
 
     /*
      *

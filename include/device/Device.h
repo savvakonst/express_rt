@@ -40,7 +40,7 @@ class COMMON_API_ Device : public Module_ifs {
 
     std::vector<Module_ifs *> modules_;
 
-    TASK_HEADER task_header_;
+    TASK_HEADER task_header_{};
 
     size_t size_ = 0;
 

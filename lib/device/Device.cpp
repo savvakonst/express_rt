@@ -1,10 +1,11 @@
 
 #include <regex>
 //
-#include "Device/Device.h"
-#include "Device/ModuleStream_ifs.h"
+#include "device/Device.h"
+#include "device/ModuleStream_ifs.h"
 #include "common/ExtensionManager.h"
 #include "common/StringProcessingTools.h"
+
 // TODO:
 #pragma pack(1)
 struct MODULE_HEADER {
@@ -36,7 +37,7 @@ Device::Device(const void *ptr, size_t size, ExtensionManager *context) {
 
     do {
         char *current_ptr = (char *)ptr + offset;
-        MODULE_HEADER *header = (MODULE_HEADER *)(current_ptr);
+        auto *header = (MODULE_HEADER *)(current_ptr);
 
         auto constructor = (moduleConstructor_f)manager->getLastVersionExtensionObject("module", stringId(header->id));
         Module_ifs *module = constructor(current_ptr, (size_t)header->size, manager);
@@ -69,7 +70,7 @@ std::vector<std::pair<std::string, Module_ifs *>> Device::getModulesFromPath(con
         std::vector<std::string> path_chunks = splitPath(matches[1]);
         std::string terminal = matches[3];
 
-        if (path_chunks.size()) {
+        if (!path_chunks.empty()) {
             error_message_ = "module encapsulation is not supported yet";
             return {};
         }

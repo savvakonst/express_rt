@@ -19,12 +19,9 @@
 #include "common/Extension.h"
 #include "device/Device.h"
 
-bool initWSA();
-
 InitExtension(ExtensionInfo *) initModules(void);
 
 #include <iostream>
-
 #include "common/ExtensionManager.h"
 /*
  *
@@ -53,19 +50,15 @@ TopWindow::~TopWindow() { delete manager_; }
 void TopWindow::initScene() {
     initWSA();
 
-    ExtensionInfo *extension_info = initModules();
-    auto uints = extension_info->units;
-
     manager_ = new ExtensionManager;
 
     std::string error_msg;
 
-    struct sockaddr_in host_addr;
-    host_addr.sin_family = AF_INET;
-    host_addr.sin_addr.s_addr = inet_addr("192.168.001.176");
-    host_addr.sin_port = 0;
+    EthernetAddress addr;
+    addr.ip = inet_addr("192.168.001.176");
+    addr.port = 0;
 
-    auto devices = devicePing(host_addr,error_msg);
+    auto devices = devicePing(addr, error_msg);
 
     if (error_msg.size()) {
         std::cout << error_msg;

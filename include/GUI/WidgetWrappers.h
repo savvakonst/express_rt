@@ -20,6 +20,7 @@ class WidgetWrapper_ifs {
     virtual status addSignal(Signal_ifs *signal) = 0;
 };
 
+
 template <class T>
 class WidgetWrapper : public WidgetWrapper_ifs {
    public:
@@ -39,25 +40,33 @@ class WidgetWrapper : public WidgetWrapper_ifs {
     T *widget_;
 };
 
-template <class T>
-class TreeWidgetWrapper : public WidgetWrapper_ifs {
+template <class T,class ret_T>
+class ListWidgetWrapper : public WidgetWrapper_ifs {
    public:
-    explicit TreeWidgetWrapper(T *widget) : widget_(widget) {}
+    explicit ListWidgetWrapper(T *widget) : widget_(widget) {}
 
-    TreeWidgetWrapper(const TreeWidgetWrapper &) = delete;
+    ListWidgetWrapper(const ListWidgetWrapper &) = delete;
 
-    TreeWidgetWrapper(const TreeWidgetWrapper &&) = delete;
+    ListWidgetWrapper(const ListWidgetWrapper &&) = delete;
 
-    ~TreeWidgetWrapper() override = default;
+    ~ListWidgetWrapper() override = default;
 
     QWidget *getWidget() override { return widget_; }
 
     status addSignal(Signal_ifs *signal) override { return widget_->signal_controller_.addSignal(signal); }
 
-    // virtual void setDataSchema(DataSchema_ifs *ds) { widget_->setDataSchema(ds); }
+    virtual bool setActive(size_t row_index) = 0 ;
+    virtual bool removeFromActive()  = 0 ;
+
+    virtual bool addToSelected(size_t row_index) = 0 ;
+    virtual bool removeFromSelected(size_t row_index) = 0 ;
+
+    virtual ret_T* getActive() = 0;
+    virtual ret_T* getSelected() = 0;
 
    private:
     T *widget_;
 };
+
 
 #endif  // EXRT_WIDGETWRAPPERS_H

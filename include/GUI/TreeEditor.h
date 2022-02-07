@@ -63,7 +63,7 @@ template <class T>
 WidgetWrapper_ifs *newTreeWidgetWrapper(Parameter_ifs *parameter, DataSchema_ifs *data_schema, const std::string &path,
                                         QWidget *parent = nullptr) {
     // std::cerr << path << "\n";
-    return new TreeWidgetWrapper(new T(parameter, data_schema, path, parent));
+    return new WidgetWrapper(new T(parameter, data_schema, path, parent));
 }
 
 // TreeEditor(parent)

@@ -18,7 +18,7 @@ DevicesListModel::DevicesListModel(ExtensionManager *manager) {
         list_of_entries_ = schema_->getMapList();
     }
 
-    unit = manager->getLastVersionExtensionUint("cnv_template_manager", "cnv_template_manager");
+    unit = manager->getLastVersionExtensionUint("device_manager", "device_manager");
     if (unit && unit->ptr) {
         device_manager_ = (DeviceManager *)unit->ptr;
         std::cout << "cnv_manager_ = (ConversionTemplateManager *)unit->ptr;\n";

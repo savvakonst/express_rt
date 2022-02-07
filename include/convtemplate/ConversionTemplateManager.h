@@ -7,8 +7,7 @@
 #include "common/BaseClass_ifs.h"
 #include "common/CustomTypes.h"
 #include "common/DataSchema_ifs.h"
-
-class ConversionTemplate;
+#include "convtemplate/ConversionTemplate.h"
 
 class ConversionTemplateManager : public BaseClass_ifs {
    public:
@@ -23,7 +22,6 @@ class ConversionTemplateManager : public BaseClass_ifs {
         if (index >= vector_.size()) {
             return nullptr;
         }
-
         return vector_[index];
     }
 
@@ -58,4 +56,4 @@ class ConversionTemplateManager : public BaseClass_ifs {
     std::vector<ConversionTemplate*> vector_;
 };
 
-#endif  // EXRT_CONVERSIONTEMPLATEMANAGER_H
+#endif

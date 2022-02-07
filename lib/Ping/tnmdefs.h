@@ -96,7 +96,7 @@ typedef struct _TNMLIB_RECORD_MODULE_INFO {
         uint32_t dwVersionSerial;
     };
 
-    LONG32 iMIBAddress;
+    int32_t iMIBAddress;
     uint32_t uiStatus;
     /*
     #define MSTATUS_VALID_MATCH_ENABLED			0

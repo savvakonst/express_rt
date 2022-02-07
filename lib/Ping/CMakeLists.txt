@@ -13,7 +13,8 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 #SHARED
 add_library(Ping
         ${Sources}
-        ${Headers})
+        ${Headers}
+        )
 
 
 target_include_directories(Ping PUBLIC ..)
