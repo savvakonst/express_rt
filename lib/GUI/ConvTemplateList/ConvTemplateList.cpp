@@ -1,15 +1,14 @@
 
+#include <QDebug>
 #include <QHeaderView>
 #include <QTableView>
-#include "QDebug"
 //
-#include "ConvTemplateList.h"
-#include "GUI/WidgetWrappers.h"
-#include "GUI/TreeEditor.h"
 #include "common/ExtensionManager.h"
 #include "convtemplate/ConversionTemplate.h"
 #include "convtemplate/ConversionTemplateManager.h"
 #include "convtemplate/Parameter_ifs.h"
+//
+#include "ConvTemplateList.h"
 
 ConvTemplateTreeModel::ConvTemplateTreeModel(ExtensionManager *manager) {
     auto unit = manager->getLastVersionExtensionUint("data_schema", "conversion_template");
@@ -124,16 +123,14 @@ ConvTemplateTableModel::ConvTemplateTableModel(ExtensionManager *manager) {
         if (manager_ == nullptr) std::cerr << "ConvTempateTableModel::cnv_manager_ == nullptr;\n";
     }
 
-    class Delegate : public Signal_ifs{
+    class Delegate : public Signal_ifs {
        public:
-        Delegate(ConvTemplateTableModel* parent):parent_(parent){}
+        Delegate(ConvTemplateTableModel *parent) : parent_(parent) {}
 
-        void emit_() {
-            parent_->layoutChanged();
-        }
+        void emit_() { parent_->layoutChanged(); }
 
        private:
-        ConvTemplateTableModel* parent_;
+        ConvTemplateTableModel *parent_;
     };
 
     manager_->addSignal(new Delegate(this));
@@ -164,96 +161,6 @@ QVariant ConvTemplateTableModel::data(const QModelIndex &index, int role) const 
  *
  *
  *
- *
- */
-
-ParameterTableModel::ParameterTableModel(ExtensionManager *manager) {
-    auto unit = manager->getLastVersionExtensionUint("data_schema", "common");
-    if (unit && unit->ptr) {
-        schema_ = (DataSchema_ifs *)unit->ptr;
-        schema_->init(manager);
-        list_of_entries_ = schema_->getMapList();
-    } else {
-        std::cerr << "can't find data_schema;\n";
-    }
-
-
-    parent_view_ = (QAbstractItemView *)manager->getLastVersionExtensionObject("widget", "conv_template_list");
-    if (parent_view_== nullptr)
-        std::cerr << "can't find conv_template_list;\n";
-
-
-    cnv_manager_ =  (ConversionTemplateManager *)manager->getLastVersionExtensionObject("cnv_template_manager", "cnv_template_manager");
-    if (cnv_manager_== nullptr)
-        std::cerr << "can't find cnv_template_manager;\n";
-
-
-
-    auto constructor = (newTreeEditor_t)manager->getLastVersionExtensionObject("tree_editor", "tree_editor");
-    if (constructor== nullptr)
-        std::cerr << "can't find cnv_template_manager;\n";
-    else
-        child_view_ = constructor(manager, nullptr);
-
-
-    connect(parent_view_, &QAbstractItemView::activated, this, &ParameterTableModel::receiveRow);
-    connect(this, &QAbstractItemView::activated,,);
-}
-
-int ParameterTableModel::rowCount(const QModelIndex &parent) const {
-    auto conv_temp = getCurrentConversionTemplate();
-
-    auto ret = conv_temp ? (int)conv_temp->getAllParameters().size() : 0;
-    return ret;
-}
-
-int ParameterTableModel::columnCount(const QModelIndex &parent) const {
-    //
-    return (int)list_of_entries_.size();
-}
-
-QVariant ParameterTableModel::headerData(int section, Qt::Orientation orientation, int role) const {
-    if ((role == Qt::DisplayRole)) {
-        return QString(list_of_entries_[section]->description_.data());
-    }
-    return {};
-}
-
-QVariant ParameterTableModel::data(const QModelIndex &index, int role) const {
-    if (role == Qt::DisplayRole) {
-        auto conv_template = getCurrentConversionTemplate();
-
-        auto &prm_map = conv_template->getAllParameters();
-        auto it = prm_map.begin();
-        std::advance(it, index.row());
-
-        auto name = list_of_entries_[index.column()]->name_;
-        auto h_data = it->second->getProperty("common/" + name);
-
-        return QVariant(h_data->getValue().asString().data());
-    }
-    return {};
-}
-
-ConversionTemplate *ParameterTableModel::getCurrentConversionTemplate() const {
-    auto index = parent_view_->currentIndex();
-
-    if (!index.isValid()) return nullptr;
-
-    while (index.parent().isValid()) index = index.parent();
-
-    return cnv_manager_->getConversionTemplateByIndex((size_t)index.row());
-}
-
-void ParameterTableModel::receiveRow(const QModelIndex &index) {
-    layoutChanged();
-    // emit dataChanged(QModelIndex(), QModelIndex());
-}
-
-/*
- *
- *
- *
  */
 
 #ifndef CONV_TEMPLATE_LIST_LIB_NAME
@@ -262,29 +169,30 @@ void ParameterTableModel::receiveRow(const QModelIndex &index) {
 
 QWidget *newTreeView(QWidget *parent) {
     auto table_view = new QTreeView();
-    /*
-        QHeaderView *vertical_header = table_view->verticalHeader();
 
-        vertical_header->setDefaultSectionSize(vertical_header->minimumSectionSize());  // 20 px height
-        vertical_header->sectionResizeMode(QHeaderView::Fixed);
-        vertical_header->hide();
-    */
-    table_view->setSelectionBehavior(QAbstractItemView::SelectRows);
     table_view->setAlternatingRowColors(true);
 
-    // table_view->setStyleSheet(
-    //     "QHeaderView::section {background-color: #D2DCDF; alternate-background-color: #f6fafb;};");
-
-    table_view->setAutoFillBackground(true);
-    table_view->setBackgroundRole(QPalette().Base);
-    auto p = table_view->palette();
-    p.setColor(table_view->backgroundRole(), QColor("#D2DCDF"));
-    table_view->setPalette(p);
-
     table_view->setStyleSheet(
-        "QHeaderView::section {background-color: #D2DCDF; alternate-background-color: #f6fafb;};");
+        "QTreeView {background-color: #D2DCDF; alternate-background-color: #f6fafb; show-decoration-selected: 1;}"
+        "QHeaderView::section {background-color: #D2DCDF}");
+
+    std::cerr << table_view->style();
+
     return table_view;
 }
+
+/*
+ *
+ *
+ */
+
+QWidget *newParameterTreeView(QWidget *parent);
+int initParameterTreeView(ExtensionManager *manager);
+
+/*
+ *
+ *
+ */
 
 static int initConvTemplateListWidget(ExtensionManager *manager);
 static ExtensionUnit *g_conv_template_list_extension_uint = nullptr;
@@ -301,7 +209,7 @@ InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, CONV_TEMPLATE_LIST_LIB_NA
          "returns widget instance, which provides list of available conversion templates", (newTreeView(nullptr)),
          0x00},
         {"parameter_list", "widget", "returns widget instance, which provides list of available parameters",
-         (newTreeView(nullptr)), 0x00},
+         (newParameterTreeView(nullptr)), 0x00},
         {"conv_template_list", "init", "checks the version and, if it's the latest, initializes the widget.",
          (void *)&initConvTemplateListWidget, 0x00},
         {nullptr, nullptr, nullptr, nullptr, 0}};
@@ -324,15 +232,13 @@ static int initConvTemplateListWidget(ExtensionManager *manager) {
      *
      *
      */
-
     p_unit = search(g_conv_template_list_extension_uint, "widget", "parameter_list");
 
     if (p_unit != manager->getLastVersionExtensionUint("widget", "parameter_list")) {
         DEBUG_CERR("cant init (name: " << p_unit->name << ", type: " << p_unit->type << ", ver.:" << p_unit->version
                                        << ") unit, since there is a newer unit.\n");
-
     } else
-        ((QAbstractItemView *)p_unit->ptr)->setModel(new ParameterTableModel(manager));
+        initParameterTreeView(manager);
 
     return 0;
 }

@@ -5,7 +5,10 @@ set(CONV_TEMPLATE_LIST ConvTemplateList)
 add_library(${CONV_TEMPLATE_LIST} SHARED
         ConvTemplateList.cpp
         ConvTemplateList.h
-
+        ParameterTable.cpp
+        ParameterTable.h
+        #DevicesList.cpp
+        #DevicesList.h
         )
 
 # TODO: remove it

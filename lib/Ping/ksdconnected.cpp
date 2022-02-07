@@ -60,7 +60,7 @@ typedef struct _CBW {
                     // SENDER_MAC:SENDER_IP:SENDER_PORT 5..0 -- currently reserved
     uint16_t reserved;
 
-    CxW_PARAMS params;
+    CxW_Params params;
 } CBW;
 
 typedef struct _CSW {
@@ -69,7 +69,7 @@ typedef struct _CSW {
     uint32_t dataTransferLength;
     uint32_t statusCode;
 
-    CxW_PARAMS params;
+    CxW_Params params;
 } CSW;
 
 typedef struct _DBW {
@@ -155,7 +155,7 @@ bool validateDBW(void *p, int32_t received, uint16_t lun, uint16_t seqID, uint16
     result |= validateProto(&dbw->proto, DATA_BLOCK_WRAPPER_SIGNATURE, lun, seqID, seqCnt);
 
     received -= DATA_BLOCK_WRAPPER_SIZE;
-    if ( int32_t(dbw->dataTransferLength)  > received) result = true;
+    if (int32_t(dbw->dataTransferLength) > received) result = true;
 
     result |= static_cast<bool>(dbw->dataTransferLength - tranferSize);
     result |= static_cast<bool>(dbw->statusCode);
@@ -177,7 +177,7 @@ bool validateDSW(void *p, int32_t received, uint16_t lun, uint16_t seqID, uint16
 }
 //-------------------------------------------------------------------------
 bool KsdConnected::ioSyncGen(uint8_t request, uint8_t flags, void *data, uint32_t transferSize, uint32_t *ptransferred,
-                             CxW_PARAMS *cbw_params, CxW_PARAMS *csw_params, int32_t timeout) {
+                             CxW_Params *cbw_params, CxW_Params *csw_params, int32_t timeout) {
     bool status = 0;
     int32_t transmitted = 0;
     uint32_t max_transfer_size = 1024;
@@ -328,7 +328,7 @@ bool KsdConnected::ioSyncGen(uint8_t request, uint8_t flags, void *data, uint32_
 }
 //-------------------------------------------------------------------------
 bool KsdConnected::ioRequestSync(uint8_t request, uint8_t flags, void *data, uint32_t transferSize,
-                                 uint32_t *ptransfered, CxW_PARAMS *cbw_params, CxW_PARAMS *csw_params,
+                                 uint32_t *ptransfered, CxW_Params *cbw_params, CxW_Params *csw_params,
                                  int32_t timeout) {
     bool status = ioSyncGen(request, flags, data, transferSize, ptransfered, cbw_params, csw_params, timeout);
 
@@ -337,103 +337,103 @@ bool KsdConnected::ioRequestSync(uint8_t request, uint8_t flags, void *data, uin
     return status;
 }
 //-------------------------------------------------------------------------
-uint32_t KsdConnected::MIB_MakeCommand(const uint8_t request, const uint8_t addr, uint16_t length) {
+uint32_t KsdConnected::mibMakeCommand(const uint8_t request, const uint8_t address, uint16_t length) {
     uint32_t command = 0;
     command |= (uint32_t(request) << 24);
-    command |= (uint32_t(addr) << 16);
+    command |= (uint32_t(address) << 16);
     command |= uint32_t(length);
 
     return command;
 }
 //-------------------------------------------------------------------------
-bool KsdConnected::MIB_Exec(const uint8_t request, const uint8_t addr, uint16_t length) {
-    CxW_PARAMS cbw_params;
+bool KsdConnected::mibExec(const uint8_t request, const uint8_t address, uint16_t length) {
+    CxW_Params cbw_params;
     memset(&cbw_params, 0, sizeof(cbw_params));
 
-    cbw_params.u32[0] = MIB_MakeCommand(request, addr, length);
+    cbw_params.u32[0] = mibMakeCommand(request, address, length);
 
     uint32_t transferred = 0;
     bool status = ioRequestSync(request::MIB_EXT_EXECUTE, 0x00, NULL, 0, &transferred, &cbw_params, nullptr, TIMEOUT);
 
-    if (status) setError("Error: MIB_Exec()");
+    if (status) setError("Error: mibExec()");
 
     return status;
 }
 //-------------------------------------------------------------------------
-bool KsdConnected::MIB_ReadBuffer(void *data, int32_t size, int32_t *ptransferred) {
+bool KsdConnected::mibReadBuffer(void *data, int32_t size, int32_t *p_transferred) {
     uint32_t transferred = 0;
     bool status = ioRequestSync(request::MIB_EXT_RWBUFFER, 0x80 /*host read*/, data, size, &transferred, nullptr,
                                 nullptr, TIMEOUT);
 
-    if (ptransferred != NULL) *ptransferred = transferred;
+    if (p_transferred != NULL) *p_transferred = transferred;
     else
         status |= static_cast<bool>(size - transferred);
 
-    if (status) setError("Error: MIB_ReadBuffer()");
+    if (status) setError("Error: mibReadBuffer()");
 
     return status;
 }
 //-------------------------------------------------------------------------
-bool KsdConnected::MIB_WriteBuffer(void *data, int32_t size, int32_t *ptransferred) {
+bool KsdConnected::mibWriteBuffer(void *data, int32_t size, int32_t *p_transferred) {
     uint32_t transferred = 0;
     bool status = ioRequestSync(request::MIB_EXT_RWBUFFER, 0x00, data, size, &transferred, nullptr, nullptr, TIMEOUT);
 
-    if (ptransferred != NULL) *ptransferred = transferred;
+    if (p_transferred != NULL) *p_transferred = transferred;
     else
         status |= static_cast<bool>(size - transferred);
 
-    if (status) setError("Error: MIB_WriteBuffer()");
+    if (status) setError("Error: mibWriteBuffer()");
 
     return status;
 }
 //-------------------------------------------------------------------------
-bool KsdConnected::MIB_ExecRead(const uint8_t request, const uint8_t addr, uint16_t length, void *data, int32_t size,
-                                int32_t *ptransferred) {
-    bool status = MIB_Exec(request, addr, length);
+bool KsdConnected::mibExecRead(const uint8_t request, const uint8_t addr, uint16_t length, void *data, int32_t size,
+                               int32_t *p_transferred) {
+    bool status = mibExec(request, addr, length);
 
-    if (!status) status = MIB_ReadBuffer(data, size, ptransferred);
+    if (!status) status = mibReadBuffer(data, size, p_transferred);
     else
-        setError("Error: MIB_ExecRead()");
+        setError("Error: mibExecRead()");
 
     return status;
 }
 //-------------------------------------------------------------------------
-bool KsdConnected::MIB_WriteExec(const uint8_t request, const uint8_t addr, uint16_t length, void *data, int32_t size,
-                                 int32_t *ptransferred) {
-    bool status = MIB_WriteBuffer(data, size, ptransferred);
-    if (!status) status = MIB_Exec(request, addr, length);
+bool KsdConnected::mibWriteExec(const uint8_t request, const uint8_t addr, uint16_t length, void *data, int32_t size,
+                                int32_t *p_transferred) {
+    bool status = mibWriteBuffer(data, size, p_transferred);
+    if (!status) status = mibExec(request, addr, length);
     else
-        setError("Error: MIB_WriteExec()");
+        setError("Error: mibWriteExec()");
     return (status);
 }
 //-------------------------------------------------------------------------
-bool KsdConnected::MIB_GetID(const uint8_t addr, MODULE_IDENT *mid) {
-    bool status = MIB_ExecRead(request::MIB_GET_ID, addr, sizeof(*mid), mid, sizeof(*mid), nullptr);
-    if (status) setError("Error: MIB_GetID()");
+bool KsdConnected::mibGetId(const uint8_t address, ModuleIdent *mid) {
+    bool status = mibExecRead(request::MIB_GET_ID, address, sizeof(*mid), mid, sizeof(*mid), nullptr);
+    if (status) setError("Error: mibGetId()");
     return status;
 }
 //-------------------------------------------------------------------------
-bool KsdConnected::MIB_GetSTATUS(const uint8_t addr, MODULE_STATUS *mst) {
-    bool status = MIB_ExecRead(request::MIB_GET_STATUS, addr, sizeof(*mst), mst, sizeof(*mst), nullptr);
-    if (status) setError("Error: MIB_GetSTATUS()");
+bool KsdConnected::mibGetStatus(const uint8_t address, ModuleStatus *mst) {
+    bool status = mibExecRead(request::MIB_GET_STATUS, address, sizeof(*mst), mst, sizeof(*mst), nullptr);
+    if (status) setError("Error: mibGetStatus()");
     return status;
 }
 //-------------------------------------------------------------------------
-bool KsdConnected::MIB_GetTASK(const uint8_t addr, void *p, uint32_t size) {
-    bool status = MIB_ExecRead(request::MIB_GET_TASK, addr, size, p, size, nullptr);
-    if (status) setError("Error: MIB_GetTASK()");
+bool KsdConnected::mibGetTask(const uint8_t address, void *p, uint32_t size) {
+    bool status = mibExecRead(request::MIB_GET_TASK, address, size, p, size, nullptr);
+    if (status) setError("Error: mibGetTask()");
     return status;
 }
 //-------------------------------------------------------------------------
-bool KsdConnected::MIB_SetTASK(uint8_t addr, void *p, uint16_t size) {
-    bool status = MIB_WriteExec(request::MIB_SET_TASK, addr, size, p, size, nullptr);
-    if (status) setError("Error: MIB_SetTASK()");
+bool KsdConnected::mibSetTask(const uint8_t address, void *p, uint16_t size) {
+    bool status = mibWriteExec(request::MIB_SET_TASK, address, size, p, size, nullptr);
+    if (status) setError("Error: mibSetTask()");
     return status;
 }
 
 //-------------------------------------------------------------------------
 bool KsdConnected::readRecordModulesMap(void *p, uint32_t offset, uint32_t size, uint32_t &transferred) {
-    CxW_PARAMS cbw_params;
+    CxW_Params cbw_params;
     cbw_params.u32[0] = offset;
 
     bool status =
@@ -445,7 +445,7 @@ bool KsdConnected::readRecordModulesMap(void *p, uint32_t offset, uint32_t size,
 //-------------------------------------------------------------------------
 bool KsdConnected::readTaskMemory(void *p, uint32_t offset, uint32_t size, uint32_t &transferred) {
     // uint32_t    tres    = 0;
-    CxW_PARAMS cbw_params;
+    CxW_Params cbw_params;
     cbw_params.u32[0] = offset;
 
     bool status =
@@ -471,14 +471,14 @@ bool KsdConnected::ask() {
             reinterpret_cast<TNMLIB_RECORD_MODULES_MAP *>(record_modules_map_buffer_.data());
 
         for (int j = 0; j < TNMLIB_CFG_MAX_MODULES_ENTRIES; j++) {
-            MODULE_INFO *udpMI = reinterpret_cast<MODULE_INFO *>(&record_modules_map_.MI[j]);
+            ModuleInfo *udpMI = reinterpret_cast<ModuleInfo *>(&record_modules_map_.module_info[j]);
             TNMLIB_RECORD_MODULE_INFO *ksdMI = reinterpret_cast<TNMLIB_RECORD_MODULE_INFO *>(&ksdRMM->MI[j]);
 
-            ksdMI->dwModuleID = udpMI->mid.u32ID;
-            ksdMI->wSerialNumber = udpMI->mid.u16SerialNumber;
-            ksdMI->wVersion = udpMI->mid.u16Version;
-            ksdMI->iMIBAddress = udpMI->i8MIBAddr;
-            ksdMI->uiStatus = udpMI->u8Status;
+            ksdMI->dwModuleID = udpMI->mid.id;
+            ksdMI->wSerialNumber = udpMI->mid.serial_number;
+            ksdMI->wVersion = udpMI->mid.version;
+            ksdMI->iMIBAddress = udpMI->mib_addr;
+            ksdMI->uiStatus = udpMI->status;
         }
 
         uint32_t task_size;
@@ -571,12 +571,23 @@ std::list<KsdConnected *> devicePing(std::string &error_msg) {
     }
 
     // Bind
+
+    // status = ::bind(sock_, (const sockaddr *)&dst_address_, sizeof(dst_address_));
+
     struct sockaddr_in sa_ping;
     memset(&sa_ping, 0, sizeof(sa_ping));
 
     sa_ping.sin_family = AF_INET;
     sa_ping.sin_addr.s_addr = INADDR_BROADCAST;
     sa_ping.sin_port = htons(DEFAULT_PORT);
+
+    // TODO:
+    struct sockaddr_in host_addr;
+    host_addr.sin_family = AF_INET;
+    host_addr.sin_addr.s_addr = inet_addr("192.168.001.176");
+    host_addr.sin_port = 0;
+
+    bind(ping_socket, (SOCKADDR *)&host_addr, sizeof(host_addr));
 
     do {
         uint16_t sequence_cnt = 0;
@@ -605,7 +616,7 @@ std::list<KsdConnected *> devicePing(std::string &error_msg) {
         do {
             int received = recvfrom(ping_socket, buffer, MAX_INPUT_BUFFER_SIZE, 0, &sa_from, &from_len);
             if (received == SOCKET_ERROR) {
-                //setError(error_msg, format("Error: recvfrom(). wsa_error_code = 0x%04X",  WSAGetLastError()) );
+                // setError(error_msg, format("Error: recvfrom(). wsa_error_code = 0x%04X",  WSAGetLastError()) );
                 break;
             }
 
@@ -655,7 +666,6 @@ std::list<KsdConnected *> devicePing(std::string &error_msg) {
         if (!devices.size()) {
             setError(error_msg, "Устройств не обнаружено.");
         }
-
     } while (false);
 
     status = closesocket(ping_socket);

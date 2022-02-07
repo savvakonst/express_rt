@@ -1,7 +1,7 @@
 
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef EXRT_MAINWINDOW_H
+#define EXRT_MAINWINDOW_H
 
 #include <QGraphicsScene>
 #include <QMainWindow>
@@ -65,4 +65,4 @@ class GraphicsScene : public QGraphicsScene {
     void keyPressEvent(QKeyEvent* event) override;
 };
 
-#endif  // MAINWINDOW_H
+#endif  // EXRT_MAINWINDOW_H

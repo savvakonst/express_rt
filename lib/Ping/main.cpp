@@ -2,15 +2,12 @@
 
 #include <stdio.h>
 
-#include <fstream>
-#include <iostream>
 #include <list>
 #include <string>
 
 #include "Device/Device.h"
 #include "Receiver/Receiver.h"
 #include "common/extension.h"
-#include "ksdconnected.h"
 
 bool initWSA() {
     WSADATA wsa;
@@ -49,31 +46,3 @@ class DeviceBuildingContext : public DeviceBuildingContext_ifs {
 };
 
 InitExtension(ExtensionInfo *) initModules(void);
-/*
-int main(int argc, char *argv[]) {
-    initWSA();
-
-    ExtensionInfo *extension_info = initModules();
-    auto units = extension_info->units;
-
-    DeviceBuildingContext building_context;
-
-    while (units->name) {
-        building_context.addUint(units++);
-    }
-
-    std::string error_msg;
-    auto devices = devicePing(error_msg);
-    auto v = devices.front()->getTask();
-
-    Device device = Device(v.data(), v.size(), &building_context);
-
-    if (device.hasError()) std::cout << "error: " << device.getErrorMessage() + "\n";
-    if (device.hasTransceiver()) {
-        ModuleStream_ifs *m_stream = device.getTopModule()->createModuleStream();
-        Receiver receiver = Receiver(m_stream, device.getSrcAddress());
-        receiver.start();
-    }
-    return 0;
-}
- */

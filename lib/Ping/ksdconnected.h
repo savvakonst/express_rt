@@ -1,5 +1,5 @@
-﻿#ifndef QKSDCONNECTED_H
-#define QKSDCONNECTED_H
+﻿#ifndef EXRT_KSDCONNECTED_H
+#define EXRT_KSDCONNECTED_H
 
 #include <winsock2.h>
 
@@ -10,7 +10,7 @@
 
 #include "tnmdefs.h"
 
-typedef union _MODULE_ADDRESS {
+union ModuleAddress {
     uint32_t address;
     struct {
         uint8_t sub;
@@ -19,36 +19,36 @@ typedef union _MODULE_ADDRESS {
         uint8_t block;
     };
 
-    bool operator==(const _MODULE_ADDRESS &ref) const { return address == ref.address; }
-} MODULE_ADDRESS;
+    bool operator==(const ModuleAddress &ref) const { return address == ref.address; }
+};
 
 #pragma pack(push, 1)
 
-typedef struct _MODULE_IDENT {
-    uint32_t u32ID;
-    uint16_t u16Version;
-    uint16_t u16SerialNumber;
-} MODULE_IDENT;
+struct ModuleIdent {
+    uint32_t id;
+    uint16_t version;
+    uint16_t serial_number;
+};
 
-typedef struct _MODULE_STATUS {
+struct ModuleStatus {
     uint32_t command;
     uint32_t status;
-} MODULE_STATUS;
+};
 
-typedef struct _MODULE_INFO {
-    MODULE_IDENT mid;
-    int8_t i8MIBAddr;
-    uint8_t u8Status;
-    uint16_t u16TaskOffset;
-} MODULE_INFO;
+struct ModuleInfo {
+    ModuleIdent mid;
+    int8_t mib_addr;
+    uint8_t status;
+    uint16_t task_offset;
+};
 
-typedef struct _UDP_RECORD_MODULES_MAP {
-    MODULE_INFO MI[16];
-} UDP_RECORD_MODULES_MAP;
+struct UdpRecordModulesMap {
+    ModuleInfo module_info[16];
+};
 
-typedef struct _CxW_PARAMS {
+struct CxW_Params {
     uint32_t u32[12];
-} CxW_PARAMS;
+};
 
 #pragma pack(pop)
 
@@ -60,20 +60,20 @@ class KsdConnected {
     explicit KsdConnected(const int index, uint16_t lun, sockaddr candidate_sockaddr, SOCKET socket);
     ~KsdConnected();
 
-    uint32_t MIB_MakeCommand(const uint8_t request, const uint8_t address, uint16_t length);
-    bool MIB_Exec(const uint8_t request, const uint8_t address, uint16_t length);
-    bool MIB_ReadBuffer(void *data, int32_t size, int32_t *p_transferred);
-    bool MIB_WriteBuffer(void *data, int32_t size, int32_t *p_transferred);
+    uint32_t mibMakeCommand(const uint8_t request, const uint8_t address, uint16_t length);
+    bool mibExec(const uint8_t request, const uint8_t address, uint16_t length);
+    bool mibReadBuffer(void *data, int32_t size, int32_t *p_transferred);
+    bool mibWriteBuffer(void *data, int32_t size, int32_t *p_transferred);
 
-    bool MIB_ExecRead(const uint8_t request, const uint8_t addr, uint16_t length, void *data, int32_t size,
+    bool mibExecRead(const uint8_t request, const uint8_t addr, uint16_t length, void *data, int32_t size,
+                     int32_t *p_transferred);
+    bool mibWriteExec(const uint8_t request, const uint8_t addr, uint16_t length, void *data, int32_t size,
                       int32_t *p_transferred);
-    bool MIB_WriteExec(const uint8_t request, const uint8_t addr, uint16_t length, void *data, int32_t size,
-                       int32_t *p_transferred);
 
-    bool MIB_GetID(const uint8_t address, MODULE_IDENT *mid);
-    bool MIB_GetSTATUS(const uint8_t address, MODULE_STATUS *mst);
-    bool MIB_GetTASK(const uint8_t address, void *p, uint32_t size);
-    bool MIB_SetTASK(const uint8_t address, void *p, uint16_t size);
+    bool mibGetId(const uint8_t address, ModuleIdent *mid);
+    bool mibGetStatus(const uint8_t address, ModuleStatus *mst);
+    bool mibGetTask(const uint8_t address, void *p, uint32_t size);
+    bool mibSetTask(const uint8_t address, void *p, uint16_t size);
 
     bool readRecordModulesMap(void *p, uint32_t offset, uint32_t size, uint32_t &transferred);
     bool readTaskMemory(void *p, uint32_t offset, uint32_t size, uint32_t &transferred);
@@ -89,11 +89,11 @@ class KsdConnected {
 
    private:
     bool ioSyncGen(uint8_t request, uint8_t flags, void *data, uint32_t transferSize, uint32_t *ptransferred,
-                   CxW_PARAMS *cbw_params, CxW_PARAMS *csw_params, int32_t timeout);
+                   CxW_Params *cbw_params, CxW_Params *csw_params, int32_t timeout);
     bool ioRequestSync(uint8_t request, uint8_t flags, void *data, uint32_t transferSize, uint32_t *ptransfered,
-                       CxW_PARAMS *cbw_params, CxW_PARAMS *csw_params, int32_t timeout);
+                       CxW_Params *cbw_params, CxW_Params *csw_params, int32_t timeout);
 
-    MODULE_ADDRESS module_address_;
+    ModuleAddress module_address_;
 
     SOCKET socket_;
     sockaddr sockaddr_;
@@ -101,7 +101,7 @@ class KsdConnected {
     uint16_t lun_;
     uint32_t device_id_;
 
-    UDP_RECORD_MODULES_MAP record_modules_map_;
+    UdpRecordModulesMap record_modules_map_;
 
     std::vector<char> task_buffer_;
     std::vector<char> record_modules_map_buffer_;
@@ -116,4 +116,4 @@ class KsdConnected {
 
 std::list<KsdConnected *> devicePing(std::string &error_msg);
 
-#endif  // QKSDCONNECTED_H
+#endif  // EXRT_KSDCONNECTED_H

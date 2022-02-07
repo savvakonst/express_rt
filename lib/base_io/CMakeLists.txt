@@ -24,6 +24,7 @@ FetchContent_Declare( # TODO: need to set up a source code destination directory
         GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
         GIT_TAG origin/master #/yaml-cpp-0.7.0
         )
+
 FetchContent_MakeAvailable(yaml_cpp)
 
 
@@ -31,7 +32,8 @@ target_link_libraries(DefaultBaseIO PRIVATE yaml-cpp)
 target_link_libraries(DefaultBaseIO PUBLIC CommonLib)
 
 set_target_properties(DefaultBaseIO PROPERTIES CXX_STANDARD_REQUIRED ON OUTPUT_NAME DefaultBaseIO)
-
+#target_compile_definitions(DefaultBaseIO PRIVATE YAML_CPP_DLL)
+#define YAML_CPP_DLL
 
 
 

@@ -18,7 +18,6 @@ add_library(CommonLib SHARED
         convtemplate/ConversionTemplate.cpp
         convtemplate/ParameterFieldTree.cpp
         convtemplate/StandardParameter_ifs.cpp
-        #../include/convtemplate/ConversionTemplateManager.h
         )
 
 
@@ -26,7 +25,7 @@ target_include_directories(CommonLib PUBLIC ../include)
 target_compile_definitions(CommonLib PUBLIC DEBUG_)
 target_compile_definitions(CommonLib PRIVATE COMMON_CREATE_SHARED_LIBRARY)
 
-add_subdirectory(baseio)
+add_subdirectory(base_io)
 add_subdirectory(modules)
 add_subdirectory(bindings)
 
@@ -35,4 +34,5 @@ add_subdirectory("Reader")
 add_subdirectory("ReaderExample")
 add_subdirectory("Receiver")
 add_subdirectory("Ping")
+#add_subdirectory("getAdapters")
 add_subdirectory("GUI")

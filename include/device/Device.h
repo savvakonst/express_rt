@@ -27,7 +27,7 @@ class COMMON_API_ DeviceBuildingContext_ifs {
 
 // TODO: i think it will be better to inherit this class from Module_ifs
 //  and use task mapper.it needs change name TaskMapper to PackedStructMapper.
-//  and i think it is possiple to remove all task structures by replacing them with PackedStructMapper
+//  and i think it is possible to remove all task structures by replacing them with PackedStructMapper
 
 class COMMON_API_ Device : public BaseClass_ifs {
    private:
@@ -69,6 +69,8 @@ class COMMON_API_ Device : public BaseClass_ifs {
         if (modules_.size()) return modules_.front();
         return nullptr;
     }
+
+
 
     [[maybe_unused]] exo_container<const Module_ifs *> getAllModules();
 

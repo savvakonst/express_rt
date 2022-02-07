@@ -23,9 +23,11 @@ class QTreeWidgetItem;
 
 class TreeEditor : public QTreeWidget {
    public:
-    explicit TreeEditor(ExtensionManager *manager, QWidget *parent = nullptr);
+    explicit TreeEditor(QWidget *parent = nullptr);
 
     virtual void setupProperties(Parameter_ifs *parameter);
+
+    void addExtensionUint(ExtensionManager *manager);
 
    private:
     void addProperty(DataSchema_ifs *ds, QTreeWidgetItem *parent_item = nullptr, const std::string &path = "");
@@ -40,8 +42,6 @@ class TreeEditor : public QTreeWidget {
     };
 
    protected:
-    void addExtensionUint(ExtensionManager *);
-
    private:
     typedef WidgetWrapper_ifs *(*treeWidgetWrapperConstructor)(Parameter_ifs *, DataSchema_ifs *, const std::string &,
                                                                QWidget *);
@@ -62,7 +62,7 @@ class TreeEditor : public QTreeWidget {
 template <class T>
 WidgetWrapper_ifs *newTreeWidgetWrapper(Parameter_ifs *parameter, DataSchema_ifs *data_schema, const std::string &path,
                                         QWidget *parent = nullptr) {
-    std::cerr << path << "\n";
+    // std::cerr << path << "\n";
     return new TreeWidgetWrapper(new T(parameter, data_schema, path, parent));
 }
 

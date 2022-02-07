@@ -14,10 +14,7 @@
 #include "TreeTextEdit.h"
 #include "common/ExtensionManager.h"
 
-TreeEditor::TreeEditor(ExtensionManager *manager, QWidget *parent) : QTreeWidget(parent), update_signal_(this) {
-
-
-
+TreeEditor::TreeEditor(QWidget *parent) : QTreeWidget(parent), update_signal_(this) {
     this->setAutoFillBackground(true);
     this->setBackgroundRole(QPalette().Base);
     auto p = this->palette();
@@ -32,11 +29,10 @@ TreeEditor::TreeEditor(ExtensionManager *manager, QWidget *parent) : QTreeWidget
     );
 
     this->setAlternatingRowColors(true);
-
-    addExtensionUint(manager);
 }
 
 void TreeEditor::setupProperties(Parameter_ifs *parameter) {
+    clear();
     const DataSchema_ifs *ds = parameter->getPropertySchema();
     parameter_ = parameter;
 
@@ -128,6 +124,10 @@ void TreeEditor::addExtensionUint(ExtensionManager *manager) {
  *
  *
  */
+#ifdef DEBUG_
+#    include <QDebug>
+#endif
+
 class TreeCheckBox : public QCheckBox {
    public:
     explicit TreeCheckBox(Parameter_ifs *parameter, DataSchema_ifs *data_schema, const std::string &path,
@@ -140,6 +140,7 @@ class TreeCheckBox : public QCheckBox {
         setToolTip(data_schema_->help_.c_str());
         initSettings();
     }
+
 
     BaseSignalController signal_controller_;
 
@@ -171,6 +172,7 @@ class TreeLineEdit : public QLineEdit {
     }
 
     BaseSignalController signal_controller_;
+
 
    private:
     void initSettings() {}
@@ -235,10 +237,24 @@ class TreeComboBox : public QComboBox {
 #    error "TREE_EDITOR_LIB_NAME undefined"
 #endif
 
-QWidget *newTreeEditor(ExtensionManager *manager, QWidget *parent) { return new TreeEditor(manager, parent); }
+QWidget *newTreeEditor(QWidget *parent) { return new TreeEditor(parent); }
 
 static ExtensionUnit *g_tree_widget_extension_uint;
 static ExtensionInfo g_tree_widget_extension_info;
+
+static int initTreeEditor_(ExtensionManager *manager) {
+    auto p_unit = search(g_tree_widget_extension_uint, "tree_editor", "tree_editor");
+
+    if (p_unit != manager->getLastVersionExtensionUint("tree_editor", "tree_editor")) {
+        DEBUG_CERR("cant init (name: " << p_unit->name << ", type: " << p_unit->type << ", ver.:" << p_unit->version
+                                       << ") unit, since there is a newer unit.\n");
+        return 1;
+    }
+
+    auto tree = (TreeEditor *)p_unit->ptr;
+    if (tree) tree->addExtensionUint(manager);
+    return 0;
+}
 
 InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, TREE_EDITOR_LIB_NAME)(void) {
     if (QCoreApplication::instance() == nullptr) return nullptr;
@@ -255,7 +271,8 @@ InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, TREE_EDITOR_LIB_NAME)(voi
          0x00},
         {"enum", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeComboBox>,
          0x00},
-        {"tree_editor", "tree_editor", "", (void *)newTreeEditor, 0x00},
+        {"tree_editor", "tree_editor", "", (void *)newTreeEditor(nullptr), 0x00},
+        {"tree_editor", "init", "", (void *)&initTreeEditor_, 0x00},
         {nullptr, nullptr, nullptr, nullptr, 0}};
 
     g_tree_widget_extension_info = {"tree_widget_extension", 0x01, g_tree_widget_extension_uint};

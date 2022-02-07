@@ -4,31 +4,33 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <source>&lt;i&gt;Choose a menu option, or right-click to invoke a context menu&lt;/i&gt;</source>
+        <location filename="mainwindow.cpp" line="40"/>
+        <source>&amp;File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;File</source>
-        <translation type="unfinished">Файл</translation>
-    </message>
-    <message>
+        <location filename="mainwindow.cpp" line="46"/>
         <source>&amp;Create a new file</source>
-        <translation type="unfinished">Создать новый файл</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="mainwindow.cpp" line="52"/>
         <source>&amp;Dock Widgets</source>
-        <translation type="unfinished">Express real time</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="mainwindow.cpp" line="63"/>
+        <location filename="mainwindow.cpp" line="64"/>
         <source>&amp;parameter properties</source>
-        <translation type="unfinished">cвойства параметра</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
+        <location filename="mainwindow.cpp" line="16"/>
         <source>&amp;Open</source>
-        <translation type="unfinished">Открыть</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

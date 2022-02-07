@@ -13,36 +13,32 @@ class ConversionTemplate;
 class ConversionTemplateManager : public BaseClass_ifs {
    public:
     void addConversionTemplate(ConversionTemplate* conversion_template) {
-        list_.push_back(conversion_template);
+        vector_.push_back(conversion_template);
         emit_();
     }
 
-    [[nodiscard]] size_t getEntriesNumber() const { return list_.size(); }
+    [[nodiscard]] size_t getEntriesNumber() const { return vector_.size(); }
 
     ConversionTemplate* getConversionTemplateByIndex(size_t index) {
-        if (index >= list_.size()) {
+        if (index >= vector_.size()) {
             return nullptr;
         }
-        auto it = list_.begin();
-        std::advance(it, index);
-        return *it;
+
+        return vector_[index];
     }
 
     bool removeConversionTemplateByIndex(size_t index) {
-        if (index >= list_.size()) {
+        if (index >= vector_.size()) {
             error_message_ = "index is out of range";
             return false;
         }
-
-        auto it = list_.begin();
-        std::advance(it, index);
-        ConversionTemplate* conversion_template = *it;
-        return removeConversionTemplate(conversion_template);
+        vector_.erase(vector_.begin() + index);
+        return true;
     }
 
     size_t getIndex(ConversionTemplate* ptr) {
         size_t index = 0;
-        for (auto i : list_) {
+        for (auto i : vector_) {
             if (i == ptr) return index;
             index++;
         }
@@ -51,15 +47,15 @@ class ConversionTemplateManager : public BaseClass_ifs {
 
     bool removeConversionTemplate(ConversionTemplate* conversion_template) {
         if (conversion_template == nullptr) return false;
-        list_.remove(conversion_template);
+        auto new_end = remove(vector_.begin(), vector_.end(), conversion_template);
         delete conversion_template;
         emit_();
     }
 
-    [[nodiscard]] const std::list<ConversionTemplate*>& getConversionTemplateList() const { return list_; }
+    [[nodiscard]] const std::vector<ConversionTemplate*>& getConversionTemplateList() const { return vector_; }
 
    private:
-    std::list<ConversionTemplate*> list_;
+    std::vector<ConversionTemplate*> vector_;
 };
 
 #endif  // EXRT_CONVERSIONTEMPLATEMANAGER_H

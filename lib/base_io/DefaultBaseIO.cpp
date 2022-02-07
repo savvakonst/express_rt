@@ -129,7 +129,7 @@ ConversionTemplate *DefaultBaseIO::readOrParseDocument(ExtensionManager *manager
         YAML::Node doc = is_file ? YAML::LoadFile(source_path) : YAML::Load(str);
 
         if (!doc.IsMap()) {
-            error_message_ = "invalid structure\n";
+            error_message_ = "invalid structure.\n";
             return nullptr;
         }
 

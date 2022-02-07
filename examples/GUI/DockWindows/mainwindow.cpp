@@ -1,12 +1,6 @@
 
 #include <QtWidgets>
-#if defined(QT_PRINTSUPPORT_LIB)
-#    include <QtPrintSupport/qtprintsupportglobal.h>
-#    if QT_CONFIG(printdialog)
-#        include <QtPrintSupport>
-#    endif
-#endif
-
+//
 #include "GUI/TreeEditor.h"
 #include "common/ExtensionManager.h"
 #include "common/IO_ifs.h"
@@ -40,15 +34,8 @@ class OpenAction : public QAction {
 };
 
 MainWindow::MainWindow(ExtensionManager *ctm) : text_edit_(new QTextEdit), manager_(ctm) {
-    // etStyle("windows");QWindowsVistaStyle
-    qDebug() << QStyleFactory::keys();
     QApplication::setStyle(QStyleFactory::create("Fusion"));
     setCentralWidget(text_edit_);
-
-    auto infoLabel =
-        new QLabel(tr("<i>Choose a menu option, or right-click to "
-                      "invoke a context menu</i>"));
-    infoLabel->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
 
     auto file_menu = menuBar()->addMenu(tr("&File"));
 
@@ -75,27 +62,15 @@ void MainWindow::createDockWindows() {
 
     dock = new QDockWidget(tr("&parameter properties"), this);
     dock->setObjectName(tr("&parameter properties"));
-    auto constructor = (newTreeEditor_t)manager_->getLastVersionExtensionUint("tree_editor", "tree_editor")->ptr;
-    // auto ds = (DataSchema_ifs *)ctm_->getLastVersionExtensionUint("data_schema", "ethernet_udp")->ptr;
-
-    typedef Parameter_ifs *(*create_parameter_t)(ExtensionManager * manager);
-    auto prmConstructor = (create_parameter_t)(manager_->getLastVersionExtensionUint("parameter", "EthernetUdp")->ptr);
-    auto prm = prmConstructor(manager_);
-
-    qDebug() << toString(prm->getProperty(""), "").c_str();
-
-    TreeEditor *top = constructor(manager_, nullptr);
-    top->setupProperties(prm);
+    TreeEditor *top = (TreeEditor *)manager_->getLastVersionExtensionUint("tree_editor", "tree_editor")->ptr;
 
     dock->setWidget(top);
-
     addDockWidget(Qt::RightDockWidgetArea, dock);
 
     this->resize(750, 600 * 2);
     top->setMinimumHeight(600);
     top->setMinimumWidth(300);
     top->setColumnWidth(0, 250);
-    // dock->swtMinimumSizeHint(250, 900);
     /*
      *
      */
@@ -113,13 +88,6 @@ void MainWindow::createDockWindows() {
     QSettings settings("MyCompany", "MyApp");
     restoreGeometry(settings.value("geometry").toByteArray());
     restoreState(settings.value("windowState").toByteArray());
-    // qDebug() << saveState().data();
-
-    // qDebug() << settings.group();
-    //  QMainWindow::closeEvent(event);
-    /*
-     *
-     */
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {

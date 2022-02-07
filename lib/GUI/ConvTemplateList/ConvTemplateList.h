@@ -16,21 +16,6 @@ class BaseSignalController;
 
 class TreeEditor;
 
-class TreeView : public QTreeView {
-    Q_OBJECT
-   public:
-    explicit TreeView(QWidget *parent = nullptr) : QTreeView(parent) {}
-    void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
-                     const QVector<int> &roles = QVector<int>()) override {
-        QTreeView::dataChanged(topLeft, bottomRight, roles);
-        repaint();
-    }
-    // repaint
-    BaseSignalController signal_controller_;
-
-   private:
-};
-
 /*
  *
  *
@@ -81,39 +66,6 @@ class ConvTemplateTableModel : public QAbstractTableModel {
     std::vector<DataSchema_ifs *> list_of_entries_;
     DataSchema_ifs *schema_ = nullptr;
     ConversionTemplateManager *manager_ = nullptr;
-};
-
-/*
- *
- *
- */
-class ConversionTemplate;
-class QAbstractItemView;
-
-class ParameterTableModel : public QAbstractTableModel {
-    Q_OBJECT
-   public:
-    explicit ParameterTableModel(ExtensionManager *manager);
-
-    [[nodiscard]] int rowCount(const QModelIndex &parent) const override;
-
-    [[nodiscard]] int columnCount(const QModelIndex &parent) const override;
-
-    [[nodiscard]] QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-
-    [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
-
-   public slots:
-    void receiveRow(const QModelIndex &index);
-
-   protected:
-    ConversionTemplate *getCurrentConversionTemplate() const;
-
-    std::vector<DataSchema_ifs *> list_of_entries_;
-    DataSchema_ifs *schema_ = nullptr;
-    QAbstractItemView *parent_view_ = nullptr;
-    TreeEditor *child_view_ = nullptr;
-    ConversionTemplateManager *cnv_manager_ = nullptr;
 };
 
 #endif  // EXRT_TABLEMODEL_H
