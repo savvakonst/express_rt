@@ -35,7 +35,7 @@ std::string Module_A09_::getPropertyAsTxt(const std::string& prop_path) const {
     return KSDModule::getPropertyAsTxt(prop_path);
 }
 
-bool Module_A09_::setProperty(const std::string& prop_path, Value value) {
+bool Module_A09_::setProperty(const std::string& prop_path, const Value& value) {
     return KSDModule::setProperty(prop_path, value);
 }
 bool Module_A09_::setPropertyAsTxt(const std::string& prop_path, const std::string& value) {

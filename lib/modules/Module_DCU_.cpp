@@ -68,7 +68,7 @@ std::string Module_DCU_::getPropertyAsTxt(const std::string &prop_path) const {
     return KSDModule::getPropertyAsTxt(prop_path);
 }
 
-bool Module_DCU_::setProperty(const std::string &prop_path, Value value) {
+bool Module_DCU_::setProperty(const std::string &prop_path, const Value &value) {
     return KSDModule::setProperty(prop_path, value);
 }
 
@@ -81,7 +81,7 @@ ModuleStream_ifs *Module_DCU_::createModuleStream() {
     return ethernet_stream_;
 };
 
-const ErrorInfo_ifs *Module_DCU_::getErrorInfo(void) const { return nullptr; }
+const ErrorInfo_ifs *Module_DCU_::getErrorInfo() const { return nullptr; }
 
 size_t Module_DCU_::getTaskSize() const {
     { return size_; }

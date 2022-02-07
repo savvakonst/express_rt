@@ -2,12 +2,11 @@
 #define EXO_DEVICE_H
 
 #include <string>
-
+//
 #include "common/BaseClass_ifs.h"
 #include "common/Port.h"
-#include "device/Module_ifs.h"
-
-class Module_ifs;
+//
+#include "Module_ifs.h"
 
 inline std::string stringId(uint32_t id) {
     char char_id[5] = {0, 0, 0, 0, 0};
@@ -29,7 +28,7 @@ class COMMON_API_ DeviceBuildingContext_ifs {
 //  and use task mapper.it needs change name TaskMapper to PackedStructMapper.
 //  and i think it is possible to remove all task structures by replacing them with PackedStructMapper
 
-class COMMON_API_ Device : public BaseClass_ifs {
+class COMMON_API_ Device : public Module_ifs {
    private:
     struct DEVICE_DATE {
         uint8_t day;
@@ -62,29 +61,50 @@ class COMMON_API_ Device : public BaseClass_ifs {
    public:
     Device(const void *ptr, size_t size, DeviceBuildingContext_ifs *context);
 
-    ~Device();
+    ~Device() override;
+
+    [[nodiscard]] bool hasTransceiver() const override;
+
+    [[nodiscard]] EthernetSettings getSrcAddress() const override;
+
+    /* not yet implemented inherited members  begin*/
+    [[nodiscard]] virtual bool isAvailable() const = 0;
+
+    [[nodiscard]] virtual std::string getID() const = 0;
+
+    virtual std::map<std::string, PrmBuffer_ifs *> getPrmBufferMap() = 0;
+
+    const DataSchema_ifs *getPropertySchema() override = 0;
+
+    [[nodiscard]] virtual std::string printProperties(const std::string &indent = "") const = 0;
+
+    [[nodiscard]] const HierarchicalData_ifs *getProperty(const std::string &prop_path) const override = 0;
+
+    [[nodiscard]] std::string getPropertyAsTxt(const std::string &prop_path) const override = 0;
+
+    bool setProperty(const std::string &prop_path, const Value &value) override = 0;
+
+    bool setProperty(const std::string &prop_path, const HierarchicalData_ifs *hierarchical_data) override = 0;
+
+    bool setPropertyAsTxt(const std::string &prop_path, const std::string &value) override = 0;
+
+    /* not yet implemented inherited members  end*/
+
+    [[nodiscard]] std::vector<std::pair<std::string, Module_ifs *>> getSubModules() const override;
+
+    [[nodiscard]] std::vector<std::pair<std::string, Module_ifs *>> getModulesFromPath(const std::string &name);
+
+    [[nodiscard]] static status checkValExistence(const std::string &path);
+
+    [[nodiscard]] const void *storeTaskToBuffer() const override;
+
+    [[nodiscard]] size_t getTaskSize() const override;
 
     // TODO : remove this
     Module_ifs *getTopModule() {
         if (modules_.size()) return modules_.front();
         return nullptr;
     }
-
-
-
-    [[maybe_unused]] exo_container<const Module_ifs *> getAllModules();
-
-    [[maybe_unused]] const Module_ifs *getModuleFromPath(const std::string &name);
-
-    [[maybe_unused]] exo_container<const Module_ifs *> getLineFromPath(const std::string &path);
-
-    [[maybe_unused]] static status checkValExistence(const std::string &path);
-
-    [[maybe_unused]] virtual size_t getTaskSize() const;
-
-    status hasTransceiver() const;
-
-    EthernetSettings getSrcAddress() const;
 };
 
 #endif

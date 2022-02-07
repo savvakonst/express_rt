@@ -89,28 +89,37 @@ class KSDModule : public Module_ifs {
 
     TaskMapper field_map_;
 
-    const TaskMapper *getBranch(const std::string &prop_path) const;
+    [[nodiscard]] const TaskMapper *getBranch(const std::string &prop_path) const;
 
    public:
-    bool hasTransceiver() const override { return false; }
+    [[nodiscard]] bool hasTransceiver() const override { return false; }
 
-    EthernetSettings getSrcAddress() const override { return EthernetSettings(); }
+    [[nodiscard]] EthernetSettings getSrcAddress() const override { return {}; }
 
-    bool isAvailable() const override { return true; }
+    [[nodiscard]] bool isAvailable() const override { return true; }
+
+    std::map<std::string, PrmBuffer_ifs *> getPrmBufferMap() override { return {}; }
 
     const DataSchema_ifs *getPropertySchema() override {
         error_message_ = "The getPropertySchema function is not realised yet";
         return nullptr;
     }
+
     [[nodiscard]] virtual std::string printProperties(const std::string &indent = "") const override;
 
     [[nodiscard]] const HierarchicalData_ifs *getProperty(const std::string &prop_path) const override;
 
     [[nodiscard]] std::string getPropertyAsTxt(const std::string &prop_path) const override;
 
-    bool setProperty(const std::string &prop_path, Value value) override;
+    bool setProperty(const std::string &prop_path, const Value &value) override;
+
+    bool setProperty(const std::string &prop_path, const HierarchicalData_ifs *hierarchical_data) override {
+        return false;
+    }
 
     bool setPropertyAsTxt(const std::string &prop_path, const std::string &valie) override;
+
+    [[nodiscard]] std::vector<std::pair<std::string, Module_ifs *>> getSubModules() const override { return {}; }
 };
 
 #endif

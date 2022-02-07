@@ -46,10 +46,10 @@ class Module_A09_ : public KSDModule {
     const HierarchicalData_ifs* getProperty(const std::string& prop_path) const override;
     std::string getPropertyAsTxt(const std::string& prop_path) const override;
 
-    bool setProperty(const std::string& prop_path, Value value) override;
+    bool setProperty(const std::string& prop_path, const Value& value) override;
     bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override;
 
-    const void* getTaskPtr() const override { return (const void*)&task_; }
+    const void* storeTaskToBuffer() const override { return (const void*)&task_; }
     size_t getTaskSize() const override { return sizeof(Task); }
 
     ModuleStream_ifs* createModuleStream() override;

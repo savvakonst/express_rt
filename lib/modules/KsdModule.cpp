@@ -47,7 +47,7 @@ TaskMapper::getMapReturn_t TaskMapper::getMap() const {
     // }
     getMapReturn_t ret;
     for (auto& i : vecmap_) {
-        ret.push_back({ i.first,(HierarchicalData_ifs*)&i.second});
+        ret.push_back({i.first, (HierarchicalData_ifs*)&i.second});
     }
     return ret;
 }
@@ -132,16 +132,16 @@ std::string KSDModule::printProperties(const std::string& indent) const {
 
 const HierarchicalData_ifs* KSDModule::getProperty(const std::string& prop_path) const {
     auto tree = (TaskMapper*)getBranch(prop_path);
-    //if (tree->isValue())
+    // if (tree->isValue())
     return tree;
 }
 
 std::string KSDModule::getPropertyAsTxt(const std::string& prop_path) const {
     auto res = getProperty(prop_path);
-    return toString(res,"");
+    return toString(res, "");
 }
 
-bool KSDModule::setProperty(const std::string& prop_path, const Value value) {
+bool KSDModule::setProperty(const std::string& prop_path, const Value& value) {
     auto tree = (TaskMapper*)getBranch(prop_path);
     return tree->setValue(value);
 }

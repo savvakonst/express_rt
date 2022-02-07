@@ -27,6 +27,8 @@ Device::Device(const void *ptr, size_t size, DeviceBuildingContext_ifs *context)
         error_message_ = "task size is too small";
     }
 
+
+
     task_header_ = *(TASK_HEADER *)ptr;
 
     size_ = (size_t)task_header_.taskSize;
@@ -55,9 +57,9 @@ Device::Device(const void *ptr, size_t size, DeviceBuildingContext_ifs *context)
 
 Device::~Device() {}
 
-exo_container<const Module_ifs *> Device::getAllModules() { return exo_container<const Module_ifs *>(); }
+std::vector<std::pair<std::string, Module_ifs *>> Device::getSubModules() const { return {}; }
 
-const Module_ifs *Device::getModuleFromPath(const std::string &name) {
+std::vector<std::pair<std::string, Module_ifs *>> Device::getModulesFromPath(const std::string &name) {
     static const std::regex validator(R"((([\w]+:[\w]+:[\w]+/)*)(\w+:[\w]))");
 
     std::smatch matches;
@@ -67,24 +69,19 @@ const Module_ifs *Device::getModuleFromPath(const std::string &name) {
 
         if (path_chunks.size()) {
             error_message_ = "module encapsulation is not supported yet";
-            return nullptr;
+            return {};
         }
     }
-    return nullptr;
-}
-
-exo_container<const Module_ifs *> Device::getLineFromPath(const std::string &path) {
-    error_message_ = "module encapsulation is not supported yet";
-    return exo_container<const Module_ifs *>();
+    return {};
 }
 
 status Device::checkValExistence(const std::string &path) { return status::failure; }
 
-status Device::hasTransceiver() const {
+bool Device::hasTransceiver() const {
     for (auto i : modules_) {
-        if (i->hasTransceiver()) return status::succes;
+        if (i->hasTransceiver()) return true;
     }
-    return status::failure;
+    return false;
 }
 
 EthernetSettings Device::getSrcAddress() const {
@@ -94,4 +91,7 @@ EthernetSettings Device::getSrcAddress() const {
     return {};
 }
 
+const void *Device::storeTaskToBuffer() const { return nullptr; }
+
 size_t Device::getTaskSize() const { return size_; }
+

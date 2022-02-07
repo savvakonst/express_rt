@@ -3,49 +3,45 @@
 
 #include <string>
 
-#include "common/BaseClass_ifs.h"
-#include "common/CustomTypes.h"
-#include "common/DataSchema_ifs.h"
+#include "common/Properties_ifs.h"
 
 class ModuleStream_ifs;
 class PrmBuffer_ifs;
 class DeviceBuildingContext_ifs;
 
-class COMMON_API_ Module_ifs : public BaseClass_ifs {
-   private:
-    /* data */
+class COMMON_API_ Module_ifs : public Properties_ifs {
    public:
-    virtual ~Module_ifs(){};
+    ~Module_ifs() override = default;
 
-    virtual bool hasTransceiver() const = 0;
+    [[nodiscard]] virtual bool hasTransceiver() const = 0;
 
-    virtual EthernetSettings getSrcAddress() const = 0;
+    [[nodiscard]] virtual EthernetSettings getSrcAddress() const = 0;
 
-    virtual bool isAvailable() const = 0;
+    [[nodiscard]] virtual bool isAvailable() const = 0;
 
     [[nodiscard]] virtual std::string getID() const = 0;
 
-    virtual std::map<std::string, PrmBuffer_ifs *> getPrmBufferMap() {
-        return std::map<std::string, PrmBuffer_ifs *>();
-    }
+    virtual std::map<std::string, PrmBuffer_ifs *> getPrmBufferMap() = 0;
 
-    virtual const DataSchema_ifs *getPropertySchema() = 0;
+    const DataSchema_ifs *getPropertySchema() override = 0;
 
     [[nodiscard]] virtual std::string printProperties(const std::string &indent = "") const = 0;
 
-    [[nodiscard]] virtual const HierarchicalData_ifs *getProperty(const std::string &prop_path) const = 0;
+    [[nodiscard]] const HierarchicalData_ifs *getProperty(const std::string &prop_path) const override = 0;
 
-    [[nodiscard]] virtual std::string getPropertyAsTxt(const std::string &prop_path) const = 0;
+    [[nodiscard]] std::string getPropertyAsTxt(const std::string &prop_path) const override = 0;
 
-    virtual bool setProperty(const std::string &prop_path, Value value) = 0;
+    bool setProperty(const std::string &prop_path, const Value &value) override = 0;
 
-    virtual bool setPropertyAsTxt(const std::string &prop_path, const std::string &valie) = 0;
+    bool setProperty(const std::string &prop_path, const HierarchicalData_ifs *hierarchical_data) override = 0;
 
-    [[nodiscard]] virtual const void *getTaskPtr() const = 0;
+    bool setPropertyAsTxt(const std::string &prop_path, const std::string &value) override = 0;
+
+    [[nodiscard]] virtual const void *storeTaskToBuffer() const = 0;
 
     [[nodiscard]] virtual size_t getTaskSize() const = 0;
 
-    virtual Module_ifs *getSubModule() { return nullptr; }
+    [[nodiscard]] virtual std::vector<std::pair<std::string, Module_ifs *>> getSubModules() const = 0;
 
     virtual ModuleStream_ifs *createModuleStream() = 0;
 };

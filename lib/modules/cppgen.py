@@ -56,12 +56,11 @@ class Module_{0:s} : public KSDModule {{
 
     const DataSchema_ifs* getPropertySchema() override;
 
-    ResValue getProperty(const std::string& prop_path) const override ;
+    const HierarchicalData_ifs *getProperty(const std::string& prop_path) const override ;
     std::string getPropertyAsTxt(const std::string& prop_path) const override;
 
-    bool setProperty(const std::string& prop_path, Value value) override;
-    bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override;
-
+    bool setProperty(const std::string& prop_path, const Value &value) override;
+    bool setPropertyAsTxt(const std::string& prop_path, const std::string& value) override;
 
     const void* getTaskPtr() const override {{ return (const void*)&task_; }}
     size_t getTaskSize() const override {{ return sizeof({1:s}); }}

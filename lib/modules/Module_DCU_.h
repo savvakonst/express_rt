@@ -60,7 +60,7 @@ class Module_DCU_ : public KSDModule {
 
     Module_DCU_(const std::string &name, const void *ptr, size_t size, DeviceBuildingContext_ifs *context);
 
-    ~Module_DCU_();
+    ~Module_DCU_() override;
 
     std::map<std::string, PrmBuffer_ifs *> getPrmBufferMap() override {
         std::map<std::string, PrmBuffer_ifs *> ret_map;
@@ -74,29 +74,29 @@ class Module_DCU_ : public KSDModule {
         return ret_map;
     }
 
-    bool hasTransceiver() const override;
+    [[nodiscard]] bool hasTransceiver() const override;
 
-    EthernetSettings getSrcAddress() const override;
+    [[nodiscard]] EthernetSettings getSrcAddress() const override;
 
-    std::string getID() const override { return module_id_; }
+    [[nodiscard]] std::string getID() const override { return module_id_; }
 
     const DataSchema_ifs *getPropertySchema() override;
 
-    const HierarchicalData_ifs *getProperty(const std::string &prop_path) const override;
+    [[nodiscard]] const HierarchicalData_ifs *getProperty(const std::string &prop_path) const override;
 
-    std::string getPropertyAsTxt(const std::string &prop_path) const override;
+    [[nodiscard]] std::string getPropertyAsTxt(const std::string &prop_path) const override;
 
-    bool setProperty(const std::string &prop_path, Value value) override;
+    bool setProperty(const std::string &prop_path, const Value &value) override;
 
     bool setPropertyAsTxt(const std::string &prop_path, const std::string &valie) override;
 
-    const void *getTaskPtr() const override { return (const void *)&task_; }
+    [[nodiscard]] const void *storeTaskToBuffer() const override { return (const void *)&task_; }
 
-    size_t getTaskSize() const override;
+    [[nodiscard]] size_t getTaskSize() const override;
 
     ModuleStream_ifs *createModuleStream() override;
 
-    const ErrorInfo_ifs *getErrorInfo(void) const override;
+    [[nodiscard]] const ErrorInfo_ifs *getErrorInfo() const override;
 };
 
 #endif

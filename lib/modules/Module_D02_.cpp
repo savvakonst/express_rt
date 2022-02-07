@@ -29,7 +29,7 @@ std::string Module_D02_::getPropertyAsTxt(const std::string& prop_path) const {
     return KSDModule::getPropertyAsTxt(prop_path);
 }
 
-bool Module_D02_::setProperty(const std::string& prop_path, Value value) {
+bool Module_D02_::setProperty(const std::string& prop_path, const Value& value) {
     return KSDModule::setProperty(prop_path, value);
 }
 bool Module_D02_::setPropertyAsTxt(const std::string& prop_path, const std::string& value) {
