@@ -7,8 +7,8 @@ add_library(${CONV_TEMPLATE_LIST} SHARED
         ConvTemplateList.h
         ParameterTable.cpp
         ParameterTable.h
-        DevicesList.cpp
-        DevicesList.h
+        #DevicesList.cpp
+        #DevicesList.h
         )
 
 # TODO: remove it
