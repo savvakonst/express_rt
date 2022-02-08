@@ -1,14 +1,18 @@
 #include <QAction>
+#include <QMenu>
 #include <QDebug>
 #include <QHeaderView>
 #include <QTableView>
+#include <QFileDialog>
 //
+#include "common/IO_ifs.h"
 #include "common/ExtensionManager.h"
 #include "convtemplate/ConversionTemplate.h"
 #include "convtemplate/ConversionTemplateManager.h"
 #include "convtemplate/Parameter_ifs.h"
 //
 #include "ConvTemplateList.h"
+
 
 ConvTemplateTreeModel::ConvTemplateTreeModel(ExtensionManager *manager) {
     auto unit = manager->getLastVersionExtensionUint("data_schema", "conversion_template");
@@ -119,8 +123,8 @@ ConvTemplateTableModel::ConvTemplateTableModel(ExtensionManager *manager) {
 
     unit = manager->getLastVersionExtensionUint("cnv_template_manager", "cnv_template_manager");
     if (unit && unit->ptr) {
-        manager_ = (ConversionTemplateManager *)unit->ptr;
-        if (manager_ == nullptr) std::cerr << "ConvTempateTableModel::cnv_manager_ == nullptr;\n";
+        cnv_manager_ = (ConversionTemplateManager *)unit->ptr;
+        if (cnv_manager_ == nullptr) std::cerr << "ConvTempateTableModel::cnv_manager_ == nullptr;\n";
     }
 
     class Delegate : public Signal_ifs {
@@ -132,10 +136,10 @@ ConvTemplateTableModel::ConvTemplateTableModel(ExtensionManager *manager) {
         ConvTemplateTableModel *parent_;
     };
 
-    manager_->addSignal(new Delegate(this));
+    cnv_manager_->addSignal(new Delegate(this));
 }
 
-int ConvTemplateTableModel::rowCount(const QModelIndex &parent) const { return (int)manager_->getEntriesNumber(); }
+int ConvTemplateTableModel::rowCount(const QModelIndex &parent) const { return (int)cnv_manager_->getEntriesNumber(); }
 
 int ConvTemplateTableModel::columnCount(const QModelIndex &parent) const { return (int)list_of_entries_.size(); }
 
@@ -148,13 +152,32 @@ QVariant ConvTemplateTableModel::headerData(int section, Qt::Orientation orienta
 
 QVariant ConvTemplateTableModel::data(const QModelIndex &index, int role) const {
     if (role == Qt::DisplayRole) {
-        auto conv_template = manager_->getConversionTemplateByIndex(index.row());
+        auto conv_template = cnv_manager_->getConversionTemplateByIndex(index.row());
         auto name = list_of_entries_[index.column()]->name_;
         auto data = conv_template->getInfo(name);
         return {data->getValue().asString().data()};
     }
     return {};
 }
+
+bool ConvTemplateTableModel::removeRows(int row, int count, const QModelIndex &parent ) {
+    qDebug()<<"bool ConvTemplateTableModel::removeRows(int row, int count, const QModelIndex &parent ) ";
+    return false;
+}
+
+Qt::ItemFlags ConvTemplateTableModel::flags(const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return Qt::NoItemFlags;
+
+    return QAbstractItemModel::flags(index);//Qt::ItemIsEditable |
+}
+
+
+
+
+
+
 
 /*
  *
@@ -173,9 +196,55 @@ QWidget *newTreeView(QWidget *parent) {
     table_view->setStyleSheet(
         "QTreeView {background-color: #D2DCDF; alternate-background-color: #f6fafb; show-decoration-selected: 1;}"
         "QHeaderView::section {background-color: #D2DCDF}");
+    table_view->setContextMenuPolicy (Qt::ActionsContextMenu);
+    //table_view->setSelectionMode( QAbstractItemView::SelectionMode::ExtendedSelection );
 
     return table_view;
 }
+
+
+class OpenAction : public QAction {
+   public:
+    explicit OpenAction(ExtensionManager *manager, IO_ifs *io, QObject *parent = nullptr)
+        : QAction(parent), manager_(manager), io_(io) {
+        setText(QObject::tr("&Open"));
+        //+ " " + io->file_type_.c_str()
+        connect(this, &QAction::triggered, this, &OpenAction::openFile);
+    }
+
+   protected slots:
+    void openFile() {
+        auto f_name =
+            QFileDialog::getOpenFileName(nullptr, /*caption*/ QString(), /*dir */ QString(),
+                                         /*filter*/ io_->filename_pattern_.c_str(), /*selectedFilter*/ nullptr,
+                                         /*options*/ QFileDialog::Options());
+        io_->readDocument(manager_, f_name.toStdString());
+    }
+
+   protected:
+    ExtensionManager *manager_ = nullptr;
+    IO_ifs *io_;
+};
+
+class RemoveAction : public QAction {
+   public:
+    explicit RemoveAction(ExtensionManager *manager,  QObject *parent = nullptr)
+        : QAction(parent){
+        setText(QObject::tr("&remove"));
+        connect(this, &QAction::triggered, this, &RemoveAction::removeEntry);
+        view_ = (QAbstractItemView *)manager->getLastVersionExtensionObject("widget", "conv_template_list");
+        cnv_manager_ = (ConversionTemplateManager*)manager->getLastVersionExtensionObject("cnv_template_manager", "cnv_template_manager");
+    }
+   protected slots:
+    void removeEntry() {
+        auto index = view_->selectionModel()->currentIndex().row();
+        cnv_manager_->removeConversionTemplateByIndex(index);
+    }
+   protected:
+    QAbstractItemView * view_ = nullptr;
+    ConversionTemplateManager *cnv_manager_ = nullptr;
+};
+
 
 /*
  *
@@ -223,17 +292,34 @@ static int initConvTemplateListWidget(ExtensionManager *manager) {
                                        << ") unit, since there is a newer unit.\n");
     } else {
         auto view = (QAbstractItemView *)p_unit->ptr;
-
         view->setModel(new ConvTemplateTableModel(manager));
 
-        auto remove_action = new QAction(QObject::tr("&remove_element"));
+        auto io_units = manager->getLastVersionExtensionUintsByType("io");
+        for (auto i : io_units) {
+            if (i && i->ptr) {
+                auto new_base = new OpenAction(manager, (IO_ifs *)i->ptr, view);
+                new_base->setStatusTip(QObject::tr("&Create a new file"));
+                new_base->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
+                new_base->setShortcut(Qt::CTRL+Qt::Key_O);
+
+                view->addAction(new_base);
+            }
+        }
+
+        auto remove_action = new RemoveAction(manager,view);
+        remove_action->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
+        remove_action->setShortcut(Qt::Key_Delete);
+
         view->addAction(remove_action);
+
+
     }
 
     /*
      *
      *
      */
+
     p_unit = search(g_conv_template_list_extension_uint, "widget", "parameter_list");
 
     if (p_unit != manager->getLastVersionExtensionUint("widget", "parameter_list")) {
@@ -244,3 +330,4 @@ static int initConvTemplateListWidget(ExtensionManager *manager) {
 
     return 0;
 }
+

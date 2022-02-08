@@ -40,6 +40,7 @@ MainWindow::MainWindow(ExtensionManager *ctm) : text_edit_(new QTextEdit), manag
     auto file_menu = menuBar()->addMenu(tr("&File"));
 
     auto io_units = manager_->getLastVersionExtensionUintsByType("io");
+
     for (auto i : io_units) {
         if (i && i->ptr) {
             auto new_base = new OpenAction(manager_, (IO_ifs *)i->ptr, this);

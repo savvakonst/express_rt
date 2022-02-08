@@ -61,7 +61,7 @@ class ParameterTreeView : public QTreeView {
    public:
     explicit ParameterTreeView(QWidget *parent = nullptr) : QTreeView(parent) {}
 
-    void currentChanged(const QModelIndex &current, const QModelIndex &previous);
+    void currentChanged(const QModelIndex &current, const QModelIndex &previous) override;
 
    public:
    signals:

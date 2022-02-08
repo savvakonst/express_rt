@@ -61,11 +61,13 @@ class ConvTemplateTableModel : public QAbstractTableModel {
     [[nodiscard]] QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
     [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
+    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
+    Qt::ItemFlags ConvTemplateTableModel::flags(const QModelIndex &index) const override;
 
    protected:
     std::vector<DataSchema_ifs *> list_of_entries_;
     DataSchema_ifs *schema_ = nullptr;
-    ConversionTemplateManager *manager_ = nullptr;
+    ConversionTemplateManager *cnv_manager_ = nullptr;
 };
 
 #endif  // EXRT_TABLEMODEL_H

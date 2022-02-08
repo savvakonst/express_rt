@@ -159,6 +159,7 @@ class TreeCheckBox : public QCheckBox {
  */
 
 class TreeLineEdit : public QLineEdit {
+
    public:
     explicit TreeLineEdit(Parameter_ifs *parameter, DataSchema_ifs *data_schema, const std::string &path,
                           QWidget *parent = nullptr)
@@ -167,12 +168,25 @@ class TreeLineEdit : public QLineEdit {
           parameter_(parameter),
           data_schema_(data_schema),
           path_(path) {
+        auto h= parameter_->getProperty(path_);
+        if(h && isString(h->getValue().type_)) {
+            setText(h->getValue().asString().c_str());
+        }
+        else{
+            setText("invalid_value");
+        }
         setToolTip(data_schema_->help_.c_str());
         initSettings();
+
+        connect(this,&QLineEdit::textEdited,this,&TreeLineEdit::textWasEdited);
     }
 
     BaseSignalController signal_controller_;
 
+   public slots:
+     void textWasEdited(const QString & text) {
+        parameter_->setProperty(path_,Value(text.toStdString()));
+    }
 
    private:
     void initSettings() {}
@@ -188,17 +202,41 @@ class TreeLineEdit : public QLineEdit {
  *
  */
 
-class TreeIPEdit : public TreeLineEdit {
+class TreeIPEdit : public QLineEdit {
    public:
     explicit TreeIPEdit(Parameter_ifs *parameter, DataSchema_ifs *data_schema, const std::string &path,
                         QWidget *parent = nullptr)
         :  //
-          TreeLineEdit(parameter, data_schema, path, parent) {
+          QLineEdit(parent),
+          parameter_(parameter),
+          data_schema_(data_schema),
+          path_(path){
         initSettings();
+        setupValue();
     }
 
+    void setupValue(){
+        auto h= parameter_->getProperty(path_);
+        if(h && isNum(h->getValue().type_)) {
+            union TempUnion{u8_t b[4];u32_t dw;};
+            TempUnion temp;
+            temp.dw= h->getValue().value_.u32;
+
+            auto s = QString("%1.%2.%3.%4")
+                .arg(temp.b[3], 3, 10, QLatin1Char('0'))
+                .arg(temp.b[2], 3, 10, QLatin1Char('0'))
+                .arg(temp.b[1], 3, 10, QLatin1Char('0'))
+                .arg(temp.b[0], 3, 10, QLatin1Char('0'));
+            qDebug()<<s;
+            setText(s);
+        }
+        else{
+            setText("invalid_value");
+        }
+    }
     ~TreeIPEdit() override { delete validator_; };
 
+    BaseSignalController signal_controller_;
    private:
     void initSettings() {
         QRegExp rx(R"(((([01]\d\d)|(2[0-4]\d)|(25[0-5])).){3}(([01]\d\d)|(2[0-4]\d)|(25[0-5])))");
@@ -209,8 +247,67 @@ class TreeIPEdit : public TreeLineEdit {
     }
 
     QValidator *validator_ = nullptr;
+   protected:
+    std::string path_;
+    Parameter_ifs *parameter_ = nullptr;
+    DataSchema_ifs *data_schema_ = nullptr;
 };
 
+/*
+ *
+ *
+ */
+
+class TreeNumEdit : public QLineEdit {
+   public:
+    explicit TreeNumEdit(Parameter_ifs *parameter, DataSchema_ifs *data_schema, const std::string &path,
+                        QWidget *parent = nullptr)
+        :  //
+          QLineEdit(parent),
+          parameter_(parameter),
+          data_schema_(data_schema),
+          path_(path){
+        initSettings();
+
+
+        auto h= parameter_->getProperty(path_);
+
+        if(h && isNum(h->getValue().type_)) {
+            setText(h->getValue().asString().c_str());
+            type_ = h->getValue().type_;
+        }
+        else{
+            setText("invalid_value");
+        }
+        setToolTip(data_schema_->help_.c_str());
+
+        connect(this,&QLineEdit::textEdited,this,&TreeNumEdit::textWasEdited);
+    }
+
+    ~TreeNumEdit() override { delete validator_; };
+
+    BaseSignalController signal_controller_;
+
+   public slots:
+    void textWasEdited(const QString & text) {
+        parameter_->setProperty(path_,Value(text.toStdString(),type_));
+    }
+
+   private:
+    void initSettings() {
+        QRegExp rx(R"([0-9]*)");
+        validator_ = new QRegExpValidator(rx);
+        setValidator(validator_);
+    }
+
+    QValidator *validator_ = nullptr;
+   protected:
+    std::string path_;
+    DataType type_ = DataType::none_v;
+    Parameter_ifs *parameter_ = nullptr;
+    DataSchema_ifs *data_schema_ = nullptr;
+
+};
 /*
  *
  *
@@ -267,7 +364,7 @@ InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, TREE_EDITOR_LIB_NAME)(voi
         {"text", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeLineEdit>,
          0x00},
         {"ip", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeIPEdit>, 0x00},
-        {"number", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeLineEdit>,
+        {"number", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeNumEdit>,
          0x00},
         {"enum", "tree_widget_wrapper", "return wrapper of TreeLineEdit", (void *)newTreeWidgetWrapper<TreeComboBox>,
          0x00},

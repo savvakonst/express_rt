@@ -40,6 +40,17 @@ ParameterTableModel::ParameterTableModel(ExtensionManager *manager) {
     child_view_ = (TreeEditor *)manager->getLastVersionExtensionObject("tree_editor", "tree_editor");
     if (child_view_ == nullptr) std::cerr << "can't find cnv_template_manager;\n";
 
+    class Delegate : public Signal_ifs {
+       public:
+        explicit Delegate(ParameterTableModel *parent) : parent_(parent) {}
+        void emit_() override { parent_->layoutChanged(); }
+
+       private:
+        ParameterTableModel *parent_;
+    };
+
+    cnv_manager_->addSignal(new Delegate(this));
+
     connect(parent_view_, &QAbstractItemView::activated, this, &ParameterTableModel::receiveRow);
 }
 
@@ -98,7 +109,6 @@ void ParameterTableModel::receiveRow(const QModelIndex &index) { layoutChanged()
 
 void ParameterTableModel::selectParameter(const QModelIndex &index) {
     auto prm = getParameter(index);
-
     if (prm) child_view_->setupProperties(prm);
 }
 
