@@ -10,8 +10,7 @@
 
 class TaskMapper : public HierarchicalData_ifs {
    public:
-    enum StructType
-    {
+    enum StructType {
         value,
         array,
         map,
@@ -108,7 +107,7 @@ class KSDModule : public Module_ifs {
         return nullptr;
     }
 
-    [[nodiscard]] virtual std::string printProperties(const std::string &indent = "") const override;
+    [[nodiscard]] std::string printProperties(const std::string &indent) const override;
 
     [[nodiscard]] const HierarchicalData_ifs *getProperty(const std::string &prop_path) const override;
 
@@ -120,7 +119,7 @@ class KSDModule : public Module_ifs {
         return false;
     }
 
-    bool setPropertyAsTxt(const std::string &prop_path, const std::string &valie) override;
+    bool setPropertyAsTxt(const std::string &prop_path, const std::string &value) override;
 
     [[nodiscard]] std::vector<std::pair<std::string, Module_ifs *>> getSubModules() const override { return {}; }
 };

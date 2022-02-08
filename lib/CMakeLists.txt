@@ -25,7 +25,8 @@ target_include_directories(CommonLib PUBLIC ../include)
 target_compile_definitions(CommonLib PUBLIC DEBUG_)
 target_compile_definitions(CommonLib PRIVATE COMMON_CREATE_SHARED_LIBRARY)
 
-add_subdirectory(base_io)
+add_subdirectory(IO/base_io)
+add_subdirectory(IO/ksd_io)
 add_subdirectory(modules)
 add_subdirectory(bindings)
 

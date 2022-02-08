@@ -10,7 +10,7 @@ Module_C06M::Module_C06M()
 
 Module_C06M::Module_C06M(const void* ptr, size_t size, ExtensionManager* manager) : Module_C06M() {
     if (size != getTaskSize()) {
-        // print error or throw error
+        // TODO: print error or throw error
     }
     task_ = *((Task*)ptr);
 }

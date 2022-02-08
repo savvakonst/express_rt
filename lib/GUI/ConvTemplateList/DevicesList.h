@@ -53,7 +53,11 @@ class DevicesListModel : public QAbstractItemModel {
             auto s = child_vector.erase(child_vector.begin() + index);
             return true;
         }
-        
+
+        size_t getIndex() {
+            // TODO: implement this
+            return 0; }
+
         void addNodesRecursively(Module_ifs *ptr) {
             auto node = new TreeNode(ptr);
             node->parent = this;

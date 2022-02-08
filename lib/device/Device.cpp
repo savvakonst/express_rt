@@ -1,10 +1,10 @@
 
 #include <regex>
 //
-#include "device/Device.h"
-#include "device/ModuleStream_ifs.h"
 #include "common/ExtensionManager.h"
 #include "common/StringProcessingTools.h"
+#include "device/Device.h"
+#include "device/ModuleStream_ifs.h"
 
 // TODO:
 #pragma pack(1)
@@ -60,7 +60,18 @@ Device::Device(const void *ptr, size_t size, ExtensionManager *context) {
 
 Device::~Device() = default;
 
-std::vector<std::pair<std::string, Module_ifs *>> Device::getSubModules() const { return {}; }
+std::vector<std::pair<std::string, Module_ifs *>> Device::getSubModules() const {
+    std::vector<std::pair<std::string, Module_ifs *>> ret;
+    // ret.resize(number_of_slots_,{"", nullptr});
+    // ret.reserve(number_of_slots_);
+
+    ret.reserve(modules_.size());
+    for (auto i : modules_) {
+        ret.push_back({i->getID(), i});
+    }
+
+    return ret;
+}
 
 std::vector<std::pair<std::string, Module_ifs *>> Device::getModulesFromPath(const std::string &name) {
     static const std::regex validator(R"((([\w]+:[\w]+:[\w]+/)*)(\w+:[\w]))");

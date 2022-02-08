@@ -52,7 +52,7 @@ static int initDefaultBaseIO(ExtensionManager *manager) {
 
     DefaultBaseIO *base_io = (DefaultBaseIO *)e_unit->ptr;
     auto set = manager->getLastVersionExtensionUintsByType("prm_parser_builder");
-    for (auto &i : set) base_io->addPpbm((PDefaultBaseIO_ifs *)i->object);
+    for (auto &i : set) base_io->addPpbm((PDefaultBaseIO_ifs *)i->ptr);
 
     return 0;
 }

@@ -12,5 +12,5 @@ cmake-build*/
 debug*/
 release*/
 *_*.qm
-
+*.ksd
 tools/set_*_env.bat

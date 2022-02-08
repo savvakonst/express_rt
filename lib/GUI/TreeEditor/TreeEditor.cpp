@@ -106,7 +106,7 @@ void TreeEditor::addExtensionUint(ExtensionManager *manager) {
         for (auto &i : str_list) {
             auto type = std::string(i.toStdString());
 
-            auto constructor_ptr = (treeWidgetWrapperConstructor)uint->object;
+            auto constructor_ptr = (treeWidgetWrapperConstructor)uint->ptr;
 
             auto cm = constructors_map_.find(type);
             if (cm == constructors_map_.end()) {
@@ -214,17 +214,17 @@ class TreeIPEdit : public QLineEdit {
         auto h = parameter_->getProperty(path_);
         if (h && isNum(h->getValue().type_)) {
             union TempUnion {
-                u8_t b[4];
-                u32_t dw;
+                u8_t b_[4];
+                u32_t dw_;
             };
             TempUnion temp;
-            temp.dw = h->getValue().value_.u32;
+            temp.dw_ = h->getValue().value_.u32;
 
             auto s = QString("%1.%2.%3.%4")
-                         .arg(temp.b[3], 3, 10, QLatin1Char('0'))
-                         .arg(temp.b[2], 3, 10, QLatin1Char('0'))
-                         .arg(temp.b[1], 3, 10, QLatin1Char('0'))
-                         .arg(temp.b[0], 3, 10, QLatin1Char('0'));
+                         .arg(temp.b_[3], 3, 10, QLatin1Char('0'))
+                         .arg(temp.b_[2], 3, 10, QLatin1Char('0'))
+                         .arg(temp.b_[1], 3, 10, QLatin1Char('0'))
+                         .arg(temp.b_[0], 3, 10, QLatin1Char('0'));
             qDebug() << s;
             setText(s);
         } else {

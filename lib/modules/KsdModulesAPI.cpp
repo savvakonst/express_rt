@@ -27,28 +27,11 @@
 #include "Module_M01_.h"
 #include "common/Extension.h"
 
-/*
-#define createDCU_Module(NAME)                                              \
-    ([](const void *ptr, size_t size, ExtensionManager *context) { \
-        return new Module_DCU_((NAME), ptr, size, context);                 \
-    })
-*/
-
-#define M_createDCU_Module(NAME)                                                                \
-    Module_ifs *create##NAME##Module(const void *ptr, size_t size, ExtensionManager *context) { \
-        return new Module_DCU_(#NAME, ptr, size, context);                                      \
-    }
-
-M_createDCU_Module(CH04);
-M_createDCU_Module(CH06);
-M_createDCU_Module(CH08);
-M_createDCU_Module(CH10);
-
 static ExtensionUnit g_modules_extension_uint[] = {
-    {"CH04", "module", "CH04 ksd module", (void *)&createCH04Module, 0x00},
-    {"CH06", "module", "CH06 ksd module", (void *)&createCH06Module, 0x00},
-    {"CH08", "module", "CH08 ksd module", (void *)&createCH08Module, 0x00},
-    {"CH10", "module", "CH10 ksd module", (void *)createCH10Module, 0x00},
+    {"CH04", "module", "CH04 ksd module", (void *)createCHXXModule<4>, 0x00},
+    {"CH06", "module", "CH06 ksd module", (void *)createCHXXModule<6>, 0x00},
+    {"CH08", "module", "CH08 ksd module", (void *)createCHXXModule<8>, 0x00},
+    {"CH10", "module", "CH10 ksd module", (void *)createCHXXModule<10>, 0x00},
     {"M01_", "module", "M01_ ksd module", (void *)createModule<Module_M01_>, 0x00},
     {"A01_", "module", "A01_ ksd module", (void *)createModule<Module_A01_>, 0x00},
     {"A02_", "module", "A02_ ksd module", (void *)createModule<Module_A02_>, 0x00},

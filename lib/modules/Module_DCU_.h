@@ -12,18 +12,18 @@ class Module_DCU_;
 
 class EthernetDCU_Stream : public ModuleStream_ifs {
    public:
-    EthernetDCU_Stream(Module_DCU_ *module);
+    explicit EthernetDCU_Stream(Module_DCU_ *module);
 
-    ~EthernetDCU_Stream();
+    ~EthernetDCU_Stream() override;
 
-    virtual void readFramePeace(ModuleStreamContext_ifs *context, char *ptr, size_t size);
+    void readFramePeace(ModuleStreamContext_ifs *context, char *ptr, size_t size) override;
 
-    virtual int getStatistic() {
+    int getStatistic() override {
         // TODO:
         return 0;
     }
 
-    virtual const Module_ifs *getModule() { return module_; }
+    const Module_ifs *getModule() override { return module_; }
 
    protected:
     bool lock_ = true;
@@ -46,19 +46,20 @@ class Module_DCU_ : public KSDModule {
 
 #pragma pack()
 
-    Task task_;
+    Task task_{};
 
     std::vector<Module_ifs *> modules_;
 
-    size_t size_;
+    size_t number_of_slots_ = 0;
+    size_t size_ = 0;
     const std::string module_id_;
 
     EthernetDCU_Stream *ethernet_stream_ = nullptr;
 
    public:
-    Module_DCU_(const std::string &module_id);
+    explicit Module_DCU_(const std::string &module_id);
 
-    Module_DCU_(const std::string &name, const void *ptr, size_t size, ExtensionManager *context);
+    Module_DCU_(size_t number_of_slots, const void *ptr, size_t size, ExtensionManager *context);
 
     ~Module_DCU_() override;
 
@@ -88,7 +89,7 @@ class Module_DCU_ : public KSDModule {
 
     bool setProperty(const std::string &prop_path, const Value &value) override;
 
-    bool setPropertyAsTxt(const std::string &prop_path, const std::string &valie) override;
+    bool setPropertyAsTxt(const std::string &prop_path, const std::string &value) override;
 
     [[nodiscard]] bool storeTaskToBuffer(void *pointer) const override {
         // TODO: implement this method
@@ -99,7 +100,15 @@ class Module_DCU_ : public KSDModule {
 
     ModuleStream_ifs *createModuleStream() override;
 
+    [[nodiscard]] std::vector<std::pair<std::string, Module_ifs *>> getSubModules() const override;
+
     [[nodiscard]] const ErrorInfo_ifs *getErrorInfo() const override;
 };
+
+template <size_t SLOTS_NUMBER>
+Module_ifs *createCHXXModule(const void *ptr, size_t size, ExtensionManager *manager) {
+    static_assert(SLOTS_NUMBER < 100);
+    return new Module_DCU_(SLOTS_NUMBER, ptr, size, manager);
+}
 
 #endif

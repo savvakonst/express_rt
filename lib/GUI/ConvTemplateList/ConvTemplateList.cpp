@@ -7,7 +7,6 @@
 //
 #include "common/ExtensionManager.h"
 #include "common/IO_ifs.h"
-#include "convtemplate/ConversionTemplate.h"
 #include "convtemplate/ConversionTemplateManager.h"
 #include "convtemplate/Parameter_ifs.h"
 //
