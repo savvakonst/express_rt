@@ -1,18 +1,17 @@
 #include <QAction>
-#include <QMenu>
 #include <QDebug>
-#include <QHeaderView>
-#include <QTableView>
 #include <QFileDialog>
+#include <QHeaderView>
+#include <QMenu>
+#include <QTableView>
 //
-#include "common/IO_ifs.h"
 #include "common/ExtensionManager.h"
+#include "common/IO_ifs.h"
 #include "convtemplate/ConversionTemplate.h"
 #include "convtemplate/ConversionTemplateManager.h"
 #include "convtemplate/Parameter_ifs.h"
 //
 #include "ConvTemplateList.h"
-
 
 ConvTemplateTreeModel::ConvTemplateTreeModel(ExtensionManager *manager) {
     auto unit = manager->getLastVersionExtensionUint("data_schema", "conversion_template");
@@ -160,25 +159,19 @@ QVariant ConvTemplateTableModel::data(const QModelIndex &index, int role) const 
     return {};
 }
 
+/*
 bool ConvTemplateTableModel::removeRows(int row, int count, const QModelIndex &parent ) {
     qDebug()<<"bool ConvTemplateTableModel::removeRows(int row, int count, const QModelIndex &parent ) ";
     return false;
 }
+*/
+/*
+Qt::ItemFlags ConvTemplateTableModel::flags(const QModelIndex &index) const {
+    if (!index.isValid()) return Qt::NoItemFlags;
 
-Qt::ItemFlags ConvTemplateTableModel::flags(const QModelIndex &index) const
-{
-    if (!index.isValid())
-        return Qt::NoItemFlags;
-
-    return QAbstractItemModel::flags(index);//Qt::ItemIsEditable |
+    return QAbstractItemModel::flags(index);  // Qt::ItemIsEditable |
 }
-
-
-
-
-
-
-
+*/
 /*
  *
  *
@@ -196,12 +189,11 @@ QWidget *newTreeView(QWidget *parent) {
     table_view->setStyleSheet(
         "QTreeView {background-color: #D2DCDF; alternate-background-color: #f6fafb; show-decoration-selected: 1;}"
         "QHeaderView::section {background-color: #D2DCDF}");
-    table_view->setContextMenuPolicy (Qt::ActionsContextMenu);
-    //table_view->setSelectionMode( QAbstractItemView::SelectionMode::ExtendedSelection );
+    table_view->setContextMenuPolicy(Qt::ActionsContextMenu);
+    // table_view->setSelectionMode( QAbstractItemView::SelectionMode::ExtendedSelection );
 
     return table_view;
 }
-
 
 class OpenAction : public QAction {
    public:
@@ -228,23 +220,23 @@ class OpenAction : public QAction {
 
 class RemoveAction : public QAction {
    public:
-    explicit RemoveAction(ExtensionManager *manager,  QObject *parent = nullptr)
-        : QAction(parent){
+    explicit RemoveAction(ExtensionManager *manager, QObject *parent = nullptr) : QAction(parent) {
         setText(QObject::tr("&remove"));
         connect(this, &QAction::triggered, this, &RemoveAction::removeEntry);
         view_ = (QAbstractItemView *)manager->getLastVersionExtensionObject("widget", "conv_template_list");
-        cnv_manager_ = (ConversionTemplateManager*)manager->getLastVersionExtensionObject("cnv_template_manager", "cnv_template_manager");
+        cnv_manager_ = (ConversionTemplateManager *)manager->getLastVersionExtensionObject("cnv_template_manager",
+                                                                                           "cnv_template_manager");
     }
    protected slots:
     void removeEntry() {
         auto index = view_->selectionModel()->currentIndex().row();
         cnv_manager_->removeConversionTemplateByIndex(index);
     }
+
    protected:
-    QAbstractItemView * view_ = nullptr;
+    QAbstractItemView *view_ = nullptr;
     ConversionTemplateManager *cnv_manager_ = nullptr;
 };
-
 
 /*
  *
@@ -300,19 +292,17 @@ static int initConvTemplateListWidget(ExtensionManager *manager) {
                 auto new_base = new OpenAction(manager, (IO_ifs *)i->ptr, view);
                 new_base->setStatusTip(QObject::tr("&Create a new file"));
                 new_base->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
-                new_base->setShortcut(Qt::CTRL+Qt::Key_O);
+                new_base->setShortcut(Qt::CTRL + Qt::Key_O);
 
                 view->addAction(new_base);
             }
         }
 
-        auto remove_action = new RemoveAction(manager,view);
+        auto remove_action = new RemoveAction(manager, view);
         remove_action->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
         remove_action->setShortcut(Qt::Key_Delete);
 
         view->addAction(remove_action);
-
-
     }
 
     /*
@@ -330,4 +320,3 @@ static int initConvTemplateListWidget(ExtensionManager *manager) {
 
     return 0;
 }
-

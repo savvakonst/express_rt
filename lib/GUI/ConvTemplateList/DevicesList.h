@@ -9,6 +9,7 @@
 #include <QTreeView>
 
 #include "common/BaseClass_ifs.h"
+#include "device/Module_ifs.h"
 
 class DataSchema_ifs;
 class ExtensionManager;
@@ -25,6 +26,8 @@ class DevicesListModel : public QAbstractItemModel {
     explicit DevicesListModel(const QString &data, QObject *parent = nullptr);
     ~DevicesListModel() override;
 
+    [[nodiscard]] void buildTree();
+
     [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
     [[nodiscard]] Qt::ItemFlags flags(const QModelIndex &index) const override;
     [[nodiscard]] QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
@@ -35,8 +38,38 @@ class DevicesListModel : public QAbstractItemModel {
     [[nodiscard]] int columnCount(const QModelIndex &parent) const override;
 
    private:
+    struct TreeNode {
+        // it is better to avoid direct deletion.
+
+        explicit TreeNode(Module_ifs *ptr) : object(ptr) {}
+
+        ~TreeNode() {
+            for (auto i : child_vector) delete i;
+        }
+
+        bool removeChild(size_t index) {
+            if (index < child_vector.size()) return false;
+            delete child_vector[index];
+            auto s = child_vector.erase(child_vector.begin() + index);
+            return true;
+        }
+        
+        void addNodesRecursively(Module_ifs *ptr) {
+            auto node = new TreeNode(ptr);
+            node->parent = this;
+            child_vector.push_back(node);
+            auto list = ptr->getSubModules();
+            for (auto i : list) addNodesRecursively(i.second);
+        }
+
+        TreeNode *parent{};
+
+        Module_ifs *object = nullptr;
+        std::vector<TreeNode *> child_vector;
+    };
+
+    TreeNode *root_;
     std::vector<DataSchema_ifs *> list_of_entries_;
-    DataSchema_ifs *schema_ = nullptr;
     DeviceManager *device_manager_ = nullptr;
 };
 

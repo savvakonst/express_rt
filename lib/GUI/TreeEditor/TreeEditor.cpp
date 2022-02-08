@@ -106,7 +106,7 @@ void TreeEditor::addExtensionUint(ExtensionManager *manager) {
         for (auto &i : str_list) {
             auto type = std::string(i.toStdString());
 
-            auto constructor_ptr = (treeWidgetWrapperConstructor)uint->ptr;
+            auto constructor_ptr = (treeWidgetWrapperConstructor)uint->object;
 
             auto cm = constructors_map_.find(type);
             if (cm == constructors_map_.end()) {
@@ -141,7 +141,6 @@ class TreeCheckBox : public QCheckBox {
         initSettings();
     }
 
-
     BaseSignalController signal_controller_;
 
    private:
@@ -159,7 +158,6 @@ class TreeCheckBox : public QCheckBox {
  */
 
 class TreeLineEdit : public QLineEdit {
-
    public:
     explicit TreeLineEdit(Parameter_ifs *parameter, DataSchema_ifs *data_schema, const std::string &path,
                           QWidget *parent = nullptr)
@@ -168,25 +166,22 @@ class TreeLineEdit : public QLineEdit {
           parameter_(parameter),
           data_schema_(data_schema),
           path_(path) {
-        auto h= parameter_->getProperty(path_);
-        if(h && isString(h->getValue().type_)) {
+        auto h = parameter_->getProperty(path_);
+        if (h && isString(h->getValue().type_)) {
             setText(h->getValue().asString().c_str());
-        }
-        else{
+        } else {
             setText("invalid_value");
         }
         setToolTip(data_schema_->help_.c_str());
         initSettings();
 
-        connect(this,&QLineEdit::textEdited,this,&TreeLineEdit::textWasEdited);
+        connect(this, &QLineEdit::textEdited, this, &TreeLineEdit::textWasEdited);
     }
 
     BaseSignalController signal_controller_;
 
    public slots:
-     void textWasEdited(const QString & text) {
-        parameter_->setProperty(path_,Value(text.toStdString()));
-    }
+    void textWasEdited(const QString &text) { parameter_->setProperty(path_, Value(text.toStdString())); }
 
    private:
     void initSettings() {}
@@ -210,33 +205,36 @@ class TreeIPEdit : public QLineEdit {
           QLineEdit(parent),
           parameter_(parameter),
           data_schema_(data_schema),
-          path_(path){
+          path_(path) {
         initSettings();
         setupValue();
     }
 
-    void setupValue(){
-        auto h= parameter_->getProperty(path_);
-        if(h && isNum(h->getValue().type_)) {
-            union TempUnion{u8_t b[4];u32_t dw;};
+    void setupValue() {
+        auto h = parameter_->getProperty(path_);
+        if (h && isNum(h->getValue().type_)) {
+            union TempUnion {
+                u8_t b[4];
+                u32_t dw;
+            };
             TempUnion temp;
-            temp.dw= h->getValue().value_.u32;
+            temp.dw = h->getValue().value_.u32;
 
             auto s = QString("%1.%2.%3.%4")
-                .arg(temp.b[3], 3, 10, QLatin1Char('0'))
-                .arg(temp.b[2], 3, 10, QLatin1Char('0'))
-                .arg(temp.b[1], 3, 10, QLatin1Char('0'))
-                .arg(temp.b[0], 3, 10, QLatin1Char('0'));
-            qDebug()<<s;
+                         .arg(temp.b[3], 3, 10, QLatin1Char('0'))
+                         .arg(temp.b[2], 3, 10, QLatin1Char('0'))
+                         .arg(temp.b[1], 3, 10, QLatin1Char('0'))
+                         .arg(temp.b[0], 3, 10, QLatin1Char('0'));
+            qDebug() << s;
             setText(s);
-        }
-        else{
+        } else {
             setText("invalid_value");
         }
     }
     ~TreeIPEdit() override { delete validator_; };
 
     BaseSignalController signal_controller_;
+
    private:
     void initSettings() {
         QRegExp rx(R"(((([01]\d\d)|(2[0-4]\d)|(25[0-5])).){3}(([01]\d\d)|(2[0-4]\d)|(25[0-5])))");
@@ -247,6 +245,7 @@ class TreeIPEdit : public QLineEdit {
     }
 
     QValidator *validator_ = nullptr;
+
    protected:
     std::string path_;
     Parameter_ifs *parameter_ = nullptr;
@@ -261,27 +260,25 @@ class TreeIPEdit : public QLineEdit {
 class TreeNumEdit : public QLineEdit {
    public:
     explicit TreeNumEdit(Parameter_ifs *parameter, DataSchema_ifs *data_schema, const std::string &path,
-                        QWidget *parent = nullptr)
+                         QWidget *parent = nullptr)
         :  //
           QLineEdit(parent),
           parameter_(parameter),
           data_schema_(data_schema),
-          path_(path){
+          path_(path) {
         initSettings();
 
+        auto h = parameter_->getProperty(path_);
 
-        auto h= parameter_->getProperty(path_);
-
-        if(h && isNum(h->getValue().type_)) {
+        if (h && isNum(h->getValue().type_)) {
             setText(h->getValue().asString().c_str());
             type_ = h->getValue().type_;
-        }
-        else{
+        } else {
             setText("invalid_value");
         }
         setToolTip(data_schema_->help_.c_str());
 
-        connect(this,&QLineEdit::textEdited,this,&TreeNumEdit::textWasEdited);
+        connect(this, &QLineEdit::textEdited, this, &TreeNumEdit::textWasEdited);
     }
 
     ~TreeNumEdit() override { delete validator_; };
@@ -289,9 +286,7 @@ class TreeNumEdit : public QLineEdit {
     BaseSignalController signal_controller_;
 
    public slots:
-    void textWasEdited(const QString & text) {
-        parameter_->setProperty(path_,Value(text.toStdString(),type_));
-    }
+    void textWasEdited(const QString &text) { parameter_->setProperty(path_, Value(text.toStdString(), type_)); }
 
    private:
     void initSettings() {
@@ -301,12 +296,12 @@ class TreeNumEdit : public QLineEdit {
     }
 
     QValidator *validator_ = nullptr;
+
    protected:
     std::string path_;
     DataType type_ = DataType::none_v;
     Parameter_ifs *parameter_ = nullptr;
     DataSchema_ifs *data_schema_ = nullptr;
-
 };
 /*
  *

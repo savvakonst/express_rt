@@ -42,8 +42,8 @@ MainWindow::MainWindow(ExtensionManager *ctm) : text_edit_(new QTextEdit), manag
     auto io_units = manager_->getLastVersionExtensionUintsByType("io");
 
     for (auto i : io_units) {
-        if (i && i->ptr) {
-            auto new_base = new OpenAction(manager_, (IO_ifs *)i->ptr, this);
+        if (i && i->object) {
+            auto new_base = new OpenAction(manager_, (IO_ifs *)i->object, this);
             new_base->setStatusTip(tr("&Create a new file"));
             file_menu->addAction(new_base);
         }
@@ -80,7 +80,7 @@ void MainWindow::createDockWindows() {
     for (auto i : units) {
         dock = new QDockWidget(tr(i->name), this);
 
-        auto widget = (QWidget *)i->ptr;  // ctm_->getLastVersionExtensionUint("widget", "conv_template_list")->ptr;
+        auto widget = (QWidget *)i->object;  // ctm_->getLastVersionExtensionUint("widget", "conv_template_list")->ptr;
         dock->setObjectName(tr(i->name));
         dock->setWidget(widget);
         addDockWidget(Qt::BottomDockWidgetArea, dock);
