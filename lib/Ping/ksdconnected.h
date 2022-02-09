@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "tnmdefs.h"
+#include "KsdApi/tnmdefs.h"
 
 union ModuleAddress {
     uint32_t address;

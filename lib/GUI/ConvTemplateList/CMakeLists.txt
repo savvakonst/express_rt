@@ -3,13 +3,14 @@ set(CONV_TEMPLATE_LIST ConvTemplateList)
 
 
 add_library(${CONV_TEMPLATE_LIST} SHARED
+        main.cpp
         ConvTemplateList.cpp
         ConvTemplateList.h
         ParameterTable.cpp
         ParameterTable.h
-        DevicesList.cpp
-        DevicesList.h
-        )
+        DeviceList.cpp
+        DeviceList.h
+        Actions.h)
 
 # TODO: remove it
 target_include_directories(${CONV_TEMPLATE_LIST} PRIVATE .)

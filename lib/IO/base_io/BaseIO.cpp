@@ -1,4 +1,4 @@
-#include "baseio/DefaultBaseIO.h"
+#include "BaseIO.h"
 
 #include <memory>
 #include <regex>
@@ -90,9 +90,9 @@ YAML::Node get(std::string key, const YAML::Node &node) {
  *
  */
 
-DefaultBaseIO::DefaultBaseIO() : IO_ifs("*.base", "express base file", "") {}
+BaseIO::BaseIO() : IO_ifs("*.base", "express base file", "") {}
 
-DefaultBaseIO::~DefaultBaseIO() = default;
+BaseIO::~BaseIO() = default;
 
 YAML::Node findParametersSubInformation(const std::string &parameter_name, const YAML::Node &node) {
     for (auto &i : node) {
@@ -101,7 +101,7 @@ YAML::Node findParametersSubInformation(const std::string &parameter_name, const
     return {};
 }
 
-bool DefaultBaseIO::readDocument(ExtensionManager *manager, const std::string &source_path) {
+bool BaseIO::readDocument(ExtensionManager *manager, const std::string &source_path) {
     auto ctm = (ConversionTemplateManager *)manager
                    ->getLastVersionExtensionUint("cnv_template_manager", "cnv_template_manager")
                    ->ptr;
@@ -114,15 +114,15 @@ bool DefaultBaseIO::readDocument(ExtensionManager *manager, const std::string &s
     return false;
 }
 
-bool DefaultBaseIO::saveDocument(const std::string &id, const std::string &dst_path) { return false; }
+bool BaseIO::saveDocument(const std::string &id, const std::string &dst_path) { return false; }
 
-ConversionTemplate *DefaultBaseIO::parseDocument(ExtensionManager *manager, const std::string &str,
-                                                 const std::string &source_path) {
+ConversionTemplate *BaseIO::parseDocument(ExtensionManager *manager, const std::string &str,
+                                          const std::string &source_path) {
     return readOrParseDocument(manager, false, str, source_path);
 }
 
-ConversionTemplate *DefaultBaseIO::readOrParseDocument(ExtensionManager *manager, bool is_file, const std::string &str,
-                                                       const std::string &source_path) {
+ConversionTemplate *BaseIO::readOrParseDocument(ExtensionManager *manager, bool is_file, const std::string &str,
+                                                const std::string &source_path) {
     std::unique_ptr<ConversionTemplate> conv_template(new ConversionTemplate(manager));
 
     try {
@@ -187,7 +187,7 @@ ConversionTemplate *DefaultBaseIO::readOrParseDocument(ExtensionManager *manager
     return conv_template.release();
 }
 
-void DefaultBaseIO::addPpbm(PDefaultBaseIO_ifs *p) {
+void BaseIO::addPpbm(PDefaultBaseIO_ifs *p) {
     auto PP = PPBMap_.find(p->getPrmType());
     if (PP == PPBMap_.end()) {
         PPBMap_[p->getPrmType()] = new PPBList{p};
@@ -196,7 +196,7 @@ void DefaultBaseIO::addPpbm(PDefaultBaseIO_ifs *p) {
     }
 }
 
-const DefaultBaseIO::PPBList *DefaultBaseIO::getPPBMList(uint32_t type) const {
+const BaseIO::PPBList *BaseIO::getPPBMList(uint32_t type) const {
     auto PP = PPBMap_.find(type);
     if (PP == PPBMap_.end()) {
         return nullptr;

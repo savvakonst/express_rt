@@ -30,7 +30,7 @@ target_link_libraries(ExampleDockWindows PRIVATE CommonLib)
 #target_link_libraries(ExampleDockWindows PRIVATE TreeEditor)
 add_dependencies(ExampleDockWindows Modules)
 add_dependencies(ExampleDockWindows PyEmbedder)
-add_dependencies(ExampleDockWindows ExampleBaseIO)
+add_dependencies(ExampleDockWindows CommonIO)
 add_dependencies(ExampleDockWindows ConvTemplateList)
 add_dependencies(ExampleDockWindows TreeEditor)
 

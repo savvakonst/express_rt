@@ -1,15 +1,13 @@
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 //
 #include "Module_DCU_.h"
-
-
-#include "device/Device.h"
 #include "common/ExtensionManager.h"
+#include "device/Device.h"
 
-static std::string createCHxxId(size_t t){
+static std::string createCHxxId(size_t slots) {
     char data[3] = {0, 0, 0};
-    std::sprintf(data, "%02d", 200);
+    std::sprintf(data, "%02d", slots);
     return "CH" + std::string(data);
 }
 
@@ -54,7 +52,8 @@ Module_DCU_::Module_DCU_(size_t number_of_slots, const void *ptr, size_t size, E
 Module_DCU_::~Module_DCU_() = default;
 
 bool Module_DCU_::hasTransceiver() const {
-    // TODO:  try to use:// return std::any_of(modules_.begin(),modules_.end(), [](auto i){ return i->hasTransceiver(); });  // instead
+    // TODO:  try to use:// return std::any_of(modules_.begin(),modules_.end(), [](auto i){ return i->hasTransceiver();
+    // });  // instead
     for (auto i : modules_)
         if (i->hasTransceiver()) return true;
     return false;
@@ -95,23 +94,19 @@ ModuleStream_ifs *Module_DCU_::createModuleStream() {
 };
 
 std::vector<std::pair<std::string, Module_ifs *>> Module_DCU_::getSubModules() const {
-    std::vector<std::pair<std::string, Module_ifs *>>  ret;
-    //ret.resize(number_of_slots_,{"", nullptr});
-    //ret.reserve(number_of_slots_);
+    std::vector<std::pair<std::string, Module_ifs *>> ret;
+    // ret.resize(number_of_slots_,{"", nullptr});
+    // ret.reserve(number_of_slots_);
 
     ret.reserve(modules_.size());
-    for(auto i :modules_){
-        ret.push_back({i->getID(),i});
+    for (auto i : modules_) {
+        ret.push_back({i->getID(), i});
     }
 
     return ret;
 }
 
 const ErrorInfo_ifs *Module_DCU_::getErrorInfo() const { return nullptr; }
-
-
-
-
 
 /*
  *

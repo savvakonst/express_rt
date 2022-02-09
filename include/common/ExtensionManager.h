@@ -42,7 +42,7 @@ inline ExtensionUnit *search(ExtensionUnit *ptr, const std::string &type, const 
 
 class COMMON_API_ ExtensionManager {
    public:
-    ExtensionManager(bool init = true);
+    explicit ExtensionManager(bool init = true);
 
     ~ExtensionManager();
 

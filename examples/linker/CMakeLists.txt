@@ -18,7 +18,7 @@ set_property(TARGET ExampleLinker PROPERTY OUTPUT_NAME ExampleLinker)
 target_link_libraries(ExampleLinker CommonLib)
 add_dependencies(ExampleLinker Modules)
 add_dependencies(ExampleLinker PyEmbedder)
-add_dependencies(ExampleLinker ExampleBaseIO)
+add_dependencies(ExampleLinker CommonIO)
 add_dependencies(ExampleLinker ConvTemplateList)
 
 set_target_properties(ExampleLinker PROPERTIES CXX_STANDARD_REQUIRED ON OUTPUT_NAME ExampleLinker)

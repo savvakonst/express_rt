@@ -9,12 +9,15 @@ typedef void *TNMLIB_HANDLE;
 #define _TNMLIB_MAX_DEVICES 128
 
 #include <stdint.h>
+#include <windows.h>  // TODO:  remove this anyway,it is best to split this file into architecture independent and architecture depended files
+
 typedef BOOL(CALLBACK *LPTNMLIB_DATAPROCESSPROC)(LPVOID lpBuffer, uint32_t dwBufferSize, LPVOID lpParam);
 typedef BOOL(CALLBACK *LPTNMLIB_PROGRESSPROC)(LPVOID lpParam);
 
 typedef BOOL(CALLBACK *LPTNMLIB_STAGEDREADPROC)(LPVOID lpStageBuffer, uint32_t dwStageSize, LPVOID lpParam);
 typedef BOOL(CALLBACK *LPTNMLIB_STAGEDWRITEPROC)(LPVOID *lpStageBuffer, uint32_t dwStageSize, LPVOID lpParam);
 
+//
 #define TNMLIB_DEVICE_MEMTYPE_RAWFLASH 0
 #define TNMLIB_DEVICE_MEMTYPE_FLASH 1
 #define TNMLIB_DEVICE_MEMTYPE_TASKS 2
@@ -28,7 +31,7 @@ typedef BOOL(CALLBACK *LPTNMLIB_STAGEDWRITEPROC)(LPVOID *lpStageBuffer, uint32_t
 #define TNMLIB_DEVICE_MEMORY_EXINFO_READ 0
 #define TNMLIB_DEVICE_MEMORY_EXINFO_WRITE 1
 
-#include <PshPack1.h>
+#include <pshpack1.h>
 
 typedef struct _TNMLIB_DEVICE_DATE {
     union {
@@ -160,6 +163,6 @@ typedef struct _TNMLIB_DEVICE_RECORD_PARAM {
 
 } TNMLIB_DEVICE_RECORD_PARAM, *LPTNMLIB_DEVICE_RECORD_PARAM;
 
-#include <PopPack.h>
+#include <poppack.h>
 
 #endif  // _tnmdefs_header_

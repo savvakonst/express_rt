@@ -4,7 +4,7 @@ file(GLOB Headers *.h)
 file(GLOB Sources *.cpp)
 
 
-add_library(DefaultBaseIO
+add_library(BaseIO
         ${Sources}
         ${Headers}
         )
@@ -28,11 +28,11 @@ FetchContent_Declare( # TODO: need to set up a source code destination directory
 FetchContent_MakeAvailable(yaml_cpp)
 
 
-target_link_libraries(DefaultBaseIO PRIVATE yaml-cpp)
-target_link_libraries(DefaultBaseIO PUBLIC CommonLib)
+target_link_libraries(BaseIO PRIVATE yaml-cpp)
+target_link_libraries(BaseIO PUBLIC CommonLib)
 
-set_target_properties(DefaultBaseIO PROPERTIES CXX_STANDARD_REQUIRED ON OUTPUT_NAME DefaultBaseIO)
-#target_compile_definitions(DefaultBaseIO PRIVATE YAML_CPP_DLL)
+set_target_properties(BaseIO PROPERTIES CXX_STANDARD_REQUIRED ON OUTPUT_NAME BaseIO)
+#target_compile_definitions(BaseIO PRIVATE YAML_CPP_DLL)
 #define YAML_CPP_DLL
 
 

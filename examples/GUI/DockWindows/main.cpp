@@ -3,8 +3,8 @@
 #include <QTranslator>
 #include <fstream>
 //
-#include "baseio/DefaultBaseIO.h"
 #include "common/ExtensionManager.h"
+#include "common/IO_ifs.h"
 #include "convtemplate/ConversionTemplate.h"
 #include "convtemplate/ConversionTemplateManager.h"
 #include "mainwindow.h"

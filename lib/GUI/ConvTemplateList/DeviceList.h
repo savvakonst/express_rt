@@ -18,13 +18,13 @@ class BaseSignalController;
 
 class TreeEditor;
 
-class DevicesListModel : public QAbstractItemModel {
+class DeviceListModel : public QAbstractItemModel {
     Q_OBJECT
 
    public:
-    explicit DevicesListModel(ExtensionManager *manager);
-    explicit DevicesListModel(const QString &data, QObject *parent = nullptr);
-    ~DevicesListModel() override;
+    explicit DeviceListModel(ExtensionManager *manager);
+    explicit DeviceListModel(const QString &data, QObject *parent = nullptr);
+    ~DeviceListModel() override;
 
     [[nodiscard]] void buildTree();
 
@@ -56,7 +56,8 @@ class DevicesListModel : public QAbstractItemModel {
 
         size_t getIndex() {
             // TODO: implement this
-            return 0; }
+            return 0;
+        }
 
         void addNodesRecursively(Module_ifs *ptr) {
             auto node = new TreeNode(ptr);
@@ -77,6 +78,6 @@ class DevicesListModel : public QAbstractItemModel {
     DeviceManager *device_manager_ = nullptr;
 };
 
-class DevicesList {};
+class DeviceList {};
 
-#endif  // EXRT_DEVICESLIST_H
+#endif  // EXRT_DEVICELIST_H

@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <fstream>
 
-#include "baseio/DefaultBaseIO.h"
+#include "../../lib/IO/base_io/BaseIO.h"
 #include "common/ExtensionManager.h"
 
 int main(void) {
@@ -30,7 +30,7 @@ int main(void) {
         DEBUG_CERR("cant find \"base_io\" unit with \"io\" type\n");
         return 1;
     }
-    auto *base_io = (DefaultBaseIO *)(e_unit->ptr);
+    auto *base_io = (BaseIO *)(e_unit->ptr);
 
     base_io->parseDocument(&manager, contents);
 

@@ -13,7 +13,7 @@ class OpenAction : public QAction {
    public:
     explicit OpenAction(ExtensionManager *manager, IO_ifs *io, QObject *parent = nullptr)
         : QAction(parent), manager_(manager), io_(io) {
-        setText(QObject::tr("&Open"));
+        setText(QObject::tr("&Open") + " " + io->file_type_.c_str());
         //+ " " + io->file_type_.c_str()
         connect(this, &QAction::triggered, this, &OpenAction::openFile);
     }

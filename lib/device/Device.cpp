@@ -21,7 +21,6 @@ struct MODULE_HEADER {
     uint8_t reserved[12];
 };
 #pragma pack()
-#include "iostream"
 
 Device::Device(const void *ptr, size_t size, ExtensionManager *context) {
     auto manager = (ExtensionManager *)context;

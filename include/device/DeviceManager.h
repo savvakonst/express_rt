@@ -11,21 +11,21 @@
 
 class DeviceManager : public BaseClass_ifs {
    public:
-    void addConversionTemplate(Device* device) {
+    void addDevice(Device* device) {
         vector_.push_back(device);
         emit_();
     }
 
     [[nodiscard]] size_t getEntriesNumber() const { return vector_.size(); }
 
-    Device* getConversionTemplateByIndex(size_t index) {
+    Device* getDeviceByIndex(size_t index) {
         if (index >= vector_.size()) {
             return nullptr;
         }
         return vector_[index];
     }
 
-    bool removeConversionTemplateByIndex(size_t index) {
+    bool removeDeviceByIndex(size_t index) {
         if (index >= vector_.size()) {
             error_message_ = "index is out of range";
             return false;
@@ -43,7 +43,7 @@ class DeviceManager : public BaseClass_ifs {
         return std::numeric_limits<size_t>::max();
     }
 
-    bool removeConversionTemplate(Device* device) {
+    bool removeDevice(Device* device) {
         if (device == nullptr) return false;
         auto new_end = remove(vector_.begin(), vector_.end(), device);
         delete device;

@@ -27,7 +27,6 @@ ConvTemplateTreeModel::ConvTemplateTreeModel(ExtensionManager *manager) {
     }
 }
 
-// TreeModel::TreeModel(const QString &data, QObject *parent) {}
 ConvTemplateTreeModel::~ConvTemplateTreeModel() = default;
 
 QVariant ConvTemplateTreeModel::data(const QModelIndex &index, int role) const {
@@ -177,23 +176,6 @@ Qt::ItemFlags ConvTemplateTableModel::flags(const QModelIndex &index) const {
  *
  */
 
-#ifndef CONV_TEMPLATE_LIST_LIB_NAME
-#    error "CONV_TEMPLATE_LIST_LIB_NAME undefined"
-#endif
-
-QWidget *newTreeView(QWidget *parent) {
-    auto table_view = new QTreeView();
-
-    table_view->setAlternatingRowColors(true);
-    table_view->setStyleSheet(
-        "QTreeView {background-color: #D2DCDF; alternate-background-color: #f6fafb; show-decoration-selected: 1;}"
-        "QHeaderView::section {background-color: #D2DCDF}");
-    table_view->setContextMenuPolicy(Qt::ActionsContextMenu);
-    // table_view->setSelectionMode( QAbstractItemView::SelectionMode::ExtendedSelection );
-
-    return table_view;
-}
-
 class OpenAction : public QAction {
    public:
     explicit OpenAction(ExtensionManager *manager, IO_ifs *io, QObject *parent = nullptr)
@@ -240,82 +222,43 @@ class RemoveAction : public QAction {
 /*
  *
  *
- */
-
-QWidget *newParameterTreeView(QWidget *parent);
-int initParameterTreeView(ExtensionManager *manager);
-
-/*
- *
  *
  */
 
-static int initConvTemplateListWidget(ExtensionManager *manager);
-static ExtensionUnit *g_conv_template_list_extension_uint = nullptr;
-static ExtensionInfo g_conv_template_list_extension_info;
+QWidget *newConversionTemplateView(QWidget *parent) {
+    auto table_view = new QTreeView();
 
-#include <qfile.h>
+    table_view->setAlternatingRowColors(true);
+    table_view->setStyleSheet(
+        "QTreeView {background-color: #D2DCDF; alternate-background-color: #f6fafb; show-decoration-selected: 1;}"
+        "QHeaderView::section {background-color: #D2DCDF}");
+    table_view->setContextMenuPolicy(Qt::ActionsContextMenu);
+    // table_view->setSelectionMode( QAbstractItemView::SelectionMode::ExtendedSelection );
 
-#include <QApplication>
-InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, CONV_TEMPLATE_LIST_LIB_NAME)(void) {
-    if (QCoreApplication::instance() == nullptr) return nullptr;
-
-    g_conv_template_list_extension_uint = new ExtensionUnit[]{
-        {"conv_template_list", "widget",
-         "returns widget instance, which provides list of available conversion templates", (newTreeView(nullptr)),
-         0x00},
-        {"parameter_list", "widget", "returns widget instance, which provides list of available parameters",
-         (newParameterTreeView(nullptr)), 0x00},
-        {"conv_template_list", "init", "checks the version and, if it's the latest, initializes the widget.",
-         (void *)&initConvTemplateListWidget, 0x00},
-        {nullptr, nullptr, nullptr, nullptr, 0}};
-
-    g_conv_template_list_extension_info = {"conv_template_list_extension", 0x01, g_conv_template_list_extension_uint};
-
-    return &g_conv_template_list_extension_info;
+    return table_view;
 }
 
-static int initConvTemplateListWidget(ExtensionManager *manager) {
-    auto p_unit = search(g_conv_template_list_extension_uint, "widget", "conv_template_list");
+int initConversionTemplateView(ExtensionManager *manager) {
+    auto view = (QAbstractItemView *)manager->getLastVersionExtensionObject("widget", "conv_template_list");
 
-    if (p_unit != manager->getLastVersionExtensionUint("widget", "conv_template_list")) {
-        DEBUG_CERR("cant init (name: " << p_unit->name << ", type: " << p_unit->type << ", ver.:" << p_unit->version
-                                       << ") unit, since there is a newer unit.\n");
-    } else {
-        auto view = (QAbstractItemView *)p_unit->ptr;
-        view->setModel(new ConvTemplateTableModel(manager));
+    view->setModel(new ConvTemplateTableModel(manager));
 
-        auto io_units = manager->getLastVersionExtensionUintsByType("io");
-        for (auto i : io_units) {
-            if (i && i->ptr) {
-                auto new_base = new OpenAction(manager, (IO_ifs *)i->ptr, view);
-                new_base->setStatusTip(QObject::tr("&Create a new file"));
-                new_base->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
-                new_base->setShortcut(Qt::CTRL + Qt::Key_O);
+    auto io_units = manager->getLastVersionExtensionUintsByType("io");
+    for (auto i : io_units) {
+        if (i && i->ptr) {
+            auto new_base = new OpenAction(manager, (IO_ifs *)i->ptr, view);
+            new_base->setStatusTip(QObject::tr("&Create a new file"));
+            new_base->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
+            new_base->setShortcut(Qt::CTRL + Qt::Key_O);
 
-                view->addAction(new_base);
-            }
+            view->addAction(new_base);
         }
-
-        auto remove_action = new RemoveAction(manager, view);
-        remove_action->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
-        remove_action->setShortcut(Qt::Key_Delete);
-
-        view->addAction(remove_action);
     }
 
-    /*
-     *
-     *
-     */
+    auto remove_action = new RemoveAction(manager, view);
+    remove_action->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
+    remove_action->setShortcut(Qt::Key_Delete);
 
-    p_unit = search(g_conv_template_list_extension_uint, "widget", "parameter_list");
-
-    if (p_unit != manager->getLastVersionExtensionUint("widget", "parameter_list")) {
-        DEBUG_CERR("cant init (name: " << p_unit->name << ", type: " << p_unit->type << ", ver.:" << p_unit->version
-                                       << ") unit, since there is a newer unit.\n");
-    } else
-        initParameterTreeView(manager);
-
+    view->addAction(remove_action);
     return 0;
 }

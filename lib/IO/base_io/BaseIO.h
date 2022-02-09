@@ -7,11 +7,11 @@ class ExtensionManager;
 class PDefaultBaseIO_ifs;
 class ConversionTemplate;
 
-class DefaultBaseIO : public IO_ifs {
+class BaseIO : public IO_ifs {
    public:
-    DefaultBaseIO();
+    BaseIO();
 
-    ~DefaultBaseIO() override;
+    ~BaseIO() override;
 
     bool readDocument(ExtensionManager *manager, const std::string &source_path) override;
     bool saveDocument(const std::string &id, const std::string &dst_path) override;

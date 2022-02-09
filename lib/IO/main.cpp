@@ -5,21 +5,24 @@
 #include <iostream>
 #include <regex>
 
-#include "SpecificPParserBuilder.h"
-#include "baseio/DefaultBaseIO.h"
+#include "base_io/BaseIO.h"
+#include "base_io_extensions/EthernetUDP.h"
+#include "base_io_extensions/SpecificPParserBuilder.h"
 #include "common/Extension.h"
 #include "common/ExtensionManager.h"
-//
-#include "EthernetUDP.h"
+#include "ksd_io/KsdIO.h"
 
-#ifndef DEFAULT_PARAMETERS_LIB_NAME
-#    error "DEFAULT_PARAMETERS_NAME undefined"
+//
+
+#ifndef COMMON_IO_LIB_NAME
+#    error "COMMON_IO_LIB_NAME undefined"
 #endif
 
 static int initDefaultBaseIO(ExtensionManager *manager);
 
 static ExtensionUnit g_default_parameters_units[] = {
-    {"base_io", "io", "instance of class which provides reading \"*.base\" files", (void *)new DefaultBaseIO, 0x00},
+    {"ksd_io", "io", "instance of class which provides reading \"*.ksd\" files", (void *)new KsdIO, 0x00},
+    {"base_io", "io", "instance of class which provides reading \"*.base\" files", (void *)new BaseIO, 0x00},
     {"EthernetUdp", "parameter", "parameter for processing Ethernet UDP",
      (void *)&createParameter<EthernetUdpParameter>, 0x00},
     {"EthernetUdp", "prm_parser_builder", "module for parsing and building EthernetUdp ",
@@ -35,11 +38,9 @@ static ExtensionUnit g_default_parameters_units[] = {
      (void *)initDefaultBaseIO, 0x00},
     {nullptr, nullptr, nullptr, nullptr, 0}};
 
-static ExtensionInfo g_default_parameters_info = {"default parameters", 0x01, g_default_parameters_units};
+static ExtensionInfo g_default_parameters_info = {"default io interfaces", 0x01, g_default_parameters_units};
 
-InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, DEFAULT_PARAMETERS_LIB_NAME)(void) {
-    return &g_default_parameters_info;
-}
+InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, COMMON_IO_LIB_NAME)(void) { return &g_default_parameters_info; }
 
 static int initDefaultBaseIO(ExtensionManager *manager) {
     // TODO: add guard
@@ -50,7 +51,7 @@ static int initDefaultBaseIO(ExtensionManager *manager) {
         return 1;
     }
 
-    DefaultBaseIO *base_io = (DefaultBaseIO *)e_unit->ptr;
+    BaseIO *base_io = (BaseIO *)e_unit->ptr;
     auto set = manager->getLastVersionExtensionUintsByType("prm_parser_builder");
     for (auto &i : set) base_io->addPpbm((PDefaultBaseIO_ifs *)i->ptr);
 
