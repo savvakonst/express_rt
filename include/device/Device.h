@@ -11,43 +11,50 @@
 inline std::string stringId(uint32_t id) {
     char char_id[5] = {0, 0, 0, 0, 0};
     *((uint32_t *)char_id) = id;
-    return std::string(char_id);
+    return char_id;
 }
 
 class COMMON_API_ Device : public Module_ifs {
    private:
-    struct DEVICE_DATE {
+    struct DeviceDate {
         uint8_t day;
         uint8_t month;
         uint16_t year;
     };
 
-    struct TASK_HEADER {
-        uint32_t taskSize;      //Общий размер задания, Б
-        uint32_t headerSize;    //Размер заголовка задания, = 64 Б
-        uint16_t taskVersion;   //Версия задания
-        uint16_t checkSumm;     //Контрольная сумма задания
-        char planeType[16];     //Идентификатор борта
-        DEVICE_DATE rdDate;     //Дата
+    struct TaskHeader {
+        uint32_t task_size;     //Общий размер задания, Б
+        uint32_t header_size;   //Размер заголовка задания, = 64 Б
+        uint16_t task_version;  //Версия задания
+        uint16_t check_sum;     //Контрольная сумма задания
+        char plane_type[16];    //Идентификатор борта
+        DeviceDate rd_date;     //Дата
         uint8_t reserved_a[4];  //Резерв
-        uint32_t planeNo;       //Номер борта
-        uint16_t flightNo;      //Номер полёта
-        uint16_t minVersion;    //Минимальная версия
-        uint32_t deviceID;  //Идентификатор устройства сбора (режима функционирования)
-        uint16_t syncSrc;        //Номер слота источника синхронизации
+        uint32_t plane_no;      //Номер борта
+        uint16_t flight_no;     //Номер полёта
+        uint16_t min_version;   //Минимальная версия
+        uint32_t device_id;  //Идентификатор устройства сбора (режима функционирования)
+        uint16_t sync_src;       //Номер слота источника синхронизации
         uint8_t reserved_c[14];  //Резерв
     };
 
     std::vector<Module_ifs *> modules_;
 
-    TASK_HEADER task_header_{};
-
+    TaskHeader task_header_{};
     size_t size_ = 0;
+
+    std::string source_;
+
+
+    friend class DeviceManager;
 
    public:
     Device(const void *ptr, size_t size, ExtensionManager *context);
 
     ~Device() override;
+
+    void setSource(const std::string &source) { source_ = source; }
+    [[nodiscard]] std::string getSource() const { return source_; }
 
     [[nodiscard]] bool hasTransceiver() const override;
 
@@ -55,7 +62,7 @@ class COMMON_API_ Device : public Module_ifs {
 
     [[nodiscard]] bool isAvailable() const override { return true; }
 
-    [[nodiscard]] std::string getID() const override { return "KSD"; }
+    [[nodiscard]] std::string getID() const override;
 
     /* not yet implemented inherited members  begin*/
     std::map<std::string, PrmBuffer_ifs *> getPrmBufferMap() override { return {}; }
@@ -90,8 +97,6 @@ class COMMON_API_ Device : public Module_ifs {
 
     /* */
     [[nodiscard]] std::vector<std::pair<std::string, Module_ifs *>> getModulesFromPath(const std::string &name);
-
-    [[nodiscard]] static status checkValExistence(const std::string &path);
 
     // TODO : remove this
     Module_ifs *getTopModule() {

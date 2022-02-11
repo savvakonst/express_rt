@@ -16,14 +16,29 @@ DeviceListModel::DeviceListModel(ExtensionManager *manager) {
     if (unit && unit->ptr) {
         device_manager_ = (DeviceManager *)unit->ptr;
     }
+
+    class Delegate : public Signal_ifs {
+       public:
+        explicit Delegate(DeviceListModel *parent) : parent_(parent) {}
+        void emit_() override {
+            parent_->buildTree();
+            parent_->layoutChanged();
+        }
+
+       private:
+        DeviceListModel *parent_;
+    };
+
+    device_manager_->addSignal(new Delegate(this));
+
     buildTree();
 }
 
 DeviceListModel::~DeviceListModel() = default;
 
 QVariant DeviceListModel::data(const QModelIndex &index, int role) const {
-    if (!index.isValid()) return QVariant();
-    if (role != Qt::DisplayRole) return QVariant();
+    if (!index.isValid()) return {};
+    if (role != Qt::DisplayRole) return {};
 
     auto node = (TreeNode *)index.internalPointer();
 
@@ -40,25 +55,25 @@ QVariant DeviceListModel::headerData(int section, Qt::Orientation orientation, i
     if (role == Qt::DisplayRole && (section == 0)) {
         return QString(tr("id"));
     }
-    return QVariant();
+    return {};
 }
 
 QModelIndex DeviceListModel::index(int row, int column, const QModelIndex &parent) const {
-    if (!hasIndex(row, column, parent)) return QModelIndex();
+    if (!hasIndex(row, column, parent)) return {};
 
     auto node = parent.isValid() ? (TreeNode *)parent.internalPointer() : root_;
 
     if (node->child_vector.size() > size_t(row)) return createIndex(row, column, node->child_vector[row]);
 
-    return QModelIndex();
+    return {};
 }
 
 QModelIndex DeviceListModel::parent(const QModelIndex &index) const {
-    if (!index.isValid()) return QModelIndex();
+    if (!index.isValid()) return {};
 
     auto parent_node = ((TreeNode *)index.internalPointer())->parent;
 
-    if (root_ == parent_node) return QModelIndex();
+    if (root_ == parent_node) return {};
 
     return createIndex(int(parent_node->getIndex()), 0, parent_node);
 }
@@ -67,7 +82,7 @@ int DeviceListModel::rowCount(const QModelIndex &parent) const {
     if (parent.column() > 0) return 0;
 
     auto node = parent.isValid() ? (TreeNode *)parent.internalPointer() : root_;
-    if (node) return node->child_vector.size();
+    if (node) return int(node->child_vector.size());
 
     return 0;
 }
@@ -78,13 +93,15 @@ int DeviceListModel::columnCount(const QModelIndex &parent) const {
 }
 
 void DeviceListModel::buildTree() {
-    if (root_) delete root_;
+    delete root_;
+    root_ = nullptr;
 
     auto list = device_manager_->getConversionTemplateList();
     root_ = new TreeNode(nullptr);
     root_->child_vector.reserve(list.size());
     for (auto i : list) root_->addNodesRecursively(i);
 }
+
 /*
  *
  *
@@ -140,7 +157,7 @@ class RemoveAction : public QAction {
  *
  */
 
-QWidget *newDevicesView(QWidget *parent) {
+QWidget *newDeviceView(QWidget *parent) {
     auto table_view = new QTreeView();
 
     table_view->setAlternatingRowColors(true);
@@ -153,14 +170,14 @@ QWidget *newDevicesView(QWidget *parent) {
     return table_view;
 }
 
-int initDevicesView(ExtensionManager *manager) {
+int initDeviceView(ExtensionManager *manager) {
     auto view = (QAbstractItemView *)manager->getLastVersionExtensionObject("widget", "device_list");
 
     view->setModel(new DeviceListModel(manager));
 
     auto io_units = manager->getLastVersionExtensionUintsByType("io");
     for (auto i : io_units) {
-        if (i && i->ptr) {
+        if (i && i->ptr && (((IO_ifs *)i->ptr)->filename_pattern_ == "*.ksd")) {
             auto new_base = new OpenAction(manager, (IO_ifs *)i->ptr, view);
             new_base->setStatusTip(QObject::tr("&Create a new file"));
             new_base->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
@@ -175,4 +192,6 @@ int initDevicesView(ExtensionManager *manager) {
     remove_action->setShortcut(Qt::Key_Delete);
 
     view->addAction(remove_action);
+
+    return 0;
 }

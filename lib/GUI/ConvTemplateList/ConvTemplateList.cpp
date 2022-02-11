@@ -30,9 +30,9 @@ ConvTemplateTreeModel::ConvTemplateTreeModel(ExtensionManager *manager) {
 ConvTemplateTreeModel::~ConvTemplateTreeModel() = default;
 
 QVariant ConvTemplateTreeModel::data(const QModelIndex &index, int role) const {
-    if (!index.isValid()) return QVariant();
+    if (!index.isValid()) return {};
 
-    if (role != Qt::DisplayRole) return QVariant();
+    if (role != Qt::DisplayRole) return {};
 
     auto ptr = (ConversionTemplate *)index.internalPointer();
     if (ptr != nullptr) {
@@ -40,7 +40,7 @@ QVariant ConvTemplateTreeModel::data(const QModelIndex &index, int role) const {
 
         auto it = prm_map.begin();
         std::advance(it, index.row());
-        return QVariant(it->first.data());
+        return it->first.data();
     }
 
     auto conv_template = manager_->getConversionTemplateByIndex(index.row());
@@ -62,7 +62,7 @@ QVariant ConvTemplateTreeModel::headerData(int section, Qt::Orientation orientat
 }
 
 QModelIndex ConvTemplateTreeModel::index(int row, int column, const QModelIndex &parent) const {
-    if (!hasIndex(row, column, parent)) return QModelIndex();
+    if (!hasIndex(row, column, parent)) return {};
 
     if (!parent.isValid()) {
         auto conv_tmp = manager_->getConversionTemplateByIndex((size_t)row);
@@ -72,16 +72,16 @@ QModelIndex ConvTemplateTreeModel::index(int row, int column, const QModelIndex 
         if (row < conv_tmp->getAllParameters().size()) return createIndex(row, column, conv_tmp);
     }
 
-    return QModelIndex();
+    return {};
 }
 
 QModelIndex ConvTemplateTreeModel::parent(const QModelIndex &index) const {
-    if (!index.isValid()) return QModelIndex();
+    if (!index.isValid()) return {};
 
     auto ptr = (ConversionTemplate *)index.internalPointer();
-    if (ptr) return createIndex(manager_->getIndex(ptr), 0, nullptr);
+    if (ptr) return createIndex(int(manager_->getIndex(ptr)), 0, nullptr);
 
-    return QModelIndex();
+    return {};
 }
 
 int ConvTemplateTreeModel::rowCount(const QModelIndex &parent) const {
@@ -121,10 +121,10 @@ ConvTemplateTableModel::ConvTemplateTableModel(ExtensionManager *manager) {
     unit = manager->getLastVersionExtensionUint("cnv_template_manager", "cnv_template_manager");
     if (unit && unit->ptr) {
         cnv_manager_ = (ConversionTemplateManager *)unit->ptr;
-        if (cnv_manager_ == nullptr) std::cerr << "ConvTempateTableModel::cnv_manager_ == nullptr;\n";
+        if (cnv_manager_ == nullptr) std::cerr << "ConvTemplateTableModel::cnv_manager_ == nullptr;\n";
     }
 
-    class Delegate : public Signal_ifs {
+    class [[maybe_unused]] Delegate : public Signal_ifs {
        public:
         explicit Delegate(ConvTemplateTableModel *parent) : parent_(parent) {}
         void emit_() override { parent_->layoutChanged(); }
@@ -245,7 +245,7 @@ int initConversionTemplateView(ExtensionManager *manager) {
 
     auto io_units = manager->getLastVersionExtensionUintsByType("io");
     for (auto i : io_units) {
-        if (i && i->ptr) {
+        if (i && i->ptr && (((IO_ifs *)i->ptr)->filename_pattern_ == "*.base")) {
             auto new_base = new OpenAction(manager, (IO_ifs *)i->ptr, view);
             new_base->setStatusTip(QObject::tr("&Create a new file"));
             new_base->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);

@@ -23,7 +23,7 @@ class DeviceListModel : public QAbstractItemModel {
 
    public:
     explicit DeviceListModel(ExtensionManager *manager);
-    explicit DeviceListModel(const QString &data, QObject *parent = nullptr);
+    
     ~DeviceListModel() override;
 
     [[nodiscard]] void buildTree();
@@ -50,7 +50,8 @@ class DeviceListModel : public QAbstractItemModel {
         bool removeChild(size_t index) {
             if (index < child_vector.size()) return false;
             delete child_vector[index];
-            auto s = child_vector.erase(child_vector.begin() + index);
+
+            auto s = child_vector.erase(child_vector.begin() + ptrdiff_t(index));
             return true;
         }
 
@@ -64,16 +65,15 @@ class DeviceListModel : public QAbstractItemModel {
             node->parent = this;
             child_vector.push_back(node);
             auto list = ptr->getSubModules();
-            for (auto i : list) addNodesRecursively(i.second);
+            for (const auto &i : list) node->addNodesRecursively(i.second);
         }
 
-        TreeNode *parent{};
-
+        TreeNode *parent = nullptr;
         Module_ifs *object = nullptr;
         std::vector<TreeNode *> child_vector;
     };
 
-    TreeNode *root_;
+    TreeNode *root_ = nullptr;
     std::vector<DataSchema_ifs *> list_of_entries_;
     DeviceManager *device_manager_ = nullptr;
 };

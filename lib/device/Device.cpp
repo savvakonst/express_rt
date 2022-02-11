@@ -14,10 +14,10 @@ struct MODULE_HEADER {
     uint8_t sub;
     uint8_t slot;
     uint16_t version;
-    uint16_t checkSum;
+    uint16_t check_sum;
     uint16_t flag;
     uint16_t dimension;
-    uint16_t syncMode;
+    uint16_t sync_mode;
     uint8_t reserved[12];
 };
 #pragma pack()
@@ -25,14 +25,14 @@ struct MODULE_HEADER {
 Device::Device(const void *ptr, size_t size, ExtensionManager *context) {
     auto manager = (ExtensionManager *)context;
 
-    if (size < sizeof(TASK_HEADER)) {
+    if (size < sizeof(TaskHeader)) {
         error_message_ = "task size is too small";
     }
 
-    task_header_ = *(TASK_HEADER *)ptr;
+    task_header_ = *(TaskHeader *)ptr;
 
-    size_ = (size_t)task_header_.taskSize;
-    size_t offset = sizeof(TASK_HEADER);
+    size_ = (size_t)task_header_.task_size;
+    size_t offset = sizeof(TaskHeader);
 
     do {
         char *current_ptr = (char *)ptr + offset;
@@ -50,7 +50,7 @@ Device::Device(const void *ptr, size_t size, ExtensionManager *context) {
         modules_.push_back(module);
     } while (offset < size_);
 
-    if (offset != getTaskSize()) {
+    if (offset != size_) {
         error_message_ = "sum of module sizes is not equal \"taskSize\" ";
     }
 
@@ -58,6 +58,22 @@ Device::Device(const void *ptr, size_t size, ExtensionManager *context) {
 }
 
 Device::~Device() = default;
+
+bool Device::hasTransceiver() const {
+    for (auto i : modules_) {
+        if (i->hasTransceiver()) return true;
+    }
+    return false;
+}
+
+EthernetSettings Device::getSrcAddress() const {
+    for (auto i : modules_) {
+        if (i->hasTransceiver()) return i->getSrcAddress();
+    }
+    return {};
+}
+
+std::string Device::getID() const { return stringId(task_header_.device_id); }
 
 std::vector<std::pair<std::string, Module_ifs *>> Device::getSubModules() const {
     std::vector<std::pair<std::string, Module_ifs *>> ret;
@@ -84,22 +100,6 @@ std::vector<std::pair<std::string, Module_ifs *>> Device::getModulesFromPath(con
             error_message_ = "module encapsulation is not supported yet";
             return {};
         }
-    }
-    return {};
-}
-
-status Device::checkValExistence(const std::string &path) { return status::failure; }
-
-bool Device::hasTransceiver() const {
-    for (auto i : modules_) {
-        if (i->hasTransceiver()) return true;
-    }
-    return false;
-}
-
-EthernetSettings Device::getSrcAddress() const {
-    for (auto i : modules_) {
-        if (i->hasTransceiver()) return i->getSrcAddress();
     }
     return {};
 }

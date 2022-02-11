@@ -42,6 +42,8 @@ bool KsdIO::readDocument(ExtensionManager *manager, const std::string &source_pa
 
         std::unique_ptr<Device> device(new Device(u_buffer.get(), task_size, manager));
 
+        device->setSource("file://"+source_path);
+
         device_manager->addDevice(device.release());
         return true;
     }

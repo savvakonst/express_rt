@@ -1,16 +1,13 @@
 
 set(CONV_TEMPLATE_LIST ConvTemplateList)
 
+file(GLOB Headers *.h)
+file(GLOB Sources *.cpp)
 
 add_library(${CONV_TEMPLATE_LIST} SHARED
-        main.cpp
-        ConvTemplateList.cpp
-        ConvTemplateList.h
-        ParameterTable.cpp
-        ParameterTable.h
-        DeviceList.cpp
-        DeviceList.h
-        Actions.h)
+        ${Sources}
+        ${Headers}
+        )
 
 # TODO: remove it
 target_include_directories(${CONV_TEMPLATE_LIST} PRIVATE .)

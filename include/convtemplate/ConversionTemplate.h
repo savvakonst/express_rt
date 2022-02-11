@@ -12,7 +12,7 @@ class DataSchema_ifs;
 
 class COMMON_API_ ConversionTemplate : public BaseClass_ifs {
    public:
-    ConversionTemplate(ExtensionManager* manager);
+    explicit ConversionTemplate(ExtensionManager* manager);
 
     /*
      *  base description voids
@@ -21,7 +21,7 @@ class COMMON_API_ ConversionTemplate : public BaseClass_ifs {
 
     status setName(std::string name);
     status addInfo(const std::string& path, const Value& value);
-    status addInfo(const std::string& path, const std::string& value);
+    static status addInfo(const std::string& path, const std::string& value);
 
     [[nodiscard]] const HierarchicalData_ifs* getInfo(const std::string& path) const;
     [[nodiscard]] const DataSchema_ifs* getInfoSchema() const;
