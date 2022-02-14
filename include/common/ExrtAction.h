@@ -1,9 +1,11 @@
 #ifndef EXRT_EXRTACTION_H
 #define EXRT_EXRTACTION_H
 
-class ExrtAction {
+#include "common/BaseClass_ifs.h"
+
+class ExrtAction : public BaseClass_ifs {
    public:
-    virtual std::string run() = 0;
+    virtual bool run() = 0;
 
     virtual std::string getDescription() = 0;
     virtual std::string getInfo() = 0;

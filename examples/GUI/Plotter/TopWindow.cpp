@@ -22,6 +22,7 @@
 InitExtension(ExtensionInfo *) initModules(void);
 
 #include <iostream>
+
 #include "common/ExtensionManager.h"
 /*
  *
@@ -48,7 +49,7 @@ TopWindow::TopWindow(QWidget *parent, double signal_frequency)
 TopWindow::~TopWindow() { delete manager_; }
 
 void TopWindow::initScene() {
-    initWSA();
+    initSocket();
 
     manager_ = new ExtensionManager;
 

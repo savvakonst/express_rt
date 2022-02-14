@@ -321,6 +321,8 @@ struct Value {
 inline std::string toString(const Value &value) { return toString(value); }
 
 struct EthernetAddress {
+    EthernetAddress() { memset(mac, 0, 6); }
+
     uint8_t mac[6];
     union {
         uint8_t port_b[2];
