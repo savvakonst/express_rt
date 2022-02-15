@@ -10,6 +10,18 @@
  *
  */
 
+TaskMapper::TaskMapper(const TaskMapper& task_mapper)  //
+    : type_(task_mapper.type_),
+      struct_type_(task_mapper.struct_type_),
+      vecmap_(task_mapper.vecmap_),
+      vector_(task_mapper.vector_),
+      ptr_(task_mapper.ptr_),
+      size_(task_mapper.size_) {
+    for (auto& i : vecmap_) {
+        map_[i.first] = &(i.second);
+    }
+}
+
 TaskMapper::TaskMapper(DataType type) : struct_type_(StructType::value), type_(type) { size_ = getTSize(type_); }
 
 TaskMapper::TaskMapper(size_t len, const TaskMapper& value) : struct_type_(StructType::array) {
@@ -22,9 +34,10 @@ TaskMapper::TaskMapper(size_t len, const TaskMapper& value) : struct_type_(Struc
 
 TaskMapper::TaskMapper(std::vector<tuple> vecmap) : vecmap_(std::move(vecmap)), struct_type_(StructType::map) {
     size_ = 0;
+
     for (auto& i : vecmap_) {
         size_ += i.second.size_;
-        map_[i.first] = &i.second;
+        map_[i.first] = &(i.second);
     }
 }
 
@@ -59,7 +72,7 @@ HierarchicalData_ifs* TaskMapper::getArrayUnit(size_t id) const {
 
 HierarchicalData_ifs* TaskMapper::getMapUnit(std::string id) const {
     auto map_uint = map_.find(id);
-    if (map_uint != map_.end()) return (TaskMapper*)&(map_uint->second);
+    if (map_uint != map_.end()) return map_uint->second;
     return nullptr;
 }
 
@@ -109,6 +122,8 @@ void TaskMapper::setReferencePtr(void* ptr) {
  */
 
 const TaskMapper* KSDModule::getBranch(const std::string& prop_path) const {
+    return (const TaskMapper*)::getBranch(&field_map_, prop_path);
+    /*
     const std::regex separator("[^/]+");
     const std::regex int_exp("[ ]*(\\+|\\-)?([0-9]+)");
 
@@ -123,6 +138,7 @@ const TaskMapper* KSDModule::getBranch(const std::string& prop_path) const {
         if (tree == nullptr) return nullptr;
     }
     return (const TaskMapper*)tree;
+     */
 }
 
 std::string KSDModule::printProperties(const std::string& indent) const {
@@ -138,6 +154,7 @@ const HierarchicalData_ifs* KSDModule::getProperty(const std::string& prop_path)
 
 std::string KSDModule::getPropertyAsTxt(const std::string& prop_path) const {
     auto res = getProperty(prop_path);
+    if (res->isValue()) return res->getValue().asString();
     return toString(res, "");
 }
 

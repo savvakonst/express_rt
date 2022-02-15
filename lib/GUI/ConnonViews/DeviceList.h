@@ -23,7 +23,7 @@ class DeviceListModel : public QAbstractItemModel {
 
    public:
     explicit DeviceListModel(ExtensionManager *manager);
-    
+
     ~DeviceListModel() override;
 
     [[nodiscard]] void buildTree();
@@ -36,7 +36,6 @@ class DeviceListModel : public QAbstractItemModel {
     [[nodiscard]] QModelIndex parent(const QModelIndex &index) const override;
     [[nodiscard]] int rowCount(const QModelIndex &parent) const override;
     [[nodiscard]] int columnCount(const QModelIndex &parent) const override;
-
 
     struct TreeNode {
         // it is better to avoid direct deletion.
@@ -60,18 +59,30 @@ class DeviceListModel : public QAbstractItemModel {
             return 0;
         }
 
-        void addNodesRecursively(Module_ifs *ptr) {
+        void addNodesRecursively(Module_ifs *ptr, const std::string &path = "") {
             auto node = new TreeNode(ptr);
             node->parent = this;
+
+            // auto slot = ptr->getPropertyAsTxt("header/slot");
+            // auto sub_slot = ptr->getPropertyAsTxt("header/sub");
+            // auto path = slot + ((sub_slot == "0" || sub_slot == "") ? "" : "." + sub_slot);
+
+            // node->path_chunk_ = path + ": " + ptr->getID();
             child_vector.push_back(node);
+            node->path_chunk_ = path + ": " + (ptr ? ptr->getID() : "");
+            if (ptr == nullptr) return;
             auto list = ptr->getSubModules();
-            for (const auto &i : list) node->addNodesRecursively(i.second);
+            for (const auto &i : list) {
+                node->addNodesRecursively(i.second, i.first);
+            }
         }
 
+        std::string path_chunk_;
         TreeNode *parent = nullptr;
         Module_ifs *object = nullptr;
         std::vector<TreeNode *> child_vector;
     };
+
    private:
     TreeNode *root_ = nullptr;
     std::vector<DataSchema_ifs *> list_of_entries_;
