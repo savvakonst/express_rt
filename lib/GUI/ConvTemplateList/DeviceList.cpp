@@ -2,8 +2,10 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QHeaderView>
+#include <QItemSelectionModel>
 #include <QTableView>
 //
+#include "GUI/WidgetWrappers.h"
 #include "common/ExtensionManager.h"
 #include "common/IO_ifs.h"
 #include "convtemplate/Parameter_ifs.h"
@@ -131,12 +133,15 @@ class OpenAction : public QAction {
     IO_ifs *io_;
 };
 
-class RemoveAction : public QAction {
+class DeviceRemoveAction : public QAction {
    public:
-    explicit RemoveAction(ExtensionManager *manager, QObject *parent = nullptr) : QAction(parent) {
+    explicit DeviceRemoveAction(ExtensionManager *manager, QObject *parent = nullptr) : QAction(parent) {
         setText(QObject::tr("&remove"));
-        connect(this, &QAction::triggered, this, &RemoveAction::removeEntry);
-        view_ = (QAbstractItemView *)manager->getLastVersionExtensionObject("widget", "device_list");
+        connect(this, &QAction::triggered, this, &DeviceRemoveAction::removeEntry);
+        auto view_wrapper =
+            (WidgetWrapper_ifs *)manager->getLastVersionExtensionObject("widget_wrapper", "device_view_wrapper");
+
+        view_ = (QAbstractItemView *)view_wrapper->getWidget();
         device_manager_ = (DeviceManager *)manager->getLastVersionExtensionObject("device_manager", "device_manager");
     }
    protected slots:
@@ -157,8 +162,96 @@ class RemoveAction : public QAction {
  *
  */
 
-QWidget *newDeviceView(QWidget *parent) {
-    auto table_view = new QTreeView();
+class DeviceViewWrapper : public DeviceViewWrapper_ifs {
+   public:
+    DeviceViewWrapper() : widget_(new QTreeView()) {}
+
+    ~DeviceViewWrapper() override { delete widget_; }
+
+    status addSignal(Signal_ifs *signal) override { return status::failure; }
+
+    QWidget *getWidget() override { return widget_; }
+
+    QModelIndex searchForDevice(const std::string &source, const QModelIndex &index) {
+        const int cnt = widget_->model()->rowCount(index);
+
+        for (int i = 0; i < cnt; i++) {
+            auto next_index = widget_->model()->index(i, 0, index);
+            auto node = (DeviceListModel::TreeNode *)next_index.internalPointer();
+
+            if (node->object == nullptr) {
+                auto ret_index = searchForDevice(source, next_index);
+                if (ret_index.isValid()) return next_index;
+
+            } else {
+                auto device = (Device *)node->object;
+                if (device && (device->getSource() == source)) return next_index;
+            }
+        }
+        return {};
+    }
+
+    bool setActive(const std::string &source, const std::string &path) override {
+        auto device_index = searchForDevice(source, QModelIndex());
+        if (device_index.isValid()) {
+            widget_->selectionModel()->setCurrentIndex(device_index, QItemSelectionModel ::NoUpdate);
+            return true;
+        }
+        return false;
+    }
+
+    bool setActive(size_t row_index) override {
+        auto model = widget_->model();
+        if (row_index < size_t(model->rowCount())) {
+            auto top_index = model->index(int(row_index), 0);
+            widget_->selectionModel()->setCurrentIndex(top_index, QItemSelectionModel ::NoUpdate);
+            return true;
+        }
+        return false;
+    }
+
+    bool removeFromActive() override {
+        widget_->setCurrentIndex(QModelIndex());
+        return true;
+    }
+
+    bool addToSelected(size_t row_index) override { return false; }
+
+    bool removeFromSelected(size_t row_index) override { return false; };
+
+    Device *getActiveDevice() override {
+        auto index = widget_->selectionModel()->currentIndex();
+        if (!index.isValid()) return nullptr;
+        auto node = (DeviceListModel::TreeNode *)index.internalPointer();
+
+        while (node->parent->object) node = node->parent;
+
+        return (Device *)node->object;
+    };
+
+    Module_ifs *getActiveModule() override {
+        auto index = widget_->selectionModel()->currentIndex();
+        if (!index.isValid()) return nullptr;
+        return ((DeviceListModel::TreeNode *)index.internalPointer())->object;
+    };
+
+    std::vector<Module_ifs *> getSelected() override {
+        std::vector<Module_ifs *> vector;
+        auto indexes = widget_->selectionModel()->selectedIndexes();
+        for (auto &i : indexes) {
+            auto node = (DeviceListModel::TreeNode *)i.internalPointer();
+            if (node->parent->parent == nullptr) vector.push_back(node->object);
+        }
+        return vector;
+    };
+
+   protected:
+    QTreeView *widget_;
+};
+
+WidgetWrapper_ifs *newDeviceViewWrapper() {
+    auto wrapper = new DeviceViewWrapper();
+    auto table_view = (QAbstractItemView *)wrapper->getWidget();
 
     table_view->setAlternatingRowColors(true);
     table_view->setStyleSheet(
@@ -167,11 +260,13 @@ QWidget *newDeviceView(QWidget *parent) {
     table_view->setContextMenuPolicy(Qt::ActionsContextMenu);
     // table_view->setSelectionMode( QAbstractItemView::SelectionMode::ExtendedSelection );
 
-    return table_view;
+    return wrapper;
 }
 
 int initDeviceView(ExtensionManager *manager) {
-    auto view = (QAbstractItemView *)manager->getLastVersionExtensionObject("widget", "device_list");
+    auto view_wrapper =
+        (WidgetWrapper_ifs *)manager->getLastVersionExtensionObject("widget_wrapper", "device_view_wrapper");
+    auto view = (QAbstractItemView *)view_wrapper->getWidget();
 
     view->setModel(new DeviceListModel(manager));
 
@@ -187,7 +282,7 @@ int initDeviceView(ExtensionManager *manager) {
         }
     }
 
-    auto remove_action = new RemoveAction(manager, view);
+    auto remove_action = new DeviceRemoveAction(manager, view);
     remove_action->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
     remove_action->setShortcut(Qt::Key_Delete);
 

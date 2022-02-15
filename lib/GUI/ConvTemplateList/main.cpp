@@ -8,7 +8,9 @@
 #    error "CONV_TEMPLATE_LIST_LIB_NAME undefined"
 #endif
 
-QWidget *newDeviceView(QWidget *parent);
+class WidgetWrapper_ifs;
+
+WidgetWrapper_ifs *newDeviceViewWrapper();
 QWidget *newParameterTreeView(QWidget *parent);
 QWidget *newConversionTemplateView(QWidget *parent);
 //
@@ -28,8 +30,9 @@ InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, CONV_TEMPLATE_LIST_LIB_NA
     if (QCoreApplication::instance() == nullptr) return nullptr;
 
     g_conv_template_list_extension_uint = new ExtensionUnit[]{
-        {"device_list", "widget", "returns widget instance, which provides list of available conversion templates",
-         (newDeviceView(nullptr)), DEVICE_LIST_VER},
+        {"device_view_wrapper", "widget_wrapper",
+         "returns widget wrapper instance, which provides tree of available devices and modules",
+         (newDeviceViewWrapper()), DEVICE_LIST_VER},
         {"conv_template_list", "widget",
          "returns widget instance, which provides list of available conversion templates",
          (newConversionTemplateView(nullptr)), CONV_TEMPLATE_LIST_VER},
@@ -46,7 +49,7 @@ InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, CONV_TEMPLATE_LIST_LIB_NA
 
 static int initWidgets(ExtensionManager *manager) {
     //
-    auto p_unit = manager->getLastVersionExtensionUint("widget", "device_list");
+    auto p_unit = manager->getLastVersionExtensionUint("widget_wrapper", "device_view_wrapper");
     if ((p_unit == nullptr) || (p_unit->version != DEVICE_LIST_VER)) {
         DEBUG_CERR("cant init (name: " << p_unit->name << ", type: " << p_unit->type << ", ver.:" << p_unit->version
                                        << ") unit, since there is a newer unit.\n");

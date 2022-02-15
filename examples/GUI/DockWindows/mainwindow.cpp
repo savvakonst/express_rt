@@ -2,6 +2,7 @@
 #include <QtWidgets>
 //
 #include "GUI/TreeEditor.h"
+#include "GUI/WidgetWrappers.h"
 #include "common/ExtensionManager.h"
 #include "common/IO_ifs.h"
 #include "convtemplate/Parameter_ifs.h"
@@ -86,13 +87,25 @@ void MainWindow::createDockWindows() {
         addDockWidget(Qt::BottomDockWidgetArea, dock);
     }
 
-    QSettings settings("MyCompany", "MyApp");
+    units = manager_->getLastVersionExtensionUintsByType("widget_wrapper");
+    for (auto i : units) {
+        dock = new QDockWidget(tr(i->name), this);
+
+        auto widget_wrapper =
+            (WidgetWrapper_ifs *)i->ptr;  // ctm_->getLastVersionExtensionUint("widget", "conv_template_list")->ptr;
+        auto widget = widget_wrapper->getWidget();
+        dock->setObjectName(tr(i->name));
+        dock->setWidget(widget);
+        addDockWidget(Qt::BottomDockWidgetArea, dock);
+    }
+
+    QSettings settings("none", "express_rt");
     restoreGeometry(settings.value("geometry").toByteArray());
     restoreState(settings.value("windowState").toByteArray());
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    QSettings settings("MyCompany", "MyApp");
+    QSettings settings("none", "express_rt");
 
     settings.setValue("geometry", saveGeometry());
     settings.setValue("windowState", saveState());

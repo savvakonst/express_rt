@@ -18,7 +18,7 @@ class KsdConnected {
    public:
     explicit KsdConnected();
 
-    // this function doesn't take ownership of this sobj. it just copies the contents
+    // this constructor doesn't take ownership of this socket_obj. it just copies the contents
     explicit KsdConnected(int index, uint16_t lun, const SocketObj *socket_obj);
 
     ~KsdConnected();
@@ -44,10 +44,12 @@ class KsdConnected {
     bool readTaskMemory(void *p, uint32_t offset, uint32_t size, uint32_t &transferred);
     bool ask();
 
-    const std::vector<char> &getTask();
-    const std::vector<char> &getRecordModulesMap();
+    [[nodiscard]] std::string getSource() const;
 
-    bool hasError() { return !error_msg_.empty(); }
+    [[nodiscard]] const std::vector<char> &getTask() const;
+    [[nodiscard]] const std::vector<char> &getRecordModulesMap() const;
+
+    [[maybe_unused]] bool hasError() { return !error_msg_.empty(); }
     std::string getErrorMsg() { return error_msg_; }
 
     void closeSocket();
@@ -55,7 +57,7 @@ class KsdConnected {
    private:
     bool ioSyncGen(uint8_t request, uint8_t flags, void *data, uint32_t transfer_size, uint32_t *p_transferred,
                    CxW_Params *cbw_params, CxW_Params *csw_params, int32_t timeout);
-    bool ioRequestSync(uint8_t request, uint8_t flags, void *data, uint32_t transfer_size, uint32_t *p_transfered,
+    bool ioRequestSync(uint8_t request, uint8_t flags, void *data, uint32_t transfer_size, uint32_t *p_transferred,
                        CxW_Params *cbw_params, CxW_Params *csw_params, int32_t timeout);
 
     SocketObj *socket_obj_;
@@ -71,7 +73,7 @@ class KsdConnected {
 
    private:
     void setError(const std::string &err_msg) { error_msg_ += err_msg + "\n"; }
-    std::string error_msg_ = "";
+    std::string error_msg_;
 };
 
 std::list<KsdConnected *> devicePing(const EthernetAddress &host_addr, std::string &error_msg);

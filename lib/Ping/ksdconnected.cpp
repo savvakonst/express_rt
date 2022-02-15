@@ -359,9 +359,9 @@ bool KsdConnected::ioSyncGen(uint8_t request, uint8_t flags, void *data, uint32_
 }
 //-------------------------------------------------------------------------
 bool KsdConnected::ioRequestSync(uint8_t request, uint8_t flags, void *data, uint32_t transfer_size,
-                                 uint32_t *p_transfered, CxW_Params *cbw_params, CxW_Params *csw_params,
+                                 uint32_t *p_transferred, CxW_Params *cbw_params, CxW_Params *csw_params,
                                  int32_t timeout) {
-    bool status = ioSyncGen(request, flags, data, transfer_size, p_transfered, cbw_params, csw_params, timeout);
+    bool status = ioSyncGen(request, flags, data, transfer_size, p_transferred, cbw_params, csw_params, timeout);
 
     if (status) setError("Error: ioRequestSync()");
 
@@ -527,11 +527,26 @@ bool KsdConnected::ask() {
     return status;
 }
 
-//-------------------------------------------------------------------------
-const std::vector<char> &KsdConnected::getTask() { return task_buffer_; }
+#include <iomanip>
+#include <sstream>
+
+std::string KsdConnected::getSource() const {
+    auto *s = (sockaddr_in *)&(socket_obj_->sockaddr_);
+    auto *ip = (uint8_t *)&(s->sin_addr);
+    std::stringstream ss;
+#define LZ(X) std::setw(3) << std::setfill('0') << uint16_t(X)
+
+    ss << "udp://" << LZ(ip[0]) << "." << LZ(ip[1]) << "." << LZ(ip[2]) << "." << LZ(ip[3]) << ":"
+       << std::to_string(htons(s->sin_port));
+
+    return std::string(ss.str());
+}
 
 //-------------------------------------------------------------------------
-const std::vector<char> &KsdConnected::getRecordModulesMap() { return record_modules_map_buffer_; }
+const std::vector<char> &KsdConnected::getTask() const { return task_buffer_; }
+
+//-------------------------------------------------------------------------
+const std::vector<char> &KsdConnected::getRecordModulesMap() const { return record_modules_map_buffer_; }
 
 /*
  *

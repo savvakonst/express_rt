@@ -3,7 +3,7 @@
 
 #include "TopWindow.h"
 
-#include <WinSock2.h>
+
 #include <qgraphicsscene.h>
 
 #include <QFrame>
@@ -49,7 +49,6 @@ TopWindow::TopWindow(QWidget *parent, double signal_frequency)
 TopWindow::~TopWindow() { delete manager_; }
 
 void TopWindow::initScene() {
-    initSocket();
 
     manager_ = new ExtensionManager;
 

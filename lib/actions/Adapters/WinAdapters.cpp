@@ -15,13 +15,18 @@
 #define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
 
 // this code was obtained from https://docs.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getadaptersinfo
-
+#include "iostream"
 class WinAdapters : public Adapters {
    public:
-    WinAdapters() {}
+    WinAdapters() {
+        auto list = getAdapterInfoList();
+        current_adapter_ = list.front();
+    }
+
     AdapterInfo getCurrentAdapter() override {
         { return current_adapter_; }
     }
+
     void setCurrentAdapter(const AdapterInfo &adapter) override { current_adapter_ = adapter; }
     std::vector<AdapterInfo> getAdapterInfoList() override;
 
@@ -87,6 +92,7 @@ std::vector<AdapterInfo> WinAdapters::getAdapterInfoList() {
             adapter_info.address_.port = 0;
             if (p_adapter->AddressLength == 6) memcpy(adapter_info.address_.mac, p_adapter->Address, 6);
 
+            adapters.push_back(adapter_info);
             // printf("\tAdapter Desc: \t%s\n", p_adapter->Description);
             /*
             printf("\tAdapter Addr: \t");

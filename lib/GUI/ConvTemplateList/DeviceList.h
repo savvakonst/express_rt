@@ -37,7 +37,7 @@ class DeviceListModel : public QAbstractItemModel {
     [[nodiscard]] int rowCount(const QModelIndex &parent) const override;
     [[nodiscard]] int columnCount(const QModelIndex &parent) const override;
 
-   private:
+
     struct TreeNode {
         // it is better to avoid direct deletion.
 
@@ -72,7 +72,7 @@ class DeviceListModel : public QAbstractItemModel {
         Module_ifs *object = nullptr;
         std::vector<TreeNode *> child_vector;
     };
-
+   private:
     TreeNode *root_ = nullptr;
     std::vector<DataSchema_ifs *> list_of_entries_;
     DeviceManager *device_manager_ = nullptr;

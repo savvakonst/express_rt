@@ -31,6 +31,7 @@ class DeviceManager : public BaseClass_ifs {
             return false;
         }
         vector_.erase(vector_.begin() + index);
+        emit_();
         return true;
     }
 
