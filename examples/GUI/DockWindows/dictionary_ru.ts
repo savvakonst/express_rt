@@ -4,23 +4,23 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="mainwindow.cpp" line="40"/>
+        <location filename="mainwindow.cpp" line="41"/>
         <source>&amp;File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="47"/>
+        <location filename="mainwindow.cpp" line="48"/>
         <source>&amp;Create a new file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="53"/>
+        <location filename="mainwindow.cpp" line="54"/>
         <source>&amp;Dock Widgets</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="64"/>
         <location filename="mainwindow.cpp" line="65"/>
+        <location filename="mainwindow.cpp" line="66"/>
         <source>&amp;parameter properties</source>
         <translation type="unfinished"></translation>
     </message>
@@ -28,7 +28,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="mainwindow.cpp" line="16"/>
+        <location filename="mainwindow.cpp" line="17"/>
         <source>&amp;Open</source>
         <translation type="unfinished"></translation>
     </message>

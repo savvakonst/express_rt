@@ -33,7 +33,7 @@ add_dependencies(ExampleDockWindows Actions)
 add_dependencies(ExampleDockWindows Modules)
 add_dependencies(ExampleDockWindows PyEmbedder)
 add_dependencies(ExampleDockWindows CommonIO)
-add_dependencies(ExampleDockWindows ConvTemplateList)
+add_dependencies(ExampleDockWindows CommonViews)
 add_dependencies(ExampleDockWindows TreeEditor)
 
 
