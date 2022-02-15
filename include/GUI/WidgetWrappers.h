@@ -52,42 +52,11 @@ class ListWidgetWrapper_ifs : public WidgetWrapper_ifs {
     virtual std::vector<ret_T *> getSelected() = 0;
 };
 
-template <class T, class ret_T>
-class ListWidgetWrapperTemplate_ifs : public ListWidgetWrapper_ifs<ret_T> {
-   public:
-    explicit ListWidgetWrapperTemplate_ifs(T *widget) : widget_(widget) {}
-
-    ListWidgetWrapperTemplate_ifs(const ListWidgetWrapperTemplate_ifs &) = delete;
-
-    ListWidgetWrapperTemplate_ifs(const ListWidgetWrapperTemplate_ifs &&) = delete;
-
-    ~ListWidgetWrapperTemplate_ifs() override = default;
-
-    QWidget *getWidget() override { return widget_; }
-
-    status addSignal(Signal_ifs *signal) override = 0;
-
-    bool setActive(size_t row_index) override = 0;
-    bool removeFromActive() override = 0;
-
-    bool addToSelected(size_t row_index) override = 0;
-    bool removeFromSelected(size_t row_index) override = 0;
-
-    ret_T *getActive() override = 0;
-    std::vector<ret_T *> getSelected() override = 0;
-
-   protected:
-    T *widget_;
-};
-
-
-
 class Module_ifs;
 class Device;
 
 class DeviceViewWrapper_ifs : public WidgetWrapper_ifs {
    public:
-
     virtual bool setActive(size_t row_index) = 0;
     virtual bool setActive(const std::string &source, const std::string &path) = 0;
     virtual bool removeFromActive() = 0;
@@ -99,9 +68,6 @@ class DeviceViewWrapper_ifs : public WidgetWrapper_ifs {
     virtual Module_ifs *getActiveModule() = 0;
 
     virtual std::vector<Module_ifs *> getSelected() = 0;
-
-
 };
-
 
 #endif  // EXRT_WIDGETWRAPPERS_H
