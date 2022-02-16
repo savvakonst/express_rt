@@ -116,6 +116,70 @@ void ParameterTableModel::selectParameter(const QModelIndex &index) {
  *
  */
 
+/*
+ *
+ *
+ *
+ */
+
+class ParameterViewWrapper : public ParameterViewWrapper_if {
+   public:
+    ParameterViewWrapper() : widget_(new QTreeView()) {}
+
+    size_t rowCount() { return size_t(widget_->model()->rowCount()); }
+
+    status addSignal(Signal_ifs *signal) override { return status::failure; }
+
+    QWidget *getWidget() override { return widget_; }
+
+    bool setActive(size_t row_index) override {
+        auto cnt = rowCount();
+        for (int i = 0; i < cnt; i++) {
+            auto index = widget_->model()->index(i, 0);
+        }
+        // TODO: implement method
+        return false;
+    }
+
+    bool setActive(const std::string &name) override {
+        // TODO: implement method
+        return false;
+    }
+
+    bool removeFromActive() override {
+        // TODO: implement method
+        return false;
+    }
+
+    bool addToSelected(size_t row_index) override {
+        // TODO: implement method
+        return false;
+    }
+
+    bool addToSelected(const std::string &name) override {
+        // TODO: implement method
+        return false;
+    }
+
+    bool removeFromSelected(size_t row_index) override {
+        // TODO: implement method
+        return false;
+    }
+
+    Parameter_ifs *getActive() override {
+        // TODO: implement method
+        return nullptr;
+    }
+
+    std::vector<Parameter_ifs *> getSelected() override {
+        // TODO: implement method
+        return {false};
+    }
+
+   protected:
+    QTreeView *widget_;
+};
+
 void ParameterTreeView::currentChanged(const QModelIndex &current, const QModelIndex &previous) {
     emit currentChangedSignal(current);
     // static int cnt = 0;

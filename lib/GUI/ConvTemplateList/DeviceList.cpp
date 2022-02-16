@@ -258,7 +258,7 @@ WidgetWrapper_ifs *newDeviceViewWrapper() {
         "QTreeView {background-color: #D2DCDF; alternate-background-color: #f6fafb; show-decoration-selected: 1;}"
         "QHeaderView::section {background-color: #D2DCDF}");
     table_view->setContextMenuPolicy(Qt::ActionsContextMenu);
-    // table_view->setSelectionMode( QAbstractItemView::SelectionMode::ExtendedSelection );
+    table_view->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
 
     return wrapper;
 }

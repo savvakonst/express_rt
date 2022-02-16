@@ -70,4 +70,36 @@ class DeviceViewWrapper_ifs : public WidgetWrapper_ifs {
     virtual std::vector<Module_ifs *> getSelected() = 0;
 };
 
+class Parameter_ifs;
+
+class ParameterViewWrapper_if : public WidgetWrapper_ifs {
+   public:
+    virtual bool setActive(size_t row_index) = 0;
+    virtual bool setActive(const std::string &name) = 0;
+    virtual bool removeFromActive() = 0;
+
+    virtual bool addToSelected(size_t row_index) = 0;
+    virtual bool addToSelected(const std::string &name) = 0;
+    virtual bool removeFromSelected(size_t row_index) = 0;
+
+    virtual Parameter_ifs *getActive() = 0;
+    virtual std::vector<Parameter_ifs *> getSelected() = 0;
+};
+
+class ConversionTemplate;
+
+class ConversionTemplateViewWrapper_if : public WidgetWrapper_ifs {
+   public:
+    virtual bool setActive(size_t row_index) = 0;
+    virtual bool setActive(const std::string &source) = 0;
+    virtual bool removeFromActive() = 0;
+
+    virtual bool addToSelected(size_t row_index) = 0;
+    virtual bool addToSelected(const std::string &name) = 0;
+    virtual bool removeFromSelected(size_t row_index) = 0;
+
+    virtual ConversionTemplate *getActive() = 0;
+    virtual std::vector<ConversionTemplate *> getSelected() = 0;
+};
+
 #endif  // EXRT_WIDGETWRAPPERS_H

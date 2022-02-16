@@ -5,6 +5,7 @@
 #include <QMenu>
 #include <QTableView>
 //
+#include "GUI/WidgetWrappers.h"
 #include "common/ExtensionManager.h"
 #include "common/IO_ifs.h"
 #include "convtemplate/ConversionTemplateManager.h"
@@ -217,6 +218,70 @@ class RemoveAction : public QAction {
    protected:
     QAbstractItemView *view_ = nullptr;
     ConversionTemplateManager *cnv_manager_ = nullptr;
+};
+
+/*
+ *
+ *
+ *
+ */
+
+class ConversionTemplateViewWrapper : public ConversionTemplateViewWrapper_if {
+   public:
+    ConversionTemplateViewWrapper() : widget_(new QTreeView()) {}
+
+    size_t rowCount() { return size_t(widget_->model()->rowCount()); }
+
+    status addSignal(Signal_ifs *signal) override { return status::failure; }
+
+    QWidget *getWidget() override { return widget_; }
+
+    bool setActive(size_t row_index) override {
+        auto cnt = rowCount();
+        for (int i = 0; i < cnt; i++) {
+            auto index = widget_->model()->index(i, 0);
+        }
+        // TODO: implement method
+        return false;
+    }
+
+    bool setActive(const std::string &name) override {
+        // TODO: implement method
+        return false;
+    }
+
+    bool removeFromActive() override {
+        // TODO: implement method
+        return false;
+    }
+
+    bool addToSelected(size_t row_index) override {
+        // TODO: implement method
+        return false;
+    }
+
+    bool addToSelected(const std::string &name) override {
+        // TODO: implement method
+        return false;
+    }
+
+    bool removeFromSelected(size_t row_index) override {
+        // TODO: implement method
+        return false;
+    }
+
+    ConversionTemplate *getActive() override {
+        // TODO: implement method
+        return nullptr;
+    }
+
+    std::vector<ConversionTemplate *> getSelected() override {
+        // TODO: implement method
+        return {false};
+    }
+
+   protected:
+    QTreeView *widget_;
 };
 
 /*
