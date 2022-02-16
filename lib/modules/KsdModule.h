@@ -17,6 +17,8 @@ class TaskMapper : public HierarchicalData_ifs {
     };
     const StructType struct_type_;
 
+    TaskMapper(const TaskMapper &task_mapper);
+
     TaskMapper(DataType type);
 
     TaskMapper(size_t len, const TaskMapper &value);

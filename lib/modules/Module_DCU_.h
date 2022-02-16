@@ -30,7 +30,7 @@ class EthernetDCU_Stream : public ModuleStream_ifs {
 
     Module_ifs *module_;
     ModuleStream_ifs **sub_modules_;
-    size_t number_of_modules_ = 0;
+    size_t number_of_slots_ = 0;
     size_t data_offset_ = 0;
 };
 

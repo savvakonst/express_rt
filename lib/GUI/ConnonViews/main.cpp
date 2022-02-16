@@ -4,8 +4,8 @@
 #include "common/ExtensionManager.h"
 //
 
-#ifndef CONV_TEMPLATE_LIST_LIB_NAME
-#    error "CONV_TEMPLATE_LIST_LIB_NAME undefined"
+#ifndef COMMON_VIEWS_LIB_NAME
+#    error "COMMON_VIEWS_LIB_NAME undefined"
 #endif
 
 class WidgetWrapper_ifs;
@@ -26,7 +26,7 @@ static ExtensionInfo g_conv_template_list_extension_info;
 #define CONV_TEMPLATE_LIST_VER 0x00
 #define PARAMETER_LIST_VER 0x00
 
-InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, CONV_TEMPLATE_LIST_LIB_NAME)(void) {
+InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, COMMON_VIEWS_LIB_NAME)(void) {
     if (QCoreApplication::instance() == nullptr) return nullptr;
 
     g_conv_template_list_extension_uint = new ExtensionUnit[]{

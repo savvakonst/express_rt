@@ -12,8 +12,7 @@
 #define exo_map std::map
 #define exo_set std::set
 
-enum status : bool
-{
+enum status : bool {
     succes = true,
     failure = false
 };
@@ -35,7 +34,7 @@ typedef bool bool_v_t;
 typedef char *str_v_t;
 
 union ArbitraryData {
-    ArbitraryData() { none_v = nullptr; }
+    ArbitraryData() { u64 = 0; }
 
     void *none_v;
 
@@ -56,8 +55,7 @@ union ArbitraryData {
     str_v_t str_v;
 };
 
-enum DataType : size_t
-{
+enum DataType : size_t {
     none_v = 0x00,
 
     i8 = 0x101,

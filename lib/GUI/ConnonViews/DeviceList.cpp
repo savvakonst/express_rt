@@ -40,11 +40,21 @@ DeviceListModel::~DeviceListModel() = default;
 
 QVariant DeviceListModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid()) return {};
+
+    if (role == Qt::DecorationRole) {
+        auto icon = QIcon::fromTheme("edit-undo", QIcon(":/undo.png"));
+        QPixmap pixmap(16, 16);
+        pixmap.fill(QColor(255, 0, 0));
+
+        return QVariant::fromValue(
+            icon.pixmap(icon.actualSize(QSize(32, 32))));  // iconProvider->icon(QFileIconProvider::Folder);
+    }
+
     if (role != Qt::DisplayRole) return {};
 
     auto node = (TreeNode *)index.internalPointer();
 
-    auto id = node->object->getID();
+    auto id = node->path_chunk_;  //->object->getID();
     return id.c_str();
 }
 

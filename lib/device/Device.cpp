@@ -82,7 +82,11 @@ std::vector<std::pair<std::string, Module_ifs *>> Device::getSubModules() const 
 
     ret.reserve(modules_.size());
     for (auto i : modules_) {
-        ret.push_back({i->getID(), i});
+        /*auto slot = i->getProperty("header/slot")->getValue().value_.u64;
+        auto sub_slot = i->getProperty("header/sub")->getValue().value_.u64;
+        auto path = std::to_string(slot) + ((sub_slot == 0) ? "" : "." + std::to_string(sub_slot));
+         */
+        ret.push_back({"", i});
     }
 
     return ret;
