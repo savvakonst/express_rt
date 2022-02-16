@@ -56,7 +56,7 @@ class DeviceListModel : public QAbstractItemModel {
 
         size_t getIndex() {
             // TODO: implement this
-            return 0;
+            return self_index;
         }
 
         void addNodesRecursively(Module_ifs *ptr, const std::string &path = "") {
@@ -68,8 +68,11 @@ class DeviceListModel : public QAbstractItemModel {
             // auto path = slot + ((sub_slot == "0" || sub_slot == "") ? "" : "." + sub_slot);
 
             // node->path_chunk_ = path + ": " + ptr->getID();
+
+            node->self_index =  child_vector.size();
             child_vector.push_back(node);
-            node->path_chunk_ = path + ": " + (ptr ? ptr->getID() : "");
+
+            node->path_chunk = path + ": " + (ptr ? ptr->getID() : "");
             if (ptr == nullptr) return;
             auto list = ptr->getSubModules();
             for (const auto &i : list) {
@@ -77,11 +80,15 @@ class DeviceListModel : public QAbstractItemModel {
             }
         }
 
-        std::string path_chunk_;
+        size_t self_index = 0;
+        std::string path_chunk;
         TreeNode *parent = nullptr;
         Module_ifs *object = nullptr;
         std::vector<TreeNode *> child_vector;
     };
+
+   public slots:
+    static void currentChangedSlot(const QModelIndex &current, const QModelIndex &previous);
 
    private:
     TreeNode *root_ = nullptr;

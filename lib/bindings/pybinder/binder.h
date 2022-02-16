@@ -11,6 +11,7 @@
 #include "common/CustomTypes.h"
 #include "common/DataSchema_ifs.h"
 #include "common/ExtensionManager.h"
+#include "GUI/WidgetWrappers.h"
 /* helper class definition
  *
  *
@@ -31,27 +32,27 @@ class PyDataSchema : public DataSchema_ifs {
 
     void setOwnerShip(py::handle handle) { handle_ = handle; }
 
-    virtual std::string getType() const override { PYBIND11_OVERRIDE_PURE(std::string, DataSchema_ifs, getType); }
+    [[nodiscard]] std::string getType() const override { PYBIND11_OVERRIDE_PURE(std::string, DataSchema_ifs, getType); }
 
-    std::string getRepresentationType() const override {
+    [[nodiscard]] std::string getRepresentationType() const override {
         PYBIND11_OVERRIDE_PURE(std::string, DataSchema_ifs, getRepresentationType);
     }
 
-    bool isValid() const override { PYBIND11_OVERRIDE_PURE(bool, DataSchema_ifs, isValid); }
+    [[nodiscard]] bool isValid() const override { PYBIND11_OVERRIDE_PURE(bool, DataSchema_ifs, isValid); }
 
-    bool isMap() const override { PYBIND11_OVERRIDE_PURE(bool, DataSchema_ifs, isMap); }
+    [[nodiscard]] bool isMap() const override { PYBIND11_OVERRIDE_PURE(bool, DataSchema_ifs, isMap); }
 
-    bool isArray() const override { PYBIND11_OVERRIDE_PURE(bool, DataSchema_ifs, isArray); }
+    [[nodiscard]] bool isArray() const override { PYBIND11_OVERRIDE_PURE(bool, DataSchema_ifs, isArray); }
 
     const std::vector<size_t> getDims() const override {
         PYBIND11_OVERRIDE_PURE(std::vector<size_t>, DataSchema_ifs, getDims);
     }
 
-    const std::vector<DataSchema_ifs *> getMapList() const override {
+    [[nodiscard]] const std::vector<DataSchema_ifs *> getMapList() const override {
         PYBIND11_OVERRIDE_PURE(std::vector<DataSchema_ifs *>, DataSchema_ifs, getMapList);
     }
 
-    virtual bool validate(HierarchicalData_ifs *data) const override {
+    bool validate(HierarchicalData_ifs *data) const override {
         PYBIND11_OVERRIDE_PURE(bool, DataSchema_ifs, validate, data);
     }
 
@@ -60,11 +61,9 @@ class PyDataSchema : public DataSchema_ifs {
 
 class PyHierarchicalData : public HierarchicalData_ifs {
    public:
-    ~PyHierarchicalData() override{
+    ~PyHierarchicalData() override= default;;
 
-    };
-
-    bool isArray() const override {
+    [[nodiscard]] bool isArray() const override {
         PYBIND11_OVERRIDE_PURE(bool,                 /* Return type */
                                HierarchicalData_ifs, /* Parent class */
                                isArray               /* Name of function in C++ (must match Python name) */
@@ -93,5 +92,82 @@ class PyHierarchicalData : public HierarchicalData_ifs {
         PYBIND11_OVERRIDE_PURE(HierarchicalData_ifs *, HierarchicalData_ifs, getMapUnit, arg);
     }
 };
+
+
+
+#include "device/Device.h"
+
+
+class PyDeviceViewWrapper : public DeviceViewWrapper_ifs {
+
+   public:
+
+    bool setActive(size_t row_index) override {
+        PYBIND11_OVERRIDE_PURE(bool, DeviceViewWrapper_ifs, setActive, row_index);
+    }
+
+    bool setActive(const std::string &source, const std::string &path) override {
+        PYBIND11_OVERRIDE_PURE(bool, DeviceViewWrapper_ifs, setActive, source, path);
+    }
+
+    bool removeFromActive() override {
+        PYBIND11_OVERRIDE_PURE(bool, DeviceViewWrapper_ifs, addToSelected);
+    }
+
+    bool addToSelected(size_t row_index) override {
+        PYBIND11_OVERRIDE_PURE(bool, DeviceViewWrapper_ifs, addToSelected, row_index);
+    }
+
+    bool removeFromSelected(size_t row_index) override {
+        PYBIND11_OVERRIDE_PURE(bool, DeviceViewWrapper_ifs, removeFromSelected,row_index);
+    }
+
+    Device *getActiveDevice() override {
+        PYBIND11_OVERRIDE_PURE(Device *, DeviceViewWrapper_ifs, getActiveDevice);
+    }
+    Module_ifs *getActiveModule() override {
+        PYBIND11_OVERRIDE_PURE(Module_ifs *, DeviceViewWrapper_ifs, getActiveModule);
+    }
+
+    std::vector<Module_ifs *> getSelected() override {
+        PYBIND11_OVERRIDE_PURE(std::vector<Module_ifs *>, DeviceViewWrapper_ifs, getSelected);
+    }
+};
+
+
+
+class PyParameterViewWrapper : public ParameterViewWrapper_if {
+
+   public:
+    bool setActive(size_t row_index) override {}
+    bool setActive(const std::string &name) override {}
+    bool removeFromActive() override = 0;
+
+    bool addToSelected(size_t row_index) override {}
+    bool addToSelected(const std::string &name) override {}
+    bool removeFromSelected(size_t row_index) override {}
+
+    Parameter_ifs *getActive() override {}
+    std::vector<Parameter_ifs *> getSelected() override {}
+};
+
+
+
+class PyConversionTemplateViewWrapper : public ConversionTemplateViewWrapper_if {
+
+   public:
+    bool setActive(size_t row_index) override {}
+    bool setActive(const std::string &source) override {}
+    bool removeFromActive() override {}
+
+    bool addToSelected(size_t row_index) override {}
+    bool addToSelected(const std::string &name) override {}
+    bool removeFromSelected(size_t row_index) override {}
+
+    ConversionTemplate *getActive() override {}
+    std::vector<ConversionTemplate *> getSelected() override {}
+};
+
+
 
 #endif  // EXAMPLE_BINDER_H

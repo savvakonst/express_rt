@@ -54,7 +54,7 @@ QVariant DeviceListModel::data(const QModelIndex &index, int role) const {
 
     auto node = (TreeNode *)index.internalPointer();
 
-    auto id = node->path_chunk_;  //->object->getID();
+    auto id = node->path_chunk;  //->object->getID();
     return id.c_str();
 }
 
@@ -109,9 +109,14 @@ void DeviceListModel::buildTree() {
     root_ = nullptr;
 
     auto list = device_manager_->getConversionTemplateList();
+    if (list.empty()) return;
     root_ = new TreeNode(nullptr);
     root_->child_vector.reserve(list.size());
     for (auto i : list) root_->addNodesRecursively(i);
+}
+
+void DeviceListModel::currentChangedSlot(const QModelIndex &current, const QModelIndex &previous) {
+    qDebug() << current;
 }
 
 /*
@@ -297,6 +302,20 @@ int initDeviceView(ExtensionManager *manager) {
     remove_action->setShortcut(Qt::Key_Delete);
 
     view->addAction(remove_action);
+
+    auto selection_model = view->selectionModel();
+    auto model = (DeviceListModel *)view->model();
+    // QObject::connect(selection_model, &QItemSelectionModel::currentChanged, model,
+    // &DeviceListModel::currentChangedSlot);
+
+    /*
+    void	currentChanged(const QModelIndex &current, const QModelIndex &previous)
+        void	currentColumnChanged(const QModelIndex &current, const QModelIndex &previous)
+            void	currentRowChanged(const QModelIndex &current, const QModelIndex &previous)
+                void	modelChanged(QAbstractItemModel *model)
+                    void	selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+    connect()
+*/
 
     return 0;
 }
