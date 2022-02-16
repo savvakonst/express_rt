@@ -129,6 +129,8 @@ class PyDeviceViewWrapper : public DeviceViewWrapper_ifs {
         PYBIND11_OVERRIDE_PURE(Module_ifs *, DeviceViewWrapper_ifs, getActiveModule);
     }
 
+
+
     std::vector<Module_ifs *> getSelected() override {
         PYBIND11_OVERRIDE_PURE(std::vector<Module_ifs *>, DeviceViewWrapper_ifs, getSelected);
     }
