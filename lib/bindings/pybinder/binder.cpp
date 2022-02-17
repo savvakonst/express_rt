@@ -21,6 +21,20 @@ DataSchema_ifs *getDataSchema(ExtensionManager *manager, const std::string &name
     return data_schema;
 }
 
+DeviceViewWrapper_ifs *geDeviceViewWrapper(ExtensionManager *manager) {
+    auto unit = manager->getLastVersionExtensionUint("widget_wrapper", "device_view_wrapper");
+    if (unit == nullptr || unit->ptr == nullptr) return nullptr;
+    auto wrapper = (DeviceViewWrapper_ifs *)unit->ptr;
+    return wrapper;
+}
+
+ExrtAction_ifs *getExrtAction(ExtensionManager *manager, const std::string &name) {
+    auto unit = manager->getLastVersionExtensionUint("exrt_action", "name");
+    if (unit == nullptr || unit->ptr == nullptr) return nullptr;
+    auto data_schema = (ExrtAction_ifs *)unit->ptr;
+    return data_schema;
+}
+
 PYBIND11_MODULE(PY_BINDLIB_NAME, m) {
     m.doc() = "exrt bindings";
 
@@ -79,6 +93,27 @@ PYBIND11_MODULE(PY_BINDLIB_NAME, m) {
         .def("getMap", &HierarchicalData_ifs::getMap)
         .def("getArrayUnit", &HierarchicalData_ifs::getArrayUnit)
         .def("getMapUnit", &HierarchicalData_ifs::getMapUnit);
+
+    // bool (DeviceViewWrapper_ifs::*dev_setActive_size)(size_t) = &DeviceViewWrapper_ifs::setActive;
+
+    py::class_<DeviceViewWrapper_ifs, PyDeviceViewWrapper>(m, "DeviceViewWrapper")
+        .def(py::init<>())
+        .def("addSignal", &DeviceViewWrapper_ifs::addSignal)
+        .def<bool (DeviceViewWrapper_ifs::*)(size_t)>("setActive", &DeviceViewWrapper_ifs::setActive)
+        .def<bool (DeviceViewWrapper_ifs::*)(const std::string &source, const std::string &path)>(
+            "setActive", &DeviceViewWrapper_ifs::setActive)
+        .def("removeFromActive", &DeviceViewWrapper_ifs::removeFromActive)
+        .def("addToSelected", &DeviceViewWrapper_ifs::addToSelected)
+        .def("removeFromSelected", &DeviceViewWrapper_ifs::removeFromSelected)
+        .def("getActiveDevice", &DeviceViewWrapper_ifs::getActiveDevice, py::return_value_policy::reference)
+        .def("getActiveModule", &DeviceViewWrapper_ifs::getActiveModule, py::return_value_policy::reference)
+        .def("getSelected", &DeviceViewWrapper_ifs::getSelected);
+
+    py::class_<ExrtAction_ifs, PyExrtAction>(m, "ExrtAction")
+        .def(py::init<>())
+        .def("addSignal", &ExrtAction_ifs::run)
+        .def("removeFromActive", &ExrtAction_ifs::getDescription)
+        .def("addToSelected", &ExrtAction_ifs::getInfo);
 
     m.def("isNum", [](std::string a) { return isNum(createDataType(a)); });
     m.def("normalizeType", [](std::string a) { return toString(createDataType(a)); });

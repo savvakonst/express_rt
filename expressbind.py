@@ -2,6 +2,7 @@ from pybinder import Value, HierarchicalData, DataSchema, normalizeType, isNum, 
 from ruamel.yaml import YAML
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 import glob
+from pyextr import getExtensionManager
 
 
 # PYTHONUNBUFFERED=1;Path=C:\Express_expr_compiler\nik\pybindings\build\temp.win-amd64-3.8\Release\bin\Release
@@ -18,7 +19,7 @@ class DataSchemaInst(DataSchema):
         for i in range(len(self.map_list_)):
             include_name = self.map_list_[i].include_
             if (include_name):
-                ds = getDataSchema(manager, include_name)
+                ds = getDataSchema(getExtensionManager(), include_name)
                 if (not ds is None):
                     self.map_list_[i] = ds
                 else:

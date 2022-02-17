@@ -2,7 +2,7 @@
 //
 #include "Adapters/Adapters.h"
 #include "Ping/ksdconnected.h"
-#include "common/ExrtAction.h"
+#include "common/ExrtAction_ifs.h"
 #include "common/Extension.h"
 #include "common/ExtensionManager.h"
 
@@ -11,7 +11,7 @@
 #    error "ACTIONS_LIB_NAME undefined"
 #endif
 
-class RefreshAction : public ExrtAction {
+class RefreshAction : public ExrtAction_ifs {
    public:
     void init(ExtensionManager *manager) {
         manager_ = manager;
@@ -54,7 +54,7 @@ class RefreshAction : public ExrtAction {
 static int initActions(ExtensionManager *manager);
 
 static ExtensionUnit g_actions_units[] = {
-    {"file/refresh_ethernet_devices", "action",
+    {"file/refresh_ethernet_devices", "exrt_action",
      "checks the status of connected ethernet devices and looks for new ones ", (void *)new RefreshAction, 0x00},
     {"adapters", "adapters", "provide available adapters and init socket system", (void *)newAdapters(), 0x00},
     //{"actions", "init", "", (void *)& initActions, 0x00},

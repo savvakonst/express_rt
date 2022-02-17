@@ -1,9 +1,9 @@
-#ifndef EXRT_EXRTACTION_H
-#define EXRT_EXRTACTION_H
+#ifndef EXRT_EXRTACTION_IFS_H
+#define EXRT_EXRTACTION_IFS_H
 
 #include "common/BaseClass_ifs.h"
 
-class ExrtAction : public BaseClass_ifs {
+class ExrtAction_ifs : public BaseClass_ifs {
    public:
     virtual bool run() = 0;
 
