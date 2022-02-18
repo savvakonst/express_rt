@@ -29,7 +29,7 @@ bool KsdIO::readDocument(ExtensionManager *manager, const std::string &source_pa
     } offsets{0, 0};
 
     auto device_manager =
-        (DeviceManager *)manager->getLastVersionExtensionUint("device_manager", "device_manager")->ptr;
+        (DeviceManager *)manager->getLastVersionExtensionUnit("device_manager", "device_manager")->ptr;
 
     if (in) {
         in.read((char *)&offsets, sizeof(offsets));
@@ -42,7 +42,7 @@ bool KsdIO::readDocument(ExtensionManager *manager, const std::string &source_pa
 
         std::unique_ptr<Device> device(new Device(u_buffer.get(), task_size, manager));
 
-        device->setSource("file://"+source_path);
+        device->setSource("file://" + source_path);
 
         device_manager->addDevice(device.release());
         return true;
@@ -50,4 +50,6 @@ bool KsdIO::readDocument(ExtensionManager *manager, const std::string &source_pa
     return false;
 }
 
-bool KsdIO::saveDocument(const std::string &id, const std::string &dst_path) { return false; }
+bool KsdIO::saveDocument(ExtensionManager *manager, const std::string &id, const std::string &dst_path) {
+    return false;
+}

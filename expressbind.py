@@ -2,7 +2,7 @@ from pybinder import Value, HierarchicalData, DataSchema, normalizeType, isNum, 
 from ruamel.yaml import YAML
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 import glob
-from pyextr import getExtensionManager
+from pyexrt import getExtensionManager
 
 
 # PYTHONUNBUFFERED=1;Path=C:\Express_expr_compiler\nik\pybindings\build\temp.win-amd64-3.8\Release\bin\Release

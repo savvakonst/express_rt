@@ -14,7 +14,7 @@ class BaseIO : public IO_ifs {
     ~BaseIO() override;
 
     bool readDocument(ExtensionManager *manager, const std::string &source_path) override;
-    bool saveDocument(const std::string &id, const std::string &dst_path) override;
+    bool saveDocument(ExtensionManager *manager, const std::string &id, const std::string &dst_path) override;
 
     ConversionTemplate *parseDocument(ExtensionManager *manager, const std::string &str,
                                       const std::string &source_path = "");

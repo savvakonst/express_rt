@@ -7,7 +7,7 @@
 #include "convtemplate/Parameter_ifs.h"
 
 ConversionTemplate::ConversionTemplate(ExtensionManager* manager) {
-    auto unit = manager->getLastVersionExtensionUint("data_schema", "conversion_template");
+    auto unit = manager->getLastVersionExtensionUnit("data_schema", "conversion_template");
 
     if (unit && unit->ptr) {
         info_schema_ = (DataSchema_ifs*)unit->ptr;

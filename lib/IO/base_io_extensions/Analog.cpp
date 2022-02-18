@@ -5,7 +5,7 @@
 #include "common/StringProcessingTools.h"
 
 AnalogParameter::AnalogParameter(ExtensionManager* manager) {
-    auto unit = manager->getLastVersionExtensionUint("data_schema", "analog");
+    auto unit = manager->getLastVersionExtensionUnit("data_schema", "analog");
 
     if (unit && unit->ptr) {
         data_schema_ = (DataSchema_ifs*)unit->ptr;
@@ -32,7 +32,7 @@ bool AnalogParameter::isValid() const { return false; }
  *
  */
 AccelerationParameter::AccelerationParameter(ExtensionManager* manager) {
-    auto unit = manager->getLastVersionExtensionUint("data_schema", "acceleration");
+    auto unit = manager->getLastVersionExtensionUnit("data_schema", "acceleration");
 
     if (unit || unit->ptr) {
         data_schema_ = (DataSchema_ifs*)unit->ptr;

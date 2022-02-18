@@ -69,7 +69,7 @@ class DeviceListModel : public QAbstractItemModel {
 
             // node->path_chunk_ = path + ": " + ptr->getID();
 
-            node->self_index =  child_vector.size();
+            node->self_index = child_vector.size();
             child_vector.push_back(node);
 
             node->path_chunk = path + ": " + (ptr ? ptr->getID() : "");
@@ -87,9 +87,8 @@ class DeviceListModel : public QAbstractItemModel {
         std::vector<TreeNode *> child_vector;
     };
 
-   public slots:
-    static void currentChangedSlot(const QModelIndex &current, const QModelIndex &previous);
-
+    QModelIndex current_index_ = QModelIndex();
+    
    private:
     TreeNode *root_ = nullptr;
     std::vector<DataSchema_ifs *> list_of_entries_;

@@ -14,14 +14,14 @@
 #include "ConvTemplateList.h"
 
 ConvTemplateTreeModel::ConvTemplateTreeModel(ExtensionManager *manager) {
-    auto unit = manager->getLastVersionExtensionUint("data_schema", "conversion_template");
+    auto unit = manager->getLastVersionExtensionUnit("data_schema", "conversion_template");
     if (unit && unit->ptr) {
         schema_ = (DataSchema_ifs *)unit->ptr;
         schema_->init(manager);
         list_of_entries_ = schema_->getMapList();
     }
 
-    unit = manager->getLastVersionExtensionUint("cnv_template_manager", "cnv_template_manager");
+    unit = manager->getLastVersionExtensionUnit("cnv_template_manager", "cnv_template_manager");
     if (unit && unit->ptr) {
         manager_ = (ConversionTemplateManager *)unit->ptr;
         std::cout << "cnv_manager_ = (ConversionTemplateManager *)unit->ptr;\n";
@@ -112,14 +112,14 @@ int ConvTemplateTreeModel::columnCount(const QModelIndex &parent) const {
  */
 
 ConvTemplateTableModel::ConvTemplateTableModel(ExtensionManager *manager) {
-    auto unit = manager->getLastVersionExtensionUint("data_schema", "conversion_template");
+    auto unit = manager->getLastVersionExtensionUnit("data_schema", "conversion_template");
     if (unit && unit->ptr) {
         schema_ = (DataSchema_ifs *)unit->ptr;
         schema_->init(manager);
         list_of_entries_ = schema_->getMapList();
     }
 
-    unit = manager->getLastVersionExtensionUint("cnv_template_manager", "cnv_template_manager");
+    unit = manager->getLastVersionExtensionUnit("cnv_template_manager", "cnv_template_manager");
     if (unit && unit->ptr) {
         cnv_manager_ = (ConversionTemplateManager *)unit->ptr;
         if (cnv_manager_ == nullptr) std::cerr << "ConvTemplateTableModel::cnv_manager_ == nullptr;\n";
@@ -308,7 +308,7 @@ int initConversionTemplateView(ExtensionManager *manager) {
 
     view->setModel(new ConvTemplateTableModel(manager));
 
-    auto io_units = manager->getLastVersionExtensionUintsByType("io");
+    auto io_units = manager->getLastVersionExtensionUnitsByType("io");
     for (auto i : io_units) {
         if (i && i->ptr && (((IO_ifs *)i->ptr)->filename_pattern_ == "*.base")) {
             auto new_base = new OpenAction(manager, (IO_ifs *)i->ptr, view);

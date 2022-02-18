@@ -41,7 +41,7 @@ Module_DCU_::Module_DCU_(size_t number_of_slots, const void *ptr, size_t size, E
         }
         offset += (size_t)header->size;
         modules_.push_back(module);
-        std::cout << "\n" + stringId(header->id) << ":" << module->printProperties("");
+        // std::cout << "\n" + stringId(header->id) << ":" << module->printProperties("");
     } while (offset < size_);
 
     if (offset != size_) {
@@ -94,27 +94,22 @@ ModuleStream_ifs *Module_DCU_::createModuleStream() {
 };
 
 std::vector<std::pair<std::string, Module_ifs *>> Module_DCU_::getSubModules() const {
-    std::vector<
-        std::vector<
-            std::pair<size_t, Module_ifs *>
-            >>
-        temp_vector(number_of_slots_,std::vector<std::pair<size_t , Module_ifs *>>());
-
+    std::vector<std::vector<std::pair<size_t, Module_ifs *>>> temp_vector(
+        number_of_slots_, std::vector<std::pair<size_t, Module_ifs *>>());
 
     for (auto i : modules_) {
         auto slot = i->getProperty("header/slot")->getValue().value_.u64;
         auto sub_slot = i->getProperty("header/sub")->getValue().value_.u64;
-        temp_vector[slot].emplace_back(sub_slot,i);
+        temp_vector[slot].emplace_back(sub_slot, i);
     }
 
     std::vector<std::pair<std::string, Module_ifs *>> ret;
     ret.reserve(number_of_slots_);
-    for(size_t slot = 0; slot<number_of_slots_;slot++){
+    for (size_t slot = 0; slot < number_of_slots_; slot++) {
         auto &v = temp_vector[slot];
-        if (v.empty())
-            ret.emplace_back(std::to_string(slot), nullptr);
-        else{
-            for(auto & i: v){
+        if (v.empty()) ret.emplace_back(std::to_string(slot), nullptr);
+        else {
+            for (auto &i : v) {
                 auto sub_slot = i.first;
                 auto path = std::to_string(slot) + ((sub_slot == 0) ? "" : "." + std::to_string(sub_slot));
                 ret.emplace_back(path, i.second);

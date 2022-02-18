@@ -49,7 +49,7 @@ InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, COMMON_VIEWS_LIB_NAME)(vo
 
 static int initWidgets(ExtensionManager *manager) {
     //
-    auto p_unit = manager->getLastVersionExtensionUint("widget_wrapper", "device_view_wrapper");
+    auto p_unit = manager->getLastVersionExtensionUnit("widget_wrapper", "device_view_wrapper");
     if ((p_unit == nullptr) || (p_unit->version != DEVICE_LIST_VER)) {
         DEBUG_CERR("cant init (name: " << p_unit->name << ", type: " << p_unit->type << ", ver.:" << p_unit->version
                                        << ") unit, since there is a newer unit.\n");
@@ -57,7 +57,7 @@ static int initWidgets(ExtensionManager *manager) {
         initDeviceView(manager);
 
     //
-    p_unit = manager->getLastVersionExtensionUint("widget", "conv_template_list");
+    p_unit = manager->getLastVersionExtensionUnit("widget", "conv_template_list");
     if ((p_unit == nullptr) || (p_unit->version != CONV_TEMPLATE_LIST_VER)) {
         DEBUG_CERR("cant init (name: " << p_unit->name << ", type: " << p_unit->type << ", ver.:" << p_unit->version
                                        << ") unit, since there is a newer unit.\n");
@@ -65,7 +65,7 @@ static int initWidgets(ExtensionManager *manager) {
         initConversionTemplateView(manager);
 
     //
-    p_unit = manager->getLastVersionExtensionUint("widget", "parameter_list");
+    p_unit = manager->getLastVersionExtensionUnit("widget", "parameter_list");
     if ((p_unit == nullptr) || (p_unit->version != PARAMETER_LIST_VER)) {
         DEBUG_CERR("cant init (name: " << p_unit->name << ", type: " << p_unit->type << ", ver.:" << p_unit->version
                                        << ") unit, since there is a newer unit.\n");

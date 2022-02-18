@@ -40,7 +40,7 @@ MainWindow::MainWindow(ExtensionManager *ctm) : text_edit_(new QTextEdit), manag
 
     auto file_menu = menuBar()->addMenu(tr("&File"));
 
-    auto io_units = manager_->getLastVersionExtensionUintsByType("io");
+    auto io_units = manager_->getLastVersionExtensionUnitsByType("io");
 
     for (auto i : io_units) {
         if (i && i->ptr) {
@@ -64,7 +64,7 @@ void MainWindow::createDockWindows() {
 
     dock = new QDockWidget(tr("&parameter properties"), this);
     dock->setObjectName(tr("&parameter properties"));
-    TreeEditor *top = (TreeEditor *)manager_->getLastVersionExtensionUint("tree_editor", "tree_editor")->ptr;
+    TreeEditor *top = (TreeEditor *)manager_->getLastVersionExtensionUnit("tree_editor", "tree_editor")->ptr;
 
     dock->setWidget(top);
     addDockWidget(Qt::RightDockWidgetArea, dock);
@@ -77,7 +77,7 @@ void MainWindow::createDockWindows() {
      *
      */
 
-    auto units = manager_->getLastVersionExtensionUintsByType("widget");
+    auto units = manager_->getLastVersionExtensionUnitsByType("widget");
     for (auto i : units) {
         dock = new QDockWidget(tr(i->name), this);
 
@@ -87,7 +87,7 @@ void MainWindow::createDockWindows() {
         addDockWidget(Qt::BottomDockWidgetArea, dock);
     }
 
-    units = manager_->getLastVersionExtensionUintsByType("widget_wrapper");
+    units = manager_->getLastVersionExtensionUnitsByType("widget_wrapper");
     for (auto i : units) {
         dock = new QDockWidget(tr(i->name), this);
 

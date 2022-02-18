@@ -110,7 +110,7 @@ ExtensionManager::ExtensionManager(bool init) {
 
 void ExtensionManager::init() {
     DEBUG_COUT("\n\n------------------running init modules---------------------\n");
-    auto init_set = getLastVersionExtensionUintsByType("init");
+    auto init_set = getLastVersionExtensionUnitsByType("init");
     for (auto i : init_set) ((initUnit_t)i->ptr)(this);
 }
 

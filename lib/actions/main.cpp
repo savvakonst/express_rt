@@ -11,6 +11,8 @@
 #    error "ACTIONS_LIB_NAME undefined"
 #endif
 
+#define REFRESH_ACTION_VER 0x00
+
 class RefreshAction : public ExrtAction_ifs {
    public:
     void init(ExtensionManager *manager) {
@@ -55,13 +57,23 @@ static int initActions(ExtensionManager *manager);
 
 static ExtensionUnit g_actions_units[] = {
     {"file/refresh_ethernet_devices", "exrt_action",
-     "checks the status of connected ethernet devices and looks for new ones ", (void *)new RefreshAction, 0x00},
+     "checks the status of connected ethernet devices and looks for new ones ", (void *)new RefreshAction, REFRESH_ACTION_VER},
     {"adapters", "adapters", "provide available adapters and init socket system", (void *)newAdapters(), 0x00},
-    //{"actions", "init", "", (void *)& initActions, 0x00},
+    {"actions", "init", "", (void *)&initActions, 0x00},
     {nullptr, nullptr, nullptr, nullptr, 0}};
 
 static ExtensionInfo g_actions_info = {"default actions", 0x01, g_actions_units};
 
 InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, ACTIONS_LIB_NAME)(void) { return &g_actions_info; }
 
-static int initActions(ExtensionManager *manager) { return 0; }
+static int initActions(ExtensionManager *manager) {
+    auto p_unit = manager->getLastVersionExtensionUnit("exrt_action", "file/refresh_ethernet_devices");
+    if ((p_unit == nullptr) || (p_unit->version != REFRESH_ACTION_VER)) {
+        DEBUG_CERR("cant init (name: " << p_unit->name << ", type: " << p_unit->type << ", ver.:" << p_unit->version
+                                       << ") unit, since there is a newer unit.\n");
+    } else
+        ((RefreshAction*)p_unit->ptr)->init(manager);
+
+
+    return 0;
+}

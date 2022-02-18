@@ -217,19 +217,31 @@ class PyConversionTemplateViewWrapper : public ConversionTemplateViewWrapper_if 
 
 class PyExrtAction : public ExrtAction_ifs {
    public:
-    bool run() override {
-        PYBIND11_OVERRIDE_PURE(bool, ExrtAction_ifs, run);
-    }
+    bool run() override { PYBIND11_OVERRIDE_PURE(bool, ExrtAction_ifs, run); }
 
-    std::string getDescription() override {
-        PYBIND11_OVERRIDE_PURE(std::string, ExrtAction_ifs, getDescription);
-    }
+    std::string getDescription() override { PYBIND11_OVERRIDE_PURE(std::string, ExrtAction_ifs, getDescription); }
 
-    std::string getInfo() override {
-        PYBIND11_OVERRIDE_PURE(std::string, ExrtAction_ifs, getInfo);
-    }
+    std::string getInfo() override { PYBIND11_OVERRIDE_PURE(std::string, ExrtAction_ifs, getInfo); }
 };
 
+#include "common/IO_ifs.h"
 
+class ExtensionManager;
+
+class PyIO : public IO_ifs {
+   public:
+    PyIO(const std::string &filename_pattern, const std::string &file_type, const std::string &file_info)
+        : IO_ifs(filename_pattern, file_type, file_info) {}
+
+    ~PyIO() override = default;
+
+    bool readDocument(ExtensionManager *manager, const std::string &source_path) override {
+        PYBIND11_OVERRIDE_PURE(bool, IO_ifs, readDocument, manager, source_path);
+    }
+
+    bool saveDocument(ExtensionManager *manager, const std::string &id, const std::string &dst_path) override {
+        PYBIND11_OVERRIDE_PURE(bool, IO_ifs, saveDocument, manager, id, dst_path);
+    }
+};
 
 #endif  // EXAMPLE_BINDER_H

@@ -21,7 +21,7 @@
  */
 
 ParameterTableModel::ParameterTableModel(ExtensionManager *manager) {
-    auto unit = manager->getLastVersionExtensionUint("data_schema", "common");
+    auto unit = manager->getLastVersionExtensionUnit("data_schema", "common");
     if (unit && unit->ptr) {
         schema_ = (DataSchema_ifs *)unit->ptr;
         schema_->init(manager);

@@ -17,7 +17,7 @@ class IO_ifs : public BaseClass_ifs {
     ~IO_ifs() override = default;
 
     virtual bool readDocument(ExtensionManager *manager, const std::string &source_path) = 0;
-    virtual bool saveDocument(const std::string &id, const std::string &dst_path) = 0;
+    virtual bool saveDocument(ExtensionManager *manager, const std::string &id, const std::string &dst_path) = 0;
 
     [[maybe_unused]] const std::string filename_pattern_ = 0;
     [[maybe_unused]] const std::string file_type_ = 0;

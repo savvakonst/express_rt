@@ -98,7 +98,7 @@ void TreeEditor::addProperty(DataSchema_ifs *ds, QTreeWidgetItem *parent_item, c
 }
 
 void TreeEditor::addExtensionUint(ExtensionManager *manager) {
-    auto unit_list = manager->getLastVersionExtensionUintsByType("tree_widget_wrapper");
+    auto unit_list = manager->getLastVersionExtensionUnitsByType("tree_widget_wrapper");
 
     for (auto uint : unit_list) {
         QString str = QString::fromStdString(uint->name);
@@ -337,7 +337,7 @@ static ExtensionInfo g_tree_widget_extension_info;
 static int initTreeEditor_(ExtensionManager *manager) {
     auto p_unit = search(g_tree_widget_extension_uint, "tree_editor", "tree_editor");
 
-    if (p_unit != manager->getLastVersionExtensionUint("tree_editor", "tree_editor")) {
+    if (p_unit != manager->getLastVersionExtensionUnit("tree_editor", "tree_editor")) {
         DEBUG_CERR("cant init (name: " << p_unit->name << ", type: " << p_unit->type << ", ver.:" << p_unit->version
                                        << ") unit, since there is a newer unit.\n");
         return 1;

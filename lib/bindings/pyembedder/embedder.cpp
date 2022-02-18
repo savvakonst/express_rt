@@ -20,7 +20,7 @@ static py::scoped_interpreter *g_guard = nullptr;
 
 static ExtensionManager *g_extension_manager = nullptr;
 
-PYBIND11_EMBEDDED_MODULE(pyextr, m) {
+PYBIND11_EMBEDDED_MODULE(pyexrt, m) {
     m.def(
         "getExtensionManager", []() { return g_extension_manager; },  //
         py::return_value_policy::reference);

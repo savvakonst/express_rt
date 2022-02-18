@@ -13,8 +13,8 @@ class KsdIO : public IO_ifs {
 
     ~KsdIO() override;
 
-    bool readDocument(ExtensionManager *manager, const std::string &source_path) override;
-    bool saveDocument(const std::string &id, const std::string &dst_path) override;
+    bool readDocument(ExtensionManager* manager, const std::string& source_path) override;
+    bool saveDocument(ExtensionManager* manager, const std::string& id, const std::string& dst_path) override;
 };
 
 #endif  // EXRT_KSDIO_H

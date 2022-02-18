@@ -10,10 +10,10 @@ int main(int argc, char *argv[]) {
 
     ExtensionManager manager;
 
-    TreeEditor *top = ((TreeEditor *)manager.getLastVersionExtensionUint("tree_editor", "tree_editor")->ptr);
+    TreeEditor *top = ((TreeEditor *)manager.getLastVersionExtensionUnit("tree_editor", "tree_editor")->ptr);
 
     typedef Parameter_ifs *(*create_parameter_t)(ExtensionManager * manager);
-    auto constr = (create_parameter_t)(manager.getLastVersionExtensionUint("parameter", "EthernetUdp")->ptr);
+    auto constr = (create_parameter_t)(manager.getLastVersionExtensionUnit("parameter", "EthernetUdp")->ptr);
     auto prm = constr(&manager);
     top->setupProperties(prm);
 

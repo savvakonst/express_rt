@@ -3,10 +3,8 @@
 #include <QTranslator>
 #include <fstream>
 //
+#include "common/BindingUtils.h"
 #include "common/ExtensionManager.h"
-#include "common/IO_ifs.h"
-#include "convtemplate/ConversionTemplate.h"
-#include "convtemplate/ConversionTemplateManager.h"
 #include "mainwindow.h"
 
 int main(int argc, char *argv[]) {
@@ -17,35 +15,9 @@ int main(int argc, char *argv[]) {
     app.installTranslator(&my_translator);
 
     ExtensionManager manager;
-    auto ctm = (ConversionTemplateManager *)manager
-                   .getLastVersionExtensionUint("cnv_template_manager", "cnv_template_manager")
-                   ->ptr;
-    {
-        auto e_unit = manager.getLastVersionExtensionUint("io", "base_io");
-        if (e_unit == nullptr) {
-            DEBUG_CERR("cant find \"base_io\" unit with \"io\" type\n");
-            return 1;
-        }
-        auto *base_io = (IO_ifs *)(e_unit->ptr);
-        if (base_io->readDocument(&manager, "analog.base"))
-            std::cerr << "error (base_io ): " << base_io->getErrorMessage();
-    }
-    std::cout << "---------------------------------------------------------------------\n";
 
-    {
-        auto conv_template = new ConversionTemplate(&manager);
-        conv_template->setName("first");
-        conv_template->addInfo("source", Value("C:/another/virtual/path"));
-        conv_template->addInfo("company", Value("АО ничего"));
-        ctm->addConversionTemplate(conv_template);
-    }
-    {
-        auto conv_template = new ConversionTemplate(&manager);
-        conv_template->setName("second");
-        conv_template->addInfo("source", Value("/virtual"));
-        conv_template->addInfo("company", Value("АО Элистех"));
-        ctm->addConversionTemplate(conv_template);
-    }
+    auto evalFile = (evalFile_t)manager.getLastVersionExtensionObject("eval_file", "py_eval_file");
+    if (evalFile) evalFile("exrt_config.py");
 
     MainWindow main_win(&manager);
     main_win.show();

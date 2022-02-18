@@ -14,7 +14,7 @@
 #include "DeviceList.h"
 
 DeviceListModel::DeviceListModel(ExtensionManager *manager) {
-    auto unit = manager->getLastVersionExtensionUint("device_manager", "device_manager");
+    auto unit = manager->getLastVersionExtensionUnit("device_manager", "device_manager");
     if (unit && unit->ptr) {
         device_manager_ = (DeviceManager *)unit->ptr;
     }
@@ -42,12 +42,13 @@ QVariant DeviceListModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid()) return {};
 
     if (role == Qt::DecorationRole) {
-        auto icon = QIcon::fromTheme("edit-undo", QIcon(":/undo.png"));
         QPixmap pixmap(16, 16);
         pixmap.fill(QColor(255, 0, 0));
+        return pixmap;
+    }
 
-        return QVariant::fromValue(
-            icon.pixmap(icon.actualSize(QSize(32, 32))));  // iconProvider->icon(QFileIconProvider::Folder);
+    if (role == Qt::BackgroundRole) {
+        if (index == current_index_) return QBrush(QColor(255 * index.row(), 255 * index.column(), 0));
     }
 
     if (role != Qt::DisplayRole) return {};
@@ -115,10 +116,6 @@ void DeviceListModel::buildTree() {
     for (auto i : list) root_->addNodesRecursively(i);
 }
 
-void DeviceListModel::currentChangedSlot(const QModelIndex &current, const QModelIndex &previous) {
-    qDebug() << current;
-}
-
 /*
  *
  *
@@ -176,10 +173,61 @@ class DeviceRemoveAction : public QAction {
  *
  *
  */
+class DeviceViewWrapper;
 
 class DeviceViewWrapper : public DeviceViewWrapper_ifs {
    public:
-    DeviceViewWrapper() : widget_(new QTreeView()) {}
+    class DeviceViewWrapperDelegate : public QObject {
+       public:
+        explicit DeviceViewWrapperDelegate(DeviceViewWrapper *wrapper) : wrapper_(wrapper) {}
+
+        void init() {
+            auto s_model = wrapper_->widget_->selectionModel();
+            connect(s_model, &QItemSelectionModel::currentChanged, this,
+                    &DeviceViewWrapperDelegate::currentChangedSlot);
+        }
+
+       public slots:
+
+        void selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected) {}
+
+        void currentChangedSlot(const QModelIndex &current, const QModelIndex &previous) {
+            wrapper_->device_list_model_->current_index_ = current;
+            // wrapper_->current_index_;
+            qDebug() << "void currentChangedSlot(const QModelIndex &current, const QModelIndex &previous)";
+        }
+
+       private:
+        DeviceViewWrapper *wrapper_ = nullptr;
+    };
+
+   public:
+    friend class DeviceViewWrapperDelegate;
+    DeviceViewWrapper() : widget_(new QTreeView()), delegate_(this) {}
+
+    void init(ExtensionManager *manager) {
+        device_list_model_ = new DeviceListModel(manager);
+        widget_->setModel(device_list_model_);
+        delegate_.init();
+
+        auto io_units = manager->getLastVersionExtensionUnitsByType("io");
+        for (auto i : io_units) {
+            if (i && i->ptr && (((IO_ifs *)i->ptr)->filename_pattern_ == "*.ksd")) {
+                auto new_base = new OpenAction(manager, (IO_ifs *)i->ptr, widget_);
+                new_base->setStatusTip(QObject::tr("&Create a new file"));
+                new_base->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
+                new_base->setShortcut(Qt::CTRL + Qt::Key_O);
+
+                widget_->addAction(new_base);
+            }
+        }
+
+        auto remove_action = new DeviceRemoveAction(manager, widget_);
+        remove_action->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
+        remove_action->setShortcut(Qt::Key_Delete);
+
+        widget_->addAction(remove_action);
+    }
 
     ~DeviceViewWrapper() override { delete widget_; }
 
@@ -261,7 +309,9 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
     };
 
    protected:
+    DeviceViewWrapperDelegate delegate_;
     QTreeView *widget_;
+    DeviceListModel *device_list_model_ = nullptr;
 };
 
 WidgetWrapper_ifs *newDeviceViewWrapper() {
@@ -271,7 +321,11 @@ WidgetWrapper_ifs *newDeviceViewWrapper() {
     table_view->setAlternatingRowColors(true);
     table_view->setStyleSheet(
         "QTreeView {background-color: #D2DCDF; alternate-background-color: #f6fafb; show-decoration-selected: 1;}"
-        "QHeaderView::section {background-color: #D2DCDF}");
+        "QHeaderView::section {background-color: #D2DCDF}"
+        //"QTreeView::item:selected{background-color: #bedcf0;} "
+        //"QTreeView::item:hover:selected{background-color: #94c8ea;} "
+        //"QTreeView::item:hover:!selected{background-color: #e6e6e6;}"
+    );
     table_view->setContextMenuPolicy(Qt::ActionsContextMenu);
     table_view->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
 
@@ -280,42 +334,8 @@ WidgetWrapper_ifs *newDeviceViewWrapper() {
 
 int initDeviceView(ExtensionManager *manager) {
     auto view_wrapper =
-        (WidgetWrapper_ifs *)manager->getLastVersionExtensionObject("widget_wrapper", "device_view_wrapper");
-    auto view = (QAbstractItemView *)view_wrapper->getWidget();
+        (DeviceViewWrapper *)manager->getLastVersionExtensionObject("widget_wrapper", "device_view_wrapper");
 
-    view->setModel(new DeviceListModel(manager));
-
-    auto io_units = manager->getLastVersionExtensionUintsByType("io");
-    for (auto i : io_units) {
-        if (i && i->ptr && (((IO_ifs *)i->ptr)->filename_pattern_ == "*.ksd")) {
-            auto new_base = new OpenAction(manager, (IO_ifs *)i->ptr, view);
-            new_base->setStatusTip(QObject::tr("&Create a new file"));
-            new_base->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
-            new_base->setShortcut(Qt::CTRL + Qt::Key_O);
-
-            view->addAction(new_base);
-        }
-    }
-
-    auto remove_action = new DeviceRemoveAction(manager, view);
-    remove_action->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
-    remove_action->setShortcut(Qt::Key_Delete);
-
-    view->addAction(remove_action);
-
-    auto selection_model = view->selectionModel();
-    auto model = (DeviceListModel *)view->model();
-    // QObject::connect(selection_model, &QItemSelectionModel::currentChanged, model,
-    // &DeviceListModel::currentChangedSlot);
-
-    /*
-    void	currentChanged(const QModelIndex &current, const QModelIndex &previous)
-        void	currentColumnChanged(const QModelIndex &current, const QModelIndex &previous)
-            void	currentRowChanged(const QModelIndex &current, const QModelIndex &previous)
-                void	modelChanged(QAbstractItemModel *model)
-                    void	selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
-    connect()
-*/
-
+    view_wrapper->init(manager);
     return 0;
 }

@@ -15,24 +15,31 @@
 std::string printer_debug(DataSchema_ifs *arg) { return toString(arg, ""); }
 
 DataSchema_ifs *getDataSchema(ExtensionManager *manager, const std::string &name) {
-    auto unit = manager->getLastVersionExtensionUint("data_schema", name);
+    auto unit = manager->getLastVersionExtensionUnit("data_schema", name);
     if (unit == nullptr || unit->ptr == nullptr) return nullptr;
     auto data_schema = (DataSchema_ifs *)unit->ptr;
     return data_schema;
 }
 
-DeviceViewWrapper_ifs *geDeviceViewWrapper(ExtensionManager *manager) {
-    auto unit = manager->getLastVersionExtensionUint("widget_wrapper", "device_view_wrapper");
+DeviceViewWrapper_ifs *getDeviceViewWrapper(ExtensionManager *manager) {
+    auto unit = manager->getLastVersionExtensionUnit("widget_wrapper", "device_view_wrapper");
     if (unit == nullptr || unit->ptr == nullptr) return nullptr;
     auto wrapper = (DeviceViewWrapper_ifs *)unit->ptr;
     return wrapper;
 }
 
 ExrtAction_ifs *getExrtAction(ExtensionManager *manager, const std::string &name) {
-    auto unit = manager->getLastVersionExtensionUint("exrt_action", "name");
+    auto unit = manager->getLastVersionExtensionUnit("exrt_action", name);
     if (unit == nullptr || unit->ptr == nullptr) return nullptr;
     auto data_schema = (ExrtAction_ifs *)unit->ptr;
     return data_schema;
+}
+
+IO_ifs *getPyIO(ExtensionManager *manager, const std::string &name) {
+    auto unit = manager->getLastVersionExtensionUnit("io", name);
+    if (unit == nullptr || unit->ptr == nullptr) return nullptr;
+    auto io = (IO_ifs *)unit->ptr;
+    return io;
 }
 
 PYBIND11_MODULE(PY_BINDLIB_NAME, m) {
@@ -45,9 +52,9 @@ PYBIND11_MODULE(PY_BINDLIB_NAME, m) {
     py::class_<ExtensionManager>(m, "ExtensionManager")
         .def(py::init([]() { return new ExtensionManager; }))
         .def("getAvailableExtensionTypes", &ExtensionManager::getAvailableExtensionTypes)
-        .def("getLastVersionExtensionUintsByType", &ExtensionManager::getLastVersionExtensionUintsByType)
-        .def("getExtensionUintSet", &ExtensionManager::getExtensionUintSet)
-        .def("getLastVersionExtensionUint", &ExtensionManager::getLastVersionExtensionUint);
+        .def("getLastVersionExtensionUnitsByType", &ExtensionManager::getLastVersionExtensionUnitsByType)
+        .def("getExtensionUnitSet", &ExtensionManager::getExtensionUnitSet)
+        .def("getLastVersionExtensionUnit", &ExtensionManager::getLastVersionExtensionUnit);
 
     py::class_<Value>(m, "Value")
         .def(py::init([]() { return new Value(); }))
@@ -111,12 +118,25 @@ PYBIND11_MODULE(PY_BINDLIB_NAME, m) {
 
     py::class_<ExrtAction_ifs, PyExrtAction>(m, "ExrtAction")
         .def(py::init<>())
-        .def("addSignal", &ExrtAction_ifs::run)
-        .def("removeFromActive", &ExrtAction_ifs::getDescription)
-        .def("addToSelected", &ExrtAction_ifs::getInfo);
+        .def("run", &ExrtAction_ifs::run)
+        .def("getDescription", &ExrtAction_ifs::getDescription)
+        .def("getInfo", &ExrtAction_ifs::getInfo);
+
+    py::class_<IO_ifs, PyIO, std::unique_ptr<IO_ifs, py::nodelete>>(m, "pyIO")
+        .def(py::init<const std::string & /*filename_pattern*/, const std::string & /*file_type*/,
+                      const std::string & /*file_info*/>())
+        .def("readDocument", &IO_ifs::readDocument)
+        .def("saveDocument", &IO_ifs::saveDocument)
+        .def_readonly("filename_pattern_", &IO_ifs::filename_pattern_)
+        .def_readonly("file_type_", &IO_ifs::file_type_)
+        .def_readonly("file_info_", &IO_ifs::file_info_);
 
     m.def("isNum", [](std::string a) { return isNum(createDataType(a)); });
     m.def("normalizeType", [](std::string a) { return toString(createDataType(a)); });
     m.def("printer_debug", printer_debug);
+
     m.def("getDataSchema", getDataSchema);
+    m.def("getDeviceViewWrapper", getDeviceViewWrapper, py::return_value_policy::reference);
+    m.def("getExrtAction", getExrtAction, py::return_value_policy::reference);
+    m.def("getPyIO", getPyIO, py::return_value_policy::reference);
 }

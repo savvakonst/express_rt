@@ -7,7 +7,7 @@
 #include "common/StringProcessingTools.h"
 
 EthernetUdpParameter::EthernetUdpParameter(ExtensionManager* manager) {
-    auto unit = manager->getLastVersionExtensionUint("data_schema", "ethernet_udp");
+    auto unit = manager->getLastVersionExtensionUnit("data_schema", "ethernet_udp");
 
     if (unit && unit->ptr) {
         data_schema_ = (DataSchema_ifs*)unit->ptr;

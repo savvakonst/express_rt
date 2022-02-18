@@ -25,7 +25,7 @@ int main(void) {
         in.close();
     }
 
-    auto e_unit = manager.getLastVersionExtensionUint("io", "base_io");
+    auto e_unit = manager.getLastVersionExtensionUnit("io", "base_io");
     if (e_unit == nullptr) {
         DEBUG_CERR("cant find \"base_io\" unit with \"io\" type\n");
         return 1;

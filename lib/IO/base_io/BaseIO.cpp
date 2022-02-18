@@ -103,7 +103,7 @@ YAML::Node findParametersSubInformation(const std::string &parameter_name, const
 
 bool BaseIO::readDocument(ExtensionManager *manager, const std::string &source_path) {
     auto ctm = (ConversionTemplateManager *)manager
-                   ->getLastVersionExtensionUint("cnv_template_manager", "cnv_template_manager")
+                   ->getLastVersionExtensionUnit("cnv_template_manager", "cnv_template_manager")
                    ->ptr;
 
     auto conv_template = readOrParseDocument(manager, true, "", source_path);
@@ -114,7 +114,9 @@ bool BaseIO::readDocument(ExtensionManager *manager, const std::string &source_p
     return false;
 }
 
-bool BaseIO::saveDocument(const std::string &id, const std::string &dst_path) { return false; }
+bool BaseIO::saveDocument(ExtensionManager *manager, const std::string &id, const std::string &dst_path) {
+    return false;
+}
 
 ConversionTemplate *BaseIO::parseDocument(ExtensionManager *manager, const std::string &str,
                                           const std::string &source_path) {

@@ -69,7 +69,7 @@ class COMMON_API_ ExtensionManager {
         return ret;
     }
 
-    std::list<ExtensionUnit *> getLastVersionExtensionUintsByType(const std::string &type) {
+    std::list<ExtensionUnit *> getLastVersionExtensionUnitsByType(const std::string &type) {
         std::list<ExtensionUnit *> ret;
         auto item = tree_.find(type);
         if (item != tree_.end())
@@ -77,7 +77,7 @@ class COMMON_API_ ExtensionManager {
         return ret;
     }
 
-    const std::set<ExtensionUnit *, VersionCmp> *getExtensionUintSet(const std::string &type,
+    const std::set<ExtensionUnit *, VersionCmp> *getExtensionUnitSet(const std::string &type,
                                                                      const std::string &name) {  // it is unsafe
         auto item = tree_.find(type);
         if (item != tree_.end()) {
@@ -87,9 +87,9 @@ class COMMON_API_ ExtensionManager {
         return nullptr;
     }
 
-    const ExtensionUnit *getLastVersionExtensionUint(const std::string &type,
+    const ExtensionUnit *getLastVersionExtensionUnit(const std::string &type,
                                                      const std::string &name) {  // it is unsafe
-        auto set = getExtensionUintSet(type, name);
+        auto set = getExtensionUnitSet(type, name);
         if (set == nullptr) return nullptr;
         auto ret = *(set->begin());  // there must be no situations with an empty set by design.
         return ret;
@@ -97,7 +97,7 @@ class COMMON_API_ ExtensionManager {
 
     const void *getLastVersionExtensionObject(const std::string &type,
                                               const std::string &name) {  // it is unsafe
-        auto set = getLastVersionExtensionUint(type, name);
+        auto set = getLastVersionExtensionUnit(type, name);
         if (set && set->ptr) return set->ptr;
         return nullptr;
     }
