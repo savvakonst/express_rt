@@ -86,8 +86,6 @@ class DeviceListModel : public QAbstractItemModel {
         Module_ifs *object = nullptr;
         std::vector<TreeNode *> child_vector;
     };
-
-    QModelIndex current_index_ = QModelIndex();
     
    private:
     TreeNode *root_ = nullptr;

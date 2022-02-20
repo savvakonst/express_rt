@@ -44,12 +44,12 @@ QVariant DeviceListModel::data(const QModelIndex &index, int role) const {
     if (role == Qt::DecorationRole) {
         QPixmap pixmap(16, 16);
         pixmap.fill(QColor(255, 0, 0));
-        return pixmap;
+        // return pixmap;
     }
 
-    if (role == Qt::BackgroundRole) {
-        if (index == current_index_) return QBrush(QColor(255 * index.row(), 255 * index.column(), 0));
-    }
+    // if (role == Qt::BackgroundRole) {
+    //     if (index == current_index_) return QBrush(QColor(255 * index.row(), 255 * index.column(), 0));
+    //  }
 
     if (role != Qt::DisplayRole) return {};
 
@@ -171,36 +171,48 @@ class DeviceRemoveAction : public QAction {
  *
  *
  *
+ */
+#include "QPainter"
+#include "QStyledItemDelegate"
+class CustomItemDelegate : public QStyledItemDelegate {
+   private:
+    QModelIndex current_index_;
+
+    void onCurrentChanged(const QModelIndex &current, const QModelIndex &prev) { current_index_ = current; }
+
+   public:
+    void connectToView(QAbstractItemView *view) {
+        connect(view->selectionModel(), &QItemSelectionModel::currentChanged, this,
+                &CustomItemDelegate ::onCurrentChanged);
+    }
+    // using QStyledItemDelegate::QStyledItemDelegate;
+
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+        if (index == current_index_) {
+            qDebug() << index << ":::  " << option;
+            // option.rect.bottomLeft()
+            int half_h = option.rect.height() / 2;
+            // painter->drawRect(option.rect.topLeft(),QPoint(half_h, half_h));
+            // painter->drawEllipse(option.rect.topLeft() + QPoint(half_h, half_h), half_h / 2, half_h / 2);
+        }
+        QStyledItemDelegate::paint(painter, option, index);
+    }
+    // QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    // QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+    // override;
+    // void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+
+   private slots:
+    void commitAndCloseEditor();
+};
+
+/*
+ *
+ *
  *
  */
-class DeviceViewWrapper;
 
 class DeviceViewWrapper : public DeviceViewWrapper_ifs {
-   public:
-    class DeviceViewWrapperDelegate : public QObject {
-       public:
-        explicit DeviceViewWrapperDelegate(DeviceViewWrapper *wrapper) : wrapper_(wrapper) {}
-
-        void init() {
-            auto s_model = wrapper_->widget_->selectionModel();
-            connect(s_model, &QItemSelectionModel::currentChanged, this,
-                    &DeviceViewWrapperDelegate::currentChangedSlot);
-        }
-
-       public slots:
-
-        void selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected) {}
-
-        void currentChangedSlot(const QModelIndex &current, const QModelIndex &previous) {
-            wrapper_->device_list_model_->current_index_ = current;
-            // wrapper_->current_index_;
-            qDebug() << "void currentChangedSlot(const QModelIndex &current, const QModelIndex &previous)";
-        }
-
-       private:
-        DeviceViewWrapper *wrapper_ = nullptr;
-    };
-
    public:
     friend class DeviceViewWrapperDelegate;
     DeviceViewWrapper() : widget_(new QTreeView()), delegate_(this) {}
@@ -208,6 +220,11 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
     void init(ExtensionManager *manager) {
         device_list_model_ = new DeviceListModel(manager);
         widget_->setModel(device_list_model_);
+
+        auto item_delegate = new CustomItemDelegate;
+        widget_->setItemDelegate(item_delegate);
+        item_delegate->connectToView(widget_);
+
         delegate_.init();
 
         auto io_units = manager->getLastVersionExtensionUnitsByType("io");
@@ -309,10 +326,42 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
     };
 
    protected:
+    class DeviceViewWrapperDelegate : public QObject {
+       public:
+        explicit DeviceViewWrapperDelegate(DeviceViewWrapper *wrapper) : wrapper_(wrapper) {}
+
+        void init() {
+            auto s_model = wrapper_->widget_->selectionModel();
+            connect(s_model, &QItemSelectionModel::currentChanged, this,
+                    &DeviceViewWrapperDelegate::currentChangedSlot);
+        }
+
+       public slots:
+
+        void selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected) {}
+
+        void currentChangedSlot(const QModelIndex &current, const QModelIndex &previous) {
+            // wrapper_->device_list_model_->current_index_ = current;
+            //  wrapper_->current_index_;
+            // qDebug() << "void currentChangedSlot(const QModelIndex &current, const QModelIndex &previous)";
+        }
+
+       private:
+        DeviceViewWrapper *wrapper_ = nullptr;
+    };
+
     DeviceViewWrapperDelegate delegate_;
     QTreeView *widget_;
     DeviceListModel *device_list_model_ = nullptr;
 };
+
+/*
+ *
+ *
+ *
+ *
+ *
+ */
 
 WidgetWrapper_ifs *newDeviceViewWrapper() {
     auto wrapper = new DeviceViewWrapper();
