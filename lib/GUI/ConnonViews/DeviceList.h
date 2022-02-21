@@ -6,6 +6,7 @@
 #define EXRT_DEVICESLIST_H
 
 #include <QAbstractTableModel>
+#include <QMap>
 #include <QTreeView>
 
 #include "common/BaseClass_ifs.h"
@@ -26,8 +27,6 @@ class DeviceListModel : public QAbstractItemModel {
 
     ~DeviceListModel() override;
 
-    [[nodiscard]] void buildTree();
-
     [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
     [[nodiscard]] Qt::ItemFlags flags(const QModelIndex &index) const override;
     [[nodiscard]] QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
@@ -37,10 +36,24 @@ class DeviceListModel : public QAbstractItemModel {
     [[nodiscard]] int rowCount(const QModelIndex &parent) const override;
     [[nodiscard]] int columnCount(const QModelIndex &parent) const override;
 
+    [[nodiscard]] void buildTree();
+
+    struct TreeNode;
+
+    TreeNode *getTreeNode(const std::string &source, const std::string &path);
+
+    bool setActiveDevice(const std::string &source);
+    TreeNode *getActiveDevice() { return active_device_; }
+
+    bool setActiveModule(const std::string &path) { return false; }
+
     struct TreeNode {
         // it is better to avoid direct deletion.
 
-        explicit TreeNode(Module_ifs *ptr) : object(ptr) {}
+        explicit TreeNode() : m_object(nullptr) {}
+        explicit TreeNode(Module_ifs *ptr) : m_object(ptr) {}
+
+        [[nodiscard]] bool isDevice() const { return (m_object != nullptr) && (parent->parent == nullptr); }
 
         ~TreeNode() {
             for (auto i : child_vector) delete i;
@@ -54,45 +67,33 @@ class DeviceListModel : public QAbstractItemModel {
             return true;
         }
 
-        size_t getIndex() {
-            // TODO: implement this
-            return self_index;
-        }
+        [[nodiscard]] size_t getIndex() const { return self_index; }
 
-        void addNodesRecursively(Module_ifs *ptr, const std::string &path = "") {
-            auto node = new TreeNode(ptr);
-            node->parent = this;
+        [[nodiscard]] std::pair<std::string, std::string> getPath() const;
+        void addNodesRecursively(Module_ifs *ptr, const std::string &path = "");
 
-            // auto slot = ptr->getPropertyAsTxt("header/slot");
-            // auto sub_slot = ptr->getPropertyAsTxt("header/sub");
-            // auto path = slot + ((sub_slot == "0" || sub_slot == "") ? "" : "." + sub_slot);
-
-            // node->path_chunk_ = path + ": " + ptr->getID();
-
-            node->self_index = child_vector.size();
-            child_vector.push_back(node);
-
-            node->path_chunk = path + ": " + (ptr ? ptr->getID() : "");
-            if (ptr == nullptr) return;
-            auto list = ptr->getSubModules();
-            for (const auto &i : list) {
-                node->addNodesRecursively(i.second, i.first);
-            }
-        }
-
-        size_t self_index = 0;
+        std::string module_type;
         std::string path_chunk;
+
         TreeNode *parent = nullptr;
-        Module_ifs *object = nullptr;
+
+        Module_ifs *m_object;
+
         std::vector<TreeNode *> child_vector;
+        size_t self_index = 0;
     };
-    
+
    private:
+    void addItemsToNodeMap(TreeNode *node);
+
+    QMap<QString, QIcon> icons_map_;
+
+    std::map<std::string, TreeNode *> node_map_;
     TreeNode *root_ = nullptr;
+    TreeNode *active_device_ = nullptr;
+
     std::vector<DataSchema_ifs *> list_of_entries_;
     DeviceManager *device_manager_ = nullptr;
 };
-
-class DeviceList {};
 
 #endif  // EXRT_DEVICELIST_H

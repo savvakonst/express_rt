@@ -120,18 +120,39 @@ class PyDeviceViewWrapper : public DeviceViewWrapper_ifs {
         PYBIND11_OVERRIDE_PURE(bool, DeviceViewWrapper_ifs, addToSelected, row_index);
     }
 
+    bool addToSelected(const std::string &source, const std::string &path) override {
+        PYBIND11_OVERRIDE_PURE(bool, DeviceViewWrapper_ifs, addToSelected, source, path);
+    }
+
     bool removeFromSelected(size_t row_index) override {
         PYBIND11_OVERRIDE_PURE(bool, DeviceViewWrapper_ifs, removeFromSelected, row_index);
     }
 
+    bool removeFromSelected(const std::string &source, const std::string &path) override {
+        PYBIND11_OVERRIDE_PURE(bool, DeviceViewWrapper_ifs, removeFromSelected, source, path);
+    }
+
     Device *getActiveDevice() override { PYBIND11_OVERRIDE_PURE(Device *, DeviceViewWrapper_ifs, getActiveDevice); }
+
+    std::string getActiveDeviceSource() override {
+        PYBIND11_OVERRIDE_PURE(std::string, DeviceViewWrapper_ifs, getActiveDeviceSource);
+    }
 
     Module_ifs *getActiveModule() override {
         PYBIND11_OVERRIDE_PURE(Module_ifs *, DeviceViewWrapper_ifs, getActiveModule);
     }
+    typedef std::pair<std::string, std::string> strPair_t;
+
+    std::pair<std::string, std::string> getActiveModulePath() override {
+        PYBIND11_OVERRIDE_PURE(strPair_t, DeviceViewWrapper_ifs, getActiveModulePath);
+    }
 
     std::vector<Module_ifs *> getSelected() override {
         PYBIND11_OVERRIDE_PURE(std::vector<Module_ifs *>, DeviceViewWrapper_ifs, getSelected);
+    }
+
+    std::vector<std::pair<std::string, std::string>> getSelectedPath() override {
+        PYBIND11_OVERRIDE_PURE(std::vector<strPair_t>, DeviceViewWrapper_ifs, getActiveDevicePath);
     }
 };
 

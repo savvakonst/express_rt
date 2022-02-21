@@ -25,6 +25,8 @@ target_include_directories(CommonLib PUBLIC ../include)
 target_compile_definitions(CommonLib PUBLIC DEBUG_)
 target_compile_definitions(CommonLib PRIVATE COMMON_CREATE_SHARED_LIBRARY)
 
+file(GLOB PNG_LIST ../png/modules/*.png)
+file(COPY ${PNG_LIST} DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/png/modules FOLLOW_SYMLINK_CHAIN)
 
 add_subdirectory(IO)
 

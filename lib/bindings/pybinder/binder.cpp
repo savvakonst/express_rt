@@ -103,17 +103,23 @@ PYBIND11_MODULE(PY_BINDLIB_NAME, m) {
 
     // bool (DeviceViewWrapper_ifs::*dev_setActive_size)(size_t) = &DeviceViewWrapper_ifs::setActive;
 
+    typedef bool (DeviceViewWrapper_ifs::*byIndex_t)(size_t);
+    typedef bool (DeviceViewWrapper_ifs::*byPath_t)(const std::string &source, const std::string &path);
+
     py::class_<DeviceViewWrapper_ifs, PyDeviceViewWrapper>(m, "DeviceViewWrapper")
         .def(py::init<>())
         .def("addSignal", &DeviceViewWrapper_ifs::addSignal)
-        .def<bool (DeviceViewWrapper_ifs::*)(size_t)>("setActive", &DeviceViewWrapper_ifs::setActive)
-        .def<bool (DeviceViewWrapper_ifs::*)(const std::string &source, const std::string &path)>(
-            "setActive", &DeviceViewWrapper_ifs::setActive)
+        .def<byIndex_t>("setActive", &DeviceViewWrapper_ifs::setActive)
+        .def<byPath_t>("setActive", &DeviceViewWrapper_ifs::setActive)
         .def("removeFromActive", &DeviceViewWrapper_ifs::removeFromActive)
-        .def("addToSelected", &DeviceViewWrapper_ifs::addToSelected)
-        .def("removeFromSelected", &DeviceViewWrapper_ifs::removeFromSelected)
+        .def<byIndex_t>("addToSelected", &DeviceViewWrapper_ifs::addToSelected)
+        .def<byPath_t>("addToSelected", &DeviceViewWrapper_ifs::addToSelected)
+        .def<byIndex_t>("removeFromSelected", &DeviceViewWrapper_ifs::removeFromSelected)
+        .def<byPath_t>("removeFromSelected", &DeviceViewWrapper_ifs::removeFromSelected)
         .def("getActiveDevice", &DeviceViewWrapper_ifs::getActiveDevice, py::return_value_policy::reference)
+        .def("getActiveDeviceSource", &DeviceViewWrapper_ifs::getActiveDeviceSource)
         .def("getActiveModule", &DeviceViewWrapper_ifs::getActiveModule, py::return_value_policy::reference)
+        .def("getActiveModulePath", &DeviceViewWrapper_ifs::getActiveModulePath)
         .def("getSelected", &DeviceViewWrapper_ifs::getSelected);
 
     py::class_<ExrtAction_ifs, PyExrtAction>(m, "ExrtAction")

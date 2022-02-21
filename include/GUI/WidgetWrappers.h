@@ -62,12 +62,19 @@ class DeviceViewWrapper_ifs : public WidgetWrapper_ifs {
     virtual bool removeFromActive() = 0;
 
     virtual bool addToSelected(size_t row_index) = 0;
+    virtual bool addToSelected(const std::string &source, const std::string &path) = 0;
+
     virtual bool removeFromSelected(size_t row_index) = 0;
+    virtual bool removeFromSelected(const std::string &source, const std::string &path) = 0;
 
     virtual Device *getActiveDevice() = 0;
+    virtual std::string getActiveDeviceSource() = 0;
+
     virtual Module_ifs *getActiveModule() = 0;
+    virtual std::pair<std::string, std::string> getActiveModulePath() = 0;
 
     virtual std::vector<Module_ifs *> getSelected() = 0;
+    virtual std::vector<std::pair<std::string, std::string>> getSelectedPath() = 0;
 };
 
 class Parameter_ifs;
