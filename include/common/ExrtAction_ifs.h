@@ -5,6 +5,9 @@
 
 class ExrtAction_ifs : public BaseClass_ifs {
    public:
+
+    ~ExrtAction_ifs() = default;
+
     virtual bool run() = 0;
 
     virtual std::string getDescription() = 0;

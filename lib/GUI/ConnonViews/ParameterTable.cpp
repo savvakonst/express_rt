@@ -122,7 +122,7 @@ void ParameterTableModel::selectParameter(const QModelIndex &index) {
  *
  */
 
-class ParameterViewWrapper : public ParameterViewWrapper_if {
+class ParameterViewWrapper : public ParameterViewWrapper_ifs {
    public:
     ParameterViewWrapper() : widget_(new QTreeView()) {}
 

@@ -32,7 +32,7 @@ TaskMapper::TaskMapper(size_t len, const TaskMapper& value) : struct_type_(Struc
     size_ = len * value.size_;
 }
 
-TaskMapper::TaskMapper(std::vector<tuple> vecmap) : vecmap_(std::move(vecmap)), struct_type_(StructType::map) {
+TaskMapper::TaskMapper(std::vector<tuple_t> vecmap) : vecmap_(std::move(vecmap)), struct_type_(StructType::map) {
     size_ = 0;
 
     for (auto& i : vecmap_) {
@@ -120,6 +120,15 @@ void TaskMapper::setReferencePtr(void* ptr) {
  *
  *
  */
+
+std::string KSDModule::getModulePath(bool full_path) const {
+    auto slot = getProperty("header/slot")->getValue().value_.u64;
+    auto sub_slot = getProperty("header/sub")->getValue().value_.u64;
+    auto path = std::to_string(slot) + ((sub_slot == 0) ? "" : "." + std::to_string(sub_slot)) + "/" + getID();
+
+    if (parent_module_ && full_path) path = parent_module_->getModulePath(true) + "/" + path;
+    return path;
+}
 
 const TaskMapper* KSDModule::getBranch(const std::string& prop_path) const {
     return (const TaskMapper*)::getBranch(&field_map_, prop_path);

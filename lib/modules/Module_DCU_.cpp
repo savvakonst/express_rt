@@ -1,13 +1,15 @@
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 //
 #include "Module_DCU_.h"
 #include "common/ExtensionManager.h"
+#include "common/StringProcessingTools.h"
 #include "device/Device.h"
 
 static std::string createCHxxId(size_t slots) {
     char data[3] = {0, 0, 0};
-    std::sprintf(data, "%02d", slots);
+    std::sprintf(data, "%02d", int(slots));
     return "CH" + std::string(data);
 }
 
@@ -36,9 +38,10 @@ Module_DCU_::Module_DCU_(size_t number_of_slots, const void *ptr, size_t size, E
             error_message_ = "cant find module with \"" + stringId(header->id) + "\" id";
             return;
         }
-        if (module->hasError()) {
-            error_message_ += "\n" + error_message_;
-        }
+        module->setParentModule(this);
+
+        if (module->hasError()) error_message_ += "\n" + error_message_;
+
         offset += (size_t)header->size;
         modules_.push_back(module);
         // std::cout << "\n" + stringId(header->id) << ":" << module->printProperties("");
@@ -64,6 +67,13 @@ EthernetSettings Module_DCU_::getSrcAddress() const {
         if (i->hasTransceiver()) return i->getSrcAddress();
     }
     return {};
+}
+
+std::list<Module_ifs *> Module_DCU_::getSubModulesFromPath(const std::string &modules_path) const {
+    std::list<Module_ifs *> ret_list;
+    for (auto i : modules_) ret_list.merge(::getSubmodules(i, modules_path));
+
+    return ret_list;
 }
 
 const DataSchema_ifs *Module_DCU_::getPropertySchema() { return nullptr; }

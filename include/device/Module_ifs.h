@@ -1,7 +1,9 @@
 #ifndef EXO_MODULE_IFS_H
 #define EXO_MODULE_IFS_H
 
+#include <list>
 #include <string>
+#include <vector>
 
 #include "common/Properties_ifs.h"
 
@@ -20,6 +22,14 @@ class COMMON_API_ Module_ifs : public Properties_ifs {
     [[nodiscard]] virtual bool isAvailable() const = 0;
 
     [[nodiscard]] virtual std::string getID() const = 0;
+
+    [[nodiscard]] virtual std::string getModulePath(bool full_path = true) const = 0;
+
+    [[nodiscard]] virtual Module_ifs *getParentModule() const = 0;
+
+    virtual bool setParentModule(Module_ifs *) = 0;
+
+    [[nodiscard]] virtual std::list<Module_ifs *> getSubModulesFromPath(const std::string &module_path) const = 0;
 
     virtual std::map<std::string, PrmBuffer_ifs *> getPrmBufferMap() = 0;
 
@@ -44,6 +54,8 @@ class COMMON_API_ Module_ifs : public Properties_ifs {
     [[nodiscard]] virtual std::vector<std::pair<std::string, Module_ifs *>> getSubModules() const = 0;
 
     virtual ModuleStream_ifs *createModuleStream() = 0;
+
+   protected:
 };
 
 template <class T>
@@ -52,5 +64,7 @@ Module_ifs *createModule(const void *ptr, size_t size, ExtensionManager *manager
 }
 
 typedef Module_ifs *(*moduleConstructor_f)(const void *ptr, size_t size, ExtensionManager *manager);
+
+COMMON_API_ std::list<Module_ifs *> getSubmodules(Module_ifs *module, const std::string &glob_pattern);
 
 #endif

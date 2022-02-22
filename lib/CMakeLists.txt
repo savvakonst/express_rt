@@ -14,11 +14,11 @@ add_library(CommonLib SHARED
         common/CustomTypes.cpp
         common/DataSchema_ifs.cpp
         common/ExtensionManager.cpp
-        device/Device.cpp
         convtemplate/ConversionTemplate.cpp
         convtemplate/ParameterFieldTree.cpp
         convtemplate/StandardParameter_ifs.cpp
-        )
+        device/Device.cpp
+        common/StringProcessingTools.cpp)
 
 
 target_include_directories(CommonLib PUBLIC ../include)

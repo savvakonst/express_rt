@@ -1,6 +1,7 @@
 #ifndef EXO_DEVICE_H
 #define EXO_DEVICE_H
 
+#include <list>
 #include <string>
 //
 #include "common/BaseClass_ifs.h"
@@ -45,7 +46,6 @@ class COMMON_API_ Device : public Module_ifs {
 
     std::string source_;
 
-
     friend class DeviceManager;
 
    public:
@@ -63,6 +63,14 @@ class COMMON_API_ Device : public Module_ifs {
     [[nodiscard]] bool isAvailable() const override { return true; }
 
     [[nodiscard]] std::string getID() const override;
+
+    [[nodiscard]] std::string getModulePath(bool full_path) const override { return getID(); }
+
+    [[nodiscard]] Module_ifs *getParentModule() const override { return nullptr; }
+
+    bool setParentModule(Module_ifs *parent_module) override { return false; }
+
+    [[nodiscard]] std::list<Module_ifs *> getSubModulesFromPath(const std::string &modules_path) const override;
 
     /* not yet implemented inherited members  begin*/
     std::map<std::string, PrmBuffer_ifs *> getPrmBufferMap() override { return {}; }

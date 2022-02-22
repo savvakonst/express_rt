@@ -45,7 +45,7 @@ Device::Device(const void *ptr, size_t size, ExtensionManager *context) {
             error_message_ = "cant find module with \"" + stringId(header->id) + "\" id";
             return;
         }
-
+        module->setParentModule(this);
         offset += (size_t)header->size;
         modules_.push_back(module);
     } while (offset < size_);
@@ -75,10 +75,15 @@ EthernetSettings Device::getSrcAddress() const {
 
 std::string Device::getID() const { return stringId(task_header_.device_id); }
 
+std::list<Module_ifs *> Device::getSubModulesFromPath(const std::string &modules_path) const {
+    std::list<Module_ifs *> ret_list;
+    for (auto i : modules_) ret_list.merge(::getSubmodules(i, modules_path));
+
+    return ret_list;
+}
+
 std::vector<std::pair<std::string, Module_ifs *>> Device::getSubModules() const {
     std::vector<std::pair<std::string, Module_ifs *>> ret;
-    // ret.resize(number_of_slots_,{"", nullptr});
-    // ret.reserve(number_of_slots_);
 
     ret.reserve(modules_.size());
     for (auto i : modules_) {
@@ -109,3 +114,87 @@ std::vector<std::pair<std::string, Module_ifs *>> Device::getModulesFromPath(con
 }
 
 size_t Device::getTaskSize() const { return size_; }
+
+/*
+ *
+ *
+ *
+ */
+
+#define PATHSEP '/'
+std::list<Module_ifs *> getSubmodules(Module_ifs *i, const std::string &glob_pattern) {
+    std::list<Module_ifs *> ret_list;
+
+    auto local_path = i->getModulePath(false);
+    auto text = local_path.c_str();
+    auto glob = glob_pattern.c_str();
+
+    const char *text_backup = nullptr;
+    const char *glob_backup = nullptr;
+    const char *text_2_star_backup = nullptr;
+    const char *glob_2_star_backup = nullptr;
+
+    if (*glob == '/') {
+        while (*text == '.' && text[1] == PATHSEP) text += 2;
+        if (*text == PATHSEP) text++;
+        glob++;
+    } else if (strchr(glob, '/') == nullptr) {
+        const char *sep = strrchr(text, PATHSEP);
+        if (sep) text = sep + 1;
+    }
+
+    while (*text != '\0') {
+        switch (*glob) {
+        case '*': {
+            if (*++glob == '*') {
+                // invalid syntax
+                if (*glob != '/') return {};
+
+                ret_list.merge(i->getSubModulesFromPath(glob - 1));
+                if (*++glob == '\0') goto ret_true;
+
+                text_backup = nullptr;
+                glob_backup = nullptr;
+                text_2_star_backup = text;
+                glob_2_star_backup = ++glob;
+                continue;
+            }
+            // trailing * matches everything except /
+            text_backup = text;
+            glob_backup = glob;
+            continue;
+        }
+        case '?':
+            if (*text == PATHSEP) break;
+            text++;
+            glob++;
+            continue;
+        case '\\':
+            glob++;
+        default:
+            if (*glob != *text && !(*glob == '/' && *text == PATHSEP)) break;
+            text++;
+            glob++;
+            continue;
+        }
+        if (glob_backup != nullptr && *text_backup != PATHSEP) {
+            // *-loop: backtrack to the last * but do not jump over /
+            text = ++text_backup;
+            glob = glob_backup;
+            continue;
+        }
+        if (glob_2_star_backup != nullptr) {
+            // **-loop: backtrack to the last **
+            text = ++text_2_star_backup;
+            glob = glob_2_star_backup;
+            continue;
+        }
+        goto ret_false;
+    }
+ret_true:
+    if (*glob != '\0') ret_list.merge(i->getSubModulesFromPath(glob));
+    else
+        ret_list.push_back(i);
+ret_false:;
+    return ret_list;
+}

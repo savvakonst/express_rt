@@ -3,7 +3,10 @@
 #ifndef EXRT_TOOLS_H
 #define EXRT_TOOLS_H
 
+#include <cstring>
 #include <regex>
+
+#include "common/Port.h"
 
 inline std::vector<std::string> splitPath(const std::string &path) {
     static const std::regex separator("[^/]+");
@@ -18,5 +21,8 @@ inline std::vector<std::string> splitPath(const std::string &path) {
     return ret;
 }
 
+COMMON_API_ bool globMatch(const std::string &text, const std::string &glob);
+
+COMMON_API_ bool filePatternMatch(const std::string &text, const std::string &glob);
 
 #endif  // EXRT_TOOLS_H

@@ -11,6 +11,7 @@
 #include "GUI/WidgetWrappers.h"
 #include "common/CustomTypes.h"
 #include "common/DataSchema_ifs.h"
+#include "common/ExrtAction_ifs.h"
 #include "common/ExtensionManager.h"
 /* helper class definition
  *
@@ -94,6 +95,7 @@ class PyHierarchicalData : public HierarchicalData_ifs {
     }
 };
 
+#include "common/ExrtAction_ifs.h"
 #include "convtemplate/ConversionTemplate.h"
 #include "convtemplate/Parameter_ifs.h"
 #include "device/Device.h"
@@ -106,26 +108,14 @@ class PyDeviceViewWrapper : public DeviceViewWrapper_ifs {
         PYBIND11_OVERRIDE_PURE(status, DeviceViewWrapper_ifs, addSignal, signal);
     }
 
-    bool setActive(size_t row_index) override {
-        PYBIND11_OVERRIDE_PURE(bool, DeviceViewWrapper_ifs, setActive, row_index);
-    }
-
     bool setActive(const std::string &source, const std::string &path) override {
         PYBIND11_OVERRIDE_PURE(bool, DeviceViewWrapper_ifs, setActive, source, path);
     }
 
     bool removeFromActive() override { PYBIND11_OVERRIDE_PURE(bool, DeviceViewWrapper_ifs, addToSelected); }
 
-    bool addToSelected(size_t row_index) override {
-        PYBIND11_OVERRIDE_PURE(bool, DeviceViewWrapper_ifs, addToSelected, row_index);
-    }
-
     bool addToSelected(const std::string &source, const std::string &path) override {
         PYBIND11_OVERRIDE_PURE(bool, DeviceViewWrapper_ifs, addToSelected, source, path);
-    }
-
-    bool removeFromSelected(size_t row_index) override {
-        PYBIND11_OVERRIDE_PURE(bool, DeviceViewWrapper_ifs, removeFromSelected, row_index);
     }
 
     bool removeFromSelected(const std::string &source, const std::string &path) override {
@@ -154,42 +144,48 @@ class PyDeviceViewWrapper : public DeviceViewWrapper_ifs {
     std::vector<std::pair<std::string, std::string>> getSelectedPath() override {
         PYBIND11_OVERRIDE_PURE(std::vector<strPair_t>, DeviceViewWrapper_ifs, getActiveDevicePath);
     }
+
+    void addAction(ExrtAction_ifs *action) override {
+        PYBIND11_OVERRIDE_PURE(void, DeviceViewWrapper_ifs, addAction, action);
+    }
 };
 
-class PyParameterViewWrapper : public ParameterViewWrapper_if {
+class PyParameterViewWrapper : public ParameterViewWrapper_ifs {
    public:
     QWidget *getWidget() override { return nullptr; }
 
     status addSignal(Signal_ifs *signal) override {
-        PYBIND11_OVERRIDE_PURE(status, ParameterViewWrapper_if, addSignal, signal);
+        PYBIND11_OVERRIDE_PURE(status, ParameterViewWrapper_ifs, addSignal, signal);
     }
 
     bool setActive(size_t row_index) override {
-        PYBIND11_OVERRIDE_PURE(bool, ParameterViewWrapper_if, setActive, row_index);
+        PYBIND11_OVERRIDE_PURE(bool, ParameterViewWrapper_ifs, setActive, row_index);
     }
 
     bool setActive(const std::string &name) override {
-        PYBIND11_OVERRIDE_PURE(bool, ParameterViewWrapper_if, setActive, name);
+        PYBIND11_OVERRIDE_PURE(bool, ParameterViewWrapper_ifs, setActive, name);
     }
 
-    bool removeFromActive() override { PYBIND11_OVERRIDE_PURE(bool, ParameterViewWrapper_if, removeFromActive); }
+    bool removeFromActive() override { PYBIND11_OVERRIDE_PURE(bool, ParameterViewWrapper_ifs, removeFromActive); }
 
     bool addToSelected(size_t row_index) override {
-        PYBIND11_OVERRIDE_PURE(bool, ParameterViewWrapper_if, addToSelected, row_index);
+        PYBIND11_OVERRIDE_PURE(bool, ParameterViewWrapper_ifs, addToSelected, row_index);
     }
 
     bool addToSelected(const std::string &name) override {
-        PYBIND11_OVERRIDE_PURE(bool, ParameterViewWrapper_if, addToSelected, name);
+        PYBIND11_OVERRIDE_PURE(bool, ParameterViewWrapper_ifs, addToSelected, name);
     }
 
     bool removeFromSelected(size_t row_index) override {
-        PYBIND11_OVERRIDE_PURE(bool, ParameterViewWrapper_if, removeFromSelected, row_index);
+        PYBIND11_OVERRIDE_PURE(bool, ParameterViewWrapper_ifs, removeFromSelected, row_index);
     }
 
-    Parameter_ifs *getActive() override { PYBIND11_OVERRIDE_PURE(Parameter_ifs *, ParameterViewWrapper_if, getActive); }
+    Parameter_ifs *getActive() override {
+        PYBIND11_OVERRIDE_PURE(Parameter_ifs *, ParameterViewWrapper_ifs, getActive);
+    }
 
     std::vector<Parameter_ifs *> getSelected() override {
-        PYBIND11_OVERRIDE_PURE(std::vector<Parameter_ifs *>, ParameterViewWrapper_if, getSelected);
+        PYBIND11_OVERRIDE_PURE(std::vector<Parameter_ifs *>, ParameterViewWrapper_ifs, getSelected);
     }
 };
 
@@ -234,15 +230,22 @@ class PyConversionTemplateViewWrapper : public ConversionTemplateViewWrapper_if 
     }
 };
 
-#include "common/ExrtAction_ifs.h"
-
 class PyExrtAction : public ExrtAction_ifs {
    public:
+    ~PyExrtAction() override {
+        std::cout << "~PyExrtAction()\n";
+        if (handle_) handle_.dec_ref();
+    }
+
+    void setOwnerShip(py::handle handle) { handle_ = handle; }
+
     bool run() override { PYBIND11_OVERRIDE_PURE(bool, ExrtAction_ifs, run); }
 
     std::string getDescription() override { PYBIND11_OVERRIDE_PURE(std::string, ExrtAction_ifs, getDescription); }
 
     std::string getInfo() override { PYBIND11_OVERRIDE_PURE(std::string, ExrtAction_ifs, getInfo); }
+
+    py::handle handle_;
 };
 
 #include "common/IO_ifs.h"

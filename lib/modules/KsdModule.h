@@ -10,7 +10,8 @@
 
 class TaskMapper : public HierarchicalData_ifs {
    public:
-    enum StructType {
+    enum StructType
+    {
         value,
         array,
         map,
@@ -23,9 +24,9 @@ class TaskMapper : public HierarchicalData_ifs {
 
     TaskMapper(size_t len, const TaskMapper &value);
 
-    typedef std::pair<std::string, TaskMapper> tuple;
+    typedef std::pair<std::string, TaskMapper> tuple_t;
 
-    explicit TaskMapper(std::vector<tuple> vecmap);
+    explicit TaskMapper(std::vector<tuple_t> vecmap);
 
     ~TaskMapper() override;
 
@@ -58,7 +59,7 @@ class TaskMapper : public HierarchicalData_ifs {
     DataType type_ = DataType::none_v;
     void *ptr_ = nullptr;
     std::vector<TaskMapper> vector_;
-    std::vector<tuple> vecmap_;
+    std::vector<tuple_t> vecmap_;
     std::map<std::string, HierarchicalData_ifs *> map_;
 };
 
@@ -93,6 +94,8 @@ class KSDModule : public Module_ifs {
 
     TaskMapper field_map_;
 
+    Module_ifs *parent_module_ = nullptr;
+
     [[nodiscard]] const TaskMapper *getBranch(const std::string &prop_path) const;
 
    public:
@@ -101,6 +104,20 @@ class KSDModule : public Module_ifs {
     [[nodiscard]] EthernetSettings getSrcAddress() const override { return {}; }
 
     [[nodiscard]] bool isAvailable() const override { return true; }
+
+    [[nodiscard]] std::string getModulePath(bool full_path) const override;
+
+    [[nodiscard]] Module_ifs *getParentModule() const override { return parent_module_; }
+
+    bool setParentModule(Module_ifs *parent_module) override {
+        if (parent_module_) return true;
+        parent_module_ = parent_module;
+        return true;
+    }
+ 
+    [[nodiscard]] std::list<Module_ifs *> getSubModulesFromPath(const std::string &prop_path) const override {
+        return {};
+    }
 
     std::map<std::string, PrmBuffer_ifs *> getPrmBufferMap() override { return {}; }
 
@@ -124,6 +141,8 @@ class KSDModule : public Module_ifs {
     bool setPropertyAsTxt(const std::string &prop_path, const std::string &value) override;
 
     [[nodiscard]] std::vector<std::pair<std::string, Module_ifs *>> getSubModules() const override { return {}; }
+
+   protected:
 };
 
 #endif

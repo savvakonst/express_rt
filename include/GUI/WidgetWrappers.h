@@ -54,17 +54,14 @@ class ListWidgetWrapper_ifs : public WidgetWrapper_ifs {
 
 class Module_ifs;
 class Device;
+class ExrtAction_ifs;
 
 class DeviceViewWrapper_ifs : public WidgetWrapper_ifs {
    public:
-    virtual bool setActive(size_t row_index) = 0;
     virtual bool setActive(const std::string &source, const std::string &path) = 0;
     virtual bool removeFromActive() = 0;
 
-    virtual bool addToSelected(size_t row_index) = 0;
     virtual bool addToSelected(const std::string &source, const std::string &path) = 0;
-
-    virtual bool removeFromSelected(size_t row_index) = 0;
     virtual bool removeFromSelected(const std::string &source, const std::string &path) = 0;
 
     virtual Device *getActiveDevice() = 0;
@@ -75,11 +72,13 @@ class DeviceViewWrapper_ifs : public WidgetWrapper_ifs {
 
     virtual std::vector<Module_ifs *> getSelected() = 0;
     virtual std::vector<std::pair<std::string, std::string>> getSelectedPath() = 0;
+
+    virtual void addAction(ExrtAction_ifs *action) = 0;
 };
 
 class Parameter_ifs;
 
-class ParameterViewWrapper_if : public WidgetWrapper_ifs {
+class ParameterViewWrapper_ifs : public WidgetWrapper_ifs {
    public:
     virtual bool setActive(size_t row_index) = 0;
     virtual bool setActive(const std::string &name) = 0;

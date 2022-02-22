@@ -36,16 +36,16 @@ class DeviceListModel : public QAbstractItemModel {
     [[nodiscard]] int rowCount(const QModelIndex &parent) const override;
     [[nodiscard]] int columnCount(const QModelIndex &parent) const override;
 
-    [[nodiscard]] void buildTree();
+    void buildTree();
 
     struct TreeNode;
-
+    QList<QModelIndex> getTreeIndexList(const std::string &source, const std::string &path);
+    std::list<TreeNode *> getTreeNodeList(const std::string &source, const std::string &path);
     TreeNode *getTreeNode(const std::string &source, const std::string &path);
 
     bool setActiveDevice(const std::string &source);
     TreeNode *getActiveDevice() { return active_device_; }
 
-    bool setActiveModule(const std::string &path) { return false; }
 
     struct TreeNode {
         // it is better to avoid direct deletion.
