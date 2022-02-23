@@ -71,7 +71,7 @@ EthernetSettings Module_DCU_::getSrcAddress() const {
 
 std::list<Module_ifs *> Module_DCU_::getSubModulesFromPath(const std::string &modules_path) const {
     std::list<Module_ifs *> ret_list;
-    for (auto i : modules_) ret_list.merge(::getSubmodules(i, modules_path));
+    for (auto i : modules_) ret_list.splice(ret_list.cend(),::getSubmodules(i, modules_path));
 
     return ret_list;
 }

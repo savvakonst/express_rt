@@ -77,7 +77,7 @@ std::string Device::getID() const { return stringId(task_header_.device_id); }
 
 std::list<Module_ifs *> Device::getSubModulesFromPath(const std::string &modules_path) const {
     std::list<Module_ifs *> ret_list;
-    for (auto i : modules_) ret_list.merge(::getSubmodules(i, modules_path));
+    for (auto i : modules_) ret_list.splice(ret_list.cend(), ::getSubmodules(i, modules_path));
 
     return ret_list;
 }
@@ -95,22 +95,6 @@ std::vector<std::pair<std::string, Module_ifs *>> Device::getSubModules() const 
     }
 
     return ret;
-}
-
-std::vector<std::pair<std::string, Module_ifs *>> Device::getModulesFromPath(const std::string &name) {
-    static const std::regex validator(R"((([\w]+:[\w]+:[\w]+/)*)(\w+:[\w]))");
-
-    std::smatch matches;
-    if (std::regex_search(name, matches, validator)) {
-        std::vector<std::string> path_chunks = splitPath(matches[1]);
-        std::string terminal = matches[3];
-
-        if (!path_chunks.empty()) {
-            error_message_ = "module encapsulation is not supported yet";
-            return {};
-        }
-    }
-    return {};
 }
 
 size_t Device::getTaskSize() const { return size_; }
@@ -148,10 +132,11 @@ std::list<Module_ifs *> getSubmodules(Module_ifs *i, const std::string &glob_pat
         case '*': {
             if (*++glob == '*') {
                 // invalid syntax
-                if (*glob != '/') return {};
 
-                ret_list.merge(i->getSubModulesFromPath(glob - 1));
                 if (*++glob == '\0') goto ret_true;
+
+                if (*glob != '/') return {};
+                ret_list.splice(ret_list.cend(), i->getSubModulesFromPath(glob - 2));
 
                 text_backup = nullptr;
                 glob_backup = nullptr;
@@ -192,7 +177,7 @@ std::list<Module_ifs *> getSubmodules(Module_ifs *i, const std::string &glob_pat
         goto ret_false;
     }
 ret_true:
-    if (*glob != '\0') ret_list.merge(i->getSubModulesFromPath(glob));
+    if (*glob != '\0') ret_list.splice(ret_list.cend(), i->getSubModulesFromPath(glob));
     else
         ret_list.push_back(i);
 ret_false:;

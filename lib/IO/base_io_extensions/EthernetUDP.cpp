@@ -4,7 +4,6 @@
 #include "EthernetUDP.h"
 #include "SpecificPParserBuilder.h"
 #include "common/ExtensionManager.h"
-#include "common/StringProcessingTools.h"
 
 EthernetUdpParameter::EthernetUdpParameter(ExtensionManager* manager) {
     auto unit = manager->getLastVersionExtensionUnit("data_schema", "ethernet_udp");

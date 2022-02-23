@@ -13,7 +13,13 @@
 #include "common/DataSchema_ifs.h"
 #include "common/ExrtAction_ifs.h"
 #include "common/ExtensionManager.h"
-/* helper class definition
+#include "convtemplate/ConversionTemplate.h"
+#include "convtemplate/Parameter_ifs.h"
+#include "device/Device.h"
+#include "device/ModuleStream_ifs.h"
+
+PYBIND11_MAKE_OPAQUE(std::map<std::string, PrmBuffer_ifs *>);
+/*
  *
  *
  */
@@ -95,10 +101,86 @@ class PyHierarchicalData : public HierarchicalData_ifs {
     }
 };
 
-#include "common/ExrtAction_ifs.h"
-#include "convtemplate/ConversionTemplate.h"
-#include "convtemplate/Parameter_ifs.h"
-#include "device/Device.h"
+class PyModule : public Module_ifs {
+   public:
+    ~PyModule() override = default;
+
+    [[nodiscard]] bool hasTransceiver() const override { PYBIND11_OVERRIDE_PURE(bool, Module_ifs, hasTransceiver); }
+
+    [[nodiscard]] EthernetSettings getSrcAddress() const override {
+        PYBIND11_OVERRIDE_PURE(EthernetSettings, Module_ifs, getSrcAddress);
+    }
+
+    [[nodiscard]] bool isAvailable() const override { PYBIND11_OVERRIDE_PURE(bool, Module_ifs, isAvailable); }
+
+    [[nodiscard]] std::string getID() const override { PYBIND11_OVERRIDE_PURE(std::string, Module_ifs, getID); }
+
+    [[nodiscard]] std::string getModulePath(bool full_path = true) const override {
+        PYBIND11_OVERRIDE_PURE(std::string, Module_ifs, getModulePath, full_path);
+    }
+
+    [[nodiscard]] Module_ifs *getParentModule() const override {
+        PYBIND11_OVERRIDE_PURE(Module_ifs *, Module_ifs, getParentModule);
+    }
+
+    bool setParentModule(Module_ifs *parent) override {
+        PYBIND11_OVERRIDE_PURE(Module_ifs *, Module_ifs, setParentModule, parent);
+    }
+
+    [[nodiscard]] std::list<Module_ifs *> getSubModulesFromPath(const std::string &module_path) const override {
+        PYBIND11_OVERRIDE_PURE(std::list<Module_ifs *>, Module_ifs, getSubModulesFromPath, module_path);
+    }
+
+    typedef std::map<std::string, PrmBuffer_ifs *> prm_buff_map_t;
+
+    [[nodiscard]] std::map<std::string, PrmBuffer_ifs *> getPrmBufferMap() override {
+        PYBIND11_OVERRIDE_PURE(prm_buff_map_t, Module_ifs, getPrmBufferMap);
+    }
+
+    [[nodiscard]] const DataSchema_ifs *getPropertySchema() override {
+        PYBIND11_OVERRIDE_PURE(DataSchema_ifs *, Module_ifs, getPropertySchema);
+    }
+
+    [[nodiscard]] std::string printProperties(const std::string &indent) const override {
+        PYBIND11_OVERRIDE_PURE(std::string, Module_ifs, printProperties, indent);
+    }
+
+    [[nodiscard]] const HierarchicalData_ifs *getProperty(const std::string &prop_path) const override {
+        PYBIND11_OVERRIDE_PURE(HierarchicalData_ifs *, Module_ifs, getProperty, prop_path);
+    }
+
+    [[nodiscard]] std::string getPropertyAsTxt(const std::string &prop_path) const override {
+        PYBIND11_OVERRIDE_PURE(std::string, Module_ifs, getPropertyAsTxt, prop_path);
+    }
+
+    bool setProperty(const std::string &prop_path, const Value &value) override {
+        PYBIND11_OVERRIDE_PURE(bool, Module_ifs, setProperty, prop_path, value);
+    }
+
+    bool setProperty(const std::string &prop_path, const HierarchicalData_ifs *hierarchical_data) override {
+        PYBIND11_OVERRIDE_PURE(bool, Module_ifs, setProperty, prop_path, hierarchical_data);
+    }
+
+    bool setPropertyAsTxt(const std::string &prop_path, const std::string &value) override {
+        PYBIND11_OVERRIDE_PURE(bool, Module_ifs, setPropertyAsTxt, prop_path, value);
+    }
+
+    [[nodiscard]] bool storeTaskToBuffer(void *pointer) const override {
+        PYBIND11_OVERRIDE_PURE(bool, Module_ifs, storeTaskToBuffer, pointer);
+    }
+
+    [[nodiscard]] size_t getTaskSize() const override { PYBIND11_OVERRIDE_PURE(size_t, Module_ifs, getTaskSize); }
+
+    typedef std::vector<std::pair<std::string, Module_ifs *>> sub_modules_map_t;
+    [[nodiscard]] std::vector<std::pair<std::string, Module_ifs *>> getSubModules() const override {
+        PYBIND11_OVERRIDE_PURE(sub_modules_map_t, Module_ifs, getSubModules);
+    }
+
+    ModuleStream_ifs *createModuleStream() override {
+        PYBIND11_OVERRIDE_PURE(ModuleStream_ifs *, Module_ifs, createModuleStream);
+    }
+};
+// class PyDevice : public Device {};
 
 class PyDeviceViewWrapper : public DeviceViewWrapper_ifs {
    public:

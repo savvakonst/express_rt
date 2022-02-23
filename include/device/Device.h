@@ -103,9 +103,6 @@ class COMMON_API_ Device : public Module_ifs {
 
     ModuleStream_ifs *createModuleStream() override { return nullptr; }
 
-    /* */
-    [[nodiscard]] std::vector<std::pair<std::string, Module_ifs *>> getModulesFromPath(const std::string &name);
-
     // TODO : remove this
     Module_ifs *getTopModule() {
         if (modules_.size()) return modules_.front();

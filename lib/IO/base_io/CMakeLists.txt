@@ -22,7 +22,7 @@ include(FetchContent)
 FetchContent_Declare( # TODO: need to set up a source code destination directory to avoid source code duplication
         yaml_cpp
         GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
-        GIT_TAG origin/master #/yaml-cpp-0.7.0
+        GIT_TAG yaml-cpp-0.7.0 #origin/master
         )
 
 FetchContent_MakeAvailable(yaml_cpp)

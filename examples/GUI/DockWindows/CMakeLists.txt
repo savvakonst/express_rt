@@ -37,6 +37,11 @@ add_dependencies(ExampleDockWindows CommonViews)
 add_dependencies(ExampleDockWindows TreeEditor)
 
 
+#add_custom_command(
+#        TARGET ExampleDockWindows POST_BUILD
+#        COMMAND cmake -E copy_if_different ${PROJECT_SOURCE_DIR}/png/modules/*.png ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/png/modules/
+#        VERBATIM)
+
 if (MSVC)
     set_target_properties(ExampleDockWindows PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=%PATH%;${CMAKE_PREFIX_PATH}\\bin")
 endif ()

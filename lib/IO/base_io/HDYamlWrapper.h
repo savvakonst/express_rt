@@ -1,6 +1,7 @@
 #ifndef HIERARCHICALDATAYAMLWRAPPER_H
 #define HIERARCHICALDATAYAMLWRAPPER_H
-
+//
+//
 #include "common/CustomTypes.h"
 #include "yaml-cpp/yaml.h"
 
@@ -29,7 +30,7 @@ class HierarchicalDataYamlWrapper : public HierarchicalData_ifs {
     union {
         std::vector<HierarchicalData_ifs *> *vector_;
         std::map<std::string, HierarchicalData_ifs *> *map_;
-        //getMapReturn_t *map_;
+        // getMapReturn_t *map_;
     };
     const YAML::Node value_;
 };
