@@ -30,8 +30,3 @@ for i in s:
     # print("path", i.getModulePath(True))
 
 del (s)
-
-# del (b)
-# del (b)
-
-# udp://192.168.000.201:4880//KSDL/0/
