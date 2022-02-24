@@ -177,8 +177,9 @@ std::list<Module_ifs *> getSubmodules(Module_ifs *i, const std::string &glob_pat
         goto ret_false;
     }
 ret_true:
-    if (*glob != '\0') ret_list.splice(ret_list.cend(), i->getSubModulesFromPath(glob));
-    else
+    if ((*glob != '\0')) {
+        if ((glob_2_star_backup != (glob - 1))) ret_list.splice(ret_list.cend(), i->getSubModulesFromPath(glob));
+    } else
         ret_list.push_back(i);
 ret_false:;
     return ret_list;
