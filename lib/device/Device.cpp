@@ -91,7 +91,7 @@ std::vector<std::pair<std::string, Module_ifs *>> Device::getSubModules() const 
         auto sub_slot = i->getProperty("header/sub")->getValue().value_.u64;
         auto path = std::to_string(slot) + ((sub_slot == 0) ? "" : "." + std::to_string(sub_slot));
 
-        ret.push_back({path, i});
+        ret.emplace_back(path, i);
     }
 
     return ret;

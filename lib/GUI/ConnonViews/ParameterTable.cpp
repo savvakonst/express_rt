@@ -67,9 +67,8 @@ int ParameterTableModel::columnCount(const QModelIndex &parent) const {
 }
 
 QVariant ParameterTableModel::headerData(int section, Qt::Orientation orientation, int role) const {
-    if ((role == Qt::DisplayRole)) {
-        return QString(list_of_entries_[section]->description_.data());
-    }
+    if (role == Qt::DisplayRole) return QString(list_of_entries_[section]->description_.data());
+
     return {};
 }
 
@@ -78,7 +77,7 @@ QVariant ParameterTableModel::data(const QModelIndex &index, int role) const {
         auto prm = getParameter(index);
         auto name = list_of_entries_[index.column()]->name_;
         auto h_data = prm->getProperty("common/" + name);
-        return QVariant(h_data->getValue().asString().data());
+        return h_data->getValue().asString().data();
     }
     return {};
 }
@@ -134,16 +133,17 @@ class ParameterViewWrapper : public ParameterViewWrapper_ifs {
 
     bool setActive(size_t row_index) override {
         auto cnt = rowCount();
-        for (int i = 0; i < cnt; i++) {
-            auto index = widget_->model()->index(i, 0);
+        if (cnt < row_index) {
+            auto index = widget_->model()->index(row_index, 0);
+            widget_->selectionModel()->setCurrentIndex(index, {});
         }
-        // TODO: implement method
-        return false;
+        return true;
     }
 
     bool setActive(const std::string &name) override {
-        // TODO: implement method
-        return false;
+        /// widget_->setCurrentIndex(QModelIndex());
+        // return false;
+        return true;
     }
 
     bool removeFromActive() override {
