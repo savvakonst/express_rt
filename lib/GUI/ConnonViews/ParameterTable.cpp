@@ -77,27 +77,6 @@ QVariant ParameterTableModel::data(const QModelIndex &index, int role) const {
     return {};
 }
 
-////////////////
-QModelIndex ParameterTableModel::index(int row, int column, const QModelIndex &parent) const {
-    return hasIndex(row, column, parent) ? createIndex(row, column) : QModelIndex();
-}
-
-QModelIndex ParameterTableModel::parent(const QModelIndex &) const { return {}; }
-
-QModelIndex ParameterTableModel::sibling(int row, int column, const QModelIndex &) const { return index(row, column); }
-
-bool ParameterTableModel::hasChildren(const QModelIndex &parent) const {
-    if (!parent.isValid()) return rowCount(parent) > 0 && columnCount(parent) > 0;
-    return false;
-}
-
-Qt::ItemFlags ParameterTableModel::flags(const QModelIndex &index) const {
-    Qt::ItemFlags f = QAbstractItemModel::flags(index);
-    if (index.isValid()) f |= Qt::ItemNeverHasChildren;
-    return f;
-}
-//////////////////
-
 QModelIndex ParameterTableModel::getIndex(const std::string &name) const {
     auto conv_template = getCurrentConversionTemplate();
     auto &prm_map = conv_template->getAllParameters();
@@ -115,6 +94,8 @@ QModelIndex ParameterTableModel::getIndex(const std::string &name) const {
     return {};
 }
 
+
+
 Parameter_ifs *ParameterTableModel::getParameter(const QModelIndex &index) const {
     if (!index.isValid()) return nullptr;
 
@@ -126,6 +107,10 @@ Parameter_ifs *ParameterTableModel::getParameter(const QModelIndex &index) const
     std::advance(it, index.row());
 
     return it->second;
+}
+
+std::vector<Parameter_ifs *> ParameterTableModel::getParameters(const QList<QModelIndex> &indexes) const {
+    return std::vector<Parameter_ifs *>();
 }
 
 ConversionTemplate *ParameterTableModel::getCurrentConversionTemplate() const {
@@ -144,6 +129,7 @@ void ParameterTableModel::selectParameter(const QModelIndex &index) {
     auto prm = getParameter(index);
     if (prm) child_view_->setupProperties(prm);
 }
+
 
 /*
  *
@@ -212,14 +198,15 @@ class ParameterViewWrapper : public ParameterViewWrapper_ifs {
     }
 
     Parameter_ifs *getActive() override {
-
-        // TODO: implement method
-        return nullptr;
+        auto current_index = widget_->selectionModel()->currentIndex();
+        return model_->getParameter(current_index);
+        ;
     }
 
     std::vector<Parameter_ifs *> getSelected() override {
         // TODO: implement method
-        widget_->selectionModel()->selectedIndexes();
+        auto current_index = widget_->selectionModel()->selectedIndexes();
+
         return {};
     }
 

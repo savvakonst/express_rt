@@ -20,7 +20,7 @@ class TreeEditor;
 
 class QAbstractItemView;
 
-class ParameterTableModel : public QAbstractItemModel /*QAbstractTableModel*/ {
+class ParameterTableModel : public QAbstractTableModel {
     Q_OBJECT
    public:
     explicit ParameterTableModel(ExtensionManager *manager);
@@ -36,19 +36,10 @@ class ParameterTableModel : public QAbstractItemModel /*QAbstractTableModel*/ {
     [[nodiscard]] QModelIndex getIndex(const std::string &name) const;
 
     //////////////
-
-    [[nodiscard]] QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
-
-    [[nodiscard]] QModelIndex parent(const QModelIndex &) const override;
-
-    [[nodiscard]] QModelIndex sibling(int row, int column, const QModelIndex &) const override;
-
-    [[nodiscard]] bool hasChildren(const QModelIndex &parent) const override;
-
-    [[nodiscard]] Qt::ItemFlags flags(const QModelIndex &index) const override;
+    [[nodiscard]] Parameter_ifs *getParameter(const QModelIndex &index) const;
+    [[nodiscard]] std::vector<Parameter_ifs *> getParameters(const QList<QModelIndex> &indexes) const;
 
    protected:
-    [[nodiscard]] Parameter_ifs *getParameter(const QModelIndex &index) const;
     [[nodiscard]] ConversionTemplate *getCurrentConversionTemplate() const;
 
    public slots:
