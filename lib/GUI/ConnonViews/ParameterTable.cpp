@@ -56,19 +56,14 @@ ParameterTableModel::ParameterTableModel(ExtensionManager *manager) {
 
 int ParameterTableModel::rowCount(const QModelIndex &parent) const {
     auto conv_temp = getCurrentConversionTemplate();
-
     auto ret = conv_temp ? (int)conv_temp->getAllParameters().size() : 0;
     return ret;
 }
 
-int ParameterTableModel::columnCount(const QModelIndex &parent) const {
-    //
-    return (int)list_of_entries_.size();
-}
+int ParameterTableModel::columnCount(const QModelIndex &parent) const { return (int)list_of_entries_.size(); }
 
 QVariant ParameterTableModel::headerData(int section, Qt::Orientation orientation, int role) const {
     if (role == Qt::DisplayRole) return QString(list_of_entries_[section]->description_.data());
-
     return {};
 }
 
@@ -82,12 +77,51 @@ QVariant ParameterTableModel::data(const QModelIndex &index, int role) const {
     return {};
 }
 
+////////////////
+QModelIndex ParameterTableModel::index(int row, int column, const QModelIndex &parent) const {
+    return hasIndex(row, column, parent) ? createIndex(row, column) : QModelIndex();
+}
+
+QModelIndex ParameterTableModel::parent(const QModelIndex &) const { return {}; }
+
+QModelIndex ParameterTableModel::sibling(int row, int column, const QModelIndex &) const { return index(row, column); }
+
+bool ParameterTableModel::hasChildren(const QModelIndex &parent) const {
+    if (!parent.isValid()) return rowCount(parent) > 0 && columnCount(parent) > 0;
+    return false;
+}
+
+Qt::ItemFlags ParameterTableModel::flags(const QModelIndex &index) const {
+    Qt::ItemFlags f = QAbstractItemModel::flags(index);
+    if (index.isValid()) f |= Qt::ItemNeverHasChildren;
+    return f;
+}
+//////////////////
+
+QModelIndex ParameterTableModel::getIndex(const std::string &name) const {
+    auto conv_template = getCurrentConversionTemplate();
+    auto &prm_map = conv_template->getAllParameters();
+
+    auto prm = conv_template->getParameter(name);
+
+    if (prm == nullptr) return {};
+
+    auto cnt = 0;
+    for (const auto &i : prm_map) {
+        if (i.second == prm) break;
+        cnt++;
+    }
+
+    return {};
+}
+
 Parameter_ifs *ParameterTableModel::getParameter(const QModelIndex &index) const {
     if (!index.isValid()) return nullptr;
 
     auto conv_template = getCurrentConversionTemplate();
 
     auto &prm_map = conv_template->getAllParameters();
+
     auto it = prm_map.begin();
     std::advance(it, index.row());
 
@@ -135,48 +169,62 @@ class ParameterViewWrapper : public ParameterViewWrapper_ifs {
         auto cnt = rowCount();
         if (cnt < row_index) {
             auto index = widget_->model()->index(row_index, 0);
+            // widget_->selectAll()
             widget_->selectionModel()->setCurrentIndex(index, {});
         }
         return true;
     }
 
     bool setActive(const std::string &name) override {
-        /// widget_->setCurrentIndex(QModelIndex());
-        // return false;
+        auto index = model_->getIndex(name);
+        widget_->selectionModel()->setCurrentIndex(index, {});
         return true;
     }
 
     bool removeFromActive() override {
-        // TODO: implement method
-        return false;
+        widget_->setCurrentIndex(QModelIndex());
+        return true;
     }
 
     bool addToSelected(size_t row_index) override {
-        // TODO: implement method
-        return false;
+        auto cnt = rowCount();
+        if (cnt < row_index) {
+            auto index = widget_->model()->index(int(row_index), 0);
+            widget_->selectionModel()->select(index, QItemSelectionModel::Rows);
+        }
+        return true;
     }
 
     bool addToSelected(const std::string &name) override {
-        // TODO: implement method
-        return false;
+        auto index = model_->getIndex(name);
+        widget_->selectionModel()->select(index, QItemSelectionModel::Rows);
+        return true;
     }
 
     bool removeFromSelected(size_t row_index) override {
-        // TODO: implement method
-        return false;
+        // TODO: remove code repeat
+        auto cnt = rowCount();
+        if (cnt < row_index) {
+            auto index = widget_->model()->index(int(row_index), 0);
+            widget_->selectionModel()->select(index, QItemSelectionModel::Deselect | QItemSelectionModel::Rows);
+        }
+        return true;
     }
 
     Parameter_ifs *getActive() override {
+
         // TODO: implement method
         return nullptr;
     }
 
     std::vector<Parameter_ifs *> getSelected() override {
         // TODO: implement method
-        return {false};
+        widget_->selectionModel()->selectedIndexes();
+        return {};
     }
 
    protected:
+    ParameterTableModel *model_ = nullptr;
     QTreeView *widget_;
 };
 
