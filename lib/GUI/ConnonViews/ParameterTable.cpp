@@ -94,8 +94,6 @@ QModelIndex ParameterTableModel::getIndex(const std::string &name) const {
     return {};
 }
 
-
-
 Parameter_ifs *ParameterTableModel::getParameter(const QModelIndex &index) const {
     if (!index.isValid()) return nullptr;
 
@@ -106,11 +104,22 @@ Parameter_ifs *ParameterTableModel::getParameter(const QModelIndex &index) const
     auto it = prm_map.begin();
     std::advance(it, index.row());
 
-    return it->second;
+    return (it == prm_map.end()) ? nullptr : it->second;
 }
 
 std::vector<Parameter_ifs *> ParameterTableModel::getParameters(const QList<QModelIndex> &indexes) const {
-    return std::vector<Parameter_ifs *>();
+    std::vector<Parameter_ifs *> ret;
+
+    auto conv_template = getCurrentConversionTemplate();
+    auto &prm_map = conv_template->getAllParameters();
+
+    auto it = prm_map.begin();
+    for (auto i : indexes) {
+        std::advance(it, i.row());
+        if (it == prm_map.end()) break;
+        ret.push_back(it->second);
+    }
+    return ret;
 }
 
 ConversionTemplate *ParameterTableModel::getCurrentConversionTemplate() const {
@@ -130,7 +139,6 @@ void ParameterTableModel::selectParameter(const QModelIndex &index) {
     if (prm) child_view_->setupProperties(prm);
 }
 
-
 /*
  *
  */
@@ -143,9 +151,19 @@ void ParameterTableModel::selectParameter(const QModelIndex &index) {
 
 class ParameterViewWrapper : public ParameterViewWrapper_ifs {
    public:
-    ParameterViewWrapper() : widget_(new QTreeView()) {}
+    ParameterViewWrapper() : widget_(new ParameterTreeView()) {
+        widget_->setAlternatingRowColors(true);
+        widget_->setStyleSheet(
+            "QTreeView {background-color: #D2DCDF; alternate-background-color: #f6fafb; show-decoration-selected: 1;}"
+            "QHeaderView::section {background-color: #D2DCDF}");
+    }
 
-    size_t rowCount() { return size_t(widget_->model()->rowCount()); }
+    void init(ExtensionManager *manager) {
+        auto model = new ParameterTableModel(manager);
+        QObject::connect(widget_, &ParameterTreeView::currentChangedSignal, model,
+                         &ParameterTableModel::selectParameter);
+        widget_->setModel(model);
+    }
 
     status addSignal(Signal_ifs *signal) override { return status::failure; }
 
@@ -154,8 +172,7 @@ class ParameterViewWrapper : public ParameterViewWrapper_ifs {
     bool setActive(size_t row_index) override {
         auto cnt = rowCount();
         if (cnt < row_index) {
-            auto index = widget_->model()->index(row_index, 0);
-            // widget_->selectAll()
+            auto index = widget_->model()->index(int(row_index), 0);
             widget_->selectionModel()->setCurrentIndex(index, {});
         }
         return true;
@@ -200,26 +217,23 @@ class ParameterViewWrapper : public ParameterViewWrapper_ifs {
     Parameter_ifs *getActive() override {
         auto current_index = widget_->selectionModel()->currentIndex();
         return model_->getParameter(current_index);
-        ;
     }
 
     std::vector<Parameter_ifs *> getSelected() override {
-        // TODO: implement method
-        auto current_index = widget_->selectionModel()->selectedIndexes();
-
-        return {};
+        auto current_index = widget_->selectionModel()->selectedRows();
+        return model_->getParameters(current_index);
     }
+
+   private:
+    size_t rowCount() { return size_t(widget_->model()->rowCount()); }
 
    protected:
     ParameterTableModel *model_ = nullptr;
-    QTreeView *widget_;
+    ParameterTreeView *widget_;
 };
 
 void ParameterTreeView::currentChanged(const QModelIndex &current, const QModelIndex &previous) {
     emit currentChangedSignal(current);
-    // static int cnt = 0;
-    // qDebug() << "ParameterTreeView::currentChanged(const QModelIndex &current, const QModelIndex &previous): " <<
-    // cnt++;
 }
 
 QWidget *newParameterTreeView(QWidget *parent) {
@@ -233,11 +247,22 @@ QWidget *newParameterTreeView(QWidget *parent) {
     return prm_view;
 }
 
+ParameterViewWrapper_ifs *newParameterViewWrapper() {
+    auto wrapper = new ParameterViewWrapper();
+    return wrapper;
+}
+
 int initParameterTreeView(ExtensionManager *manager) {
     auto tree_view = (ParameterTreeView *)manager->getLastVersionExtensionObject("widget", "parameter_list");
 
     auto model = new ParameterTableModel(manager);
     QObject::connect(tree_view, &ParameterTreeView::currentChangedSignal, model, &ParameterTableModel::selectParameter);
     tree_view->setModel(model);
+    ////////////////////////
+    auto view_wrapper =
+        (ParameterViewWrapper *)manager->getLastVersionExtensionObject("widget_wrapper", "parameter_view_wrapper");
+
+    view_wrapper->init(manager);
+
     return 0;
 }

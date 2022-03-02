@@ -22,10 +22,12 @@ DataSchema_ifs *getDataSchema(ExtensionManager *manager, const std::string &name
 }
 
 DeviceViewWrapper_ifs *getDeviceViewWrapper(ExtensionManager *manager) {
-    auto unit = manager->getLastVersionExtensionUnit("widget_wrapper", "device_view_wrapper");
-    if (unit == nullptr || unit->ptr == nullptr) return nullptr;
-    auto wrapper = (DeviceViewWrapper_ifs *)unit->ptr;
-    return wrapper;
+    return (DeviceViewWrapper_ifs *)manager->getLastVersionExtensionObject("widget_wrapper", "device_view_wrapper");
+}
+
+ParameterViewWrapper_ifs *getParameterViewWrapper(ExtensionManager *manager) {
+    return (ParameterViewWrapper_ifs *)manager->getLastVersionExtensionObject("widget_wrapper",
+                                                                              "parameter_view_wrapper");
 }
 
 ExrtAction_ifs *getExrtAction(ExtensionManager *manager, const std::string &name) {
@@ -106,28 +108,27 @@ PYBIND11_MODULE(PY_BINDLIB_NAME, m) {
 
     py::class_<Module_ifs, PyModule>(m, "Module")
         .def(py::init<>())
-
-         .def("hasTransceiver",&Module_ifs::hasTransceiver)
-         .def("getSrcAddress",&Module_ifs::getSrcAddress)
-         .def("isAvailable",&Module_ifs::isAvailable)
-         .def("getID",&Module_ifs::getID)
-         .def("getModulePath",&Module_ifs::getModulePath)
-         .def("getParentModule",&Module_ifs::getParentModule,py::return_value_policy::reference)
-         .def("setParentModule",&Module_ifs::setParentModule)
-         .def("getSubModulesFromPath",&Module_ifs::getSubModulesFromPath,py::return_value_policy::reference)
-         .def("getPrmBufferMap",&Module_ifs::getPrmBufferMap,py::return_value_policy::reference)
-         .def("getPropertySchema",&Module_ifs::getPropertySchema,py::return_value_policy::reference)
-         .def("printProperties",&Module_ifs::printProperties)
-         .def("getProperty",&Module_ifs::getProperty,py::return_value_policy::reference)
-         .def("getPropertyAsTxt",&Module_ifs::getPropertyAsTxt)
-         .def<bool (Module_ifs::*)(const std::string &, const Value &)>("setProperty",&Module_ifs::setProperty)
-         .def<bool (Module_ifs::*)(const std::string &, const HierarchicalData_ifs *)>("setProperty",&Module_ifs::setProperty)
-         .def("setPropertyAsTxt",&Module_ifs::setPropertyAsTxt)
-         .def("storeTaskToBuffer",&Module_ifs::storeTaskToBuffer)
-         .def("getTaskSize",&Module_ifs::getTaskSize)
-         .def("getSubModules",&Module_ifs::getSubModules,py::return_value_policy::reference)
-         .def("createModuleStream",&Module_ifs::createModuleStream)
-        ;
+        .def("hasTransceiver", &Module_ifs::hasTransceiver)
+        .def("getSrcAddress", &Module_ifs::getSrcAddress)
+        .def("isAvailable", &Module_ifs::isAvailable)
+        .def("getID", &Module_ifs::getID)
+        .def("getModulePath", &Module_ifs::getModulePath)
+        .def("getParentModule", &Module_ifs::getParentModule, py::return_value_policy::reference)
+        .def("setParentModule", &Module_ifs::setParentModule)
+        .def("getSubModulesFromPath", &Module_ifs::getSubModulesFromPath, py::return_value_policy::reference)
+        .def("getPrmBufferMap", &Module_ifs::getPrmBufferMap, py::return_value_policy::reference)
+        .def("getPropertySchema", &Module_ifs::getPropertySchema, py::return_value_policy::reference)
+        .def("printProperties", &Module_ifs::printProperties)
+        .def("getProperty", &Module_ifs::getProperty, py::return_value_policy::reference)
+        .def("getPropertyAsTxt", &Module_ifs::getPropertyAsTxt)
+        .def<bool (Module_ifs::*)(const std::string &, const Value &)>("setProperty", &Module_ifs::setProperty)
+        .def<bool (Module_ifs::*)(const std::string &, const HierarchicalData_ifs *)>("setProperty",
+                                                                                      &Module_ifs::setProperty)
+        .def("setPropertyAsTxt", &Module_ifs::setPropertyAsTxt)
+        .def("storeTaskToBuffer", &Module_ifs::storeTaskToBuffer)
+        .def("getTaskSize", &Module_ifs::getTaskSize)
+        .def("getSubModules", &Module_ifs::getSubModules, py::return_value_policy::reference)
+        .def("createModuleStream", &Module_ifs::createModuleStream);
 
     py::class_<DeviceViewWrapper_ifs, PyDeviceViewWrapper>(m, "DeviceViewWrapper")
         .def(py::init<>())
@@ -144,7 +145,17 @@ PYBIND11_MODULE(PY_BINDLIB_NAME, m) {
         .def("getSelectedPath", &DeviceViewWrapper_ifs::getSelectedPath)
         .def("addAction", &DeviceViewWrapper_ifs::addAction);
 
-    //, std::unique_ptr<ExrtAction_ifs, py::nodelete>
+    py::class_<ParameterViewWrapper_ifs, PyParameterViewWrapper>(m, "ParameterViewWrapper")
+        .def<bool (ParameterViewWrapper_ifs::*)(size_t)>("setActive", &ParameterViewWrapper_ifs::setActive)
+        .def<bool (ParameterViewWrapper_ifs::*)(const std::string &)>("setActive", &ParameterViewWrapper_ifs::setActive)
+        .def("removeFromActive", &ParameterViewWrapper_ifs::removeFromActive)
+        .def<bool (ParameterViewWrapper_ifs::*)(size_t)>("addToSelected", &ParameterViewWrapper_ifs::addToSelected)
+        .def<bool (ParameterViewWrapper_ifs::*)(const std::string &)>("addToSelected",
+                                                                      &ParameterViewWrapper_ifs::addToSelected)
+        .def("removeFromSelected", &ParameterViewWrapper_ifs::removeFromSelected)
+        .def("getActive", &ParameterViewWrapper_ifs::getActive, py::return_value_policy::reference)
+        .def("getSelected", &ParameterViewWrapper_ifs::getSelected, py::return_value_policy::reference);
+
     py::class_<ExrtAction_ifs, PyExrtAction, std::unique_ptr<ExrtAction_ifs, py::nodelete>>(m, "ExrtAction")
         .def(py::init<>())
         .def("run", &ExrtAction_ifs::run)
@@ -152,8 +163,7 @@ PYBIND11_MODULE(PY_BINDLIB_NAME, m) {
         .def("getInfo", &ExrtAction_ifs::getInfo);
 
     py::class_<IO_ifs, PyIO, std::unique_ptr<IO_ifs, py::nodelete>>(m, "pyIO")
-        .def(py::init<const std::string & /*filename_pattern*/, const std::string & /*file_type*/,
-                      const std::string & /*file_info*/>())
+        .def(py::init<const std::string &, const std::string &, const std::string &>())
         .def("readDocument", &IO_ifs::readDocument)
         .def("saveDocument", &IO_ifs::saveDocument)
         .def_readonly("filename_pattern_", &IO_ifs::filename_pattern_)
@@ -166,6 +176,7 @@ PYBIND11_MODULE(PY_BINDLIB_NAME, m) {
 
     m.def("getDataSchema", getDataSchema);
     m.def("getDeviceViewWrapper", getDeviceViewWrapper, py::return_value_policy::reference);
+    m.def("getParameterViewWrapper", getDeviceViewWrapper, py::return_value_policy::reference);
     m.def("getExrtAction", getExrtAction, py::return_value_policy::reference);
     m.def("getPyIO", getPyIO, py::return_value_policy::reference);
 }
