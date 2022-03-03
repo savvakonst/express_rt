@@ -33,7 +33,7 @@ DataType createDataType(const std::string &str) {
     return DataType::none_v;
 }
 
-const HierarchicalData_ifs *getBranch(const HierarchicalData_ifs *h_data, const std::string path) {
+const HierarchicalData_ifs *getBranch(const HierarchicalData_ifs *h_data, const std::string &path) {
     if (h_data == nullptr) return nullptr;
     auto path_chunks = splitPath(path);
 

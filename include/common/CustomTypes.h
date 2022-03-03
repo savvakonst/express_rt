@@ -12,7 +12,8 @@
 #define exo_map std::map
 #define exo_set std::set
 
-enum status : bool {
+enum status : bool
+{
     succes = true,
     failure = false
 };
@@ -55,7 +56,8 @@ union ArbitraryData {
     str_v_t str_v;
 };
 
-enum DataType : size_t {
+enum DataType : size_t
+{
     none_v = 0x00,
 
     i8 = 0x101,
@@ -365,7 +367,7 @@ class COMMON_API_ HierarchicalData_ifs {
     [[nodiscard]] virtual HierarchicalData_ifs *getMapUnit(std::string field_name) const = 0;
 };
 
-COMMON_API_ const HierarchicalData_ifs *getBranch(const HierarchicalData_ifs *h_data, const std::string path);
+COMMON_API_ const HierarchicalData_ifs *getBranch(const HierarchicalData_ifs *h_data, const std::string &path);
 
 COMMON_API_ std::string toString(const HierarchicalData_ifs *h_data, const std::string &indent);
 
