@@ -1,3 +1,6 @@
+#include <functional>
+#include <utility>
+//
 #include <QAction>
 #include <QCoreApplication>
 #include <QDebug>
@@ -6,14 +9,14 @@
 #include <QHeaderView>
 #include <QTableView>
 //
+#include "DeviceList.h"
 #include "GUI/WidgetWrappers.h"
+#include "common/ExrtAction_ifs.h"
 #include "common/ExtensionManager.h"
 #include "common/IO_ifs.h"
 #include "common/StringProcessingTools.h"
 #include "convtemplate/Parameter_ifs.h"
 #include "device/DeviceManager.h"
-//
-#include "DeviceList.h"
 
 DeviceListModel::DeviceListModel(ExtensionManager *manager) {
     auto image_dir = QDir(QCoreApplication::applicationDirPath() + "/png/modules");
@@ -107,6 +110,7 @@ int DeviceListModel::columnCount(const QModelIndex &parent) const {
 }
 
 void DeviceListModel::buildTree() {
+    beginResetModel();
     delete root_;
     node_map_.clear();
 
@@ -290,10 +294,6 @@ class DeviceRemoveAction : public QAction {
  *
  */
 
-#include <functional>
-#include <utility>
-
-#include "common/ExrtAction_ifs.h"
 class DeviceViewWrapper : public DeviceViewWrapper_ifs {
    private:
     class FuncProxyQAction : public QAction {
@@ -354,7 +354,7 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
 
         widget_->addAction(remove_action);
 
-        FuncProxyQAction *action = new FuncProxyQAction(
+        auto *action = new FuncProxyQAction(
             [&]() {
                 auto node = (DeviceListModel::TreeNode *)(widget_->selectionModel()->currentIndex().internalPointer());
                 while (!node->isDevice()) node = node->parent;
@@ -362,6 +362,7 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
                 return true;
             },
             widget_);
+
         action->setShortcut(Qt::Key_Return);
         action->setText("&Set active device");
         widget_->addAction(action);
@@ -369,7 +370,10 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
 
     ~DeviceViewWrapper() override { delete widget_; }
 
-    status addSignal(Signal_ifs *signal) override { return status::failure; }
+    status addSignal(Signal_ifs *signal) override {
+        signals_.push_back(signal);
+        return status::succes;
+    }
 
     QWidget *getWidget() override { return widget_; }
 
@@ -406,7 +410,7 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
         auto index = widget_->selectionModel()->currentIndex();
         if (!index.isValid()) return nullptr;
         auto node = ((DeviceListModel::TreeNode *)index.internalPointer());
-        return node->isDevice()? nullptr : node->m_object;
+        return node->isDevice() ? nullptr : node->m_object;
     };
 
     std::pair<std::string, std::string> getActiveModulePath() override {
@@ -442,6 +446,13 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
     }
 
    protected:
+    void emit_() {
+        for (auto i : signals_) {
+            i->emit_();
+        }
+    }
+
+    std::list<Signal_ifs *> signals_;
     QTreeView *widget_;
     DeviceListModel *device_list_model_ = nullptr;
 };

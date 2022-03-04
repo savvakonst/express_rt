@@ -103,9 +103,6 @@ PYBIND11_MODULE(PY_BINDLIB_NAME, m) {
         .def("getArrayUnit", &HierarchicalData_ifs::getArrayUnit)
         .def("getMapUnit", &HierarchicalData_ifs::getMapUnit);
 
-    // bool (DeviceViewWrapper_ifs::*dev_setActive_size)(size_t) = &DeviceViewWrapper_ifs::setActive;
-    //([a-z]*)\n        .def("$1",&Module_ifs::$1)\n
-
     py::class_<Module_ifs, PyModule>(m, "Module")
         .def(py::init<>())
         .def("hasTransceiver", &Module_ifs::hasTransceiver)
@@ -129,6 +126,19 @@ PYBIND11_MODULE(PY_BINDLIB_NAME, m) {
         .def("getTaskSize", &Module_ifs::getTaskSize)
         .def("getSubModules", &Module_ifs::getSubModules, py::return_value_policy::reference)
         .def("createModuleStream", &Module_ifs::createModuleStream);
+
+    py::class_<Parameter_ifs, PyParameter>(m, "Parameter")
+        .def("createBuffer", &Parameter_ifs::createBuffer)
+        .def("getType", &Parameter_ifs::getType)
+        .def("getPropertySchema", &Parameter_ifs::getPropertySchema, py::return_value_policy::reference)
+        .def("getProperty", &Parameter_ifs::getProperty, py::return_value_policy::reference)
+        .def("getPropertyAsTxt", &Parameter_ifs::getPropertyAsTxt)
+        .def<bool (Parameter_ifs::*)(const std::string &, const HierarchicalData_ifs *)>("setProperty",
+                                                                                         &Parameter_ifs::setProperty)
+        .def<bool (Parameter_ifs::*)(const std::string &, const Value &)>("setProperty", &Parameter_ifs::setProperty)
+        .def("setPropertyAsTxt", &Parameter_ifs::setPropertyAsTxt)
+        .def("isValid", &Parameter_ifs::isValid)
+        .def("isLocked", &Parameter_ifs::isLocked);
 
     py::class_<DeviceViewWrapper_ifs, PyDeviceViewWrapper>(m, "DeviceViewWrapper")
         .def(py::init<>())

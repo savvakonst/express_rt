@@ -247,22 +247,12 @@ QWidget *newParameterTreeView(QWidget *parent) {
     return prm_view;
 }
 
-ParameterViewWrapper_ifs *newParameterViewWrapper() {
-    auto wrapper = new ParameterViewWrapper();
-    return wrapper;
-}
+WidgetWrapper_ifs *newParameterViewWrapper() { return new ParameterViewWrapper(); }
 
 int initParameterTreeView(ExtensionManager *manager) {
-    auto tree_view = (ParameterTreeView *)manager->getLastVersionExtensionObject("widget", "parameter_list");
-
-    auto model = new ParameterTableModel(manager);
-    QObject::connect(tree_view, &ParameterTreeView::currentChangedSignal, model, &ParameterTableModel::selectParameter);
-    tree_view->setModel(model);
-    ////////////////////////
     auto view_wrapper =
         (ParameterViewWrapper *)manager->getLastVersionExtensionObject("widget_wrapper", "parameter_view_wrapper");
 
     view_wrapper->init(manager);
-
     return 0;
 }

@@ -32,9 +32,9 @@ class DataSchema_ifs {
 
     [[nodiscard]] virtual bool isArray() const = 0;
 
-    [[nodiscard]] virtual const std::vector<size_t> getDims() const = 0;
+    [[nodiscard]] virtual std::vector<size_t> getDims() const = 0;
 
-    [[nodiscard]] virtual const std::vector<DataSchema_ifs *> getMapList() const = 0;
+    [[nodiscard]] virtual std::vector<DataSchema_ifs *> getMapList() const = 0;
 
     virtual bool validate(HierarchicalData_ifs *data) const = 0;
 
@@ -49,19 +49,5 @@ class DataSchema_ifs {
 };
 
 COMMON_API_ inline std::string toString(DataSchema_ifs *arg, const std::string &intend);
-
-typedef size_t StatusFlags;
-
-struct ResValue {
-    ResValue(){
-    }
-
-    ResValue(HierarchicalData_ifs * data):data_(data){
-    }
-
-    HierarchicalData_ifs *data_ = nullptr;
-    DataSchema_ifs *schema_ = nullptr;
-    unsigned char stage;
-};
 
 #endif

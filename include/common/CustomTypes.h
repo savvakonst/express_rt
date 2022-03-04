@@ -307,7 +307,7 @@ struct Value {
 
     bool operator!() const { return type_ == none_v; }
 
-    std::string asString() { return ::asString(value_, type_); }
+    [[nodiscard]] std::string asString() const { return ::asString(value_, type_); }
 
     ~Value() {
         // std::cout << "del Value\n";
@@ -318,7 +318,7 @@ struct Value {
     DataType type_;
 };
 
-inline std::string toString(const Value &value) { return toString(value); }
+inline std::string toString(const Value &value) { return value.asString(); }
 
 struct EthernetAddress {
     EthernetAddress() { memset(mac, 0, 6); }

@@ -15,6 +15,7 @@
 #include "common/ExtensionManager.h"
 #include "convtemplate/ConversionTemplate.h"
 #include "convtemplate/Parameter_ifs.h"
+#include "convtemplate/PrmBuffer_ifs.h"
 #include "device/Device.h"
 #include "device/ModuleStream_ifs.h"
 
@@ -51,11 +52,11 @@ class PyDataSchema : public DataSchema_ifs {
 
     [[nodiscard]] bool isArray() const override { PYBIND11_OVERRIDE_PURE(bool, DataSchema_ifs, isArray); }
 
-    const std::vector<size_t> getDims() const override {
+    [[nodiscard]] std::vector<size_t> getDims() const override {
         PYBIND11_OVERRIDE_PURE(std::vector<size_t>, DataSchema_ifs, getDims);
     }
 
-    [[nodiscard]] const std::vector<DataSchema_ifs *> getMapList() const override {
+    [[nodiscard]] std::vector<DataSchema_ifs *> getMapList() const override {
         PYBIND11_OVERRIDE_PURE(std::vector<DataSchema_ifs *>, DataSchema_ifs, getMapList);
     }
 
@@ -138,7 +139,7 @@ class PyModule : public Module_ifs {
     }
 
     [[nodiscard]] const DataSchema_ifs *getPropertySchema() override {
-        PYBIND11_OVERRIDE_PURE(DataSchema_ifs *, Module_ifs, getPropertySchema);
+        PYBIND11_OVERRIDE_PURE(const DataSchema_ifs *, Module_ifs, getPropertySchema);
     }
 
     [[nodiscard]] std::string printProperties(const std::string &indent) const override {
@@ -146,7 +147,7 @@ class PyModule : public Module_ifs {
     }
 
     [[nodiscard]] const HierarchicalData_ifs *getProperty(const std::string &prop_path) const override {
-        PYBIND11_OVERRIDE_PURE(HierarchicalData_ifs *, Module_ifs, getProperty, prop_path);
+        PYBIND11_OVERRIDE_PURE(const HierarchicalData_ifs *, Module_ifs, getProperty, prop_path);
     }
 
     [[nodiscard]] std::string getPropertyAsTxt(const std::string &prop_path) const override {
@@ -180,7 +181,47 @@ class PyModule : public Module_ifs {
         PYBIND11_OVERRIDE_PURE(ModuleStream_ifs *, Module_ifs, createModuleStream);
     }
 };
-// class PyDevice : public Device {};
+
+class PyParameter : public Parameter_ifs {
+   public:
+    ~PyParameter() override = default;
+
+    [[nodiscard]] PrmBuffer_ifs *createBuffer() const override {
+        PYBIND11_OVERRIDE_PURE(PrmBuffer_ifs *, Parameter_ifs, createBuffer);
+    }
+
+    [[nodiscard]] std::string getType() const override { PYBIND11_OVERRIDE_PURE(std::string, Parameter_ifs, getType); }
+
+    const DataSchema_ifs *getPropertySchema() override {
+        PYBIND11_OVERRIDE_PURE(const DataSchema_ifs *, Parameter_ifs, getPropertySchema);
+    }
+
+    [[nodiscard]] const HierarchicalData_ifs *getProperty(const std::string &prop_path) const override {
+        PYBIND11_OVERRIDE_PURE(const HierarchicalData_ifs *, Parameter_ifs, getProperty, prop_path);
+    }
+
+    [[nodiscard]] std::string getPropertyAsTxt(const std::string &prop_path) const override {
+        PYBIND11_OVERRIDE_PURE(std::string, Parameter_ifs, getPropertyAsTxt, prop_path);
+    }
+
+    bool setProperty(const std::string &prop_path, const Value &value) override {
+        PYBIND11_OVERRIDE_PURE(bool, Parameter_ifs, setProperty, prop_path, value);
+    }
+
+    bool setProperty(const std::string &prop_path, const HierarchicalData_ifs *hierarchical_data) override {
+        PYBIND11_OVERRIDE_PURE(bool, Parameter_ifs, setProperty, prop_path, hierarchical_data);
+    }
+
+    bool setPropertyAsTxt(const std::string &prop_path, const std::string &value) override {
+        PYBIND11_OVERRIDE_PURE(bool, Parameter_ifs, setPropertyAsTxt, prop_path, value);
+    }
+
+    [[nodiscard]] bool isValid() const override { PYBIND11_OVERRIDE_PURE(bool, Parameter_ifs, isValid); }
+
+   protected:
+    friend PrmBuffer_ifs;
+    PrmBuffer_ifs *prm_buffer_ = nullptr;
+};
 
 class PyDeviceViewWrapper : public DeviceViewWrapper_ifs {
    public:

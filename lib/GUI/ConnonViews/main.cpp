@@ -2,7 +2,6 @@
 #include <QApplication>
 //
 #include "common/ExtensionManager.h"
-//
 
 #ifndef COMMON_VIEWS_LIB_NAME
 #    error "COMMON_VIEWS_LIB_NAME undefined"
@@ -11,6 +10,7 @@
 class WidgetWrapper_ifs;
 
 WidgetWrapper_ifs *newDeviceViewWrapper();
+WidgetWrapper_ifs *newParameterViewWrapper();
 QWidget *newParameterTreeView(QWidget *parent);
 QWidget *newConversionTemplateView(QWidget *parent);
 //
@@ -32,13 +32,14 @@ InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, COMMON_VIEWS_LIB_NAME)(vo
     g_conv_template_list_extension_uint = new ExtensionUnit[]{
         {"device_view_wrapper", "widget_wrapper",
          "returns widget wrapper instance, which provides tree of available devices and modules",
-         (newDeviceViewWrapper()), DEVICE_LIST_VER},
+         newDeviceViewWrapper(), DEVICE_LIST_VER},
+        {"parameter_view_wrapper", "widget_wrapper",
+         "returns widget wrapper instance, which provides list of available parameters", newParameterViewWrapper(),
+         PARAMETER_LIST_VER},
         {"conv_template_list", "widget",
          "returns widget instance, which provides list of available conversion templates",
          (newConversionTemplateView(nullptr)), CONV_TEMPLATE_LIST_VER},
-        {"parameter_list", "widget", "returns widget instance, which provides list of available parameters",
-         (newParameterTreeView(nullptr)), PARAMETER_LIST_VER},
-        {"conv_template_list", "init", "checks the version and, if it's the latest, initializes the widget.",
+        {"common_views", "init", "checks the version and, if it's the latest, initializes the widget.",
          (void *)&initWidgets, 0x00},
         {nullptr, nullptr, nullptr, nullptr, 0}};
 
@@ -65,8 +66,10 @@ static int initWidgets(ExtensionManager *manager) {
         initConversionTemplateView(manager);
 
     //
-    p_unit = manager->getLastVersionExtensionUnit("widget", "parameter_list");
-    if ((p_unit == nullptr) || (p_unit->version != PARAMETER_LIST_VER)) {
+    p_unit = manager->getLastVersionExtensionUnit("widget_wrapper", "parameter_view_wrapper");
+    if (p_unit == nullptr) {
+        DEBUG_CERR("cant init(), since p_unit == nullptr.\n");
+    } else if (p_unit->version != PARAMETER_LIST_VER) {
         DEBUG_CERR("cant init (name: " << p_unit->name << ", type: " << p_unit->type << ", ver.:" << p_unit->version
                                        << ") unit, since there is a newer unit.\n");
     } else
