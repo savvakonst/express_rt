@@ -68,6 +68,8 @@ QVariant ParameterTableModel::headerData(int section, Qt::Orientation orientatio
 }
 
 QVariant ParameterTableModel::data(const QModelIndex &index, int role) const {
+    if (role == Qt::TextColorRole) {
+    }
     if (role == Qt::DisplayRole) {
         auto prm = getParameter(index);
         auto name = list_of_entries_[index.column()]->name_;
