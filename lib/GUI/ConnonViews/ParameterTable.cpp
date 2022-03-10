@@ -69,6 +69,7 @@ QVariant ParameterTableModel::headerData(int section, Qt::Orientation orientatio
 
 QVariant ParameterTableModel::data(const QModelIndex &index, int role) const {
     if (role == Qt::TextColorRole) {
+
     }
     if (role == Qt::DisplayRole) {
         auto prm = getParameter(index);
@@ -153,6 +154,9 @@ void ParameterTableModel::selectParameter(const QModelIndex &index) {
 
 class ParameterViewWrapper : public ParameterViewWrapper_ifs {
    public:
+
+
+
     ParameterViewWrapper() : widget_(new ParameterTreeView()) {
         widget_->setAlternatingRowColors(true);
         widget_->setStyleSheet(
@@ -167,7 +171,10 @@ class ParameterViewWrapper : public ParameterViewWrapper_ifs {
         widget_->setModel(model);
     }
 
-    status addSignal(Signal_ifs *signal) override { return status::failure; }
+    status addSignal(Signal_ifs *signal) override {
+        signals_.push_back(signal);
+        return status::succes;
+    }
 
     QWidget *getWidget() override { return widget_; }
 
@@ -228,8 +235,15 @@ class ParameterViewWrapper : public ParameterViewWrapper_ifs {
 
    private:
     size_t rowCount() { return size_t(widget_->model()->rowCount()); }
-
+    std::list<Signal_ifs *> signals_;
    protected:
+
+    void emit_() {
+        for (auto i : signals_) {
+            i->emit_();
+        }
+    }
+
     ParameterTableModel *model_ = nullptr;
     ParameterTreeView *widget_;
 };

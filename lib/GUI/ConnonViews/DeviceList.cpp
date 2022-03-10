@@ -9,7 +9,6 @@
 #include <QHeaderView>
 #include <QTableView>
 //
-#include "DeviceList.h"
 #include "GUI/WidgetWrappers.h"
 #include "common/ExrtAction_ifs.h"
 #include "common/ExtensionManager.h"
@@ -17,6 +16,9 @@
 #include "common/StringProcessingTools.h"
 #include "convtemplate/Parameter_ifs.h"
 #include "device/DeviceManager.h"
+//
+#include "CustomQActions.h"
+#include "DeviceList.h"
 
 DeviceListModel::DeviceListModel(ExtensionManager *manager) {
     auto image_dir = QDir(QCoreApplication::applicationDirPath() + "/png/modules");
@@ -241,22 +243,14 @@ class DeviceOpenAction : public QAction {
    public:
     explicit DeviceOpenAction(ExtensionManager *manager, IO_ifs *io, QObject *parent = nullptr)
         : QAction(parent), manager_(manager), io_(io) {
-        setText(QObject::tr("&Open"));
-        //+ " " + io->file_type_.c_str()
         connect(this, &QAction::triggered, this, &DeviceOpenAction::openFile);
     }
 
    protected slots:
     void openFile() {
-        auto f_name =
-            QFileDialog::getOpenFileName(nullptr, /*caption*/ QString(), /*dir */ QString(),
-                                         /*filter*/ io_->filename_pattern_.c_str(), /*selectedFilter*/ nullptr,
-                                         /*options*/ QFileDialog::Options());
-
-        auto dir = QDir(QDir::current());
-        qDebug() << "//" << QDir::current();
-        // dir.relativeFilePath(f_name)
-        io_->readDocument(manager_, dir.relativeFilePath(f_name).toStdString());
+        auto f_name = QFileDialog::getOpenFileName(nullptr, QString(), QString(), io_->filename_pattern_.c_str(),
+                                                   nullptr, QFileDialog::Options());
+        io_->readDocument(manager_, QDir(QDir::current()).relativeFilePath(f_name).toStdString());
     }
 
    protected:
@@ -264,63 +258,12 @@ class DeviceOpenAction : public QAction {
     IO_ifs *io_;
 };
 
-class DeviceRemoveAction : public QAction {
-   public:
-    explicit DeviceRemoveAction(ExtensionManager *manager, QObject *parent = nullptr) : QAction(parent) {
-        setText(QObject::tr("&remove"));
-        connect(this, &QAction::triggered, this, &DeviceRemoveAction::removeEntry);
-        auto view_wrapper =
-            (WidgetWrapper_ifs *)manager->getLastVersionExtensionObject("widget_wrapper", "device_view_wrapper");
-
-        view_ = (QAbstractItemView *)view_wrapper->getWidget();
-        device_manager_ = (DeviceManager *)manager->getLastVersionExtensionObject("device_manager", "device_manager");
-    }
-
-   protected slots:
-
-    void removeEntry() {
-        auto index = view_->selectionModel()->currentIndex().row();
-        device_manager_->removeDeviceByIndex(index);
-    }
-
-   protected:
-    QAbstractItemView *view_ = nullptr;
-    DeviceManager *device_manager_ = nullptr;
-};
-
 /*
  *
  *
  *
  */
-
 class DeviceViewWrapper : public DeviceViewWrapper_ifs {
-   private:
-    class FuncProxyQAction : public QAction {
-       public:
-        using function_t = std::function<bool()>;
-        FuncProxyQAction(function_t function, QObject *parent = nullptr)
-            : QAction(parent), function_(std::move(function)) {
-            connect(this, &FuncProxyQAction::triggered, this, &FuncProxyQAction::run);
-        }
-       public slots:
-        void run() { function_(); };
-
-       private:
-        function_t function_;
-    };
-
-    class ProxyQAction : public QAction {
-       public:
-        ProxyQAction(ExrtAction_ifs *action, QObject *parent = nullptr) : QAction(parent), action_(action) {
-            setText(action->getDescription().c_str());
-            connect(this, &ProxyQAction::triggered, this, &ProxyQAction::run);
-        }
-       public slots:
-        void run() { action_->run(); };
-        ExrtAction_ifs *action_;
-    };
-
    public:
     friend class DeviceViewWrapperDelegate;
     DeviceViewWrapper() : widget_(new QTreeView()) {
@@ -333,39 +276,58 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
     }
 
     void init(ExtensionManager *manager) {
+        device_manager_ = (DeviceManager *)manager->getLastVersionExtensionObject("device_manager", "device_manager");
+
         device_list_model_ = new DeviceListModel(manager);
         widget_->setModel(device_list_model_);
 
         auto io_units = manager->getLastVersionExtensionUnitsByType("io");
         for (auto i : io_units) {
-            if (i && i->ptr && (((IO_ifs *)i->ptr)->filename_pattern_ == "*.ksd")) {
-                auto new_base = new DeviceOpenAction(manager, (IO_ifs *)i->ptr, widget_);
-                new_base->setStatusTip(QObject::tr("&Create a new file"));
-                new_base->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
-                new_base->setShortcut(Qt::CTRL + Qt::Key_O);
+            if (i) {
+                auto io = (IO_ifs *)i->ptr;
+                if (io && io->filename_pattern_ == "*.ksd") {
+                    auto new_base = new DeviceOpenAction(manager, (IO_ifs *)i->ptr, widget_);
 
-                widget_->addAction(new_base);
+                    new_base->setText(QObject::tr("&Open"));
+                    new_base->setStatusTip(QObject::tr("&Open a new file"));
+                    new_base->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
+                    new_base->setShortcut(Qt::CTRL + Qt::Key_O);
+                    widget_->addAction(new_base);
+                }
             }
         }
 
-        auto remove_action = new DeviceRemoveAction(manager, widget_);
-        remove_action->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
-        remove_action->setShortcut(Qt::Key_Delete);
-
-        widget_->addAction(remove_action);
-
-        auto *action = new FuncProxyQAction(
+        /*
+         *
+         */
+        auto remove_action = new FuncProxyQAction(
             [&]() {
-                auto node = (DeviceListModel::TreeNode *)(widget_->selectionModel()->currentIndex().internalPointer());
-                while (!node->isDevice()) node = node->parent;
-                device_list_model_->setActiveDevice(node->getPath().first);
+                auto index = widget_->selectionModel()->currentIndex().row();
+                device_manager_->removeDeviceByIndex(index);
                 return true;
             },
             widget_);
 
-        action->setShortcut(Qt::Key_Return);
-        action->setText("&Set active device");
-        widget_->addAction(action);
+        remove_action->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
+        remove_action->setShortcut(Qt::Key_Delete);
+        remove_action->setText("&Delete");
+        widget_->addAction(remove_action);
+
+        /*
+         *
+         */
+        auto *set_active_action = new FuncProxyQAction(
+            [&]() {
+                auto node = (DeviceListModel::TreeNode *)(widget_->selectionModel()->currentIndex().internalPointer());
+                while (!node->isDevice()) node = node->parent;
+                setActive(node->getPath().first, "");
+                return true;
+            },
+            widget_);
+
+        set_active_action->setShortcut(Qt::Key_Return);
+        set_active_action->setText("&Set active device");
+        widget_->addAction(set_active_action);
     }
 
     ~DeviceViewWrapper() override { delete widget_; }
@@ -378,6 +340,7 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
     QWidget *getWidget() override { return widget_; }
 
     bool setActive(const std::string &source, const std::string &path) override {
+        emit_();
         if (path.empty()) device_list_model_->setActiveDevice(source);
         return true;
     }
@@ -453,8 +416,9 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
     }
 
     std::list<Signal_ifs *> signals_;
-    QTreeView *widget_;
+    QTreeView *widget_ = nullptr;
     DeviceListModel *device_list_model_ = nullptr;
+    DeviceManager *device_manager_ = nullptr;
 };
 
 /*
