@@ -19,7 +19,7 @@ class COMMON_API_ ConversionTemplate : public BaseClass_ifs {
      *
      */
 
-    status setName(std::string name);
+    status setName(const std::string& name);
     status addInfo(const std::string& path, const Value& value);
     static status addInfo(const std::string& path, const std::string& value);
 
@@ -32,22 +32,22 @@ class COMMON_API_ ConversionTemplate : public BaseClass_ifs {
 
     status addParameter(Parameter_ifs* prm);
     [[nodiscard]] const exo_map<std::string, Parameter_ifs*>& getAllParameters() const { return parameters_; }
-    [[nodiscard]] const Parameter_ifs* getParameter(std::string name) const;
-    [[nodiscard]] exo_container<const Parameter_ifs*> getSingleTypeParameters(std::string type) const;
-    [[nodiscard]] exo_container<const Parameter_ifs*> getParametersFromPath(std::string searching_path) const;
-    status changeParameterName(std::string old, std::string new_name);
-    status removeParameter(std::string name);
-    status removeParametersFromPath(std::string path);
+    [[nodiscard]] const Parameter_ifs* getParameter(const std::string& name) const;
+    [[nodiscard]] exo_container<const Parameter_ifs*> getSingleTypeParameters(const std::string& type) const;
+    [[nodiscard]] exo_container<const Parameter_ifs*> getParametersFromPath(const std::string& searching_path) const;
+    status changeParameterName(const std::string& old, const std::string& new_name);
+    status removeParameter(const std::string& name);
+    status removeParametersFromPath(const std::string& path);
 
     /*
      *
      *
      */
 
-    status addModule(std::string path);
-    status removeModulesFromPath(std::string path);
-    status getModulesFromPath(std::string path);
-    [[nodiscard]] const exo_container<std::string> getModulesFromPath(std::string path) const;
+    status addModule(const std::string& path);
+    status removeModulesFromPath(const std::string& path);
+    status getModulesFromPath(const std::string& path);
+    [[nodiscard]] const exo_container<std::string> getModulesFromPath(const std::string& path) const;
 
     const ErrorInfo_ifs* getErrorInfo() const override;
 

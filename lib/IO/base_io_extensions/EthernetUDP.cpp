@@ -28,11 +28,10 @@ std::string EthernetUdpParameter::getType() const { return "ethernet_udp"; }
 bool EthernetUdpParameter::isValid() const { return false; }
 
 Parameter_ifs* EthernetUdParserBuilder::parse(ExtensionManager* manager, HierarchicalData_ifs* other,
-                                              HierarchicalData_ifs* header) const {
+                                              HierarchicalData_ifs* header, const std::string& path_to_module) const {
     auto item = new EthernetUdpParameter(manager);
     PropBuilder builder = {item, header};
-
-    builder.setCommon();
+    builder.setData("common/path", Value(path_to_module));
 
     // TODO: need to  build path
 

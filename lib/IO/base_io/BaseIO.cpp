@@ -74,15 +74,41 @@ void saveAsJson(const YAML::Node &node, std::stringstream &s, const std::string 
     }
 }
 
-std::string getStrID(uint32_t id) {
-    uint64_t u64_id = uint64_t(id) & 0xffffffff;
-    return std::string((char *)&u64_id);
-}
-
 YAML::Node get(std::string key, const YAML::Node &node) {
     auto res = node[key];
     if (!res) throw YAML::Exception(node.Mark(), "cant find field with key: \"" + key + "\"");
     return res;
+}
+
+template <typename T>
+T getVal(std::string key, const YAML::Node &node, T default_v) {
+    auto res = node[key];
+    if (!res) return default_v;
+    return res.as<T>();
+}
+
+template <typename T>
+T getVal(std::string key, const YAML::Node &node) {
+    auto res = node[key];
+    if (!res) throw YAML::Exception(node.Mark(), "cant find field with key: \"" + key + "\"");
+    return res.as<T>();
+}
+
+std::string getStrID(std::string key, const YAML::Node &node) {
+    auto id = get(key, node).as<uint32_t>();
+    uint64_t u64_id = uint64_t(id) & 0xffffffff;
+    return std::string((char *)&u64_id);
+}
+
+std::string getPath(const YAML::Node &i, const std::string &prefix = "") {
+    auto module_name = getStrID("Module.ID", i);
+    if (module_name == "CALC") return "";
+
+    auto slot = getVal<uint32_t>("Module.Slot", i, 0);
+    auto sub_slot = getVal<uint32_t>("Module.Subslot", i, 0);
+
+    auto path = std::to_string(slot) + ((sub_slot == 0) ? "" : "." + std::to_string(sub_slot)) + "/" + module_name;
+    return path.empty() ? "" : prefix + path;
 }
 
 /*
@@ -143,20 +169,22 @@ ConversionTemplate *BaseIO::readOrParseDocument(ExtensionManager *manager, bool 
         conv_template->addInfo("company", Value(get(" File.Company", doc).as<std::string>()));
         conv_template->addInfo("source", Value(source_path));
 
-        for (const auto &i : get("Device.Modules.List", doc)) {
-            const std::string module_name = getStrID(get("Module.ID", i).as<uint32_t>());
-            const std::string module = module_name + ":" + std::to_string(get("Module.Slot", i).as<uint32_t>());
+        std::string device_id = getStrID("Device.ID", doc);
 
-            if (module_name != "CALC")
-                if (!conv_template->addModule(module)) {
+        for (const auto &i : get("Device.Modules.List", doc)) {
+            auto full_path = getPath(i, device_id + "/0/*/");
+
+            if (!full_path.empty())
+                if (!conv_template->addModule(full_path)) {
                     warning_messages_.push_back(conv_template->getErrorMessage());
                     conv_template->clearErrorMessage();
                 }
         }
+        std::cout << "---------------------------------\n";
 
         for (const auto &header : get("Parameters.List", doc)) {
-            const auto parameter_type = get("Type", header).as<uint32_t>();
-            const auto parameter_name = get(" Name", header).as<std::string>();
+            auto parameter_type = get("Type", header).as<uint32_t>();
+            auto parameter_name = get(" Name", header).as<std::string>();
 
             auto list = getPPBMList(parameter_type);
             if (list && ((bool)list->size())) {  // TODO: this section is slow
@@ -166,14 +194,14 @@ ConversionTemplate *BaseIO::readOrParseDocument(ExtensionManager *manager, bool 
                 auto hd_header = HierarchicalDataYamlWrapper(header);
                 auto hd_other = HierarchicalDataYamlWrapper(other);
 
+                auto full_path = getPath(header, device_id + "/0/*/");
                 for (auto i : *list) {
-                    Parameter_ifs *prm = i->parse(manager, &hd_other, &hd_header);
+                    Parameter_ifs *prm = i->parse(manager, &hd_other, &hd_header, full_path);
                     if (prm) {
                         conv_template->addParameter(prm);
                         break;
                     }
                 }
-
             } else {
                 warning_messages_.push_back("unknown parameter type: " + std::to_string(parameter_type));
             }

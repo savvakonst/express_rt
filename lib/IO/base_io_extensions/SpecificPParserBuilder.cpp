@@ -41,19 +41,19 @@
 
 */
 
-Parameter_ifs *AnalogParserBuilder::parse(ExtensionManager *manager, HierarchicalData_ifs *other,
-                                          HierarchicalData_ifs *header) const {
+Parameter_ifs* AnalogParserBuilder::parse(ExtensionManager* manager, HierarchicalData_ifs* other,
+                                          HierarchicalData_ifs* header, const std::string& path_to_module) const {
     PRINT_DEBUG_INFO("Parameters.List.Analog\n");
 
-    Parameter_ifs * item = new AnalogParameter(manager);
+    Parameter_ifs* item = new AnalogParameter(manager);
     PropBuilder builder = {item, header};
-    builder.setCommon();
+    builder.setData("common/path", Value(path_to_module));
 
     return item;
 }
 
-Parameter_ifs *AnalogVibroParserBuilder::parse(ExtensionManager *manager, HierarchicalData_ifs *other,
-                                               HierarchicalData_ifs *header) const {
+Parameter_ifs* AnalogVibroParserBuilder::parse(ExtensionManager* manager, HierarchicalData_ifs* other,
+                                               HierarchicalData_ifs* header, const std::string& path_to_module) const {
     PRINT_DEBUG_INFO("Parameters.List.Analog.Vibro\n");
     auto u = other->getMapUnit("Type");
 
@@ -65,18 +65,19 @@ Parameter_ifs *AnalogVibroParserBuilder::parse(ExtensionManager *manager, Hierar
         return nullptr;
     }
 
-    Parameter_ifs *item = nullptr;
+    Parameter_ifs* item = nullptr;
     switch (vibro_type) {
     case 0: {
         item = new AnalogParameter(manager);
         PropBuilder builder = {item, header};
-        builder.setCommon();
+        builder.setData("common/path", Value(path_to_module));
+
         break;
     }
     case 1: {
         item = new AccelerationParameter(manager);
         PropBuilder builder = {item, header};
-        builder.setCommon();
+        builder.setData("common/path", Value(path_to_module));
         builder.setData("conversion_factor", Value(1.0));
         break;
     }
@@ -89,8 +90,9 @@ Parameter_ifs *AnalogVibroParserBuilder::parse(ExtensionManager *manager, Hierar
     return item;
 }
 
-Parameter_ifs *AnalogVoltageParserBuilder::parse(ExtensionManager *manager, HierarchicalData_ifs *other,
-                                                 HierarchicalData_ifs *header) const {
+Parameter_ifs* AnalogVoltageParserBuilder::parse(ExtensionManager* manager, HierarchicalData_ifs* other,
+                                                 HierarchicalData_ifs* header,
+                                                 const std::string& path_to_module) const {
     PRINT_DEBUG_INFO("Parameters.List.Analog.Voltage\n");
     return nullptr;
 }

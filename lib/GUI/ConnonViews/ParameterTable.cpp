@@ -244,6 +244,8 @@ class ParameterViewWrapper : public ParameterViewWrapper_ifs {
         }
     }
 
+
+    DeviceViewWrapper_ifs *device_view_wrapper_ = nullptr;
     ParameterTableModel *model_ = nullptr;
     ParameterTreeView *widget_;
 };

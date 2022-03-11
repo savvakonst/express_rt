@@ -23,10 +23,11 @@ view_wrapper.addToSelected("file://data-003.ksd", "")
 s = view_wrapper.getSelected()
 
 # s[0].getParentModule()
+print()
 for i in s:
-    mapping = i.getSubModulesFromPath("**/*1/*")
+    mapping = i.getSubModulesFromPath("**/*")
     for j in mapping:
-        print("path", j.getModulePath(True))
+        print("path:", j.getModulePath(True))
     # print("path", i.getModulePath(True))
 
 del (s)

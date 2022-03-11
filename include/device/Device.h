@@ -9,12 +9,6 @@
 //
 #include "Module_ifs.h"
 
-inline std::string stringId(uint32_t id) {
-    char char_id[5] = {0, 0, 0, 0, 0};
-    *((uint32_t *)char_id) = id;
-    return char_id;
-}
-
 class COMMON_API_ Device : public Module_ifs {
    private:
     struct DeviceDate {

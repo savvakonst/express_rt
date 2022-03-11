@@ -33,8 +33,8 @@ class EthernetUdParserBuilder : public PDefaultBaseIO_ifs {
     [[nodiscard]] std::string getTypeIdentifier() const override { return "Parameters.List.Ethernet.UDP"; }
     [[nodiscard]] int getPrmType() const override { return ETHERNET_UDP_PB; }
 
-    Parameter_ifs* parse(ExtensionManager* manager, HierarchicalData_ifs* other,
-                         HierarchicalData_ifs* header) const override;
+    Parameter_ifs* parse(ExtensionManager* manager, HierarchicalData_ifs* other, HierarchicalData_ifs* header,
+                         const std::string& path_to_module) const override;
 };
 
 #endif
