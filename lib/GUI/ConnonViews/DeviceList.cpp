@@ -1,4 +1,5 @@
 #include <functional>
+#include <sstream>
 #include <utility>
 //
 #include <QAction>
@@ -7,6 +8,7 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QHeaderView>
+#include <QMimeData>
 #include <QTableView>
 //
 #include "GUI/WidgetWrappers.h"
@@ -52,7 +54,7 @@ DeviceListModel::~DeviceListModel() = default;
 QVariant DeviceListModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid()) return {};
 
-    auto node = (TreeNode *)index.internalPointer();
+    auto node = getNode(index);
 
     if (role == Qt::DecorationRole) {
         if (node == active_device_) return icons_map_["DEV_CHECK"];
@@ -67,8 +69,13 @@ QVariant DeviceListModel::data(const QModelIndex &index, int role) const {
 }
 
 Qt::ItemFlags DeviceListModel::flags(const QModelIndex &index) const {
-    if (!index.isValid()) return Qt::NoItemFlags;
-    return QAbstractItemModel::flags(index);
+    Qt::ItemFlags flags = QAbstractItemModel::flags(index);
+    if (index.isValid()) return flags | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+    else
+        return flags | Qt::ItemIsDropEnabled;
+
+    // if (!index.isValid()) return Qt::NoItemFlags;
+    // return QAbstractItemModel::flags(index);
 }
 
 QVariant DeviceListModel::headerData(int section, Qt::Orientation orientation, int role) const {
@@ -80,7 +87,7 @@ QVariant DeviceListModel::headerData(int section, Qt::Orientation orientation, i
 QModelIndex DeviceListModel::index(int row, int column, const QModelIndex &parent) const {
     if (!hasIndex(row, column, parent)) return {};
 
-    auto node = parent.isValid() ? (TreeNode *)parent.internalPointer() : root_;
+    auto node = parent.isValid() ? getNode(parent) : root_;
 
     if (node->child_vector.size() > size_t(row)) return createIndex(row, column, node->child_vector[row]);
 
@@ -90,7 +97,7 @@ QModelIndex DeviceListModel::index(int row, int column, const QModelIndex &paren
 QModelIndex DeviceListModel::parent(const QModelIndex &index) const {
     if (!index.isValid()) return {};
 
-    auto parent_node = ((TreeNode *)index.internalPointer())->parent;
+    auto parent_node = getNode(index)->parent;
 
     if (parent_node == root_) return {};
 
@@ -100,7 +107,7 @@ QModelIndex DeviceListModel::parent(const QModelIndex &index) const {
 int DeviceListModel::rowCount(const QModelIndex &parent) const {
     if (parent.column() > 0) return 0;
 
-    auto node = parent.isValid() ? (TreeNode *)parent.internalPointer() : root_;
+    auto node = parent.isValid() ? getNode(parent) : root_;
     if (node) return int(node->child_vector.size());
 
     return 0;
@@ -110,6 +117,8 @@ int DeviceListModel::columnCount(const QModelIndex &parent) const {
     if (parent.isValid()) return 1;
     return (int)1;
 }
+
+Qt::DropActions DeviceListModel::supportedDropActions() const { return QAbstractItemModel::supportedDropActions(); }
 
 void DeviceListModel::buildTree() {
     beginResetModel();
@@ -134,17 +143,21 @@ void DeviceListModel::buildTree() {
     emit layoutChanged();
 }
 
-QList<QModelIndex> DeviceListModel::getTreeIndexList(const std::string &source, const std::string &path) {
+DeviceListModel::TreeNode *DeviceListModel::getNode(const QModelIndex &index) const {
+    return (TreeNode *)index.internalPointer();
+}
+
+QList<QModelIndex> DeviceListModel::getTreeIndexList(const std::string &source, const std::string &path) const {
     QList<QModelIndex> ret;
     auto full_path = source + "//" + path;
-    for (auto &i : node_map_) {
+    for (auto &i : node_map_)
         if (filePatternMatch(full_path, i.first)) ret.push_back(createIndex(i.second->getIndex(), 0, i.second));
-    }
+
     return ret;
 }
 
 std::list<DeviceListModel::TreeNode *> DeviceListModel::getTreeNodeList(const std::string &source,
-                                                                        const std::string &path) {
+                                                                        const std::string &path) const {
     std::list<DeviceListModel::TreeNode *> ret;
     auto full_path = source + "//" + path;
     for (auto &i : node_map_) {
@@ -153,7 +166,7 @@ std::list<DeviceListModel::TreeNode *> DeviceListModel::getTreeNodeList(const st
     return ret;
 }
 
-DeviceListModel::TreeNode *DeviceListModel::getTreeNode(const std::string &source, const std::string &path) {
+DeviceListModel::TreeNode *DeviceListModel::getTreeNode(const std::string &source, const std::string &path) const {
     if (path.empty()) {
         TreeNode *node = nullptr;
         for (auto i : root_->child_vector)
@@ -191,6 +204,29 @@ void DeviceListModel::addItemsToNodeMap(TreeNode *node) {
     node_map_[s] = node;
     auto &vector = node->child_vector;
     for (TreeNode *i : vector) addItemsToNodeMap(i);
+}
+
+QStringList DeviceListModel::mimeTypes() const {
+    return {QAbstractItemModel::mimeTypes().at(0), "text/module", "text/uri-list"};
+}
+
+QMimeData *DeviceListModel::mimeData(const QModelIndexList &indexes) const {
+    auto mime_data = new QMimeData();
+    std::stringstream s_stream;
+
+    for (auto &i : indexes) {
+        auto c = getNode(i)->getPath();
+        s_stream << c.first << "//" << c.second << "\n";
+    }
+    auto s = s_stream.str();
+    mime_data->setData("text/module", QByteArray::fromStdString(s));
+    return mime_data;
+}
+
+bool DeviceListModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
+                                   const QModelIndex &parent) {
+    // qDebug() << data->data("module").data();
+    return QAbstractItemModel::dropMimeData(data, action, row, column, parent);
 }
 
 void DeviceListModel::TreeNode::addNodesRecursively(Module_ifs *ptr, const std::string &path) {
@@ -273,13 +309,19 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
             "QHeaderView::section {background-color: #D2DCDF}");
         widget_->setContextMenuPolicy(Qt::ActionsContextMenu);
         widget_->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
+
+        // widget_->setSelectionMode(QAbstractItemView::SingleSelection);
+        widget_->setDragDropMode(QAbstractItemView::DragDrop);
+        widget_->setDragEnabled(true);
+        widget_->setDropIndicatorShown(true);
+        widget_->setAcceptDrops(true);
     }
 
     void init(ExtensionManager *manager) {
         device_manager_ = (DeviceManager *)manager->getLastVersionExtensionObject("device_manager", "device_manager");
 
-        device_list_model_ = new DeviceListModel(manager);
-        widget_->setModel(device_list_model_);
+        model_ = new DeviceListModel(manager);
+        widget_->setModel(model_);
 
         auto io_units = manager->getLastVersionExtensionUnitsByType("io");
         for (auto i : io_units) {
@@ -318,7 +360,7 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
          */
         auto *set_active_action = new FuncProxyQAction(
             [&]() {
-                auto node = (DeviceListModel::TreeNode *)(widget_->selectionModel()->currentIndex().internalPointer());
+                auto node = model_->getNode(widget_->selectionModel()->currentIndex());
                 while (!node->isDevice()) node = node->parent;
                 setActive(node->getPath().first, "");
                 return true;
@@ -341,7 +383,7 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
 
     bool setActive(const std::string &source, const std::string &path) override {
         emit_();
-        if (path.empty()) device_list_model_->setActiveDevice(source);
+        if (path.empty()) model_->setActiveDevice(source);
         return true;
     }
 
@@ -352,7 +394,7 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
 
     bool addToSelected(const std::string &source, const std::string &path) override {
         auto s_model = widget_->selectionModel();
-        auto list = device_list_model_->getTreeIndexList(source, path);
+        auto list = model_->getTreeIndexList(source, path);
         for (auto i : list) s_model->select(i, QItemSelectionModel::Select);
         return !list.empty();
     }
@@ -360,26 +402,26 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
     bool removeFromSelected(const std::string &source, const std::string &path) override {
         // TODO: remove code repeat
         auto s_model = widget_->selectionModel();
-        auto list = device_list_model_->getTreeIndexList(source, path);
+        auto list = model_->getTreeIndexList(source, path);
         for (auto i : list) s_model->select(i, QItemSelectionModel::Deselect);
         return !list.empty();
     }
 
-    Device *getActiveDevice() override { return (Device *)device_list_model_->getActiveDevice()->m_object; };
+    Device *getActiveDevice() override { return (Device *)model_->getActiveDevice()->m_object; };
 
     std::string getActiveDeviceSource() override { return getActiveDevice()->getSource(); }
 
     Module_ifs *getActiveModule() override {
         auto index = widget_->selectionModel()->currentIndex();
         if (!index.isValid()) return nullptr;
-        auto node = ((DeviceListModel::TreeNode *)index.internalPointer());
+        auto node = model_->getNode(index);
         return node->isDevice() ? nullptr : node->m_object;
     };
 
     std::pair<std::string, std::string> getActiveModulePath() override {
         auto index = widget_->selectionModel()->currentIndex();
         if (!index.isValid()) return {};
-        auto node = ((DeviceListModel::TreeNode *)index.internalPointer());
+        auto node = model_->getNode(index);
         return node->getPath();
     }
 
@@ -387,7 +429,7 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
         std::vector<Module_ifs *> vector;
         auto indexes = widget_->selectionModel()->selectedIndexes();
         for (auto &i : indexes) {
-            auto node = (DeviceListModel::TreeNode *)i.internalPointer();
+            auto node = model_->getNode(i);
             vector.push_back(node->m_object);
         }
         return vector;
@@ -397,7 +439,7 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
         std::vector<std::pair<std::string, std::string>> vector;
         auto indexes = widget_->selectionModel()->selectedIndexes();
         for (auto &i : indexes) {
-            auto node = (DeviceListModel::TreeNode *)i.internalPointer();
+            auto node = model_->getNode(i);
             vector.push_back(node->getPath());
         }
         return vector;
@@ -417,7 +459,7 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
 
     std::list<Signal_ifs *> signals_;
     QTreeView *widget_ = nullptr;
-    DeviceListModel *device_list_model_ = nullptr;
+    DeviceListModel *model_ = nullptr;
     DeviceManager *device_manager_ = nullptr;
 };
 

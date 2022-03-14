@@ -369,6 +369,8 @@ class COMMON_API_ HierarchicalData_ifs {
 
 COMMON_API_ const HierarchicalData_ifs *getBranch(const HierarchicalData_ifs *h_data, const std::string &path);
 
+COMMON_API_ Value getValue(const HierarchicalData_ifs *h_data, const std::string &src);
+
 COMMON_API_ std::string toString(const HierarchicalData_ifs *h_data, const std::string &indent);
 
 #endif

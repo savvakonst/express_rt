@@ -187,7 +187,7 @@ ConversionTemplate *BaseIO::readOrParseDocument(ExtensionManager *manager, bool 
             auto parameter_name = get(" Name", header).as<std::string>();
 
             auto list = getPPBMList(parameter_type);
-            if (list && ((bool)list->size())) {  // TODO: this section is slow
+            if (list && (!list->empty())) {  // TODO: this section is slow
                 const YAML::Node additional_list = doc[list->front()->getTypeIdentifier()];
                 const YAML::Node other = findParametersSubInformation(parameter_name, additional_list);
 

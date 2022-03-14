@@ -13,6 +13,7 @@ struct PropBuilder {
 
     PropBuilder(Parameter_ifs* item, HierarchicalData_ifs* header) : item_(item), header_(header) { setCommon(); }
 
+
     void setData(const std::string& dst, const std::string& src) const {
         auto u = header_->getMapUnit(src);
         if (u) {

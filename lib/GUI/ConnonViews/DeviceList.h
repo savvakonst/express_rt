@@ -36,16 +36,24 @@ class DeviceListModel : public QAbstractItemModel {
     [[nodiscard]] int rowCount(const QModelIndex &parent) const override;
     [[nodiscard]] int columnCount(const QModelIndex &parent) const override;
 
+    [[nodiscard]] QStringList mimeTypes() const override;
+    [[nodiscard]] QMimeData *mimeData(const QModelIndexList &indexes) const override;
+    [[nodiscard]] Qt::DropActions supportedDropActions() const override;
+
+    bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
+                      const QModelIndex &parent) override;
+
     void buildTree();
 
     struct TreeNode;
-    QList<QModelIndex> getTreeIndexList(const std::string &source, const std::string &path);
-    std::list<TreeNode *> getTreeNodeList(const std::string &source, const std::string &path);
-    TreeNode *getTreeNode(const std::string &source, const std::string &path);
+
+    [[nodiscard]] TreeNode *getNode(const QModelIndex &index) const;
+    [[nodiscard]] QList<QModelIndex> getTreeIndexList(const std::string &source, const std::string &path) const;
+    [[nodiscard]] std::list<TreeNode *> getTreeNodeList(const std::string &source, const std::string &path) const;
+    [[nodiscard]] TreeNode *getTreeNode(const std::string &source, const std::string &path) const;
 
     bool setActiveDevice(const std::string &source);
     TreeNode *getActiveDevice() { return active_device_; }
-
 
     struct TreeNode {
         // it is better to avoid direct deletion.
@@ -91,9 +99,7 @@ class DeviceListModel : public QAbstractItemModel {
     std::map<std::string, TreeNode *> node_map_;
     TreeNode *root_ = nullptr;
     TreeNode *active_device_ = nullptr;
-
-    std::vector<DataSchema_ifs *> list_of_entries_;
     DeviceManager *device_manager_ = nullptr;
 };
 
-#endif  // EXRT_DEVICELIST_H
+#endif

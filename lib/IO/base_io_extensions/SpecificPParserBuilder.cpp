@@ -45,9 +45,11 @@ Parameter_ifs* AnalogParserBuilder::parse(ExtensionManager* manager, Hierarchica
                                           HierarchicalData_ifs* header, const std::string& path_to_module) const {
     PRINT_DEBUG_INFO("Parameters.List.Analog\n");
 
+    auto path = path_to_module + "/" + getValue(other, "Line").asString();
+
     Parameter_ifs* item = new AnalogParameter(manager);
     PropBuilder builder = {item, header};
-    builder.setData("common/path", Value(path_to_module));
+    builder.setData("common/path", Value(path));
 
     return item;
 }
@@ -66,18 +68,20 @@ Parameter_ifs* AnalogVibroParserBuilder::parse(ExtensionManager* manager, Hierar
     }
 
     Parameter_ifs* item = nullptr;
+
+    auto path = path_to_module + "/" + getValue(other, "Line").asString();
+
     switch (vibro_type) {
     case 0: {
         item = new AnalogParameter(manager);
         PropBuilder builder = {item, header};
-        builder.setData("common/path", Value(path_to_module));
-
+        builder.setData("common/path", Value(path));
         break;
     }
     case 1: {
         item = new AccelerationParameter(manager);
         PropBuilder builder = {item, header};
-        builder.setData("common/path", Value(path_to_module));
+        builder.setData("common/path", Value(path));
         builder.setData("conversion_factor", Value(1.0));
         break;
     }

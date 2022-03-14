@@ -48,6 +48,13 @@ const HierarchicalData_ifs *getBranch(const HierarchicalData_ifs *h_data, const 
     return h_data;
 }
 
+Value getValue(const HierarchicalData_ifs *h_data, const std::string &src) {
+    auto u = getBranch(h_data, src);
+    if (u) return u->getValue();
+    else
+        return {};
+}
+
 std::string toString(const HierarchicalData_ifs *h_data, const std::string &indent) {
     std::string res;
     if (h_data == nullptr) return res;
