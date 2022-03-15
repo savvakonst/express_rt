@@ -30,7 +30,7 @@ Module_M01_::Module_M01_(const void *ptr, size_t size, ExtensionManager *manager
 
 Module_M01_::~Module_M01_() {}
 
-const DataSchema_ifs *Module_M01_::getPropertySchema() { return nullptr; }
+const DataSchema_ifs *Module_M01_::getPropertySchema() const { return nullptr; }
 
 const HierarchicalData_ifs *Module_M01_::getProperty(const std::string &prop_path) const {
     return KSDModule::getProperty(prop_path);

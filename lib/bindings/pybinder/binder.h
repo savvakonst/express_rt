@@ -97,7 +97,7 @@ class PyHierarchicalData : public HierarchicalData_ifs {
         PYBIND11_OVERRIDE_PURE(HierarchicalData_ifs *, HierarchicalData_ifs, getArrayUnit, arg);
     }
 
-    [[nodiscard]] HierarchicalData_ifs *getMapUnit(std::string arg) const override {
+    [[nodiscard]] HierarchicalData_ifs *getMapUnit(const std::string &arg) const override {
         PYBIND11_OVERRIDE_PURE(HierarchicalData_ifs *, HierarchicalData_ifs, getMapUnit, arg);
     }
 };
@@ -138,7 +138,7 @@ class PyModule : public Module_ifs {
         PYBIND11_OVERRIDE_PURE(prm_buff_map_t, Module_ifs, getPrmBufferMap);
     }
 
-    [[nodiscard]] const DataSchema_ifs *getPropertySchema() override {
+    [[nodiscard]] const DataSchema_ifs *getPropertySchema() const override {
         PYBIND11_OVERRIDE_PURE(const DataSchema_ifs *, Module_ifs, getPropertySchema);
     }
 
@@ -164,6 +164,10 @@ class PyModule : public Module_ifs {
 
     bool setPropertyAsTxt(const std::string &prop_path, const std::string &value) override {
         PYBIND11_OVERRIDE_PURE(bool, Module_ifs, setPropertyAsTxt, prop_path, value);
+    }
+
+    bool removeProperty(const std::string &prop_path) override {
+        PYBIND11_OVERRIDE_PURE(bool, Module_ifs, removeProperty, prop_path);
     }
 
     [[nodiscard]] bool storeTaskToBuffer(void *pointer) const override {
@@ -192,7 +196,7 @@ class PyParameter : public Parameter_ifs {
 
     [[nodiscard]] std::string getType() const override { PYBIND11_OVERRIDE_PURE(std::string, Parameter_ifs, getType); }
 
-    const DataSchema_ifs *getPropertySchema() override {
+    const DataSchema_ifs *getPropertySchema() const override {
         PYBIND11_OVERRIDE_PURE(const DataSchema_ifs *, Parameter_ifs, getPropertySchema);
     }
 

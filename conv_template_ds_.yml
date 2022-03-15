@@ -1,4 +1,4 @@
-ext_type: "parameter  "
+ext_type: "parameter"
 ext_set:
   - name: "conversion_template"
     type:
@@ -17,12 +17,12 @@ ext_set:
       - name: "changes"
         dims: [ 0 ]
         type:
-          - name: "by"
+          - name: "created_by"
             type: "string"
             description: "кем"
 
-          - name: "unix_time"
-            type: "i32"
+          - name: "time"
+            type: "string"
             description: "время"
         description: "дата создания/изменения"
         representation: "first_element"

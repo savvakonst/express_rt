@@ -45,9 +45,29 @@ QVariant ConvTemplateTreeModel::data(const QModelIndex &index, int role) const {
     }
 
     auto conv_template = manager_->getConversionTemplateByIndex(index.row());
+
     auto name = list_of_entries_[index.column()]->name_;
-    auto data = conv_template->getInfo(name);
-    return {data->getValue().asString().data()};
+    auto data = conv_template->getProperty(name);
+    if (data->isValue()) return {data->getValue().asString().data()};
+
+    // TODO: use getSize()
+    if (name != "changes") return "";
+
+    qDebug()<<"-----------------------alarm--------------------------";
+
+    auto array = data->getArray();
+
+    switch (array.size()) {
+    case 0:
+        return {"no date"};
+    case 1:
+        return {array[0]->getMapUnit("time")->getValue().asString().data()};
+    default:
+        auto first = array[0]->getMapUnit("time")->getValue().asString();
+        auto end = array[array.size() - 1]->getMapUnit("time")->getValue().asString();
+        auto s = first + " / " + end;
+        return {s.data()};
+    }
 }
 
 Qt::ItemFlags ConvTemplateTreeModel::flags(const QModelIndex &index) const {
@@ -152,7 +172,7 @@ QVariant ConvTemplateTableModel::data(const QModelIndex &index, int role) const 
     if (role == Qt::DisplayRole) {
         auto conv_template = cnv_manager_->getConversionTemplateByIndex(index.row());
         auto name = list_of_entries_[index.column()]->name_;
-        auto data = conv_template->getInfo(name);
+        auto data = conv_template->getProperty(name);
         return {data->getValue().asString().data()};
     }
     return {};

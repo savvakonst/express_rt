@@ -82,13 +82,25 @@ Parameter_ifs* AnalogVibroParserBuilder::parse(ExtensionManager* manager, Hierar
         item = new AccelerationParameter(manager);
         PropBuilder builder = {item, header};
         builder.setData("common/path", Value(path));
-        builder.setData("conversion_factor", Value(1.0));
+        builder.setData("conversion_factor", getValue(other, "Vibro.Ration"));
         break;
     }
-    case 2:
+    case 2: {
+        item = new VelocityParameter(manager);
+        PropBuilder builder = {item, header};
+        builder.setData("common/path", Value(path));
+        builder.setData("conversion_factor", getValue(other, "Vibro.Ration"));
+        builder.setData("length", getValue(other, "Vibro.Length"));
         break;
-    case 3:
+    }
+    case 3: {
+        item = new DisplacementParameter(manager);
+        PropBuilder builder = {item, header};
+        builder.setData("common/path", Value(path));
+        builder.setData("conversion_factor", getValue(other, "Vibro.Ration"));
+        builder.setData("length", getValue(other, "Vibro.Length"));
         break;
+    }
     }
 
     return item;

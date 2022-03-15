@@ -36,14 +36,14 @@ class Module_A06_ : public KSDModule {
 
     Module_A06_(const void* ptr, size_t size, ExtensionManager* context);
 
-    ~Module_A06_();
+    ~Module_A06_() override;
 
-    std::string getID() const override { return "A06_"; }
+    [[nodiscard]] std::string getID() const override { return "A06_"; }
 
-    const DataSchema_ifs* getPropertySchema() override;
+    [[nodiscard]] const DataSchema_ifs* getPropertySchema() const override;
 
-    const HierarchicalData_ifs* getProperty(const std::string& prop_path) const override;
-    std::string getPropertyAsTxt(const std::string& prop_path) const override;
+    [[nodiscard]] const HierarchicalData_ifs* getProperty(const std::string& prop_path) const override;
+    [[nodiscard]] std::string getPropertyAsTxt(const std::string& prop_path) const override;
 
     bool setProperty(const std::string& prop_path, const Value& value) override;
     bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override;
@@ -52,11 +52,11 @@ class Module_A06_ : public KSDModule {
         memcpy(pointer, (void*)&task_, sizeof(Task));
         return true;
     }
-    size_t getTaskSize() const override { return sizeof(Task); }
+    [[nodiscard]] size_t getTaskSize() const override { return sizeof(Task); }
 
     ModuleStream_ifs* createModuleStream() override;
 
-    const ErrorInfo_ifs* getErrorInfo(void) const override;
+    [[nodiscard]] const ErrorInfo_ifs* getErrorInfo() const override;
 };
 
 #endif

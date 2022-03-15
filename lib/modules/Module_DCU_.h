@@ -83,7 +83,7 @@ class Module_DCU_ : public KSDModule {
 
     [[nodiscard]] std::list<Module_ifs *> getSubModulesFromPath(const std::string &prop_path) const override;
 
-    const DataSchema_ifs *getPropertySchema() override;
+    const DataSchema_ifs *getPropertySchema() const override;
 
     [[nodiscard]] const HierarchicalData_ifs *getProperty(const std::string &prop_path) const override;
 

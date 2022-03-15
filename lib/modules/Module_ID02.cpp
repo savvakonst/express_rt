@@ -26,7 +26,7 @@ Module_ID02::Module_ID02(const void* ptr, size_t size, ExtensionManager* manager
 
 Module_ID02::~Module_ID02() {}
 
-const DataSchema_ifs* Module_ID02::getPropertySchema() { return nullptr; }
+const DataSchema_ifs* Module_ID02::getPropertySchema() const { return nullptr; }
 
 const HierarchicalData_ifs* Module_ID02::getProperty(const std::string& prop_path) const {
     return KSDModule::getProperty(prop_path);

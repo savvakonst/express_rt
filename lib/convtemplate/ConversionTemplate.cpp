@@ -16,26 +16,39 @@ ConversionTemplate::ConversionTemplate(ExtensionManager* manager) {
     info_data_ = newParameterFieldTree(info_schema_);
 }
 
-status ConversionTemplate::setName(const std::string& name) {
-    auto bool_status = ((ParameterFieldTree_ifs*)info_data_)->setValue("name", Value(name), error_message_);
-    return bool_status ? status::succes : status::failure;
-}
+const DataSchema_ifs* ConversionTemplate::getPropertySchema() const { return info_schema_; }
 
-status ConversionTemplate::addInfo(const std::string& path, const Value& value) {
-    auto bool_status = ((ParameterFieldTree_ifs*)info_data_)->setValue(path, value, error_message_);
-    return bool_status ? status::succes : status::failure;
-}
-
-status ConversionTemplate::addInfo(const std::string& path, const std::string& value) {
-    // TODO: implement this member function
-    return failure;
-}
-
-const HierarchicalData_ifs* ConversionTemplate::getInfo(const std::string& path) const {
+const HierarchicalData_ifs* ConversionTemplate::getProperty(const std::string& path) const {
     return getBranch(info_data_, path);
 }
 
-const DataSchema_ifs* ConversionTemplate::getInfoSchema() const { return info_schema_; }
+std::string ConversionTemplate::getPropertyAsTxt(const std::string& prop_path) const {
+    auto branch = getBranch(info_data_, prop_path);
+    if (branch->isValue()) return branch->getValue().asString();
+    return toString(branch, "");
+}
+
+bool ConversionTemplate::setName(const std::string& name) {
+    auto bool_status = info_data_->setValue("name", Value(name), error_message_);
+    return bool_status;
+}
+
+bool ConversionTemplate::setProperty(const std::string& path, const Value& value) {
+    auto bool_status = info_data_->setValue(path, value, error_message_);
+    return bool_status;
+}
+
+bool ConversionTemplate::setProperty(const std::string& prop_path, const HierarchicalData_ifs* hierarchical_data) {
+    return info_data_->setValue(prop_path, hierarchical_data, error_message_);
+}
+
+bool ConversionTemplate::setPropertyAsTxt(const std::string& prop_path, const std::string& value) {
+    return info_data_->setValueAsTxt(prop_path, value, error_message_);
+}
+
+bool ConversionTemplate::removeProperty(const std::string& prop_path) {
+    return info_data_->removeUnit(prop_path, error_message_);
+}
 
 /*
  *
@@ -148,7 +161,7 @@ status ConversionTemplate::removeModulesFromPath(const std::string& path) {
     return status::failure;
 }
 
-const exo_container<std::string> ConversionTemplate::getModulesFromPath(const std::string& path) const {
+exo_container<std::string> ConversionTemplate::getModulesFromPath(const std::string& path) const {
     exo_container<std::string> container;
     size_t path_len = path.size();
     for (auto path : modules_) {
@@ -165,6 +178,4 @@ const exo_container<std::string> ConversionTemplate::getModulesFromPath(const st
 
 const ErrorInfo_ifs* ConversionTemplate::getErrorInfo() const { return nullptr; }
 
-status ConversionTemplate::getModulesFromPath(const std::string& path) {
-    return failure;
-}
+status ConversionTemplate::getModulesFromPath(const std::string& path) { return failure; }

@@ -69,7 +69,7 @@ class COMMON_API_ Device : public Module_ifs {
     /* not yet implemented inherited members  begin*/
     std::map<std::string, PrmBuffer_ifs *> getPrmBufferMap() override { return {}; }
 
-    const DataSchema_ifs *getPropertySchema() override { return nullptr; }
+    [[nodiscard]] const DataSchema_ifs *getPropertySchema() const override { return nullptr; }
 
     [[nodiscard]] std::string printProperties(const std::string &indent) const override { return ""; }
 
@@ -86,6 +86,8 @@ class COMMON_API_ Device : public Module_ifs {
     }
 
     bool setPropertyAsTxt(const std::string &prop_path, const std::string &value) override { return false; }
+
+    bool removeProperty(const std::string &prop_path) override {return false;};
 
     /* not yet implemented inherited members  end*/
 

@@ -39,7 +39,7 @@ class COMMON_API_ Module_ifs : public Properties_ifs {
 
     virtual std::map<std::string, PrmBuffer_ifs *> getPrmBufferMap() = 0;
 
-    const DataSchema_ifs *getPropertySchema() override = 0;
+    [[nodiscard]] const DataSchema_ifs *getPropertySchema() const override = 0;
 
     [[nodiscard]] virtual std::string printProperties(const std::string &indent) const = 0;
 
@@ -52,6 +52,8 @@ class COMMON_API_ Module_ifs : public Properties_ifs {
     bool setProperty(const std::string &prop_path, const HierarchicalData_ifs *hierarchical_data) override = 0;
 
     bool setPropertyAsTxt(const std::string &prop_path, const std::string &value) override = 0;
+
+    bool removeProperty(const std::string &prop_path) override = 0;  // { return false;}
 
     [[nodiscard]] virtual bool storeTaskToBuffer(void *pointer) const = 0;
 

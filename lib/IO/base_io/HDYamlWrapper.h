@@ -24,7 +24,7 @@ class HierarchicalDataYamlWrapper : public HierarchicalData_ifs {
     getMapReturn_t getMap() const override;
 
     HierarchicalData_ifs *getArrayUnit(size_t) const override;
-    HierarchicalData_ifs *getMapUnit(std::string) const override;
+    HierarchicalData_ifs *getMapUnit(const std::string &) const override;
 
    private:
     union {

@@ -166,13 +166,22 @@ ConversionTemplate *BaseIO::readOrParseDocument(ExtensionManager *manager, bool 
         auto node = get("Parameters.List", doc);
 
         conv_template->setName(get("Base. Name", doc).as<std::string>());
-        conv_template->addInfo("company", Value(get(" File.Company", doc).as<std::string>()));
-        conv_template->addInfo("source", Value(source_path));
+        conv_template->setProperty("company", Value(get(" File.Company", doc).as<std::string>()));
+        conv_template->setProperty("source", Value(source_path));
 
         std::string device_id = getStrID("Device.ID", doc);
 
+        conv_template->setProperty("changes/0", nullptr);
+
+        for (const auto &i : get("Base.Alteration.List", doc)) {
+
+        }
+
         for (const auto &i : get("Device.Modules.List", doc)) {
             auto full_path = getPath(i, device_id + "/0/*/");
+
+            // Base.Alteration.List
+            // Base.Date
 
             if (!full_path.empty())
                 if (!conv_template->addModule(full_path)) {

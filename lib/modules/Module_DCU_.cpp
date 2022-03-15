@@ -75,7 +75,7 @@ std::list<Module_ifs *> Module_DCU_::getSubModulesFromPath(const std::string &mo
     return ret_list;
 }
 
-const DataSchema_ifs *Module_DCU_::getPropertySchema() { return nullptr; }
+const DataSchema_ifs *Module_DCU_::getPropertySchema() const { return nullptr; }
 
 const HierarchicalData_ifs *Module_DCU_::getProperty(const std::string &prop_path) const {
     return KSDModule::getProperty(prop_path);

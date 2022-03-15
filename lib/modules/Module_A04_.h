@@ -39,7 +39,7 @@ class Module_A04_ : public KSDModule {
 
     std::string getID() const override { return "A04_"; }
 
-    const DataSchema_ifs* getPropertySchema() override;
+    const DataSchema_ifs* getPropertySchema() const override;
 
     const HierarchicalData_ifs* getProperty(const std::string& prop_path) const override;
     std::string getPropertyAsTxt(const std::string& prop_path) const override;

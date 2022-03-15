@@ -3,18 +3,15 @@
 
 #include <cstring>
 
-ParameterFieldTree::StructType getStructType(DataSchema_ifs *data_schema) {
-    if (data_schema->isArray()) return ParameterFieldTree::StructType::array;
-    if (data_schema->isMap()) return ParameterFieldTree::StructType::map;
-    return ParameterFieldTree::StructType::value;
-}
+#include "common/StringProcessingTools.h"
+
 /*
  *
  */
 
 class ParameterFieldTreeArray : public ParameterFieldTree_ifs {
    public:
-    ParameterFieldTreeArray(DataSchema_ifs *data_schema, size_t dim) {
+    ParameterFieldTreeArray(const DataSchema_ifs *data_schema, size_t dim) : dim_(dim), data_schema_(data_schema) {
         auto len = data_schema->getDims()[dim];
         vector_.reserve(len);
         for (size_t i = 0; i < len; i++) vector_.push_back(newParameterFieldTree(data_schema, dim + 1));
@@ -34,9 +31,27 @@ class ParameterFieldTreeArray : public ParameterFieldTree_ifs {
         return (vector_[id]);
     }
 
-    [[nodiscard]] virtual bool setArrayUnit(size_t index, ParameterFieldTree_ifs *data) { return false; }
+    size_t getSize() override { return vector_.size(); }
+
+    [[nodiscard]] bool addArrayUnit() override {
+        auto len = data_schema_->getDims()[dim_];
+        if (len != 0) return false;
+        vector_.push_back(newParameterFieldTree(data_schema_, dim_ + 1));
+        return true;
+    }
+
+    [[nodiscard]] bool removeArrayUnit(size_t index) override {
+        auto len = data_schema_->getDims()[dim_];
+        if ((len != 0) || (index >= vector_.size())) return false;
+        vector_.erase(vector_.begin() + ptrdiff_t(index));
+        return false;
+    }
+
+    // vec.erase(vec.begin()+1);
 
    private:
+    const DataSchema_ifs *data_schema_;
+    const size_t dim_ = 0;
     std::vector<ParameterFieldTree_ifs *> vector_;
 };
 
@@ -44,7 +59,7 @@ class ParameterFieldTreeMap : public ParameterFieldTree_ifs {
    public:
     // typedef std::pair<std::string, HierarchicalData_ifs *> tuple_t;
 
-    ParameterFieldTreeMap(DataSchema_ifs *data_schema) {
+    explicit ParameterFieldTreeMap(const DataSchema_ifs *data_schema) {
         auto map_list = data_schema->getMapList();
         vecmap_.reserve(map_list.size());
         for (auto i : map_list) vecmap_.push_back({i->name_, newParameterFieldTree(i)});
@@ -63,11 +78,13 @@ class ParameterFieldTreeMap : public ParameterFieldTree_ifs {
         return vecmap_;
     }
 
-    [[nodiscard]] HierarchicalData_ifs *getMapUnit(std::string id) const override {
+    [[nodiscard]] HierarchicalData_ifs *getMapUnit(const std::string &id) const override {
         auto map_uint = map_.find(id);
         if (map_uint != map_.end()) return (map_uint->second);
         return nullptr;
     }
+
+    size_t getSize() override { return map_.size(); }
 
    private:
     getMapReturn_t vecmap_;
@@ -76,7 +93,7 @@ class ParameterFieldTreeMap : public ParameterFieldTree_ifs {
 
 class ParameterFieldTreeValue : public ParameterFieldTree_ifs {
    public:
-    ParameterFieldTreeValue(DataSchema_ifs *data_schema) {
+    explicit ParameterFieldTreeValue(const DataSchema_ifs *data_schema) {
         type_ = createDataType(data_schema->getType());
         // value_ = data_schema->default_value_;
         if (!value_) {
@@ -91,14 +108,14 @@ class ParameterFieldTreeValue : public ParameterFieldTree_ifs {
 
     [[nodiscard]] Value getValue() const override { return value_; }
 
-    [[maybe_unused]] virtual bool setValue(const Value &data) override {
+    [[maybe_unused]] bool setValue(const Value &data) override {
         auto v = Value(data, type_);
         auto status = bool(v);
         if (status) value_ = v;
         return status;
     }
 
-    [[maybe_unused]] virtual bool setValue(const std::string &data) override {
+    [[maybe_unused]] bool setValue(const std::string &data) override {
         auto v = Value(data, type_);
         auto status = bool(v);
         if (status) value_ = v;
@@ -109,91 +126,6 @@ class ParameterFieldTreeValue : public ParameterFieldTree_ifs {
     DataType type_ = DataType::none_v;
     Value value_ = Value();
 };
-
-ParameterFieldTree_ifs *newParameterFieldTree(DataSchema_ifs *data_schema, size_t dim) {
-    if (data_schema == nullptr) return nullptr;
-    if (data_schema->isArray()) return new ParameterFieldTreeArray(data_schema, dim);
-    if (data_schema->isMap()) return new ParameterFieldTreeMap(data_schema);
-    return new ParameterFieldTreeValue(data_schema);
-}
-
-/*
- *
- *
- */
-
-ParameterFieldTree::ParameterFieldTree(DataSchema_ifs *data_schema, size_t dim)
-    : struct_type_(getStructType(data_schema)) {
-    switch (struct_type_) {
-    case array: {
-        auto len = data_schema->getDims()[dim];
-        vector_.reserve(len);
-        for (size_t i = 0; i < len; i++) vector_.push_back(ParameterFieldTree(data_schema, dim + 1));
-        break;
-    }
-    case map: {
-        auto map_list = data_schema->getMapList();
-        vecmap_.reserve(map_list.size());
-        for (auto i : map_list) vecmap_.push_back({i->name_, ParameterFieldTree(i)});
-
-        for (auto &i : vecmap_) map_[i.first] = &i.second;
-
-        break;
-    }
-    case value: {
-        type_ = createDataType(data_schema->getType());
-        value_ = data_schema->default_value_;
-        break;
-    }
-    }
-}
-
-ParameterFieldTree::~ParameterFieldTree() {}
-
-std::vector<HierarchicalData_ifs *> ParameterFieldTree::getArray() const {
-    std::vector<HierarchicalData_ifs *> ret;
-
-    ret.reserve(vector_.size());
-    for (auto &i : vector_) {
-        ret.push_back((ParameterFieldTree *)&i);
-    }
-    return ret;
-}
-
-ParameterFieldTree::getMapReturn_t ParameterFieldTree::getMap() const {
-    /*
-    std::map<std::string, HierarchicalData_ifs *> ret;
-    for (auto &i : vecmap_) {
-        ret[i.first] = (HierarchicalData_ifs *)&i.second;
-    }
-    return ret;
-    */
-    getMapReturn_t ret;
-    ret.reserve(ret.size());
-    for (auto &i : vecmap_) {
-        ret.push_back({i.first, (HierarchicalData_ifs *)&i.second});
-    }
-    return ret;
-}
-
-HierarchicalData_ifs *ParameterFieldTree::getArrayUnit(size_t id) const {
-    if (id >= vector_.size()) return nullptr;
-    return (ParameterFieldTree *)&(vector_[id]);
-}
-
-HierarchicalData_ifs *ParameterFieldTree::getMapUnit(std::string id) const {
-    auto map_uint = map_.find(id);
-    if (map_uint != map_.end()) return (ParameterFieldTree *)&(map_uint->second);
-    return nullptr;
-}
-
-bool ParameterFieldTree::setArrayUnit(size_t index, HierarchicalData_ifs *data) { return false; }
-
-// bool ParameterFieldTree::setMapUnit(size_t field_name, HierarchicalData_ifs *data) { return false; }
-
-bool ParameterFieldTree::setValue(Value data) { return false; }
-
-bool ParameterFieldTree::setValue(std::string data) { return false; }
 
 bool ParameterFieldTree_ifs::setValue(const std::string &prop_path, const Value &value, std::string &error_message) {
     auto ptr = (ParameterFieldTree_ifs *)getBranch(this, prop_path);
@@ -207,4 +139,64 @@ bool ParameterFieldTree_ifs::setValue(const std::string &prop_path, const Value 
         return false;
     }
     return true;
+}
+
+bool ParameterFieldTree_ifs::removeUnit(const std::string &prop_path, std::string &error_message) {
+    auto c_str = prop_path.c_str();
+    auto end_point = c_str + prop_path.size();
+    while ((c_str < end_point) && (*end_point != '/')) end_point--;
+    auto size = end_point - c_str;
+
+    std::string begin_path(c_str, size);
+    std::string end_path(end_point + 1);
+
+    auto ptr = (ParameterFieldTree_ifs *)getBranch(this, begin_path);
+    if (!isNumber(end_path) || !ptr->isArray()) return false;
+
+    return ptr->removeArrayUnit(size_t(std::stoi(end_path.c_str())));
+}
+
+bool ParameterFieldTree_ifs::setValue(const std::string &prop_path, const HierarchicalData_ifs *hierarchical_data,
+                                      std::string &error_message) {
+    auto c_str = prop_path.c_str();
+    auto end_point = c_str + prop_path.size();
+    while ((c_str < end_point) && (*end_point != '/')) end_point--;
+    auto size = end_point - c_str;
+
+    std::string begin_path(c_str, size);
+    std::string end_path(end_point + 1);
+
+    auto ptr = (ParameterFieldTree_ifs *)getBranch(this, begin_path);
+    if (!isNumber(end_path) || !ptr->isArray()) return false;
+
+    auto pos = size_t(std::stoi(end_path));
+
+    if ((pos != 0) && (ptr->getArrayUnit(pos - 1) == nullptr)) return false;
+
+    if (ptr->getArrayUnit(pos) == nullptr) return ptr->addArrayUnit();
+
+    return false;
+}
+
+bool ParameterFieldTree_ifs::setValueAsTxt(const std::string &prop_path, const std::string &value,
+                                           std::string &error_message) {
+    auto ptr = (ParameterFieldTree_ifs *)getBranch(this, prop_path);
+    if (ptr == nullptr || !ptr->isValue()) {
+        error_message = "non-existent path";
+        return false;
+    }
+
+    if (!ptr->setValue(value)) {
+        error_message = "incompatible types";
+        return false;
+    }
+    return true;
+}
+
+ParameterFieldTree_ifs *newParameterFieldTree(const DataSchema_ifs *data_schema, size_t dim) {
+    if (data_schema == nullptr) return nullptr;
+    if (data_schema->isArray() && (dim < data_schema->getDims().size()))
+        return new ParameterFieldTreeArray(data_schema, dim);
+    if (data_schema->isMap()) return new ParameterFieldTreeMap(data_schema);
+    return new ParameterFieldTreeValue(data_schema);
 }

@@ -119,3 +119,33 @@ ext_set:
       - name: "conversion_factor"
         type: "f64"
         description: "коэф. преобразования V~a"
+        help: "м/c^2/в"
+
+  - name: "velocity"
+    type:
+      - name: "common"
+        include: "common"
+
+      - name: "conversion_factor"
+        type: "f64"
+        description: "коэф. преобразования V~a"
+        help: "м/c^2/в"
+
+      - name: "length"
+        type: "f64"
+        description: "период интегрирования, с"
+
+  - name: "displacement"
+    type:
+      - name: "common"
+        include: "common"
+
+      - name: "conversion_factor"
+        type: "f64"
+        description: "коэф. преобразования V~a, м/c^2/в"
+        help: "м/c^2/в"
+
+      - name: "length"
+        type: "f64"
+        description: "период интегрирования, c"
+        help: "c"

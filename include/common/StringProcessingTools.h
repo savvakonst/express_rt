@@ -8,6 +8,15 @@
 
 #include "common/Port.h"
 
+inline bool isNumber(const char *val) {
+    auto it = val;
+    if (*it == 0) return false;
+    while ((*it != 0) && std::isdigit(*it)) it++;
+    return *it == 0;
+}
+
+inline bool isNumber(const std::string &val) { return isNumber(val.c_str()); }
+
 inline std::vector<std::string> splitPath(const std::string &path) {
     static const std::regex separator("[^/]+");
     std::vector<std::string> ret;

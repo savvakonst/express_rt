@@ -46,7 +46,7 @@ class TaskMapper : public HierarchicalData_ifs {
 
     [[nodiscard]] HierarchicalData_ifs *getArrayUnit(size_t id) const override;
 
-    [[nodiscard]] HierarchicalData_ifs *getMapUnit(std::string id) const override;
+    [[nodiscard]] HierarchicalData_ifs *getMapUnit(const std::string &id) const override;
 
     [[maybe_unused]] bool setValue(const Value &data);
 
@@ -114,15 +114,15 @@ class KSDModule : public Module_ifs {
         parent_module_ = parent_module;
         return true;
     }
- 
+
     [[nodiscard]] std::list<Module_ifs *> getSubModulesFromPath(const std::string &prop_path) const override {
         return {};
     }
 
     std::map<std::string, PrmBuffer_ifs *> getPrmBufferMap() override { return {}; }
 
-    const DataSchema_ifs *getPropertySchema() override {
-        error_message_ = "The getPropertySchema function is not realised yet";
+    [[nodiscard]] const DataSchema_ifs *getPropertySchema() const override {
+        // error_message_ = "The getPropertySchema function is not realised yet";
         return nullptr;
     }
 
@@ -139,6 +139,8 @@ class KSDModule : public Module_ifs {
     }
 
     bool setPropertyAsTxt(const std::string &prop_path, const std::string &value) override;
+
+    bool removeProperty(const std::string &prop_path) override { return false; }
 
     [[nodiscard]] std::vector<std::pair<std::string, Module_ifs *>> getSubModules() const override { return {}; }
 

@@ -6,7 +6,7 @@
 #include "common/StringProcessingTools.h"
 #include "convtemplate/StandardParameter_ifs.h"
 
-const DataSchema_ifs* StandardParameter_ifs::getPropertySchema() { return data_schema_; }
+const DataSchema_ifs* StandardParameter_ifs::getPropertySchema() const { return data_schema_; }
 
 const HierarchicalData_ifs* StandardParameter_ifs::getProperty(const std::string& prop_path) const {
     return getBranch(parameter_field_tree_, prop_path);
@@ -19,33 +19,17 @@ std::string StandardParameter_ifs::getPropertyAsTxt(const std::string& prop_path
 }
 
 bool StandardParameter_ifs::setProperty(const std::string& prop_path, const Value& value) {
-    auto ptr = (ParameterFieldTree_ifs*)getBranch(parameter_field_tree_, prop_path);
-    if (ptr == nullptr || !ptr->isValue()) {
-        error_message_ = "non-existent path";
-        return false;
-    }
-
-    if (!ptr->setValue(value)) {
-        error_message_ = "incompatible types";
-        return false;
-    }
-    return true;
+    return parameter_field_tree_->setValue(prop_path, value, error_message_);
 }
 
 bool StandardParameter_ifs::setProperty(const std::string& prop_path, const HierarchicalData_ifs* hierarchical_data) {
-    return false;
+    return parameter_field_tree_->setValue(prop_path, hierarchical_data, error_message_);
 }
 
 bool StandardParameter_ifs::setPropertyAsTxt(const std::string& prop_path, const std::string& value) {
-    auto ptr = (ParameterFieldTree_ifs*)getBranch(parameter_field_tree_, prop_path);
-    if (ptr == nullptr || !ptr->isValue()) {
-        error_message_ = "non-existent path";
-        return false;
-    }
+    return parameter_field_tree_->setValueAsTxt(prop_path, value, error_message_);
+}
 
-    if (!ptr->setValue(value)) {
-        error_message_ = "incompatible types";
-        return false;
-    }
-    return true;
+bool StandardParameter_ifs::removeProperty(const std::string& prop_path) {
+    return parameter_field_tree_->removeUnit(prop_path, error_message_);
 }

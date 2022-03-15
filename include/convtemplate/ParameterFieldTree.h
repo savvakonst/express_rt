@@ -13,83 +13,34 @@ class ParameterFieldTree_ifs : public HierarchicalData_ifs {
 
     [[nodiscard]] bool isValue() const override { return false; }
 
-    [[nodiscard]] Value getValue() const override { return Value(); }
+    [[nodiscard]] Value getValue() const override { return {}; }
 
-    [[nodiscard]] std::vector<HierarchicalData_ifs *> getArray() const override {
-        return std::vector<HierarchicalData_ifs *>();
-    }
+    [[nodiscard]] std::vector<HierarchicalData_ifs *> getArray() const override { return {}; }
 
-    [[nodiscard]] std::vector<std::pair<std::string, HierarchicalData_ifs *>> getMap() const override {
-        return getMapReturn_t();
-    }
+    [[nodiscard]] std::vector<std::pair<std::string, HierarchicalData_ifs *>> getMap() const override { return {}; }
 
     [[nodiscard]] HierarchicalData_ifs *getArrayUnit(size_t id) const override { return nullptr; }
 
-    [[nodiscard]] HierarchicalData_ifs *getMapUnit(std::string id) const override { return nullptr; }
+    [[nodiscard]] HierarchicalData_ifs *getMapUnit(const std::string &id) const override { return nullptr; }
 
-    [[nodiscard]] virtual bool addArrayUnit(DataSchema_ifs *data_schema, size_t dim = 0) { return false; }
+    [[nodiscard]] virtual bool addArrayUnit() { return false; }
 
     [[nodiscard]] virtual bool removeArrayUnit(size_t index) { return false; }
+
+    [[nodiscard]] virtual size_t getSize() { return 0; }
 
     [[maybe_unused]] virtual bool setValue(const Value &data) { return false; }
 
     [[maybe_unused]] virtual bool setValue(const std::string &data) { return false; }
 
+    bool removeUnit(const std::string &prop_path, std::string &error_message);
+
     [[maybe_unused]] bool setValue(const std::string &prop_path, const Value &value, std::string &error_message);
+    [[maybe_unused]] bool setValue(const std::string &prop_path, const HierarchicalData_ifs *hierarchical_data,
+                                   std::string &error_message);
+    [[maybe_unused]] bool setValueAsTxt(const std::string &prop_path, const std::string &, std::string &error_message);
 };
 
-COMMON_API_ ParameterFieldTree_ifs *newParameterFieldTree(DataSchema_ifs *data_schema, size_t dim = 0);
-
-class COMMON_API_ ParameterFieldTree : public HierarchicalData_ifs {
-   public:
-    enum StructType
-    {
-        value,
-        array,
-        map,
-    };
-
-    const StructType struct_type_;
-
-    typedef std::pair<std::string, ParameterFieldTree> tuple_t;
-
-    explicit ParameterFieldTree(DataSchema_ifs *data_schema, size_t dim = 0);
-
-    ~ParameterFieldTree() override;
-
-    [[nodiscard]] bool isArray() const override { return struct_type_ == StructType::array; };
-
-    [[nodiscard]] bool isMap() const override { return struct_type_ == StructType::map; };
-
-    [[nodiscard]] bool isValue() const override { return struct_type_ == StructType::value; };
-
-    [[nodiscard]] Value getValue() const override {  // necessarry to add guard
-        return value_;
-    };
-
-    [[nodiscard]] std::vector<HierarchicalData_ifs *> getArray() const override;
-
-    [[nodiscard]] std::vector<std::pair<std::string, HierarchicalData_ifs *>> getMap() const override;
-
-    [[nodiscard]] HierarchicalData_ifs *getArrayUnit(size_t id) const override;
-
-    [[nodiscard]] HierarchicalData_ifs *getMapUnit(std::string id) const override;
-
-    [[nodiscard]] bool setArrayUnit(size_t index, HierarchicalData_ifs *data);
-
-    //[[nodiscard]] bool setMapUnit(size_t field_name, HierarchicalData_ifs *data);
-
-    [[maybe_unused]] bool setValue(Value data);
-
-    [[maybe_unused]] bool setValue(std::string data);
-
-   private:
-    size_t size_ = 0;
-    DataType type_ = DataType::none_v;
-    Value value_ = Value();
-    std::vector<ParameterFieldTree> vector_;
-    std::vector<tuple_t> vecmap_;
-    std::map<std::string, HierarchicalData_ifs *> map_;
-};
+COMMON_API_ ParameterFieldTree_ifs *newParameterFieldTree(const DataSchema_ifs *data_schema, size_t dim = 0);
 
 #endif  // EXRT_PARAMETERFIELDTREE_H

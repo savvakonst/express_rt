@@ -25,7 +25,7 @@ Module_C04_::Module_C04_(const void* ptr, size_t size, ExtensionManager* manager
 
 Module_C04_::~Module_C04_() {}
 
-const DataSchema_ifs* Module_C04_::getPropertySchema() { return nullptr; }
+const DataSchema_ifs* Module_C04_::getPropertySchema() const { return nullptr; }
 
 const HierarchicalData_ifs* Module_C04_::getProperty(const std::string& prop_path) const {
     return KSDModule::getProperty(prop_path);

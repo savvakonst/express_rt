@@ -364,7 +364,9 @@ class COMMON_API_ HierarchicalData_ifs {
 
     /*  need provide access not only to map entries(units) also to array entries(units);
      *  getMapUnit("10") is expected to behave like getArrayUnit(10). */
-    [[nodiscard]] virtual HierarchicalData_ifs *getMapUnit(std::string field_name) const = 0;
+    [[nodiscard]] virtual HierarchicalData_ifs *getMapUnit(const std::string &field_name) const = 0;
+
+    // getSize
 };
 
 COMMON_API_ const HierarchicalData_ifs *getBranch(const HierarchicalData_ifs *h_data, const std::string &path);

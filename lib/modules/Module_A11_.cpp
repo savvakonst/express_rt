@@ -25,7 +25,7 @@ Module_A11_::Module_A11_(const void* ptr, size_t size, ExtensionManager* manager
 
 Module_A11_::~Module_A11_() {}
 
-const DataSchema_ifs* Module_A11_::getPropertySchema() { return nullptr; }
+const DataSchema_ifs* Module_A11_::getPropertySchema() const { return nullptr; }
 
 const HierarchicalData_ifs* Module_A11_::getProperty(const std::string& prop_path) const {
     return KSDModule::getProperty(prop_path);

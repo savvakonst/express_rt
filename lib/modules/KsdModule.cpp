@@ -34,7 +34,6 @@ TaskMapper::TaskMapper(size_t len, const TaskMapper& value) : struct_type_(Struc
 
 TaskMapper::TaskMapper(std::vector<tuple_t> vecmap) : vecmap_(std::move(vecmap)), struct_type_(StructType::map) {
     size_ = 0;
-
     for (auto& i : vecmap_) {
         size_ += i.second.size_;
         map_[i.first] = &(i.second);
@@ -70,7 +69,7 @@ HierarchicalData_ifs* TaskMapper::getArrayUnit(size_t id) const {
     return (TaskMapper*)&(vector_[id]);
 }
 
-HierarchicalData_ifs* TaskMapper::getMapUnit(std::string id) const {
+HierarchicalData_ifs* TaskMapper::getMapUnit(const std::string& id) const {
     auto map_uint = map_.find(id);
     if (map_uint != map_.end()) return map_uint->second;
     return nullptr;

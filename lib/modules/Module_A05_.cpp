@@ -22,9 +22,9 @@ Module_A05_::Module_A05_(const void* ptr, size_t size, ExtensionManager* context
     task_ = *((Task*)ptr);
 }
 
-Module_A05_::~Module_A05_() {}
+Module_A05_::~Module_A05_() = default;
 
-const DataSchema_ifs* Module_A05_::getPropertySchema() { return nullptr; }
+const DataSchema_ifs* Module_A05_::getPropertySchema() const { return nullptr; }
 
 const HierarchicalData_ifs* Module_A05_::getProperty(const std::string& prop_path) const {
     return KSDModule::getProperty(prop_path);
@@ -45,4 +45,4 @@ ModuleStream_ifs* Module_A05_::createModuleStream() {
     return nullptr;
 };
 
-const ErrorInfo_ifs* Module_A05_::getErrorInfo(void) const { return nullptr; }
+const ErrorInfo_ifs* Module_A05_::getErrorInfo() const { return nullptr; }
