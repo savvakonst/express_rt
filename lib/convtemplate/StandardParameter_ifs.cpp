@@ -33,3 +33,13 @@ bool StandardParameter_ifs::setPropertyAsTxt(const std::string& prop_path, const
 bool StandardParameter_ifs::removeProperty(const std::string& prop_path) {
     return parameter_field_tree_->removeUnit(prop_path, error_message_);
 }
+void StandardParameter_ifs::init(ExtensionManager* manager) {
+    auto unit = manager->getLastVersionExtensionUnit("data_schema", getType());
+
+    if (unit && unit->ptr) {
+        data_schema_ = (DataSchema_ifs*)unit->ptr;
+        data_schema_->init(manager);
+    }
+
+    parameter_field_tree_ = newParameterFieldTree(data_schema_);
+}

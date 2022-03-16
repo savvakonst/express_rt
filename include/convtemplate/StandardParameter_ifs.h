@@ -10,9 +10,7 @@
 
 class COMMON_API_ StandardParameter_ifs : public Parameter_ifs {
    public:
-    ~StandardParameter_ifs() override {
-        delete parameter_field_tree_;
-    };
+    ~StandardParameter_ifs() override { delete parameter_field_tree_; };
 
     [[nodiscard]] const DataSchema_ifs* getPropertySchema() const override;
 
@@ -26,9 +24,11 @@ class COMMON_API_ StandardParameter_ifs : public Parameter_ifs {
 
     bool setPropertyAsTxt(const std::string& prop_path, const std::string& value) override;
 
-    bool removeProperty(const std::string &prop_path) override;
+    bool removeProperty(const std::string& prop_path) override;
 
    protected:
+    void init(ExtensionManager* manager);
+
     ParameterFieldTree_ifs* parameter_field_tree_ = nullptr;
     DataSchema_ifs* data_schema_ = nullptr;
 };

@@ -33,9 +33,8 @@ add_dependencies(ExampleDockWindows Actions)
 add_dependencies(ExampleDockWindows Modules)
 add_dependencies(ExampleDockWindows PyEmbedder)
 add_dependencies(ExampleDockWindows CommonIO)
-add_dependencies(ExampleDockWindows CommonViews)
 add_dependencies(ExampleDockWindows TreeEditor)
-
+add_dependencies(ExampleDockWindows CommonViews)
 
 #add_custom_command(
 #        TARGET ExampleDockWindows POST_BUILD

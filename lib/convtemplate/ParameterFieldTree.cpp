@@ -22,7 +22,7 @@ class ParameterFieldTreeArray : public ParameterFieldTree_ifs {
     [[nodiscard]] std::vector<HierarchicalData_ifs *> getArray() const override {
         auto s = vector_.size();
         std::vector<HierarchicalData_ifs *> ret(s);
-        std::memcpy(ret.data(), vector_.data(), s);
+        std::memcpy(ret.data(), vector_.data(), s * sizeof(HierarchicalData_ifs *));
         return ret;
     }
 
@@ -43,6 +43,7 @@ class ParameterFieldTreeArray : public ParameterFieldTree_ifs {
     [[nodiscard]] bool removeArrayUnit(size_t index) override {
         auto len = data_schema_->getDims()[dim_];
         if ((len != 0) || (index >= vector_.size())) return false;
+        delete vector_[index];
         vector_.erase(vector_.begin() + ptrdiff_t(index));
         return false;
     }

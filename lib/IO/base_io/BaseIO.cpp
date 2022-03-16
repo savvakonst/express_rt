@@ -171,10 +171,30 @@ ConversionTemplate *BaseIO::readOrParseDocument(ExtensionManager *manager, bool 
 
         std::string device_id = getStrID("Device.ID", doc);
 
-        conv_template->setProperty("changes/0", nullptr);
+        /*
+         *
+         *
+         */
+        size_t counter = 0;
+        auto setAlteration = [&](const auto &path, const std::string &time, const std::string &edited_by) {
+            conv_template->setProperty(path, nullptr);
+            conv_template->setProperty(path + "/time", Value(time));
+            conv_template->setProperty(path + "/by", Value(edited_by));
+        };
 
+        auto edited_by = getVal<std::string>("Base.CreatedBy", doc, "");
+        auto time = getVal<std::string>("Base.Date", doc, "") + " " + getVal<std::string>("Base.Time", doc, "");
+        auto path = "changes/" + std::to_string(counter);
+
+        setAlteration(path, time, edited_by);
+        
         for (const auto &i : get("Base.Alteration.List", doc)) {
+            counter++;
+            edited_by = getVal<std::string>("EditedBy", i, "");
+            time = getVal<std::string>("Date", i, "") + " " + getVal<std::string>("Time", i, "");
+            path = "changes/" + std::to_string(counter);
 
+            setAlteration(path, time, edited_by);
         }
 
         for (const auto &i : get("Device.Modules.List", doc)) {
@@ -189,7 +209,7 @@ ConversionTemplate *BaseIO::readOrParseDocument(ExtensionManager *manager, bool 
                     conv_template->clearErrorMessage();
                 }
         }
-        std::cout << "---------------------------------\n";
+        // std::cout << "---------------------------------\n";
 
         for (const auto &header : get("Parameters.List", doc)) {
             auto parameter_type = get("Type", header).as<uint32_t>();

@@ -106,10 +106,12 @@ ext_set:
         type: "i32"
         description: "коэф. смещения (a2)"
 
+
   - name: "analog"
     type:
       - name: "common"
         include: "common"
+
 
   - name: "acceleration"
     type:
@@ -120,6 +122,7 @@ ext_set:
         type: "f64"
         description: "коэф. преобразования V~a"
         help: "м/c^2/в"
+
 
   - name: "velocity"
     type:
@@ -135,6 +138,7 @@ ext_set:
         type: "f64"
         description: "период интегрирования, с"
 
+
   - name: "displacement"
     type:
       - name: "common"
@@ -149,3 +153,45 @@ ext_set:
         type: "f64"
         description: "период интегрирования, c"
         help: "c"
+
+
+  - name: "thermocouple_emf"  # type 3 ЭДС
+    type:
+      - name: "common"
+        include: "common"
+
+  - name: "thermocouple_temperature"  # type 3
+    type:
+      - name: "common"
+        include: "common"
+
+      - name: "thermocouple_type"
+        type: "string"
+        enum: { "R (ТПП)": "TP_R_TtoE", "S (ТПП)": "TP_S_TtoE", "B (ТПР)": "TP_B_TtoE", "J (ТЖК)": "TP_J_TtoE",
+                "T (ТМК)": "TP_T_TtoE" , "E (ТХКн)": "TP_E_TtoE", "K (ТХА)": "TP_K_TtoE_A", "N (ТНН)": "TP_N_TtoE",
+                "A-1 (ТВР)": "TP_A1_TtoE", "A-2 (ТВР)": "TP_A2_TtoE", "A-3 (ТВР)": "TP_A3_TtoE",
+                "L (ТХК)": "TP_L_TtoE", "M (ТМК)": "TP_M_TtoE" }
+        description: "тип термопары"
+
+
+  - name: "thermistor_resistance"  # type 4
+    type:
+      - name: "common"
+        include: "common"
+
+  - name: "thermistor_temperature"  # type 4
+    type:
+      - name: "common"
+        include: "common"
+
+      - name: "thermistor_type"
+        type: "string"
+        enum: [ "Pt, 0.00385",  "П, 0.00391",  "М, 0.00428",  "Н, 0.00617" ]
+        description: "тип термопары"
+
+      - name: "resistor_value"
+        type: "f64"
+        description: "R0, Ом"
+        help: ""
+
+

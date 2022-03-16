@@ -43,7 +43,7 @@
 
 Parameter_ifs* AnalogParserBuilder::parse(ExtensionManager* manager, HierarchicalData_ifs* other,
                                           HierarchicalData_ifs* header, const std::string& path_to_module) const {
-    PRINT_DEBUG_INFO("Parameters.List.Analog\n");
+    PRINT_DEBUG_INFO(getTypeIdentifier() << "\n");
 
     auto path = path_to_module + "/" + getValue(other, "Line").asString();
 
@@ -56,7 +56,7 @@ Parameter_ifs* AnalogParserBuilder::parse(ExtensionManager* manager, Hierarchica
 
 Parameter_ifs* AnalogVibroParserBuilder::parse(ExtensionManager* manager, HierarchicalData_ifs* other,
                                                HierarchicalData_ifs* header, const std::string& path_to_module) const {
-    PRINT_DEBUG_INFO("Parameters.List.Analog.Vibro\n");
+    PRINT_DEBUG_INFO(getTypeIdentifier() << "\n");
     auto u = other->getMapUnit("Type");
 
     i64_t vibro_type = -1;
@@ -101,14 +101,63 @@ Parameter_ifs* AnalogVibroParserBuilder::parse(ExtensionManager* manager, Hierar
         builder.setData("length", getValue(other, "Vibro.Length"));
         break;
     }
+    default:
+        break;
     }
 
     return item;
 }
 
+Parameter_ifs* ThermocoupleParserBuilder::parse(ExtensionManager* manager, HierarchicalData_ifs* other,
+                                                HierarchicalData_ifs* header, const std::string& path_to_module) const {
+    PRINT_DEBUG_INFO(getTypeIdentifier() << "\n");
+
+    return nullptr;
+}
+
+Parameter_ifs* ThermoResistanceParserBuilder::parse(ExtensionManager* manager, HierarchicalData_ifs* other,
+                                                    HierarchicalData_ifs* header,
+                                                    const std::string& path_to_module) const {
+    PRINT_DEBUG_INFO(getTypeIdentifier() << "\n");
+
+    auto u = other->getMapUnit("Type");
+
+    i64_t type = -1;
+    if (u) {
+        type = u->getValue().value_.i64;
+    } else {
+        std::cout << "cant find field type in Base\n";
+        return nullptr;
+    }
+
+    Parameter_ifs* item = nullptr;
+
+    auto path = path_to_module + "/" + getValue(other, "Line").asString();
+
+    switch (type) {
+    case 0: {
+        item = new ThermistorResistanceParameter(manager);
+        PropBuilder builder = {item, header};
+        builder.setData("common/path", Value(path));
+        break;
+    }
+    case 1: {
+        item = new ThermistorTemperatureParameter(manager);
+        PropBuilder builder = {item, header};
+        builder.setData("common/path", Value(path));
+        builder.setData("thermistor_type", getValue(other, "Vibro.Ration"));
+        break;
+    }
+    default:
+        break;
+    }
+
+    return nullptr;
+}
+
 Parameter_ifs* AnalogVoltageParserBuilder::parse(ExtensionManager* manager, HierarchicalData_ifs* other,
                                                  HierarchicalData_ifs* header,
                                                  const std::string& path_to_module) const {
-    PRINT_DEBUG_INFO("Parameters.List.Analog.Voltage\n");
+    PRINT_DEBUG_INFO(getTypeIdentifier() << "\n");
     return nullptr;
 }
