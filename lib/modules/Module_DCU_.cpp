@@ -131,6 +131,13 @@ std::vector<std::pair<std::string, Module_ifs *>> Module_DCU_::getSubModules() c
 
 const ErrorInfo_ifs *Module_DCU_::getErrorInfo() const { return nullptr; }
 
+bool Module_DCU_::isChannelAvailable(const std::string &prop_path) {
+    auto path = lastCharPos(prop_path, '/');
+    auto modules = getSubModulesFromPath(path.first);  //::getSubmodules(this, path.first);
+    if (modules.size() == 1) return modules.front()->isChannelAvailable(path.second);
+    return false;
+}
+
 /*
  *
  *

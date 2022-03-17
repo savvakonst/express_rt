@@ -67,7 +67,7 @@ class Module_DCU_ : public KSDModule {
         std::map<std::string, PrmBuffer_ifs *> ret_map;
         for (auto i : modules_) {
             auto temp = i->getPrmBufferMap();
-            for (auto i : temp) {
+            for (const auto &i : temp) {
                 ret_map[i.first] = i.second;
             }
         }
@@ -83,7 +83,7 @@ class Module_DCU_ : public KSDModule {
 
     [[nodiscard]] std::list<Module_ifs *> getSubModulesFromPath(const std::string &prop_path) const override;
 
-    const DataSchema_ifs *getPropertySchema() const override;
+    [[nodiscard]] const DataSchema_ifs *getPropertySchema() const override;
 
     [[nodiscard]] const HierarchicalData_ifs *getProperty(const std::string &prop_path) const override;
 
@@ -97,6 +97,8 @@ class Module_DCU_ : public KSDModule {
         // TODO: implement this method
         return false;
     }
+
+    bool isChannelAvailable(const std::string &prop_path) override ;
 
     [[nodiscard]] size_t getTaskSize() const override;
 

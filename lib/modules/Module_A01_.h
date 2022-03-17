@@ -68,7 +68,7 @@ class Module_A01_ : public KSDModule {
 
 #pragma pack()
 
-    Task task_;
+    Task task_{};
     EthernetA01_Stream* ethernet_stream_ = nullptr;
 
    public:
@@ -93,6 +93,8 @@ class Module_A01_ : public KSDModule {
 
     bool setProperty(const std::string& prop_path, const Value& value) override;
     bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override;
+
+    bool isChannelAvailable(const std::string& prop_path) override { return true; }
 
     bool storeTaskToBuffer(void* pointer) const override {
         memcpy(pointer, (void*)&task_, sizeof(Task));

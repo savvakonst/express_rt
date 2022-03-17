@@ -145,14 +145,16 @@ Parameter_ifs* ThermoResistanceParserBuilder::parse(ExtensionManager* manager, H
         item = new ThermistorTemperatureParameter(manager);
         PropBuilder builder = {item, header};
         builder.setData("common/path", Value(path));
-        builder.setData("thermistor_type", getValue(other, "Vibro.Ration"));
+        // auto data_schema = getSubSchema(item->getPropertySchema(), "thermistor_type");
+        builder.setData("thermistor_type", getValue(other, "Resistor.Type"));
+        builder.setData("resistor_value", getValue(other, "Resistor.Value"));
         break;
     }
     default:
         break;
     }
 
-    return nullptr;
+    return item;
 }
 
 Parameter_ifs* AnalogVoltageParserBuilder::parse(ExtensionManager* manager, HierarchicalData_ifs* other,

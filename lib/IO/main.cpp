@@ -31,11 +31,14 @@ static ExtensionUnit g_default_parameters_units[] = {
      0x00},
     {"AnalogVibro", "prm_parser_builder", "module for parsing and building parameter",
      (void *)(new AnalogVibroParserBuilder), 0x00},
+    {"ThermoResistance", "prm_parser_builder", "module for parsing and building parameter",
+     (void *)(new ThermoResistanceParserBuilder), 0x00},
     {"AnalogVoltage", "prm_parser_builder", "module for parsing and building parameter",
      (void *)(new AnalogVoltageParserBuilder), 0x00},
     {"DefaultBaseIO", "init",
      "unit with type \"init\" are functions which are running after all modules initialization",
      (void *)initDefaultBaseIO, 0x00},
+
     {nullptr, nullptr, nullptr, nullptr, 0}};
 
 static ExtensionInfo g_default_parameters_info = {"default io interfaces", 0x01, g_default_parameters_units};
@@ -51,7 +54,7 @@ static int initDefaultBaseIO(ExtensionManager *manager) {
         return 1;
     }
 
-    BaseIO *base_io = (BaseIO *)e_unit->ptr;
+    auto *base_io = (BaseIO *)e_unit->ptr;
     auto set = manager->getLastVersionExtensionUnitsByType("prm_parser_builder");
     for (auto &i : set) base_io->addPpbm((PDefaultBaseIO_ifs *)i->ptr);
 

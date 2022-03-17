@@ -185,8 +185,8 @@ ext_set:
         include: "common"
 
       - name: "thermistor_type"
-        type: "string"
-        enum: [ "Pt, 0.00385",  "П, 0.00391",  "М, 0.00428",  "Н, 0.00617" ]
+        type: "u64"
+        enum: { "Pt, 0.00385": 0,  "П, 0.00391": 1,  "М, 0.00428": 2,  "Н, 0.00617": 3 }
         description: "тип термопары"
 
       - name: "resistor_value"

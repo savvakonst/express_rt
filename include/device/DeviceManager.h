@@ -8,6 +8,7 @@
 #include "common/BaseClass_ifs.h"
 #include "common/CustomTypes.h"
 #include "common/DataSchema_ifs.h"
+#include "common/StringProcessingTools.h"
 
 class DeviceManager : public BaseClass_ifs {
    public:
@@ -56,5 +57,14 @@ class DeviceManager : public BaseClass_ifs {
    private:
     std::vector<Device*> vector_;
 };
+
+bool Device::isChannelAvailable(const std::string& prop_path) {
+    auto path = lastCharPos(prop_path, '/');
+    auto modules = getSubModulesFromPath(path.first);  //::getSubmodules(this, path.first);
+
+    if (modules.size() == 1) return modules.front()->isChannelAvailable(path.second);
+
+    return false;
+}
 
 #endif

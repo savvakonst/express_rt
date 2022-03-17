@@ -8,6 +8,31 @@
 
 #include "common/Port.h"
 
+
+inline std::pair<std::string, std::string> firstCharPos(const std::string &text, char character) {
+    auto c_str = text.c_str();
+    auto first_point = c_str;
+    while ((*first_point!=0) && (*first_point != character)) first_point++;
+    auto size = first_point - c_str;
+
+    std::string begin_path(c_str, size);
+    std::string end_path(first_point + 1);
+
+    return {begin_path, end_path};
+}
+
+inline std::pair<std::string, std::string> lastCharPos(const std::string &text, char character) {
+    auto c_str = text.c_str();
+    auto end_point = c_str + text.size();
+    while ((c_str < end_point) && (*end_point != character)) end_point--;
+    auto size = end_point - c_str;
+
+    std::string begin_path(c_str, size);
+    std::string end_path(end_point + 1);
+
+    return {begin_path, end_path};
+}
+
 inline bool isNumber(const char *val) {
     auto it = val;
     if (*it == 0) return false;

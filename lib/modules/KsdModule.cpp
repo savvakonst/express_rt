@@ -176,6 +176,8 @@ bool KSDModule::setPropertyAsTxt(const std::string& prop_path, const std::string
     return tree->setValue(value);
 }
 
+bool KSDModule::isChannelAvailable(const std::string& prop_path) { return false; }
+
 const TaskMapper KSDModule::header_map_ =  //
     TaskMapper({{"size", u32},
                 {"id", u32},

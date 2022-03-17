@@ -8,6 +8,7 @@
 #include <QAbstractTableModel>
 #include <QTreeView>
 
+#include "GUI/WidgetWrappers.h"
 #include "common/BaseClass_ifs.h"
 
 class Parameter_ifs;
@@ -52,6 +53,7 @@ class ParameterTableModel : public QAbstractTableModel {
     std::vector<DataSchema_ifs *> list_of_entries_;
     QAbstractItemView *parent_view_ = nullptr;
     ConversionTemplateManager *cnv_manager_ = nullptr;
+    DeviceViewWrapper_ifs *device_view_wrapper_ = nullptr;
 
     TreeEditor *child_view_ = nullptr;
 };

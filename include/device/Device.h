@@ -89,6 +89,8 @@ class COMMON_API_ Device : public Module_ifs {
 
     bool removeProperty(const std::string &prop_path) override {return false;};
 
+    bool isChannelAvailable(const std::string &prop_path) override ;
+
     /* not yet implemented inherited members  end*/
 
     [[nodiscard]] bool storeTaskToBuffer(void *pointer) const override { return false; }

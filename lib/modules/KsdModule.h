@@ -142,6 +142,8 @@ class KSDModule : public Module_ifs {
 
     bool removeProperty(const std::string &prop_path) override { return false; }
 
+    bool isChannelAvailable(const std::string &prop_path) override;
+
     [[nodiscard]] std::vector<std::pair<std::string, Module_ifs *>> getSubModules() const override { return {}; }
 
    protected:

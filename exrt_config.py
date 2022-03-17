@@ -26,7 +26,7 @@ s = view_wrapper.getSelected()
 # s[0].getParentModule()
 print()
 for i in s:
-    mapping = i.getSubModulesFromPath("**/*")
+    mapping = i.getSubModulesFromPath("0/CH04/**/*")
     for j in mapping:
         print("path:", j.getModulePath(True))
     # print("path", i.getModulePath(True))

@@ -7,9 +7,11 @@
 //
 #include "GUI/TreeEditor.h"
 #include "common/ExtensionManager.h"
+#include "common/StringProcessingTools.h"
 #include "convtemplate/ConversionTemplate.h"
 #include "convtemplate/ConversionTemplateManager.h"
 #include "convtemplate/Parameter_ifs.h"
+#include "device/Device.h"
 //
 #include "ParameterTable.h"
 
@@ -29,6 +31,10 @@ ParameterTableModel::ParameterTableModel(ExtensionManager *manager) {
     } else {
         std::cerr << "can't find data_schema;\n";
     }
+
+    device_view_wrapper_ =
+        (DeviceViewWrapper_ifs *)manager->getLastVersionExtensionObject("widget_wrapper", "device_view_wrapper");
+    if (device_view_wrapper_ == nullptr) std::cerr << "can't find device_view_wrapper;\n";
 
     parent_view_ = (QAbstractItemView *)manager->getLastVersionExtensionObject("widget", "conv_template_list");
     if (parent_view_ == nullptr) std::cerr << "can't find conv_template_list;\n";
@@ -68,10 +74,16 @@ QVariant ParameterTableModel::headerData(int section, Qt::Orientation orientatio
 }
 
 QVariant ParameterTableModel::data(const QModelIndex &index, int role) const {
-    if (role == Qt::TextColorRole) {
+    if (role == Qt::TextColorRole && index.column() == 0) {
+        auto device = device_view_wrapper_->getActiveDevice();
+        if (device == nullptr) return {};
 
-    }
-    if (role == Qt::DisplayRole) {
+        auto prm = getParameter(index);
+        auto path = firstCharPos(prm->getProperty("common/path")->getValue().asString(), '/');
+
+        return device->isChannelAvailable(path.second) ? QColor("red") : QVariant();
+
+    } else if (role == Qt::DisplayRole) {
         auto prm = getParameter(index);
         auto name = list_of_entries_[index.column()]->name_;
         auto h_data = prm->getProperty("common/" + name);
@@ -154,9 +166,6 @@ void ParameterTableModel::selectParameter(const QModelIndex &index) {
 
 class ParameterViewWrapper : public ParameterViewWrapper_ifs {
    public:
-
-
-
     ParameterViewWrapper() : widget_(new ParameterTreeView()) {
         widget_->setAlternatingRowColors(true);
         widget_->setStyleSheet(
@@ -236,14 +245,13 @@ class ParameterViewWrapper : public ParameterViewWrapper_ifs {
    private:
     size_t rowCount() { return size_t(widget_->model()->rowCount()); }
     std::list<Signal_ifs *> signals_;
-   protected:
 
+   protected:
     void emit_() {
         for (auto i : signals_) {
             i->emit_();
         }
     }
-
 
     DeviceViewWrapper_ifs *device_view_wrapper_ = nullptr;
     ParameterTableModel *model_ = nullptr;

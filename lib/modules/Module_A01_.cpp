@@ -22,7 +22,7 @@ Module_A01_::Module_A01_(const void* ptr, size_t size, ExtensionManager* context
     task_ = *((Task*)ptr);
 }
 
-Module_A01_::~Module_A01_() {}
+Module_A01_::~Module_A01_() = default;
 
 const DataSchema_ifs* Module_A01_::getPropertySchema() const { return nullptr; }
 

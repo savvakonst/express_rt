@@ -5,18 +5,9 @@
 #include "SpecificPParserBuilder.h"
 #include "common/ExtensionManager.h"
 
-EthernetUdpParameter::EthernetUdpParameter(ExtensionManager* manager) {
-    auto unit = manager->getLastVersionExtensionUnit("data_schema", "ethernet_udp");
+EthernetUdpParameter::EthernetUdpParameter(ExtensionManager* manager) { init(manager); }
 
-    if (unit && unit->ptr) {
-        data_schema_ = (DataSchema_ifs*)unit->ptr;
-        data_schema_->init(manager);
-    }
-
-    parameter_field_tree_ = newParameterFieldTree(data_schema_);
-}
-
-EthernetUdpParameter::~EthernetUdpParameter() {}
+EthernetUdpParameter::~EthernetUdpParameter() = default;
 
 PrmBuffer_ifs* EthernetUdpParameter::createBuffer() const {
     // TODO: to implement this function

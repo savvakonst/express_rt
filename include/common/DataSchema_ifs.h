@@ -48,6 +48,15 @@ class DataSchema_ifs {
    private:
 };
 
+inline DataSchema_ifs *getSubSchema(const DataSchema_ifs *arg, const std::string &path) {
+    if (arg->isArray() || !arg->isMap()) return nullptr;
+
+    for (auto i : arg->getMapList())
+        if (i->name_ == path) return i;
+
+    return nullptr;
+}
+
 COMMON_API_ inline std::string toString(DataSchema_ifs *arg, const std::string &intend);
 
 #endif

@@ -112,7 +112,7 @@ bool ThermocoupleTemperatureParameter::isValid() const { return false; }
  *
  *
  */
-ThermistorResistanceParameter::ThermistorResistanceParameter(ExtensionManager* manager) {}
+ThermistorResistanceParameter::ThermistorResistanceParameter(ExtensionManager* manager) { init(manager); }
 
 ThermistorResistanceParameter::~ThermistorResistanceParameter() = default;
 
@@ -130,7 +130,7 @@ bool ThermistorResistanceParameter::isValid() const { return false; }
  *
  *
  */
-ThermistorTemperatureParameter::ThermistorTemperatureParameter(ExtensionManager* manager) {}
+ThermistorTemperatureParameter::ThermistorTemperatureParameter(ExtensionManager* manager) { init(manager); }
 
 ThermistorTemperatureParameter::~ThermistorTemperatureParameter() = default;
 

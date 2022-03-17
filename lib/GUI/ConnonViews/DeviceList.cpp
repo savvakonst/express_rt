@@ -407,7 +407,10 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
         return !list.empty();
     }
 
-    Device *getActiveDevice() override { return (Device *)model_->getActiveDevice()->m_object; };
+    Device *getActiveDevice() override {
+        auto node = model_->getActiveDevice();
+        return node ? (Device *)node->m_object : nullptr;
+    };
 
     std::string getActiveDeviceSource() override { return getActiveDevice()->getSource(); }
 
