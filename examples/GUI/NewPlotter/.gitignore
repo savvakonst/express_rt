@@ -1,0 +1,10 @@
+
+.vscode/
+.idea/
+build/
+x86/
+x64/
+cmake-build-debug-visual-studio/
+cmake-build-release-visual-studio/
+cmake-build-debug/
+ClionBuild/
