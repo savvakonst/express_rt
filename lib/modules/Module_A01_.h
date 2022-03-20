@@ -32,17 +32,17 @@ class EthernetA01_Stream : public ModuleStream_ifs {
    protected:
     std::map<std::string, PrmBuffer_ifs*> prm_buffer_map_;
     Module_ifs* module_ = nullptr;
-    std::vector<char> vec_;
+    std::vector<unsigned char> vec_;
     std::vector<PrmBuffer_ifs*> prm_buff_vec_;
     // size_t size_ = 0;
     PrmBuffer_ifs** prm_buff_ptr_ = nullptr;
     PrmBuffer_ifs** prm_buff_end_ptr_ = nullptr;
-    char* channels_map_ = nullptr;
-    char* channels_map_end_ = nullptr;
-    char* current_ptr_ = nullptr;
+    unsigned char* channels_map_ = nullptr;
+    unsigned char* channels_map_end_ = nullptr;
+    unsigned char* current_ptr_ = nullptr;
 
     double** buffers_ = nullptr;
-    size_t* size_buffers_ = 0;
+    size_t* size_buffers_ = nullptr;
     double** current_buffers_ = nullptr;
 };
 
@@ -76,35 +76,35 @@ class Module_A01_ : public KSDModule {
 
     Module_A01_(const void* ptr, size_t size, ExtensionManager* context);
 
-    ~Module_A01_();
+    ~Module_A01_() override;
 
     // TODO : need to delete
     std::map<std::string, PrmBuffer_ifs*> getPrmBufferMap() override {
         if (ethernet_stream_) return ethernet_stream_->getPrmBufferMap();
-        return std::map<std::string, PrmBuffer_ifs*>();
+        return {};
     }
 
-    std::string getID() const override { return "A01_"; }
+    [[nodiscard]] std::string getID() const override { return "A01_"; }
 
-    const DataSchema_ifs* getPropertySchema() const override;
+    [[nodiscard]] const DataSchema_ifs* getPropertySchema() const override;
 
-    const HierarchicalData_ifs* getProperty(const std::string& prop_path) const override;
-    std::string getPropertyAsTxt(const std::string& prop_path) const override;
+    [[nodiscard]] const HierarchicalData_ifs* getProperty(const std::string& prop_path) const override;
+    [[nodiscard]] std::string getPropertyAsTxt(const std::string& prop_path) const override;
 
     bool setProperty(const std::string& prop_path, const Value& value) override;
     bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override;
 
-    bool isChannelAvailable(const std::string& prop_path) override { return true; }
+    [[nodiscard]] bool isChannelAvailable(const std::string& prop_path) const override;
 
     bool storeTaskToBuffer(void* pointer) const override {
         memcpy(pointer, (void*)&task_, sizeof(Task));
         return true;
     }
-    size_t getTaskSize() const override { return sizeof(Task); }
+    [[nodiscard]] size_t getTaskSize() const override { return sizeof(Task); }
 
     ModuleStream_ifs* createModuleStream() override;
 
-    const ErrorInfo_ifs* getErrorInfo(void) const override;
+    [[nodiscard]] const ErrorInfo_ifs* getErrorInfo(void) const override;
 };
 
 #endif

@@ -15,6 +15,7 @@ qt5_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} dictionary_ru.ts)
 add_executable(ExampleDockWindows
         main.cpp
         mainwindow.cpp
+
         ${QM_FILES}
         )
 
@@ -35,6 +36,8 @@ add_dependencies(ExampleDockWindows PyEmbedder)
 add_dependencies(ExampleDockWindows CommonIO)
 add_dependencies(ExampleDockWindows TreeEditor)
 add_dependencies(ExampleDockWindows CommonViews)
+
+target_link_libraries(ExampleDockWindows PUBLIC ksdExpressOnlineScreen)
 
 #add_custom_command(
 #        TARGET ExampleDockWindows POST_BUILD

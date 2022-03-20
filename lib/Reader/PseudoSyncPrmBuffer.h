@@ -1,6 +1,7 @@
 #ifndef EXRT_PSEUDOSYNCREADER_H
 #define EXRT_PSEUDOSYNCREADER_H
 
+#include <algorithm>
 #include <atomic>
 
 #include "common/Reader_ifs.h"
@@ -91,8 +92,9 @@ inline void PseudoSyncPrmBuffer::initPoint(Reader_ifs::Point &p, size_t index) {
 inline void PseudoSyncPrmBuffer::addToPoint(Reader_ifs::Point &p, size_t index) {
     Reader_ifs::ReaderData val = buffer_[index];
     p.sum += val;
-    p.max = std::max(p.max, val);
-    p.min = std::min(p.min, val);
+    p.max = val > p.max ? val : p.max;  // std::max(val, p.max);
+    p.min = val < p.min ? val : p.min;
+    // p.min = std::min(val, p.min);
 }
 
 inline size_t PseudoSyncPrmBuffer::getStartIndex(const Borders &borders) const {

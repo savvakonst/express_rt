@@ -1,9 +1,7 @@
 //#include "chip.h"
 #define _USE_MATH_DEFINES
-
-#include "TopWindow.h"
-
-
+#include "Receiver/Receiver.h"
+//
 #include <qgraphicsscene.h>
 
 #include <QFrame>
@@ -15,7 +13,7 @@
 
 #include "Ping/ksdconnected.h"
 #include "ReaderExample/ReaderExample.h"
-#include "Receiver/Receiver.h"
+#include "TopWindow.h"
 #include "common/Extension.h"
 #include "device/Device.h"
 
@@ -49,7 +47,6 @@ TopWindow::TopWindow(QWidget *parent, double signal_frequency)
 TopWindow::~TopWindow() { delete manager_; }
 
 void TopWindow::initScene() {
-
     manager_ = new ExtensionManager;
 
     std::string error_msg;
@@ -60,7 +57,7 @@ void TopWindow::initScene() {
 
     auto devices = devicePing(addr, error_msg);
 
-    if (error_msg.size()) {
+    if (!error_msg.empty()) {
         std::cout << error_msg;
         return;
     }
@@ -70,11 +67,11 @@ void TopWindow::initScene() {
 
     if (device.hasTransceiver()) {
         ModuleStream_ifs *m_stream = device.getTopModule()->createModuleStream();
-        Receiver *receiver = new Receiver(m_stream, device.getSrcAddress());
+        auto *receiver = new Receiver(m_stream, device.getSrcAddress());
 
         auto prm_buff = device.getTopModule()->getPrmBufferMap();
 
-        for (auto i : prm_buff) {
+        for (const auto &i : prm_buff) {
             reader_ = i.second;
             break;
         }
@@ -97,7 +94,7 @@ void TopWindow::initScene() {
     view_->show();
 }
 
-void TopWindow::draw(QPainter &paint, Reader_ifs::Chunk *c_ptr, size_t offset) {
+void TopWindow::draw(QPainter &paint, Reader_ifs::Chunk *c_ptr, size_t offset) const {
     paint.setPen(QColor(0, 100, 100));
     while (c_ptr) {
         Reader_ifs::Point *pb = c_ptr->first_point_;

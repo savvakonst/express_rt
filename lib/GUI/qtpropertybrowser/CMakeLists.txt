@@ -3,10 +3,13 @@ set(QT_PROPERTY_BROWSER QtPropertyBrowser)
 
 file(GLOB Headers *.h)
 file(GLOB Sources *.cpp)
+file(GLOB Resources *.qrc)
+
 
 add_library(${QT_PROPERTY_BROWSER}
         ${Sources}
         ${Headers}
+        ${Resources}
         )
 
 # TODO: remove it

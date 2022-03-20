@@ -28,7 +28,7 @@ class TopWindow : public QMainWindow {
     // void setupMatrix();
     void initScene();
 
-    void draw(QPainter& paint, Reader_ifs::Chunk* c_ptr, size_t offset);
+    void draw(QPainter& paint, Reader_ifs::Chunk* c_ptr, size_t offset) const;
 
     size_t hight_ = 800;
     size_t buffer_size_ = 2000;
@@ -53,7 +53,7 @@ class TopWindow : public QMainWindow {
     Reader_ifs* view_1_ = nullptr;
     Reader_ifs* view_2_ = nullptr;
 
-    ExtensionManager *manager_ = nullptr;
+    ExtensionManager* manager_ = nullptr;
 
     friend class GraphicsScene;
 };

@@ -98,7 +98,7 @@ class Module_DCU_ : public KSDModule {
         return false;
     }
 
-    bool isChannelAvailable(const std::string &prop_path) override ;
+    bool isChannelAvailable(const std::string &prop_path) const override;
 
     [[nodiscard]] size_t getTaskSize() const override;
 

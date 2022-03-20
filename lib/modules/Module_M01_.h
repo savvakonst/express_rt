@@ -83,12 +83,12 @@ class Module_M01_ : public KSDModule {
         return e;
     }
 
-    std::string getID() const override { return "M01_"; }
+    [[nodiscard]] std::string getID() const override { return "M01_"; }
 
-    const DataSchema_ifs* getPropertySchema() const override;
+    [[nodiscard]] const DataSchema_ifs* getPropertySchema() const override;
 
-    const HierarchicalData_ifs* getProperty(const std::string& prop_path) const override;
-    std::string getPropertyAsTxt(const std::string& prop_path) const override;
+    [[nodiscard]] const HierarchicalData_ifs* getProperty(const std::string& prop_path) const override;
+    [[nodiscard]] std::string getPropertyAsTxt(const std::string& prop_path) const override;
 
     bool setProperty(const std::string& prop_path, const Value& value) override;
     bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override;
@@ -97,11 +97,11 @@ class Module_M01_ : public KSDModule {
         memcpy(pointer, (void*)&task_, sizeof(Task));
         return true;
     }
-    size_t getTaskSize() const override { return sizeof(Task); }
+    [[nodiscard]] size_t getTaskSize() const override { return sizeof(Task); }
 
     ModuleStream_ifs* createModuleStream() override;
 
-    const ErrorInfo_ifs* getErrorInfo(void) const override;
+    [[nodiscard]] const ErrorInfo_ifs* getErrorInfo(void) const override;
 };
 
 #endif

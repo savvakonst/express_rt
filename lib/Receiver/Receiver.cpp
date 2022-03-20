@@ -1,9 +1,10 @@
 //
 // Created by SVK on 17.11.2021.
 //
-
+//#include <winsock2.h>
+//
 #include "Receiver.h"
-
+//
 #include <atomic>
 #include <iostream>
 #include <thread>

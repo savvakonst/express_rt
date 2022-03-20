@@ -87,9 +87,9 @@ class COMMON_API_ Device : public Module_ifs {
 
     bool setPropertyAsTxt(const std::string &prop_path, const std::string &value) override { return false; }
 
-    bool removeProperty(const std::string &prop_path) override {return false;};
+    bool removeProperty(const std::string &prop_path) override { return false; };
 
-    bool isChannelAvailable(const std::string &prop_path) override ;
+    bool isChannelAvailable(const std::string &prop_path) const override;
 
     /* not yet implemented inherited members  end*/
 

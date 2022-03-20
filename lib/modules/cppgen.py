@@ -51,23 +51,27 @@ class Module_{0:s} : public KSDModule {{
 
     ~Module_{0:s}();
 
-    std::string getID() const override {{ return "{0:s}"; }}
+    [[nodiscard]] std::string getID() const override {{ return "{0:s}"; }}
 
 
-    DataSchema_ifs* getPropertySchema() const override;
+    [[nodiscard]] DataSchema_ifs* getPropertySchema() const override;
 
-    const HierarchicalData_ifs *getProperty(const std::string& prop_path) const override ;
-    std::string getPropertyAsTxt(const std::string& prop_path) const override;
+    [[nodiscard]] const HierarchicalData_ifs* getProperty(const std::string& prop_path) const override ;
+    [[nodiscard]] std::string getPropertyAsTxt(const std::string& prop_path) const override;
 
     bool setProperty(const std::string& prop_path, const Value &value) override;
     bool setPropertyAsTxt(const std::string& prop_path, const std::string& value) override;
 
-    const void* getTaskPtr() const override {{ return (const void*)&task_; }}
-    size_t getTaskSize() const override {{ return sizeof({1:s}); }}
+    bool storeTaskToBuffer(void* pointer) const override {{
+        memcpy(pointer, (void*)&task_, sizeof({1:s}));
+        return true;
+    }}
+
+    [[nodiscard]] size_t getTaskSize() const override {{ return sizeof({1:s}); }}
 
     ModuleStream_ifs* createModuleStream() override ;
 
-    const ErrorInfo_ifs *getErrorInfo(void) const override ;
+    [[nodiscard]] const ErrorInfo_ifs* getErrorInfo(void) const override ;
 
 }};
 
@@ -101,7 +105,7 @@ class Module_{0:s} : public KSDModule {{
 
     ~Module_{0:s}(){{ }}
 
-    std::string getID() const override {{ return "{0:s}"; }}
+    [[nodiscard]] std::string getID() const override {{ return "{0:s}"; }}
 
 
     //const InfoList& getPropertiesInfoList() override;
@@ -117,7 +121,7 @@ class Module_{0:s} : public KSDModule {{
         memcpy(pointer, (void*)&task_, sizeof(Task));
         return true;
     }
-    size_t getTaskSize() const override {{ return sizeof({1:s}); }}
+    [[nodiscard]] size_t getTaskSize() const override {{ return sizeof({1:s}); }}
 
     ModuleStream_ifs* createModuleStream() override {{
         error_mesadge_ = "The createModuleStream function is not realised yet";
@@ -252,14 +256,12 @@ for i in pattern_list:
         if new_complex is None:
             break
 
-
         def genArr(type_, dims=[]):
             if (len(dims)):
                 dim = dims.pop()
                 return '{{{0:d},{1:s}}}'.format(dim, genArr(type_, dims))
             else:
                 return type_
-
 
         def genMap(struct):
             fields = []
@@ -271,7 +273,6 @@ for i in pattern_list:
                     key.name, genArr(type_, key.dims))
                 fields.append(s)
             return "TaskMapper({{\n{0:s} }})".format(",\n".join(fields))
-
 
         s = genMap(new_complex)
         print(s)

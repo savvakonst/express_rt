@@ -14,7 +14,7 @@ enum class DataStatus : uint32_t
 
 class PrmBuffer_ifs {
    public:
-    PrmBuffer_ifs(const Parameter_ifs* parent)  //
+    explicit PrmBuffer_ifs(const Parameter_ifs* parent)  //
         : parameter_(parent) {
         if (parameter_) ((Parameter_ifs*)parameter_)->prm_buffer_ = this;
     }

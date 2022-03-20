@@ -40,6 +40,19 @@ bool Module_A01_::setProperty(const std::string& prop_path, const Value& value) 
 bool Module_A01_::setPropertyAsTxt(const std::string& prop_path, const std::string& value) {
     return KSDModule::setPropertyAsTxt(prop_path, value);
 }
+#include "iostream"
+bool Module_A01_::isChannelAvailable(const std::string& prop_path) const {
+    auto hd = getProperty("cnl/" + prop_path + "/frequency");
+    if ((hd == nullptr)) {
+        std::cout << "path not exists: header/cnl/" + prop_path + "/frequency\n";
+        return false;
+    }
+    if (!hd->isValue()) {
+        std::cout << "path exists, but it isn't Value: header/cnl/" + prop_path + "/frequency\n";
+        return false;
+    }
+    return hd->getValue().value_.u8 != 0xff;
+}
 
 ModuleStream_ifs* Module_A01_::createModuleStream() {
     // error_mesadge_ = "The createModuleStream function is not realised yet";
@@ -62,9 +75,9 @@ const ErrorInfo_ifs* Module_A01_::getErrorInfo(void) const { return nullptr; }
 #include "Reader/PseudoSyncPrmBuffer.h"
 #pragma intrinsic(_BitScanForward)
 
-char scanForwardBits(char max_val, unsigned long arg) {
+unsigned char scanForwardBits(char max_val, unsigned long arg) {
     unsigned long index;
-    char b = _BitScanForward(&index, arg);
+    unsigned char b = _BitScanForward(&index, arg);
     index = max_val - index;
     if (!b) index = 0;
     return (unsigned char)index;
@@ -72,16 +85,15 @@ char scanForwardBits(char max_val, unsigned long arg) {
 
 #define new_arr(TYPE, LEN) new TYPE[(LEN)]
 
-static std::vector<char> getList(const std::vector<int>& vec) {
+static std::vector<unsigned char> getList(const std::vector<int>& vec) {
     /* parse arguments */
 
     int int_list_len = 0;
 
     int_list_len = (int)vec.size();
-    if (int_list_len <= 0) return std::vector<char>();
+    if (int_list_len <= 0) return {};
 
     long* int_arr = new_arr(long, int_list_len);
-    if (int_arr == NULL) return std::vector<char>();
 
     int max_e = 0;
     int min_e = vec[0];
@@ -95,7 +107,7 @@ static std::vector<char> getList(const std::vector<int>& vec) {
 
     //////////////////
     // redefine
-    long freq_arr_size = int_list_len;
+    unsigned long freq_arr_size = int_list_len;
     long* freq_arr = int_arr;
     //////////////////
 
@@ -108,13 +120,13 @@ static std::vector<char> getList(const std::vector<int>& vec) {
         idx_arr_size += 1 << (char)*e_ptr;
     }
 
-    char* idx_arr = new_arr(char, idx_arr_size);
+    auto* idx_arr = new_arr(unsigned char, idx_arr_size);
 
     {  // isolated namespace
-        char* e_ptr = idx_arr;
+        unsigned char* e_ptr = idx_arr;
         for (long pos = 0; pos < time_ponts_size; pos++) {
-            char pos_val = scanForwardBits((char)max_e, pos);
-            for (char fr_idx = 0; fr_idx < freq_arr_size; fr_idx++) {
+            unsigned char pos_val = scanForwardBits((char)max_e, pos);
+            for (unsigned char fr_idx = 0; fr_idx < (unsigned char)freq_arr_size; fr_idx++) {
                 if (pos_val <= freq_arr[fr_idx]) {
                     *(e_ptr++) = fr_idx;
                 }
@@ -123,12 +135,12 @@ static std::vector<char> getList(const std::vector<int>& vec) {
     }
     delete[] int_arr;
 
-    std::vector<char> python_val;
-    python_val.reserve(idx_arr_size);
-    for (int idx = 0; idx < idx_arr_size; idx++) python_val.push_back((char)idx_arr[idx]);
+    std::vector<unsigned char> ret_vector;
+    ret_vector.reserve(idx_arr_size);
+    for (int idx = 0; idx < idx_arr_size; idx++) ret_vector.push_back(idx_arr[idx]);
 
     delete[] idx_arr;
-    return python_val;
+    return ret_vector;
 }
 
 EthernetA01_Stream::EthernetA01_Stream(Module_A01_* module) : module_(module) {
@@ -141,9 +153,9 @@ EthernetA01_Stream::EthernetA01_Stream(Module_A01_* module) : module_(module) {
     size_buffers_ = new size_t[32];
     current_buffers_ = new double*[32];
 
-    auto temp_buffers_ = buffers_;
-    auto temp_size_buffers_ = size_buffers_;
-    auto temp_current_buffers_ = current_buffers_;
+    auto temp_buffers = buffers_;
+    auto temp_size_buffers = size_buffers_;
+    auto temp_current_buffers = current_buffers_;
 
     for (size_t i = 0; i < 32; i++) {
         int fr = (int)module->task_.cnl[i].frequency;
@@ -158,10 +170,10 @@ EthernetA01_Stream::EthernetA01_Stream(Module_A01_* module) : module_(module) {
 
             auto temp_size = 1 << (fr - 10);
 
-            double* d_ptr = new double[temp_size];
-            *(temp_buffers_++) = d_ptr;
-            *(temp_size_buffers_++) = temp_size;
-            *(temp_current_buffers_++) = d_ptr;
+            auto* d_ptr = new double[temp_size];
+            *(temp_buffers++) = d_ptr;
+            *(temp_size_buffers++) = temp_size;
+            *(temp_current_buffers++) = d_ptr;
         }
     }
 
@@ -174,7 +186,7 @@ EthernetA01_Stream::EthernetA01_Stream(Module_A01_* module) : module_(module) {
 }
 #include <iostream>
 void EthernetA01_Stream::readFramePeace(ModuleStreamContext_ifs* context, char* ptr, size_t size) {
-    int16_t* c_ptr = (int16_t*)ptr;
+    auto* c_ptr = (int16_t*)ptr;
     int16_t* end_ptr = c_ptr + size;
 
     char* map_ptr = current_ptr_;

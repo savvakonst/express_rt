@@ -1,51 +1,46 @@
 ﻿#ifndef QFORMSCREEN_H
 #define QFORMSCREEN_H
 
-#include <QDialog>
-#include <QStatusBar>
-#include <QProgressBar>
-#include <QMenuBar>
-#include <QToolBar>
+#include <QAction>
 #include <QCloseEvent>
-#include <QResizeEvent>
-#include <QMessageBox>
+#include <QDateTime>
+#include <QDialog>
+#include <QFileDialog>
 #include <QIcon>
 #include <QMenu>
-#include <QAction>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QProgressBar>
+#include <QResizeEvent>
 #include <QSettings>
-#include <QFileDialog>
-#include <QDateTime>
 #include <QStandardPaths>
+#include <QStatusBar>
 #include <QTimer>
+#include <QToolBar>
 
-#include "qscreenscene.h"
+#include "qformscreensettings.h"
 #include "qscreenaxisx.h"
 #include "qscreenmarker.h"
 #include "qscreenscale.h"
-
-#include "qformscreensettings.h"
-
+#include "qscreenscene.h"
 
 namespace Ui {
-    class QFormScreen;
+class QFormScreen;
 }
 
-class QFormScreen : public QDialog
-{
+class QFormScreen : public QDialog {
     Q_OBJECT
 
     const QString INI_FILENAME_EO = "/ksdeo.ini";
     const QString INI_IMAGE_SAVE_PATH = "IMAGE_SAVE/PATH";
     const QString INI_IMAGE_SAVE_AUTO = "IMAGE_SAVE/AUTO";
 
-public:
-
-
-    explicit QFormScreen(const int &index, const LineProperties &dstx0, QWidget *parent = nullptr);
+   public:
+    explicit QFormScreen(const int &index, const LineProperties &dstx_0, QWidget *parent = nullptr) {}
 
     explicit QFormScreen(/*const int &index, const SETTINGS_DIAGITEM &dstx0,*/ QWidget *parent = nullptr);
 
-    ~QFormScreen();
+    ~QFormScreen() override;
 
     int getIndex();
 
@@ -68,27 +63,27 @@ public:
     int marker_index_ = -1;
     int label_index_ = -1;
 
-public slots:
+   public slots:
 
     void onExit();
 
-    void onIndexReduce(const int &index0);
+    void onIndexReduce(const int &index_0);
 
-    void onRefresh(const RelativeTime &t, const bool zoomed = false);
+    void onRefresh(const RelativeTime &t, bool zoomed = false);
 
     void onTimer();
 
     void onSetTimeVariables(const RelativeTime &t_width, const RelativeTime &t_step);
 
-    void onAddLabelExt(const RelativeTime &t0, const int &y0, const QString &txt, const LineProperties &dstx);
+    void onAddLabelExt(const RelativeTime &t_0, const int &y_0, const QString &txt, const LineProperties &properties);
 
-    void onAddMakerExt(const RelativeTime &t0);
+    void onAddMakerExt(const RelativeTime &t_0);
 
     void onMessageShow(QString s);
 
-    void on_help();
+    void onHelp();
 
-private:
+   private:
     struct AxisYStats {
         union {
             struct {
@@ -137,20 +132,20 @@ private:
 
     QMenu *mn_file_;
     QAction *act_exit_;
-    //QAction                             *actAdd;
+    // QAction                             *actAdd;
     QAction *act_shot_;
     QAction *act_shot_as_;
     QAction *act_clear_;
     QAction *act_refresh_;
     QAction *act_group_up_;
     QAction *act_scale_hide_;
-    //QAction                             *actListScale;
-    //QAction                             *actListMarker;
-    //QAction                             *actListLabel;
+    // QAction                             *actListScale;
+    // QAction                             *actListMarker;
+    // QAction                             *actListLabel;
 
     QMenu *mn_settings_;
     QAction *act_settings_;
-    //QMenu                               *mnConf;
+    // QMenu                               *mnConf;
     QAction *act_conf_save_;
 
     QMenu *mn_help_;
@@ -165,7 +160,7 @@ private:
 
     QList<QScreenScale *> scales_;
     QList<QScreenMarker *> markers_;
-    //QList<QScreenLabel*>                labels;
+    // QList<QScreenLabel*>                labels;
 
     int index_ = 0;
     QString title_ = "";
@@ -174,10 +169,6 @@ private:
     RelativeTime t_last_ = {0};
 
     RelativeTime t_ = {0};
-
-    // Example
-    QTimer *timer_;
-    //
 
     // Float Marker
     MarkerSimple mark_f_;
@@ -195,16 +186,16 @@ private:
     bool axis_y_marker_ = false;
     bool axis_y_current_ = true;
 
-
     QString label_main_ = "";
-    //RelativeTime t_width_ = {0};
-    //RelativeTime t_step_ = {0};
 
+    QTimer * timer_;
+
+    RelativeTime time_step_ = {0};
+    RelativeTime time_width_ = {0};
     Timing time_;
     ImageSaving saving_;
     LineProperties lining_;
     Margin margin_;
-
 
     QString program_data_path_ = "";
 
@@ -214,10 +205,10 @@ private:
 
     int counter_ = 0;
 
-private slots:
+   private slots:
 
     void onResizeScene();
-    void onZoom(const QPointF& pt, const int& delta);
+    void onZoom(const QPointF &pt, const int &delta);
     void onPause();
 
     void onClearScene();
@@ -244,9 +235,9 @@ private slots:
 
     void onUpdateMarkerFloat(const QPointF &pt);
 
-    void onChangeSettings(const QString title, const SettingsCommon stx_cmn);
+    void onChangeSettings(const QString &title, const SettingsCommon stx_cmn);
 
-    //void                                on_addParameter();
+    // void                                on_addParameter();
 
     void onRemoveItem(const int &src = -1, const int &index = -1);
     void onTuneItem(const int &src = -1, const int &index = -1);
@@ -272,12 +263,12 @@ private slots:
 
     void onSaveImageFilterChange(const QString &filter);
 
-protected:
+   protected:
     void closeEvent(QCloseEvent *event) override;
 
     void resizeEvent(QResizeEvent *event) override;
 
-signals:
+   signals:
 
     void toRemoved(const int &index);
 
@@ -291,13 +282,11 @@ signals:
 
     void toIndexReduced(const int &src, const int &index);
 
-    //void                                to_setInterval(const TIME_INTERVAL &ti);
+    // void                                to_setInterval(const TIME_INTERVAL &ti);
 
     void to_titleChanged();
 
     void to_help();
-
-
 };
 
-#endif // QFORMSCREEN_H
+#endif  // QFORMSCREEN_H

@@ -26,14 +26,14 @@ DeviceListModel::DeviceListModel(ExtensionManager *manager) {
     auto image_dir = QDir(QCoreApplication::applicationDirPath() + "/png/modules");
     auto image_path_list = image_dir.entryInfoList({"*.png", "*.bmp", "*.ico"});
 
-    for (auto &i : image_path_list) {
+    for (auto &i : image_path_list)
         icons_map_[i.baseName()] = QIcon(i.absoluteFilePath());
-    }
+
 
     auto unit = manager->getLastVersionExtensionUnit("device_manager", "device_manager");
-    if (unit && unit->ptr) {
+    if (unit && unit->ptr)
         device_manager_ = (DeviceManager *)unit->ptr;
-    }
+
 
     class Delegate : public Signal_ifs {
        public:

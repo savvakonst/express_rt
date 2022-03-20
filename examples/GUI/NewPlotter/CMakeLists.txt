@@ -37,39 +37,28 @@ file(GLOB QtResources *.qrc)
 qt5_wrap_ui(UiHeaders ${UiFiles})
 
 
-set(QtToolsPath ../../qttools/src/shared/qtpropertybrowser)
-
-file(GLOB QtToolsHeaders ${QtToolsPath}/*.h)
-file(GLOB QtToolsSources ${QtToolsPath}/*.cpp)
-file(GLOB QtToolsResources ${QtToolsPath}/*.qrc)
-
-message(STATUS ${QtToolsSources})
-
-add_executable(ksdExpressOnlineScreen
+add_library(ksdExpressOnlineScreen
         ${Sources}
         ${Headers}
         ${UiHeaders}
         ${QtResources}
-
-        ${QtToolsSources}
-        ${QtToolsHeaders}
-        ${QtToolsResources}
         )
 
 target_include_directories(ksdExpressOnlineScreen PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-target_include_directories(ksdExpressOnlineScreen PRIVATE ${QtToolsPath})
+target_include_directories(ksdExpressOnlineScreen PUBLIC .)
 
-
-add_subdirectory("../PseudoReader" ReaderExample EXCLUDE_FROM_ALL)
+target_link_libraries(ksdExpressOnlineScreen QtPropertyBrowser)
 target_link_libraries(ksdExpressOnlineScreen ReaderExample)
 target_link_libraries(ksdExpressOnlineScreen Ping)
+target_link_libraries(ksdExpressOnlineScreen Modules)
+target_link_libraries(ksdExpressOnlineScreen Qt5::Widgets)
+
 
 source_group(src FILES ${Sources})
 source_group(headers FILES ${Headers})
 source_group(uis FILES ${UiFiles})
 source_group(qrc FILES ${QtResources})
 
-target_link_libraries(ksdExpressOnlineScreen Qt5::Widgets)
 
 if (MSVC)
     set_target_properties(ksdExpressOnlineScreen PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=%PATH%;${CMAKE_PREFIX_PATH}\\bin")

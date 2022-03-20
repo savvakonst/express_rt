@@ -170,7 +170,7 @@ class PyModule : public Module_ifs {
         PYBIND11_OVERRIDE_PURE(bool, Module_ifs, removeProperty, prop_path);
     }
 
-    bool isChannelAvailable(const std::string &prop_path) override {
+    bool isChannelAvailable(const std::string &prop_path) const override {
         PYBIND11_OVERRIDE_PURE(bool, Module_ifs, isChannelAvailable, prop_path);
     }
 

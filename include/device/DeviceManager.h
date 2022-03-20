@@ -58,7 +58,7 @@ class DeviceManager : public BaseClass_ifs {
     std::vector<Device*> vector_;
 };
 
-bool Device::isChannelAvailable(const std::string& prop_path) {
+bool Device::isChannelAvailable(const std::string& prop_path) const {
     auto path = lastCharPos(prop_path, '/');
     auto modules = getSubModulesFromPath(path.first);  //::getSubmodules(this, path.first);
 

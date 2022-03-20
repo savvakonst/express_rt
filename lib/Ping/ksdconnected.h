@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "KsdApi/tnmdefs.h"
+#include "common/CustomTypes.h"
 
 struct ModuleIdent;
 struct ModuleStatus;
