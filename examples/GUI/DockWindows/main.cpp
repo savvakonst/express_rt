@@ -12,12 +12,12 @@ int main(int argc, char *argv[]) {
 
     QTranslator my_translator;
     my_translator.load("dictionary_ru");
-    app.installTranslator(&my_translator);
+    QApplication::installTranslator(&my_translator);
 
     ExtensionManager manager;
 
-    auto evalFile = (evalFile_t)manager.getLastVersionExtensionObject("eval_file", "py_eval_file");
-    if (evalFile) evalFile("exrt_config.py");
+    auto eval_file = (evalFile_t)manager.getLastVersionExtensionObject("eval_file", "py_eval_file");
+    if (eval_file) eval_file("exrt_config.py");
 
     MainWindow main_win(&manager);
     main_win.show();

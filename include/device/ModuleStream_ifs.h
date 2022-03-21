@@ -10,19 +10,20 @@ class PrmBuffer_ifs;
 
 class ModuleStream_ifs : public BaseClass_ifs {
    public:
-    virtual ~ModuleStream_ifs() {}
+    ~ModuleStream_ifs() override = default;
 
     virtual void readFramePeace(ModuleStreamContext_ifs* context, char* ptr, size_t size) = 0;
 
     virtual int getStatistic() = 0;
 
-    virtual void addPrmBuffer(std::string path, PrmBuffer_ifs* prm_buffer) {}
-    virtual void addPrmBuffer(size_t index, size_t sub_index, PrmBuffer_ifs* prm_buffer) {}
+    virtual bool addPrmBuffer(const std::string& path, PrmBuffer_ifs* prm_buffer) { return false; }
 
     // TODO: need to delete
-    virtual std::map<std::string, PrmBuffer_ifs*> getPrmBufferMap() { return std::map<std::string, PrmBuffer_ifs*>(); }
+    virtual std::map<std::string, PrmBuffer_ifs*> getPrmBufferMap() { return {}; }
 
     virtual const Module_ifs* getModule() = 0;
+
+    virtual ModuleStream_ifs* reduce() { return this; }
 };
 
 #endif

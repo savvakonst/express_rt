@@ -388,7 +388,7 @@ void QFormScreen::onAddMakerExt(const RelativeTime &t_0) {
 
     int index = markers_.count();
 
-    QScreenMarker *mrk = new QScreenMarker(index, pt, sz, lining_, this);
+    auto *mrk = new QScreenMarker(index, pt, sz, lining_, this);
 
     mrk->setTime(t_0);
     mrk->pScale_ = &axis_x_->scale_;
@@ -411,7 +411,7 @@ void QFormScreen::onAddMakerExt(const RelativeTime &t_0) {
     emit mrk->to_changed(SOURCE_MARKER);
 }
 //-------------------------------------------------------------------------
-void QFormScreen::onMessageShow(QString s) { QMessageBox::warning(this, tr("Внимание!"), s, QMessageBox::Ok); }
+void QFormScreen::onMessageShow(const QString &s) { QMessageBox::warning(this, tr("Внимание!"), s, QMessageBox::Ok); }
 //-------------------------------------------------------------------------
 void QFormScreen::onHelp() { emit to_help(); }
 //-------------------------------------------------------------------------

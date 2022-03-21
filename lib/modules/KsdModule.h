@@ -82,10 +82,10 @@ class KSDModule : public Module_ifs {
         uint8_t sub;
         uint8_t slot;
         uint16_t version;
-        uint16_t checkSum;
+        uint16_t check_sum;
         uint16_t flag;
         uint16_t dimension;
-        uint16_t syncMode;
+        uint16_t sync_mode;
         uint8_t reserved[12];
     };
 #pragma pack()

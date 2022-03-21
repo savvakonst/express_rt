@@ -89,7 +89,7 @@ class COMMON_API_ Device : public Module_ifs {
 
     bool removeProperty(const std::string &prop_path) override { return false; };
 
-    bool isChannelAvailable(const std::string &prop_path) const override;
+    [[nodiscard]] bool isChannelAvailable(const std::string &prop_path) const override;
 
     /* not yet implemented inherited members  end*/
 
@@ -99,7 +99,9 @@ class COMMON_API_ Device : public Module_ifs {
 
     [[nodiscard]] std::vector<std::pair<std::string, Module_ifs *>> getSubModules() const override;
 
-    ModuleStream_ifs *createModuleStream() override { return nullptr; }
+    ModuleStream_ifs *createModuleStream() override {
+        return nullptr;
+    }
 
     // TODO : remove this
     Module_ifs *getTopModule() {

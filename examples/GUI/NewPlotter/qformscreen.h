@@ -79,7 +79,7 @@ class QFormScreen : public QDialog {
 
     void onAddMakerExt(const RelativeTime &t_0);
 
-    void onMessageShow(QString s);
+    void onMessageShow(const QString &s);
 
     void onHelp();
 
@@ -102,7 +102,7 @@ class QFormScreen : public QDialog {
 
     bool saveShot(const QString &filename);
 
-    void placeAxisX(QPainter *painter, const QScreenAxisX *axis);
+    static void placeAxisX(QPainter *painter, const QScreenAxisX *axis);
 
     void placeDiag(QPainter *painter, const QScreenScale *scl);
 
@@ -188,7 +188,7 @@ class QFormScreen : public QDialog {
 
     QString label_main_ = "";
 
-    QTimer * timer_;
+    QTimer *timer_;
 
     RelativeTime time_step_ = {0};
     RelativeTime time_width_ = {0};

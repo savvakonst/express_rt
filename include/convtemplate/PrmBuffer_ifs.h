@@ -39,4 +39,6 @@ class PrmBuffer_ifs {
     const Parameter_ifs* parameter_ = nullptr;
 };
 
+typedef PrmBuffer_ifs* (*prmBufferConstructor_f)(Parameter_ifs* parameter, ExtensionManager* manager);
+
 #endif

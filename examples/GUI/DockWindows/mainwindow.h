@@ -17,13 +17,11 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
    public:
-    MainWindow(ExtensionManager *ctm);
+    explicit MainWindow(ExtensionManager *ctm);
 
    private:
     void closeEvent(QCloseEvent *event) override;
 
-    void createActions();
-    void createStatusBar();
     void createDockWindows();
 
     ExtensionManager *manager_ = nullptr;

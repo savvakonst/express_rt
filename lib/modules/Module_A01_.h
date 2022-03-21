@@ -5,16 +5,16 @@
 #include <cstdint>
 #include <map>
 
-#include "KSDModule.h"
+#include "KsdModule.h"
 #include "device/ModuleStream_ifs.h"
 
 class Module_A01_;
 
 class EthernetA01_Stream : public ModuleStream_ifs {
    public:
-    EthernetA01_Stream(Module_A01_* module);
+    explicit EthernetA01_Stream(Module_A01_* module);
 
-    ~EthernetA01_Stream() {}
+    ~EthernetA01_Stream() override = default;
 
     void readFramePeace(ModuleStreamContext_ifs* context, char* ptr, size_t size) override;
 
@@ -23,20 +23,21 @@ class EthernetA01_Stream : public ModuleStream_ifs {
         return 0;
     }
 
-    const Module_ifs* getModule() override { return module_; }
+    const Module_ifs* getModule() override;
 
-    void addPrmBuffer(size_t index, size_t sub_index, PrmBuffer_ifs* prm_buffer) override {}
+    bool addPrmBuffer(const std::string& path, PrmBuffer_ifs* prm_buffer) override;
 
     std::map<std::string, PrmBuffer_ifs*> getPrmBufferMap() override;
 
    protected:
-    std::map<std::string, PrmBuffer_ifs*> prm_buffer_map_;
-    Module_ifs* module_ = nullptr;
+    Module_A01_* module_ = nullptr;
     std::vector<unsigned char> vec_;
+
+    //
     std::vector<PrmBuffer_ifs*> prm_buff_vec_;
-    // size_t size_ = 0;
-    PrmBuffer_ifs** prm_buff_ptr_ = nullptr;
     PrmBuffer_ifs** prm_buff_end_ptr_ = nullptr;
+    // size_t size_ = 0;
+
     unsigned char* channels_map_ = nullptr;
     unsigned char* channels_map_end_ = nullptr;
     unsigned char* current_ptr_ = nullptr;
@@ -104,7 +105,7 @@ class Module_A01_ : public KSDModule {
 
     ModuleStream_ifs* createModuleStream() override;
 
-    [[nodiscard]] const ErrorInfo_ifs* getErrorInfo(void) const override;
+    [[nodiscard]] const ErrorInfo_ifs* getErrorInfo() const override;
 };
 
 #endif

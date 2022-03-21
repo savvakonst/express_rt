@@ -160,9 +160,9 @@ EthernetDCU_Stream::EthernetDCU_Stream(Module_DCU_ *module) : module_(module) {
     data_offset_ = 2 + 4 + number_of_slots_ * 2 + 2;
 }
 
-EthernetDCU_Stream::~EthernetDCU_Stream() {}
+EthernetDCU_Stream::~EthernetDCU_Stream() = default;
 
-const size_t cnt_offset = 6;
+const size_t g_cnt_offset = 6;
 
 void EthernetDCU_Stream::readFramePeace(ModuleStreamContext_ifs *context, char *ptr, size_t size) {
     uint32_t time = *((uint32_t *)(ptr + 2));
@@ -172,10 +172,10 @@ void EthernetDCU_Stream::readFramePeace(ModuleStreamContext_ifs *context, char *
 
     ModuleStream_ifs **module_ptr = sub_modules_;
 
-    uint16_t *cnt = (uint16_t *)(ptr + cnt_offset);
+    auto *cnt = (uint16_t *)(ptr + g_cnt_offset);
     uint16_t *cnt_end = cnt + number_of_slots_;
 
-    uint16_t *data_ptr = (uint16_t *)(ptr + data_offset_);
+    auto *data_ptr = (uint16_t *)(ptr + data_offset_);
     while (cnt != cnt_end) {
         if ((*cnt != 0) && (*module_ptr != nullptr)) (*module_ptr)->readFramePeace(context, (char *)data_ptr, *(cnt));
         module_ptr++;

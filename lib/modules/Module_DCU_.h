@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <map>
 
-#include "KSDModule.h"
+#include "KsdModule.h"
 #include "device/ModuleStream_ifs.h"
 
 class Module_DCU_;
@@ -67,9 +67,7 @@ class Module_DCU_ : public KSDModule {
         std::map<std::string, PrmBuffer_ifs *> ret_map;
         for (auto i : modules_) {
             auto temp = i->getPrmBufferMap();
-            for (const auto &i : temp) {
-                ret_map[i.first] = i.second;
-            }
+            for (const auto &j : temp) ret_map[j.first] = j.second;
         }
 
         return ret_map;

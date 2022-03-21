@@ -104,7 +104,7 @@ struct Frame {
     uint16_t marker;
     uint32_t time;
 
-    size_t getCntListLen() {
+    size_t getCntListLen() const {
         // 0x5A3x
         return size_t(0x000F & marker);
     }
@@ -119,7 +119,7 @@ struct Frame {
 
 void unpack() {
     void *ptr = nullptr;
-    Frame *frame = (Frame *)ptr;
+    auto *frame = (Frame *)ptr;
     ModuleStream_ifs **m_stream_ifs = nullptr;
 
     size_t len = frame->getCntListLen();

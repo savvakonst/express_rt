@@ -9,6 +9,7 @@
 #include "common/ExtensionManager.h"
 #include "common/IO_ifs.h"
 #include "convtemplate/Parameter_ifs.h"
+#include "convtemplate/PrmBuffer_ifs.h"
 #include "device/Device.h"
 #include "mainwindow.h"
 #include "qformscreen.h"
@@ -35,10 +36,26 @@ class OpenAction : public QAction {
     IO_ifs *io_;
 };
 
+void generateStream(ExtensionManager *manager, const std::string &type, Device *device,
+                    const std::list<Parameter_ifs *> &parameters) {
+    ModuleStream_ifs *m_stream = device->createModuleStream();
+    for (auto prm : parameters) {
+        auto constructor = (prmBufferConstructor_f)manager->getLastVersionExtensionObject(type, prm->getType());
+        if (constructor) {
+            auto prm_buffer = constructor(prm, manager);
+            auto path = prm->getProperty("common/path")->getValue().asString();
+            m_stream->addPrmBuffer(path, prm_buffer);
+        }
+    }
+    = m_stream->reduce();
+    auto *receiver = new Receiver(m_stream, device->getSrcAddress());
+}
+
 MainWindow::MainWindow(ExtensionManager *ctm) : text_edit_(new QTextEdit), manager_(ctm) {
     QApplication::setStyle(QStyleFactory::create("Fusion"));
 
     ////////////////////////////////////////////////////////////////////////////
+    /*
     std::string error_msg;
 
     EthernetAddress addr;
@@ -64,8 +81,9 @@ MainWindow::MainWindow(ExtensionManager *ctm) : text_edit_(new QTextEdit), manag
     for (const auto &i : prm_buff) form_screen->addScale(getReaderExample(i.second));
 
     receiver->start();
+     */
     //////////////////////////////////////////////////////////////////////////
-    setCentralWidget(form_screen);
+    setCentralWidget(text_edit_);
 
     auto file_menu = menuBar()->addMenu(tr("&Файл"));
 
@@ -107,12 +125,10 @@ void MainWindow::createDockWindows() {
      *
      */
 
-    QMap<std::string,QString> name_mapper{};
-
     auto units = manager_->getLastVersionExtensionUnitsByType("widget");
     for (auto i : units) {
         dock = new QDockWidget(tr(i->name), this);
-        qDebug()<<i->name;
+        qDebug() << i->name;
         auto widget = (QWidget *)i->ptr;  // ctm_->getLastVersionExtensionUint("widget", "conv_template_list")->ptr;
         dock->setObjectName(tr(i->name));
         dock->setWidget(widget);
@@ -122,7 +138,7 @@ void MainWindow::createDockWindows() {
     units = manager_->getLastVersionExtensionUnitsByType("widget_wrapper");
     for (auto i : units) {
         dock = new QDockWidget(tr(i->name), this);
-        qDebug()<<i->name;
+        qDebug() << i->name;
         auto widget_wrapper =
             (WidgetWrapper_ifs *)i->ptr;  // ctm_->getLastVersionExtensionUint("widget", "conv_template_list")->ptr;
         auto widget = widget_wrapper->getWidget();

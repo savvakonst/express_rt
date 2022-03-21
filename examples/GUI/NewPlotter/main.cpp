@@ -14,9 +14,9 @@
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
-    QTranslator qtTranslator;
-    qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    QApplication::installTranslator(&qtTranslator);
+    QTranslator qt_translator;
+    qt_translator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+    QApplication::installTranslator(&qt_translator);
 
     auto manager = new ExtensionManager;
 
@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
     auto v = devices.front()->getTask();
 
     Device device = Device(v.data(), v.size(), manager);
-
+    
     /////////////////////////////////////
 
     if (device.hasTransceiver()) {

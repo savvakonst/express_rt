@@ -2,6 +2,8 @@
 
 #include "Module_A01_.h"
 
+#include "convtemplate/PrmBuffer_ifs.h"
+
 Module_A01_::Module_A01_()
     : KSDModule(  //
           TaskMapper({{"header", header_map_},
@@ -43,12 +45,8 @@ bool Module_A01_::setPropertyAsTxt(const std::string& prop_path, const std::stri
 #include "iostream"
 bool Module_A01_::isChannelAvailable(const std::string& prop_path) const {
     auto hd = getProperty("cnl/" + prop_path + "/frequency");
-    if ((hd == nullptr)) {
+    if ((hd == nullptr) || !hd->isValue()) {
         std::cout << "path not exists: header/cnl/" + prop_path + "/frequency\n";
-        return false;
-    }
-    if (!hd->isValue()) {
-        std::cout << "path exists, but it isn't Value: header/cnl/" + prop_path + "/frequency\n";
         return false;
     }
     return hd->getValue().value_.u8 != 0xff;
@@ -61,7 +59,7 @@ ModuleStream_ifs* Module_A01_::createModuleStream() {
     return ethernet_stream_;
 };
 
-const ErrorInfo_ifs* Module_A01_::getErrorInfo(void) const { return nullptr; }
+const ErrorInfo_ifs* Module_A01_::getErrorInfo() const { return nullptr; }
 
 /*
  *
@@ -71,8 +69,6 @@ const ErrorInfo_ifs* Module_A01_::getErrorInfo(void) const { return nullptr; }
 
 #include <intrin.h>
 
-#include "Reader/IntervalBuffer.h"
-#include "Reader/PseudoSyncPrmBuffer.h"
 #pragma intrinsic(_BitScanForward)
 
 unsigned char scanForwardBits(char max_val, unsigned long arg) {
@@ -120,7 +116,9 @@ static std::vector<unsigned char> getList(const std::vector<int>& vec) {
         idx_arr_size += 1 << (char)*e_ptr;
     }
 
-    auto* idx_arr = new_arr(unsigned char, idx_arr_size);
+    std::vector<unsigned char> ret_vector(idx_arr_size, 0);
+    ret_vector.reserve(idx_arr_size);
+    auto* idx_arr = ret_vector.data();
 
     {  // isolated namespace
         unsigned char* e_ptr = idx_arr;
@@ -135,11 +133,6 @@ static std::vector<unsigned char> getList(const std::vector<int>& vec) {
     }
     delete[] int_arr;
 
-    std::vector<unsigned char> ret_vector;
-    ret_vector.reserve(idx_arr_size);
-    for (int idx = 0; idx < idx_arr_size; idx++) ret_vector.push_back(idx_arr[idx]);
-
-    delete[] idx_arr;
     return ret_vector;
 }
 
@@ -147,7 +140,7 @@ EthernetA01_Stream::EthernetA01_Stream(Module_A01_* module) : module_(module) {
     // TODO: need to choose available modules
     std::vector<int> active_freq;
 
-    std::string name = "A01_[" + std::to_string(module->task_.header.slot) + "]";
+    std::string name = "A01_[" + std::to_string(module_->task_.header.slot) + "]";
 
     buffers_ = new double*[32];
     size_buffers_ = new size_t[32];
@@ -157,16 +150,14 @@ EthernetA01_Stream::EthernetA01_Stream(Module_A01_* module) : module_(module) {
     auto temp_size_buffers = size_buffers_;
     auto temp_current_buffers = current_buffers_;
 
-    for (size_t i = 0; i < 32; i++) {
-        int fr = (int)module->task_.cnl[i].frequency;
+    for (auto& i : module_->task_.cnl) {
+        int fr = i.frequency;
 
         if (0xff != fr) {
             active_freq.push_back(fr);
 
-            auto buffer = new PseudoSyncPrmBuffer(nullptr, fr, nullptr);
-            std::string channel = ", канал: " + std::to_string(i);
+            auto buffer = nullptr;
             prm_buff_vec_.push_back(buffer);
-            prm_buffer_map_[name + channel] = buffer;
 
             auto temp_size = 1 << (fr - 10);
 
@@ -178,42 +169,70 @@ EthernetA01_Stream::EthernetA01_Stream(Module_A01_* module) : module_(module) {
     }
 
     vec_ = getList(active_freq);
-    prm_buff_ptr_ = prm_buff_vec_.data();
-    prm_buff_end_ptr_ = prm_buff_ptr_ + prm_buff_vec_.size();
+    prm_buff_end_ptr_ = prm_buff_vec_.data() + prm_buff_vec_.size();
     channels_map_ = vec_.data();
     current_ptr_ = channels_map_;
     channels_map_end_ = channels_map_ + vec_.size();
 }
-#include <iostream>
+
 void EthernetA01_Stream::readFramePeace(ModuleStreamContext_ifs* context, char* ptr, size_t size) {
     auto* c_ptr = (int16_t*)ptr;
     int16_t* end_ptr = c_ptr + size;
 
-    char* map_ptr = current_ptr_;
+    unsigned char* map_ptr = current_ptr_;
 
-    auto temp_buffers_ = buffers_;
-    auto temp_size_buffers_ = size_buffers_;
-    auto temp_current_buffers_ = current_buffers_;
+    auto temp_buffers = buffers_;
+    auto temp_size_buffers = size_buffers_;
+    auto temp_current_buffers = current_buffers_;
 
-    // std::cout<<"ret";
     while (c_ptr < end_ptr) {
-        // prm_buff_ptr_[*(map_ptr)]->setData(ptr, 1, DataStatus::success);
-
         auto k = *(map_ptr++);
-        *((temp_current_buffers_[k])++) = double(*(c_ptr++)) / (1 << 16);
+        *((temp_current_buffers[k])++) = double(*(c_ptr++)) / (1 << 16);
 
         if (map_ptr == channels_map_end_) map_ptr = channels_map_;
     }
 
-    temp_current_buffers_ = current_buffers_;
+    temp_current_buffers = current_buffers_;
 
-    auto temp_prm = prm_buff_ptr_;
-    while (temp_prm < prm_buff_end_ptr_) {
-        *(temp_current_buffers_++) = *temp_buffers_;
-        (*temp_prm++)->setData((char*)*(temp_buffers_++), *(temp_size_buffers_++), DataStatus::success);
+    auto temp_prm = prm_buff_vec_.data();
+    while (temp_prm <= prm_buff_end_ptr_) {
+        *(temp_current_buffers++) = *temp_buffers;
+        if (temp_prm) (*temp_prm)->setData((char*)*(temp_buffers), *(temp_size_buffers), DataStatus::success);
+        (temp_prm++, temp_buffers++, temp_size_buffers++);
     }
 
     current_ptr_ = map_ptr;
 }
 
-std::map<std::string, PrmBuffer_ifs*> EthernetA01_Stream::getPrmBufferMap() { return prm_buffer_map_; }
+const Module_ifs* EthernetA01_Stream::getModule() { return module_; }
+
+bool EthernetA01_Stream::addPrmBuffer(const std::string& path, PrmBuffer_ifs* prm_buffer) {
+    auto cnl = std::stoul(path);
+    if ((cnl >= 32) || (module_->task_.cnl[cnl].frequency == 0xff)) return false;
+
+    int cnt = 0;
+
+    for (size_t i = 0; i < cnl; i++) {
+        auto fr = module_->task_.cnl[i].frequency;
+        if (0xff != fr) cnt++;
+    }
+    prm_buff_vec_[cnt] = prm_buffer;
+    return true;
+}
+
+std::map<std::string, PrmBuffer_ifs*> EthernetA01_Stream::getPrmBufferMap() {
+    std::map<std::string, PrmBuffer_ifs*> prm_buffer_map;
+
+    auto cnt = 0;
+    for (size_t i = 0; i < 32; i++) {
+        int fr = (int)module_->task_.cnl[i].frequency;
+        if (0xff != fr) {
+            if (prm_buff_vec_[cnt]) {
+                std::string channel = std::to_string(i);
+                prm_buffer_map[channel] = prm_buff_vec_[cnt];
+            }
+            cnt++;
+        }
+    }
+    return prm_buffer_map;
+}
