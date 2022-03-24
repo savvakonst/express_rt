@@ -40,6 +40,8 @@ class COMMON_API_ Device : public Module_ifs {
 
     std::string source_;
 
+    ModuleStream_ifs *current_stream_ = nullptr;
+
     friend class DeviceManager;
 
    public:
@@ -87,7 +89,7 @@ class COMMON_API_ Device : public Module_ifs {
 
     bool setPropertyAsTxt(const std::string &prop_path, const std::string &value) override { return false; }
 
-    bool removeProperty(const std::string &prop_path) override { return false; };
+    bool removeProperty(const std::string &prop_path) override { return false; }
 
     [[nodiscard]] bool isChannelAvailable(const std::string &prop_path) const override;
 
@@ -99,9 +101,11 @@ class COMMON_API_ Device : public Module_ifs {
 
     [[nodiscard]] std::vector<std::pair<std::string, Module_ifs *>> getSubModules() const override;
 
-    ModuleStream_ifs *createModuleStream() override {
-        return nullptr;
-    }
+    ModuleStream_ifs *createModuleStream() override;
+
+    ModuleStream_ifs *getModuleStream() override;
+
+    bool removeModuleStream() override;
 
     // TODO : remove this
     Module_ifs *getTopModule() {

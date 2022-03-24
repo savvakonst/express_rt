@@ -29,7 +29,7 @@ class EthernetDCU_Stream : public ModuleStream_ifs {
     bool lock_ = true;
 
     Module_ifs *module_;
-    ModuleStream_ifs **sub_modules_;
+    ModuleStream_ifs **sub_streams_;
     size_t number_of_slots_ = 0;
     size_t data_offset_ = 0;
 };
@@ -53,8 +53,6 @@ class Module_DCU_ : public KSDModule {
     size_t number_of_slots_ = 0;
     size_t size_ = 0;
     const std::string module_id_;
-
-    EthernetDCU_Stream *ethernet_stream_ = nullptr;
 
    public:
     explicit Module_DCU_(const std::string &module_id);
@@ -96,7 +94,7 @@ class Module_DCU_ : public KSDModule {
         return false;
     }
 
-    bool isChannelAvailable(const std::string &prop_path) const override;
+    [[nodiscard]] bool isChannelAvailable(const std::string &prop_path) const override;
 
     [[nodiscard]] size_t getTaskSize() const override;
 

@@ -237,7 +237,7 @@
       "Dimension": "",
       "Formula": "x = param()\ny = x\nreturn double(y)\n",
       "Method": 0,
-      "Module.ID": 1597059137,
+      "Module.ID": 1597321281,
       "Module.Name": "КСД/А05",
       "Module.Slot": 1,
       "Points.Approximation": false,

@@ -10,45 +10,8 @@
 
 class Module_A01_;
 
-class EthernetA01_Stream : public ModuleStream_ifs {
-   public:
-    explicit EthernetA01_Stream(Module_A01_* module);
-
-    ~EthernetA01_Stream() override = default;
-
-    void readFramePeace(ModuleStreamContext_ifs* context, char* ptr, size_t size) override;
-
-    int getStatistic() override {
-        // TODO:
-        return 0;
-    }
-
-    const Module_ifs* getModule() override;
-
-    bool addPrmBuffer(const std::string& path, PrmBuffer_ifs* prm_buffer) override;
-
-    std::map<std::string, PrmBuffer_ifs*> getPrmBufferMap() override;
-
-   protected:
-    Module_A01_* module_ = nullptr;
-    std::vector<unsigned char> vec_;
-
-    //
-    std::vector<PrmBuffer_ifs*> prm_buff_vec_;
-    PrmBuffer_ifs** prm_buff_end_ptr_ = nullptr;
-    // size_t size_ = 0;
-
-    unsigned char* channels_map_ = nullptr;
-    unsigned char* channels_map_end_ = nullptr;
-    unsigned char* current_ptr_ = nullptr;
-
-    double** buffers_ = nullptr;
-    size_t* size_buffers_ = nullptr;
-    double** current_buffers_ = nullptr;
-};
 
 class Module_A01_ : public KSDModule {
-    friend EthernetA01_Stream;
 
    protected:
 #pragma pack(1)
@@ -70,7 +33,6 @@ class Module_A01_ : public KSDModule {
 #pragma pack()
 
     Task task_{};
-    EthernetA01_Stream* ethernet_stream_ = nullptr;
 
    public:
     Module_A01_();
@@ -106,6 +68,8 @@ class Module_A01_ : public KSDModule {
     ModuleStream_ifs* createModuleStream() override;
 
     [[nodiscard]] const ErrorInfo_ifs* getErrorInfo() const override;
+
+    [[nodiscard]] const Task& getTask() const { return task_; }
 };
 
 #endif

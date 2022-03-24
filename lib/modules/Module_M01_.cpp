@@ -49,9 +49,8 @@ bool Module_M01_::setPropertyAsTxt(const std::string &prop_path, const std::stri
 }
 
 ModuleStream_ifs *Module_M01_::createModuleStream() {
-    // error_mesadge_ = "The createModuleStream function is not realised yet";
-    // TODO:
-    if (ethernet_stream_ == nullptr) ethernet_stream_ = new EthernetM01_Stream(this);
+    if (ethernet_stream_ != nullptr) return nullptr;
+    ethernet_stream_ = new EthernetM01_Stream(this);
     return ethernet_stream_;
 };
 

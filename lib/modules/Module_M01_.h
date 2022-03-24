@@ -63,8 +63,6 @@ class Module_M01_ : public KSDModule {
 
     Task task_;
 
-    EthernetM01_Stream* ethernet_stream_ = nullptr;
-
    public:
     Module_M01_();
 

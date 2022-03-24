@@ -96,6 +96,8 @@ class KSDModule : public Module_ifs {
 
     Module_ifs *parent_module_ = nullptr;
 
+    ModuleStream_ifs *ethernet_stream_ = nullptr;
+
     [[nodiscard]] const TaskMapper *getBranch(const std::string &prop_path) const;
 
    public:
@@ -142,9 +144,20 @@ class KSDModule : public Module_ifs {
 
     bool removeProperty(const std::string &prop_path) override { return false; }
 
-    bool isChannelAvailable(const std::string &prop_path) const override;
+    [[nodiscard]] bool isChannelAvailable(const std::string &prop_path) const override;
 
     [[nodiscard]] std::vector<std::pair<std::string, Module_ifs *>> getSubModules() const override { return {}; }
+
+    ModuleStream_ifs *getModuleStream() { return ethernet_stream_; }
+
+    bool removeModuleStream() {
+        if (ethernet_stream_) {
+            delete ethernet_stream_;
+            ethernet_stream_ = nullptr;
+            return true;
+        }
+        return false;
+    }
 
    protected:
 };

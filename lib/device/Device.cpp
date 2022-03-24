@@ -60,9 +60,9 @@ Device::Device(const void *ptr, size_t size, ExtensionManager *context) {
 Device::~Device() = default;
 
 bool Device::hasTransceiver() const {
-    for (auto i : modules_) {
+    for (auto i : modules_)
         if (i->hasTransceiver()) return true;
-    }
+
     return false;
 }
 
@@ -97,7 +97,60 @@ std::vector<std::pair<std::string, Module_ifs *>> Device::getSubModules() const 
     return ret;
 }
 
+bool Device::isChannelAvailable(const std::string &prop_path) const {
+    auto path = lastCharPos(prop_path, '/');
+    auto modules = getSubModulesFromPath(path.first);  //::getSubmodules(this, path.first);
+
+    if (modules.size() == 1) return modules.front()->isChannelAvailable(path.second);
+
+    return false;
+}
+
 size_t Device::getTaskSize() const { return size_; }
+
+class EthernetDeviceStream : public ModuleStream_ifs {
+   public:
+    explicit EthernetDeviceStream(Device *device) : device_(device) {
+        auto modules = device->getSubModules();
+
+        if (modules.empty()) return;
+
+        sub_stream_ = modules.front().second->getModuleStream();
+    }
+
+    ~EthernetDeviceStream() override = default;
+
+    void readFramePeace(ModuleStreamContext_ifs *context, char *ptr, size_t size) override {
+        sub_stream_->readFramePeace(context, ptr, size);
+    }
+
+    int getStatistic() override { return 0; }
+
+    const Module_ifs *getModule() override { return device_; }
+
+    ModuleStream_ifs *reduce() override { return sub_stream_; }
+
+   protected:
+    Device *device_{};
+    ModuleStream_ifs *sub_stream_ = nullptr;
+};
+
+ModuleStream_ifs *Device::createModuleStream() {
+    if (current_stream_) return nullptr;
+    current_stream_ = new EthernetDeviceStream(this);
+    return current_stream_;
+}
+
+ModuleStream_ifs *Device::getModuleStream() { return current_stream_; }
+
+bool Device::removeModuleStream() {
+    delete current_stream_;
+    if (current_stream_) {
+        current_stream_ = nullptr;
+        return true;
+    }
+    return false;
+}
 
 /*
  *

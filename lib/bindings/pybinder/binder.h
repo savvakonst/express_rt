@@ -188,6 +188,12 @@ class PyModule : public Module_ifs {
     ModuleStream_ifs *createModuleStream() override {
         PYBIND11_OVERRIDE_PURE(ModuleStream_ifs *, Module_ifs, createModuleStream);
     }
+
+    ModuleStream_ifs *getModuleStream() override {
+        PYBIND11_OVERRIDE_PURE(ModuleStream_ifs *, Module_ifs, getModuleStream);
+    }
+
+    bool removeModuleStream() override { PYBIND11_OVERRIDE_PURE(bool, Module_ifs, removeModuleStream); }
 };
 
 class PyParameter : public Parameter_ifs {

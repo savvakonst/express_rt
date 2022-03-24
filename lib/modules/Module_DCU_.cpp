@@ -98,9 +98,10 @@ size_t Module_DCU_::getTaskSize() const {
 }
 
 ModuleStream_ifs *Module_DCU_::createModuleStream() {
-    if (ethernet_stream_ == nullptr) ethernet_stream_ = new EthernetDCU_Stream(this);
+    if (ethernet_stream_ != nullptr) return nullptr;
+    ethernet_stream_ = new EthernetDCU_Stream(this);
     return ethernet_stream_;
-};
+}
 
 std::vector<std::pair<std::string, Module_ifs *>> Module_DCU_::getSubModules() const {
     std::vector<std::vector<std::pair<size_t, Module_ifs *>>> temp_vector(
@@ -146,10 +147,10 @@ bool Module_DCU_::isChannelAvailable(const std::string &prop_path) const {
  */
 
 EthernetDCU_Stream::EthernetDCU_Stream(Module_DCU_ *module) : module_(module) {
-    sub_modules_ = new ModuleStream_ifs *[module->modules_.size() + 1];  // module->modules_.size();
+    sub_streams_ = new ModuleStream_ifs *[module->modules_.size() + 1];  // module->modules_.size();
 
     // TODO: need to choose only available modules
-    auto ptr = sub_modules_;
+    auto ptr = sub_streams_;
     for (auto i : module->modules_)
         if (i->isAvailable()) {
             *(ptr++) = i->createModuleStream();
@@ -170,7 +171,7 @@ void EthernetDCU_Stream::readFramePeace(ModuleStreamContext_ifs *context, char *
     if ((0x3ff & time) == 0) lock_ = false;
     if (lock_) return;
 
-    ModuleStream_ifs **module_ptr = sub_modules_;
+    ModuleStream_ifs **module_ptr = sub_streams_;
 
     auto *cnt = (uint16_t *)(ptr + g_cnt_offset);
     uint16_t *cnt_end = cnt + number_of_slots_;

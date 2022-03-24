@@ -8,6 +8,7 @@
 #include "Ping/ksdconnected.h"
 #include "common/ExtensionManager.h"
 #include "common/IO_ifs.h"
+#include "common/StringProcessingTools.h"
 #include "convtemplate/Parameter_ifs.h"
 #include "convtemplate/PrmBuffer_ifs.h"
 #include "device/Device.h"
@@ -36,19 +37,27 @@ class OpenAction : public QAction {
     IO_ifs *io_;
 };
 
-void generateStream(ExtensionManager *manager, const std::string &type, Device *device,
-                    const std::list<Parameter_ifs *> &parameters) {
-    ModuleStream_ifs *m_stream = device->createModuleStream();
+ModuleStream_ifs *generateStream(ExtensionManager *manager, const std::string &type, Device *device,
+                                 const std::list<Parameter_ifs *> &parameters) {
+    ModuleStream_ifs *top_m_stream = device->createModuleStream();
+
     for (auto prm : parameters) {
         auto constructor = (prmBufferConstructor_f)manager->getLastVersionExtensionObject(type, prm->getType());
         if (constructor) {
             auto prm_buffer = constructor(prm, manager);
-            auto path = prm->getProperty("common/path")->getValue().asString();
-            m_stream->addPrmBuffer(path, prm_buffer);
+
+            auto full_path = prm->getProperty("common/path")->getValue().asString();
+
+            auto path = lastCharPos(full_path, '/');
+            auto sub_modules = ::getSubmodules(device, path.first);
+            if (sub_modules.size() == 1) {
+                auto m = sub_modules.front()->getModuleStream();
+                if (m) top_m_stream->addPrmBuffer(path.second, prm_buffer);
+            }
         }
     }
-    = m_stream->reduce();
-    auto *receiver = new Receiver(m_stream, device->getSrcAddress());
+
+    return top_m_stream;
 }
 
 MainWindow::MainWindow(ExtensionManager *ctm) : text_edit_(new QTextEdit), manager_(ctm) {
