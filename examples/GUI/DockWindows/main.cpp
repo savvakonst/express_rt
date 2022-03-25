@@ -3,7 +3,7 @@
 #include <QTranslator>
 #include <fstream>
 //
-#include "common/BindingUtils.h"
+
 #include "common/ExtensionManager.h"
 #include "mainwindow.h"
 
@@ -14,10 +14,7 @@ int main(int argc, char *argv[]) {
     my_translator.load("dictionary_ru");
     QApplication::installTranslator(&my_translator);
 
-    ExtensionManager manager;
-
-    auto eval_file = (evalFile_t)manager.getLastVersionExtensionObject("eval_file", "py_eval_file");
-    if (eval_file) eval_file("exrt_config.py");
+    ExtensionManager manager(false);
 
     MainWindow main_win(&manager);
     main_win.show();

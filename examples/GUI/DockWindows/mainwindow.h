@@ -17,7 +17,7 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
    public:
-    explicit MainWindow(ExtensionManager *ctm);
+    explicit MainWindow(ExtensionManager *manager);
 
    private:
     void closeEvent(QCloseEvent *event) override;
@@ -25,8 +25,6 @@ class MainWindow : public QMainWindow {
     void createDockWindows();
 
     ExtensionManager *manager_ = nullptr;
-    QTextEdit *text_edit_ = nullptr;
-    QTableView *table_view_ = nullptr;
     QMenu *view_menu_ = nullptr;
 };
 

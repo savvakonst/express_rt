@@ -28,10 +28,10 @@ QFormScreen::QFormScreen(
     else {
         // QString     programDataFolder = QDir().toNativeSeparators(programDataPath
         // + PROGRAM_DATA_FOLDER);
-        QString programDataFolder = QDir().toNativeSeparators(program_data_path_);
-        if (!QDir(programDataFolder).exists()) QDir().mkdir(programDataFolder);
+        QString program_data_folder = QDir().toNativeSeparators(program_data_path_);
+        if (!QDir(program_data_folder).exists()) QDir().mkdir(program_data_folder);
 
-        g_supportPath = programDataFolder;
+        g_supportPath = program_data_folder;
     }
     //
 
@@ -187,9 +187,10 @@ QFormScreen::QFormScreen(
 
     show();
 }
-
+#include <QDebug>
 //-------------------------------------------------------------------------
 QFormScreen::~QFormScreen() {
+    qDebug() << "~QFormScreen()";
     if (timer_) timer_->stop();
 
     delete timer_;

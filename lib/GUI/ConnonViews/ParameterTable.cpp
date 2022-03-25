@@ -88,7 +88,9 @@ QVariant ParameterTableModel::data(const QModelIndex &index, int role) const {
         auto name = list_of_entries_[index.column()]->name_;
         auto h_data = prm->getProperty("common/" + name);
         return h_data->getValue().asString().data();
-    }
+    }  // else if (role == Qt::CheckStateRole) {
+       //    if (index.column() == 0) return Qt::Unchecked;
+    //}
     return {};
 }
 
@@ -164,6 +166,21 @@ void ParameterTableModel::selectParameter(const QModelIndex &index) {
  *
  */
 
+#include <QBoxLayout>
+#include <QCoreApplication>
+#include <QDockWidget>
+#include <QMainWindow>
+#include <QToolBar>
+#include <QToolButton>
+
+#include "CustomQActions.h"
+#include "qformscreen.h"
+
+QPixmap getPixmap(QString str) {
+    auto pixmap_path = QCoreApplication::applicationDirPath() + str;
+    return QPixmap(pixmap_path);
+}
+
 class ParameterViewWrapper : public ParameterViewWrapper_ifs {
    public:
     ParameterViewWrapper() : widget_(new ParameterTreeView()) {
@@ -171,10 +188,62 @@ class ParameterViewWrapper : public ParameterViewWrapper_ifs {
         widget_->setStyleSheet(
             "QTreeView {background-color: #D2DCDF; alternate-background-color: #f6fafb; show-decoration-selected: 1;}"
             "QHeaderView::section {background-color: #D2DCDF}");
+
+        top_widget_ = new QWidget();
+        auto layout = new QVBoxLayout(top_widget_);
+
+        layout->addWidget(widget_);
+
+        auto p_layout = reinterpret_cast<QHBoxLayout *>(top_widget_->layout());
+        auto toolbar = new QToolBar();
+
+        QIcon run_icon;
+        run_icon.addPixmap(getPixmap("/png/common/play.png"), QIcon::Normal, QIcon::Off);
+        run_icon.addPixmap(getPixmap("/png/common/stop.png"), QIcon::Normal, QIcon::On);
+
+        action_run_ = new FuncProxyQAction(
+            run_icon, QObject::tr("Ru&n"),
+            [&]() {
+                if (main_window_ == nullptr) return false;
+
+                QList<int> dock_widths;
+                QList<QDockWidget *> dock_widgets;
+                qDebug() << "-------------------";
+                for (auto i : main_window_->findChildren<QDockWidget *>())
+                    if (i->objectName() != "&plotter") {
+                        dock_widths.push_back(i->width());
+                        dock_widgets.push_back(i);
+                        qDebug() << "\t" << i->objectName() << ": " << i->width();
+                    }
+
+                // auto dock = new QDockWidget(QObject::tr("&plotter"), main_window_);
+                // dock->setObjectName(QObject::tr("&plotter"));
+
+                QWidget *form_screen = !action_run_->isChecked() ? new QWidget : new QFormScreen();
+
+                // dock->setWidget(form_screen);
+
+                delete main_window_->takeCentralWidget();
+
+                main_window_->setCentralWidget(form_screen);
+                main_window_->resizeDocks(dock_widgets, dock_widths, Qt::Horizontal);
+
+                // main_window_->addDockWidget(Qt::RightDockWidgetArea, dock);
+                return true;
+            },
+            widget_);
+
+        action_run_->setCheckable(true);
+
+        toolbar->addAction(action_run_);
+        p_layout->insertWidget(0, toolbar);
     }
 
     void init(ExtensionManager *manager) {
         auto model = new ParameterTableModel(manager);
+
+        main_window_ = (QMainWindow *)manager->getLastVersionExtensionObject("main_window", "main_window");
+
         QObject::connect(widget_, &ParameterTreeView::currentChangedSignal, model,
                          &ParameterTableModel::selectParameter);
         widget_->setModel(model);
@@ -185,7 +254,7 @@ class ParameterViewWrapper : public ParameterViewWrapper_ifs {
         return status::succes;
     }
 
-    QWidget *getWidget() override { return widget_; }
+    QWidget *getWidget() override { return top_widget_; }
 
     bool setActive(size_t row_index) override {
         auto cnt = rowCount();
@@ -256,21 +325,14 @@ class ParameterViewWrapper : public ParameterViewWrapper_ifs {
     DeviceViewWrapper_ifs *device_view_wrapper_ = nullptr;
     ParameterTableModel *model_ = nullptr;
     ParameterTreeView *widget_;
+    QMainWindow *main_window_ = nullptr;
+
+    QAction *action_run_ = nullptr;
+    QWidget *top_widget_ = nullptr;
 };
 
 void ParameterTreeView::currentChanged(const QModelIndex &current, const QModelIndex &previous) {
     emit currentChangedSignal(current);
-}
-
-QWidget *newParameterTreeView(QWidget *parent) {
-    auto prm_view = new ParameterTreeView();
-    prm_view->setAlternatingRowColors(true);
-
-    prm_view->setStyleSheet(
-        "QTreeView {background-color: #D2DCDF; alternate-background-color: #f6fafb; show-decoration-selected: 1;}"
-        "QHeaderView::section {background-color: #D2DCDF}");
-
-    return prm_view;
 }
 
 WidgetWrapper_ifs *newParameterViewWrapper() { return new ParameterViewWrapper(); }

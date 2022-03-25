@@ -6,6 +6,7 @@
 #include "GUI/TreeEditor.h"
 #include "GUI/WidgetWrappers.h"
 #include "Ping/ksdconnected.h"
+#include "common/BindingUtils.h"
 #include "common/ExtensionManager.h"
 #include "common/IO_ifs.h"
 #include "common/StringProcessingTools.h"
@@ -60,9 +61,21 @@ ModuleStream_ifs *generateStream(ExtensionManager *manager, const std::string &t
     return top_m_stream;
 }
 
-MainWindow::MainWindow(ExtensionManager *ctm) : text_edit_(new QTextEdit), manager_(ctm) {
+ExtensionUnit *g_top_gui_units = nullptr;
+ExtensionInfo g_top_gui_info;
+
+MainWindow::MainWindow(ExtensionManager *manager) : manager_(manager) {
     QApplication::setStyle(QStyleFactory::create("Fusion"));
 
+    g_top_gui_units = new ExtensionUnit[]{{"main_window", "main_window", "pointer to main window", this, 0},
+                                          {nullptr, nullptr, nullptr, nullptr, 0}};
+
+    g_top_gui_info = {"top gui", 0, g_top_gui_units};
+    manager_->insertExtensionInfo(&g_top_gui_info);
+    manager_->init();
+
+    auto eval_file = (evalFile_t)manager->getLastVersionExtensionObject("eval_file", "py_eval_file");
+    if (eval_file) eval_file("exrt_config.py");
     ////////////////////////////////////////////////////////////////////////////
     /*
     std::string error_msg;
@@ -92,7 +105,8 @@ MainWindow::MainWindow(ExtensionManager *ctm) : text_edit_(new QTextEdit), manag
     receiver->start();
      */
     //////////////////////////////////////////////////////////////////////////
-    setCentralWidget(text_edit_);
+    setCentralWidget(new QTextEdit);
+    // centralWidget()
 
     auto file_menu = menuBar()->addMenu(tr("&Файл"));
 

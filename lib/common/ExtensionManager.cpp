@@ -66,8 +66,7 @@ HINSTANCE tryToLinkSharedLibrary(ExtensionManager *em, const std::string &path, 
     // If the handle is valid, try to get the function address.
     if (hinstance != nullptr) {
         DEBUG_COUT("library loaded \n");
-        ExtensionInitFunction initFunction =
-            (ExtensionInitFunction)GetProcAddress(hinstance, init_function_name.c_str());
+        auto initFunction = (ExtensionInitFunction)GetProcAddress(hinstance, init_function_name.c_str());
 
         // If the function address is valid, call the function.
         if (nullptr != initFunction) {
@@ -88,7 +87,7 @@ HINSTANCE tryToLinkSharedLibrary(ExtensionManager *em, const std::string &path, 
 }
 
 ExtensionManager::ExtensionManager(bool init) {
-    std::list<HINSTANCE> *hinstance_list = new std::list<HINSTANCE>;
+    auto *hinstance_list = new std::list<HINSTANCE>;
     resource_ = (extensionResource_t)hinstance_list;
 
     std::string path = getExecutePath();
@@ -96,12 +95,37 @@ ExtensionManager::ExtensionManager(bool init) {
 
     DEBUG_COUT("----------------------------------------------------------\n");
 
-    for (auto i : shared_libs_list) {
+    for (const auto &i : shared_libs_list) {
         DEBUG_COUT("--------------------------\n" << i << "\n");
         HINSTANCE hinstance = tryToLinkSharedLibrary(this, path, i);
         if (hinstance != nullptr) hinstance_list->push_back(hinstance);
         DEBUG_COUT("\n");
     }
+
+    if (init) {
+        this->init();
+    }
+}
+
+ExtensionManager::ExtensionManager(const std::vector<ExtensionInfo *> &extensions, bool init) {
+    auto *hinstance_list = new std::list<HINSTANCE>;
+    resource_ = (extensionResource_t)hinstance_list;
+
+    std::string path = getExecutePath();
+    auto shared_libs_list = searchForSharedLibraries(path);
+
+    DEBUG_COUT("----------------------------------------------------------\n");
+
+    for (const auto &i : shared_libs_list) {
+        DEBUG_COUT("--------------------------\n" << i << "\n");
+        HINSTANCE hinstance = tryToLinkSharedLibrary(this, path, i);
+        if (hinstance != nullptr) hinstance_list->push_back(hinstance);
+        DEBUG_COUT("\n");
+    }
+
+    for (const auto &i : extensions)
+        insertExtensionInfo(i);
+
 
     if (init) {
         this->init();
@@ -115,7 +139,7 @@ void ExtensionManager::init() {
 }
 
 ExtensionManager::~ExtensionManager() {
-    std::list<HINSTANCE> *hinstance_list = (std::list<HINSTANCE> *)resource_;
+    auto *hinstance_list = (std::list<HINSTANCE> *)resource_;
     bool f_free_result;
 
     DEBUG_COUT("\n\n------------------free-libraries---------------------\n");

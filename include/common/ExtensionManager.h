@@ -9,6 +9,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <vector>
 
 #include "Extension.h"
 #include "Port.h"
@@ -41,13 +42,6 @@ inline ExtensionUnit *search(ExtensionUnit *ptr, const std::string &type, const 
 }
 
 class COMMON_API_ ExtensionManager {
-   public:
-    explicit ExtensionManager(bool init = true);
-
-    ~ExtensionManager();
-
-    void init();
-
    private:
     struct VersionCmp {
         constexpr bool operator()(const ExtensionUnit *lhs, const ExtensionUnit *rhs) const {
@@ -57,11 +51,18 @@ class COMMON_API_ ExtensionManager {
         constexpr bool operator()(const version_t lhs, const ExtensionUnit *rhs) const { return lhs < rhs->version; }
     };
 
+   public:
     template <typename T>
     using map_t = std::map<std::string, T>;
-
-   public:
     typedef std::set<ExtensionUnit *, VersionCmp> versionList_t;
+
+    explicit ExtensionManager(bool init = true);
+
+    explicit ExtensionManager(const std::vector<ExtensionInfo *> &extensions, bool init = true);
+
+    ~ExtensionManager();
+
+    void init();
 
     std::list<std::string> getAvailableExtensionTypes(const std::string &type) {
         std::list<std::string> ret;
