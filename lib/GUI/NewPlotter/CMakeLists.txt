@@ -3,13 +3,6 @@
 project(ksdExpressOnlineScreen VERSION 1.0.0 LANGUAGES CXX)
 
 
-get_directory_property(hasParent PARENT_DIRECTORY)
-if (hasParent)
-else ()
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
-endif ()
-
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 

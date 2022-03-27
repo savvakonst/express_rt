@@ -206,27 +206,34 @@ class ParameterViewWrapper : public ParameterViewWrapper_ifs {
             [&]() {
                 if (main_window_ == nullptr) return false;
 
+                main_window_->setCentralWidget(dock);
+
                 QList<int> dock_widths;
                 QList<QDockWidget *> dock_widgets;
                 qDebug() << "-------------------";
+
+                int last_width = 400;
                 for (auto i : main_window_->findChildren<QDockWidget *>())
                     if (i->objectName() != "&plotter") {
                         dock_widths.push_back(i->width());
                         dock_widgets.push_back(i);
                         qDebug() << "\t" << i->objectName() << ": " << i->width();
+                    } else {
+                        last_width = i->width();
                     }
 
-                // auto dock = new QDockWidget(QObject::tr("&plotter"), main_window_);
-                // dock->setObjectName(QObject::tr("&plotter"));
+                auto dock = new QDockWidget(QObject::tr("&plotter"), main_window_);
+                dock->setObjectName(QObject::tr("&plotter"));
 
                 QWidget *form_screen = !action_run_->isChecked() ? new QWidget : new QFormScreen();
 
-                // dock->setWidget(form_screen);
+                dock->setWidget(form_screen);
 
-                delete main_window_->takeCentralWidget();
+                // delete main_window_->takeCentralWidget();
 
-                main_window_->setCentralWidget(form_screen);
-                main_window_->resizeDocks(dock_widgets, dock_widths, Qt::Horizontal);
+                main_window_->setCentralWidget(dock);
+                // main_window_->resizeDocks(dock_widgets, dock_widths, Qt::Horizontal);
+                main_window_->resizeDocks({dock}, {last_width}, Qt::Horizontal);
 
                 // main_window_->addDockWidget(Qt::RightDockWidgetArea, dock);
                 return true;

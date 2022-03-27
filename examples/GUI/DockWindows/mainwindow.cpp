@@ -105,8 +105,11 @@ MainWindow::MainWindow(ExtensionManager *manager) : manager_(manager) {
     receiver->start();
      */
     //////////////////////////////////////////////////////////////////////////
-    setCentralWidget(new QTextEdit);
-    // centralWidget()
+    // setCentralWidget(new QTextEdit);
+    // auto dock = new QDockWidget(QObject::tr("&plotter"));
+    // dock->setObjectName(QObject::tr("&plotter"));
+    // dock->setWidget(new QWidget);
+    setCentralWidget(new QMainWindow);
 
     auto file_menu = menuBar()->addMenu(tr("&Файл"));
 

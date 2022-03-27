@@ -79,7 +79,7 @@ QFormScreen::QFormScreen(
     // connect(axisX, &QScreenAxisX::toChanged, this, &QFormScreen::onUpdateScene);
     connect(axis_x_, &QScreenAxisX::to_height, this, &QFormScreen::onSetAxisXHeight);
 
-    QHBoxLayout *p_layout = reinterpret_cast<QHBoxLayout *>(layout());
+    auto *p_layout = reinterpret_cast<QHBoxLayout *>(layout());
 
     auto image_path = QCoreApplication::applicationDirPath() + "/png/common/play.png";
     QIcon run_icon = QIcon::fromTheme("run", QIcon(image_path));
@@ -185,7 +185,7 @@ QFormScreen::QFormScreen(
     timer_->setInterval(static_cast<int>(1000 * time_step_.toDouble()));
     timer_->start(static_cast<int>(time_step_.toDouble() * 1000));
 
-    show();
+    // show();
 }
 #include <QDebug>
 //-------------------------------------------------------------------------
