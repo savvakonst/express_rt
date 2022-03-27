@@ -6,6 +6,7 @@
 #include "GUI/TreeEditor.h"
 #include "GUI/WidgetWrappers.h"
 #include "Ping/ksdconnected.h"
+#include "TopWindow.h"
 #include "common/BindingUtils.h"
 #include "common/ExtensionManager.h"
 #include "common/IO_ifs.h"
@@ -109,7 +110,7 @@ MainWindow::MainWindow(ExtensionManager *manager) : manager_(manager) {
     // auto dock = new QDockWidget(QObject::tr("&plotter"));
     // dock->setObjectName(QObject::tr("&plotter"));
     // dock->setWidget(new QWidget);
-    setCentralWidget(new QMainWindow);
+    setCentralWidget(new TopWindow());
 
     auto file_menu = menuBar()->addMenu(tr("&Файл"));
 

@@ -1,8 +1,0 @@
-//
-// Created by SVK on 18.02.2022.
-//
-
-#ifndef EXRT_DEVICELISTWRAPPER_H
-#define EXRT_DEVICELISTWRAPPER_H
-
-#endif  // EXRT_DEVICELISTWRAPPER_H

@@ -10,6 +10,6 @@ endif ()
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
 add_subdirectory(TreeEditor)
-add_subdirectory(ConnonViews)
+add_subdirectory(CommonViews)
 add_subdirectory(QtPropertyBrowser)
 add_subdirectory(NewPlotter)

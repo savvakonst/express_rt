@@ -26,14 +26,10 @@ DeviceListModel::DeviceListModel(ExtensionManager *manager) {
     auto image_dir = QDir(QCoreApplication::applicationDirPath() + "/png/modules");
     auto image_path_list = image_dir.entryInfoList({"*.png", "*.bmp", "*.ico"});
 
-    for (auto &i : image_path_list)
-        icons_map_[i.baseName()] = QIcon(i.absoluteFilePath());
-
+    for (auto &i : image_path_list) icons_map_[i.baseName()] = QIcon(i.absoluteFilePath());
 
     auto unit = manager->getLastVersionExtensionUnit("device_manager", "device_manager");
-    if (unit && unit->ptr)
-        device_manager_ = (DeviceManager *)unit->ptr;
-
+    if (unit && unit->ptr) device_manager_ = (DeviceManager *)unit->ptr;
 
     class Delegate : public Signal_ifs {
        public:
@@ -220,6 +216,7 @@ QMimeData *DeviceListModel::mimeData(const QModelIndexList &indexes) const {
     }
     auto s = s_stream.str();
     mime_data->setData("text/module", QByteArray::fromStdString(s));
+    mime_data->setData("text/uri-list", QByteArray::fromStdString(s));
     return mime_data;
 }
 
