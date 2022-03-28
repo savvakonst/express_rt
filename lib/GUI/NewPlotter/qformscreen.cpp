@@ -5,42 +5,36 @@
 #include "ui_qformscreen.h"
 
 //
-QString g_supportPath;
+QString g_support_path;
 //
 
 //-------------------------------------------------------------------------
-QFormScreen::QFormScreen(
-    /*const int &index, const SETTINGS_DIAGITEM &dstx0,*/ QWidget *parent)
-    : QDialog(parent), ui_(new Ui::QFormScreen) {
+QFormScreen::QFormScreen(QWidget *parent) : QDialog(parent), ui_(new Ui::QFormScreen) {
     ui_->setupUi(this);
 
-    index_ = 0;  // index;
-    // dstx_ = SettingsDiagitem(); // dstx0
+    margin_.left = kDiagramOffsetLeft;
+    margin_.right = kDiagramOffsetLeft;
 
-    margin_.left = DIAGRAM_OFFSET_LEFT;
-    margin_.right = DIAGRAM_OFFSET_LEFT;
+    setStyleSheet(
+        "QWidget {background-color: #D2DCDF; alternate-background-color: #f6fafb; show-decoration-selected: 1;}");
 
     //
     program_data_path_ = QStandardPaths::writableLocation(QStandardPaths::StandardLocation::AppDataLocation);
 
-    QSettings ini(QDir::currentPath() + INI_FILENAME_EO, QSettings::IniFormat);
-    if (ini.isWritable()) g_supportPath = QDir::currentPath();
+    QSettings ini(QDir::currentPath() + ini_filename_eo_, QSettings::IniFormat);
+    if (ini.isWritable()) g_support_path = QDir::currentPath();
     else {
-        // QString     programDataFolder = QDir().toNativeSeparators(programDataPath
-        // + PROGRAM_DATA_FOLDER);
         QString program_data_folder = QDir().toNativeSeparators(program_data_path_);
         if (!QDir(program_data_folder).exists()) QDir().mkdir(program_data_folder);
 
-        g_supportPath = program_data_folder;
+        g_support_path = program_data_folder;
     }
-    //
 
     Qt::WindowFlags flags = nullptr;
     flags |= Qt::Window;
     flags |= Qt::WindowMinMaxButtonsHint;
     flags |= Qt::WindowCloseButtonHint;
     setWindowFlags(flags);
-    setWindowTitle(getTitle());
     setWindowIcon(QIcon("://image_w"));
 
     t_.fromDouble(30);
@@ -88,37 +82,38 @@ QFormScreen::QFormScreen(
     setStatusTip(tr("run"));
 
     // menu File
-    act_shot_ = new QAction(QIcon("://shot"), tr("Снимок"), this);
-    act_shot_->setShortcut(Qt::CTRL + Qt::Key_S);
-    connect(act_shot_, &QAction::triggered, this, &QFormScreen::onMakeShotAuto);
+    {
+        act_shot_ = new QAction(QIcon("://shot"), tr("Снимок"), this);
+        act_shot_->setShortcut(Qt::CTRL + Qt::Key_S);
+        connect(act_shot_, &QAction::triggered, this, &QFormScreen::onMakeShotAuto);
 
-    act_shot_as_ = new QAction(QIcon("://shot"), tr("Сохранить снимок как ..."), this);
-    act_shot_as_->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_S);
-    connect(act_shot_as_, &QAction::triggered, this, &QFormScreen::onMakeShotManual);
+        act_shot_as_ = new QAction(QIcon("://shot"), tr("Сохранить снимок как ..."), this);
+        act_shot_as_->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_S);
+        connect(act_shot_as_, &QAction::triggered, this, &QFormScreen::onMakeShotManual);
 
-    act_refresh_ = new QAction(QIcon("://refresh"), tr("Обновить"), this);
-    act_refresh_->setShortcut(Qt::CTRL + Qt::Key_R);
-    connect(act_refresh_, &QAction::triggered, this, &QFormScreen::onRefreshScene);
+        act_refresh_ = new QAction(QIcon("://refresh"), tr("Обновить"), this);
+        act_refresh_->setShortcut(Qt::CTRL + Qt::Key_R);
+        connect(act_refresh_, &QAction::triggered, this, &QFormScreen::onRefreshScene);
 
-    act_group_up_ = new QAction(QIcon("://greed"), tr("Сгруппировать"), this);
-    act_group_up_->setShortcut(Qt::CTRL + Qt::Key_G);
-    connect(act_group_up_, &QAction::triggered, this, &QFormScreen::onGroupupScene);
+        act_group_up_ = new QAction(QIcon("://greed"), tr("Сгруппировать"), this);
+        act_group_up_->setShortcut(Qt::CTRL + Qt::Key_G);
+        connect(act_group_up_, &QAction::triggered, this, &QFormScreen::onGroupupScene);
 
-    act_scale_hide_ = new QAction(QIcon("://hidden"), tr("Скрыть все шкалы"), this);
+        act_scale_hide_ = new QAction(QIcon("://hidden"), tr("Скрыть все шкалы"), this);
+        act_scale_hide_->setCheckable(true);
+        act_scale_hide_->setShortcut(Qt::Key_Delete);
+        act_scale_hide_->setChecked(is_axis_hidden_);
+        if (is_axis_hidden_) act_scale_hide_->setText(tr("Показать шкалы"));
+        connect(act_scale_hide_, &QAction::triggered, this, &QFormScreen::onHideScale);
 
-    act_scale_hide_->setCheckable(true);
-    act_scale_hide_->setShortcut(Qt::Key_Delete);
-    act_scale_hide_->setChecked(is_axis_hidden_);
-    if (is_axis_hidden_) act_scale_hide_->setText(tr("Показать шкалы"));
-    connect(act_scale_hide_, &QAction::triggered, this, &QFormScreen::onHideScale);
+        act_clear_ = new QAction(QIcon("://clear"), tr("Очистить"), this);
+        act_clear_->setShortcut(Qt::CTRL + Qt::Key_Delete);
+        connect(act_clear_, &QAction::triggered, this, &QFormScreen::onClearScene);
 
-    act_clear_ = new QAction(QIcon("://clear"), tr("Очистить"), this);
-    act_clear_->setShortcut(Qt::CTRL + Qt::Key_Delete);
-    connect(act_clear_, &QAction::triggered, this, &QFormScreen::onClearScene);
-
-    act_exit_ = new QAction(QIcon("://close"), tr("Выход"), this);
-    act_exit_->setShortcut(Qt::ALT + Qt::Key_F4);
-    connect(act_exit_, &QAction::triggered, this, &QFormScreen::onExit);
+        act_exit_ = new QAction(QIcon("://close"), tr("Выход"), this);
+        act_exit_->setShortcut(Qt::ALT + Qt::Key_F4);
+        connect(act_exit_, &QAction::triggered, this, &QFormScreen::onExit);
+    }
 
     mn_file_ = new QMenu(tr("Экран"), this);
     mn_file_->addAction(act_shot_);
@@ -133,24 +128,28 @@ QFormScreen::QFormScreen(
     mn_file_->addAction(act_run);
 
     // menu Settings
-    act_settings_ = new QAction(QIcon("://settings"), tr("Настройки"), this);
-    act_settings_->setShortcut(Qt::CTRL + Qt::Key_Q);
-    connect(act_settings_, &QAction::triggered, this, &QFormScreen::onShowSettings);
+    {
+        act_settings_ = new QAction(QIcon(":/settings"), tr("Настройки"), this);
+        act_settings_->setShortcut(Qt::CTRL + Qt::Key_Q);
+        connect(act_settings_, &QAction::triggered, this, &QFormScreen::onShowSettings);
 
-    act_conf_save_ = new QAction(QIcon("://save_conf"), tr("Сохранить конфигурацию"), this);
-    connect(act_conf_save_, &QAction::triggered, this, &QFormScreen::onSaveConf);
+        act_conf_save_ = new QAction(QIcon(":/save_conf"), tr("Сохранить конфигурацию"), this);
+        connect(act_conf_save_, &QAction::triggered, this, &QFormScreen::onSaveConf);
 
-    mn_settings_ = new QMenu(tr("Настройки"), this);
-    mn_settings_->addAction(act_settings_);
-    mn_settings_->addAction(act_conf_save_);
+        mn_settings_ = new QMenu(tr("Настройки"), this);
+        mn_settings_->addAction(act_settings_);
+        mn_settings_->addAction(act_conf_save_);
+    }
 
     // menu help
-    act_help_ = new QAction(tr("Справка"), this);
-    act_help_->setShortcut(Qt::Key_F1);
-    connect(act_help_, &QAction::triggered, this, &QFormScreen::onHelp);
+    {
+        act_help_ = new QAction(tr("Справка"), this);
+        act_help_->setShortcut(Qt::Key_F1);
+        connect(act_help_, &QAction::triggered, this, &QFormScreen::onHelp);
 
-    mn_help_ = new QMenu(tr("Справка"), this);
-    mn_help_->addAction(act_help_);
+        mn_help_ = new QMenu(tr("Справка"), this);
+        mn_help_->addAction(act_help_);
+    }
 
     // main menu
     menubar_ = new QMenuBar(this);
@@ -177,7 +176,7 @@ QFormScreen::QFormScreen(
     progress_->setVisible(false);
 
     statusbar_->addPermanentWidget(progress_);
-    statusbar_->showMessage(getTitle());
+    // statusbar_->showMessage(getTitle());
     p_layout->addWidget(statusbar_);
 
     timer_ = new QTimer();
@@ -198,21 +197,13 @@ QFormScreen::~QFormScreen() {
 }
 
 //-------------------------------------------------------------------------
-int QFormScreen::getIndex() { return index_; }
 
 //-------------------------------------------------------------------------
 void QFormScreen::setTitle(const QString &title) {
     title_ = title;
-    setWindowTitle(title_);
+    // setWindowTitle(title_);
 
     emit to_titleChanged();
-}
-
-//-------------------------------------------------------------------------
-QString QFormScreen::getTitle() {
-    if (title_.isEmpty()) return (tr("Экран %1").arg(index_ + 1));
-    else
-        return title_;
 }
 
 //-------------------------------------------------------------------------
@@ -331,23 +322,8 @@ QScreenScale *QFormScreen::getScale(const int &index) {
     return scales_.at(index);
 }
 //-------------------------------------------------------------------------
-void QFormScreen::onExit() { emit toRemoved(index_); }
+void QFormScreen::onExit() {}
 //-------------------------------------------------------------------------
-void QFormScreen::onIndexReduce(const int &index_0) {
-    QString oldTitle = getTitle();
-
-    bool changed = false;
-    if (index_ > index_0) {
-        index_--;
-        changed = true;
-    }
-
-    if (!title_.isEmpty() || !changed) return;
-
-    setTitle(getTitle());
-
-    statusbar_->showMessage(QString("%1 >> %2").arg(oldTitle).arg(getTitle()));
-}
 
 //-------------------------------------------------------------------------
 void QFormScreen::onRefresh(const RelativeTime &t0, const bool zoomed) {
@@ -384,7 +360,7 @@ void QFormScreen::onAddMakerExt(const RelativeTime &t_0) {
     sz.setHeight(scene_->height());
 
     QPointF pt;
-    pt.setX(SCREEN_OFFSET_LEFT);
+    pt.setX(kScreenOffsetLeft);
     pt.setY(0);
 
     int index = markers_.count();
@@ -408,8 +384,8 @@ void QFormScreen::onAddMakerExt(const RelativeTime &t_0) {
     markers_.push_back(mrk);
     scene_->addItem(mrk);
 
-    emit mrk->to_focused(SOURCE_MARKER, index);
-    emit mrk->to_changed(SOURCE_MARKER);
+    emit mrk->to_focused(kSourceMarker, index);
+    emit mrk->to_changed(kSourceMarker);
 }
 //-------------------------------------------------------------------------
 void QFormScreen::onMessageShow(const QString &s) { QMessageBox::warning(this, tr("Внимание!"), s, QMessageBox::Ok); }
@@ -454,12 +430,12 @@ void QFormScreen::placeAxisX(QPainter *painter, const QScreenAxisX *axis) {
 }
 
 //-------------------------------------------------------------------------
-void QFormScreen::placeDiag(QPainter *painter, const QScreenScale *scl) {
+void QFormScreen::placeDiag(QPainter *painter, const QScreenScale *scl) const {
     QPointF pt = scl->pos();
     pt.setX(0);
 
     int y = static_cast<int>(pt.y());
-    y -= DIAGRAM_MARGIN;
+    y -= kDiagramMargin;
     y += scl->img_shift_y_;
     pt.setY(y);
     int x = static_cast<int>(pt.x());
@@ -511,8 +487,8 @@ void QFormScreen::placeScale(QPainter *painter, const QScreenScale *scl) {
     painter->setPen(pen);
 
     for (auto co : scl->cutoffs_) {
-        qreal y = pt.y() + co.pos + DIAGRAM_MARGIN;
-        painter->drawLine(QPointF(margin_.left - DIAGRAM_MARGIN, y), QPointF(width() - margin_.right, y));
+        qreal y = pt.y() + co.pos + kDiagramMargin;
+        painter->drawLine(QPointF(margin_.left - kDiagramMargin, y), QPointF(width() - margin_.right, y));
     }
 }
 //-------------------------------------------------------------------------
@@ -524,7 +500,7 @@ void QFormScreen::placeStat(QPainter *painter, const QScreenScale *scl) {
     QRect rt = scene_->setRect(ui_->graphicsView->rect());
     QPointF pt = scl->scenePos();
 
-    pt.setX(rt.width() - margin_.right + DIAGRAM_MARGIN);
+    pt.setX(rt.width() - margin_.right + kDiagramMargin);
 
     QFontMetrics fm = painter->fontMetrics();
 
@@ -727,8 +703,8 @@ void QFormScreen::placeMarkerFloat(QPainter *painter) {
 
     painter->drawLine(QPointF(mark_f_.x, 0), QPointF(mark_f_.x, sceneH));
     if (axis_y_marker_)
-        painter->drawLine(QPointF(margin_.left - DIAGRAM_MARGIN, mark_f_.y),
-                          QPointF(scene_->width() - margin_.right + DIAGRAM_MARGIN, mark_f_.y));
+        painter->drawLine(QPointF(margin_.left - kDiagramMargin, mark_f_.y),
+                          QPointF(scene_->width() - margin_.right + kDiagramMargin, mark_f_.y));
 
     QPointF ptT;
     ptT.setX(x + 5);
@@ -804,11 +780,11 @@ void QFormScreen::placeMarkerAnchor(QPainter *painter) {
 
 //-------------------------------------------------------------------------
 void QFormScreen::placeMarkerValues(QPainter *painter, int x) {
-    QString s;
+    // QString s;
     int y = 0;
     QPointF pt;
     QFontMetrics fm = painter->fontMetrics();
-    QList<int> occupiedDots;
+    QList<int> occupied_dots;
 
     int pos_x = x - margin_.left;
 
@@ -816,96 +792,85 @@ void QFormScreen::placeMarkerValues(QPainter *painter, int x) {
         for (const auto &dots : scl->list_dots_) {
             if (dots.count() <= pos_x) continue;
 
+            AxisXyDot dot = dots.at(pos_x);
+            painter->setPen(QColor(scl->color_));
+            if (dot.warning) painter->setPen(Qt::white);
+
+            QPointF pt_d = scl->scenePos();  // Max Value
+            pt.setX(x + 5);
+            pt.setY(pt_d.y() + dot.y1 - kDiagramMargin + scl->img_shift_y_);
+
+            QString s = formatValue(dot.val_max, scl->axis_y_.fmt_scale, scl->precision_scale_);
+            QSize txt_size = fm.size(Qt::TextSingleLine, s);
+
+            int txt_h = txt_size.height();
+            y = static_cast<int>(pt.y() - txt_h + 2);  //
+            bool occupied = true;
+            int ct = 0;
             do {
-                AxisXyDot dot = dots.at(pos_x);
-                painter->setPen(QColor(scl->color_));
-                if (dot.warning) painter->setPen(Qt::white);
+                bool result = false;
+                int first = 0;
+                for (int j = y; j < y + txt_h; j++) {
+                    if (occupied_dots.contains(j)) {
+                        first = j;
+                        result = true;
+                        break;
+                    }
+                }
+                if (result) y = first - txt_h;
 
-                QPointF ptD = scl->scenePos();
-                // Max Value
-                pt.setX(x + 5);
-                pt.setY(ptD.y() + dot.y1 - DIAGRAM_MARGIN + scl->img_shift_y_);
+                occupied = result;
+                ct++;
+                if (ct > 8) break;
+            } while (occupied);
+            for (int j = y; j < y + txt_h; j++) {
+                occupied_dots.push_back(j);
+            }  // qSort(occupiedDots);
+            //
+            QColor clr = Qt::white;
+            if (dot.warning) clr = Qt::red;
+            painter->fillRect(static_cast<int>(pt.x() - 2), y - 1, txt_size.width() + 3, txt_size.height() + 2,
+                              clr);    // QColor(255, 255, 255, 192)
+            pt.setY(y + txt_h - 2);    //
+            painter->drawText(pt, s);  // Min Value
+            // if(dot.ct > 1 && (dot.y0 != dot.y1)){
+            if (dot.y0 != dot.y1) {
+                // QString s = formatValue(dot.val_min, scl->axis_y_.fmt_scale, scl->precision_scale_);
 
-                s = formatValue(dot.val_max, scl->axis_y_.fmt_scale, scl->precision_scale_);
-
-                QSize txtSize = fm.size(Qt::TextSingleLine, s);
-                int txtH = txtSize.height();
-
-                y = static_cast<int>(pt.y() - txtH + 2);
+                pt.setY(pt_d.y() + dot.y0 + txt_h + scl->img_shift_y_);
+                // width   = fm.width(s) + 2;
+                y = static_cast<int>(pt.y() - txt_h + 2);
 
                 //
-                bool occupied = true;
-                int ct = 0;
+                occupied = true;
+                ct = 0;
                 do {
                     bool result = false;
                     int first = 0;
-                    for (int j = y; j < y + txtH; j++) {
-                        if (occupiedDots.contains(j)) {
+                    for (int j = y; j < y + txt_h; j++) {
+                        if (occupied_dots.contains(j)) {
                             first = j;
                             result = true;
                             break;
                         }
                     }
-                    if (result) y = first - txtH;
+                    if (result) y = first + txt_h;
 
                     occupied = result;
                     ct++;
                     if (ct > 8) break;
                 } while (occupied);
-                for (int j = y; j < y + txtH; j++) {
-                    occupiedDots.push_back(j);
+                for (int j = y; j < y + txt_h; j++) {
+                    occupied_dots.push_back(j);
                 }
                 // qSort(occupiedDots);
                 //
 
-                QColor clr = Qt::white;
-                if (dot.warning) clr = Qt::red;
+                painter->fillRect(static_cast<int>(pt.x() - 1), y - 0, txt_size.width() + 3, txt_h + 2, clr);
 
-                painter->fillRect(static_cast<int>(pt.x() - 2), y - 1, txtSize.width() + 3, txtSize.height() + 2,
-                                  clr);  // QColor(255, 255, 255, 192)
-                pt.setY(y + txtH - 2);   //
-                painter->drawText(pt, s);
-
-                // Min Value
-                // if(dot.ct > 1 && (dot.y0 != dot.y1)){
-                if (dot.y0 != dot.y1) {
-                    QString s = formatValue(dot.val_min, scl->axis_y_.fmt_scale, scl->precision_scale_);
-
-                    pt.setY(ptD.y() + dot.y0 + txtH + scl->img_shift_y_);
-                    // width   = fm.width(s) + 2;
-                    y = static_cast<int>(pt.y() - txtH + 2);
-
-                    //
-                    occupied = true;
-                    ct = 0;
-                    do {
-                        bool result = false;
-                        int first = 0;
-                        for (int j = y; j < y + txtH; j++) {
-                            if (occupiedDots.contains(j)) {
-                                first = j;
-                                result = true;
-                                break;
-                            }
-                        }
-                        if (result) y = first + txtH;
-
-                        occupied = result;
-                        ct++;
-                        if (ct > 8) break;
-                    } while (occupied);
-                    for (int j = y; j < y + txtH; j++) {
-                        occupiedDots.push_back(j);
-                    }
-                    // qSort(occupiedDots);
-                    //
-
-                    painter->fillRect(static_cast<int>(pt.x() - 1), y - 0, txtSize.width() + 3, txtH + 2, clr);
-
-                    pt.setY(y + txtH - 2);  //
-                    painter->drawText(pt, s);
-                }
-            } while (false);
+                pt.setY(y + txt_h - 2);  //
+                painter->drawText(pt, formatValue(dot.val_min, scl->axis_y_.fmt_scale, scl->precision_scale_));
+            }
         }
     }
 }
@@ -915,23 +880,23 @@ QString QFormScreen::formatValue(const double &val, const DataOutputFormat fmt, 
     QString s;
 
     switch (fmt.type) {
-    case DATA_OUTPUT_FORMAT_INT_16: {
+    case kDataOutputFormatInt16: {
         int ival = static_cast<int>(val);
         s = QString("%1").arg(ival, 0, 16);
     } break;
-    case DATA_OUTPUT_FORMAT_INT_10: {
+    case kDataOutputFormatInt10: {
         int ival = static_cast<int>(val);
         s = QString("%1").arg(ival);
     } break;
-    case DATA_OUTPUT_FORMAT_INT_8: {
+    case kDataOutputFormatInt8: {
         int ival = static_cast<int>(val);
         s = QString("%1").arg(ival, 0, 8);
     } break;
-    case DATA_OUTPUT_FORMAT_INT_2: {
+    case kDataOutputFormatInt2: {
         int ival = static_cast<int>(val);
         s = QString("%1").arg(ival, 0, 2);
     } break;
-    case DATA_OUTPUT_FORMAT_ANGLE: {
+    case kDataOutputFormatAngle: {
         int gg = static_cast<int>(floor(val));
 
         double ms = 60 * (val - gg);
@@ -940,7 +905,7 @@ QString QFormScreen::formatValue(const double &val, const DataOutputFormat fmt, 
 
         double ss = 60 * (ms - mm);
 
-        if (fmt.prec == DEFAULT_DATA_OUTPUT_PRECISION) {
+        if (fmt.prec == kDefaultDataOutputPrecision) {
             if (prec >= 0) {
                 int precx = trimZeroes(ss, prec);
                 s = QString("%1°%2'%3\"").arg(gg, 2, 10, QChar('0')).arg(mm, 2, 10, QChar('0')).arg(ss, 0, 'f', precx);
@@ -951,14 +916,14 @@ QString QFormScreen::formatValue(const double &val, const DataOutputFormat fmt, 
 
         s.replace(QLocale(QLocale::English).decimalPoint(), QLocale::system().decimalPoint());
     } break;
-    case DATA_OUTPUT_FORMAT_TIME: {
+    case kDataOutputFormatTime: {
         double x = val;
         int hh = static_cast<int>(floor(x / 3600));
         x -= (hh * 3600);
         int mm = static_cast<int>(floor(x / 60));
         x -= (mm * 60);
 
-        if (fmt.prec == DEFAULT_DATA_OUTPUT_PRECISION) {
+        if (fmt.prec == kDefaultDataOutputPrecision) {
             if (prec >= 0) {
                 int precx = trimZeroes(x, prec);
                 s = QString("%1:%2:%3").arg(hh, 2, 10, QChar('0')).arg(mm, 2, 10, QChar('0')).arg(x, 0, 'f', precx);
@@ -970,7 +935,7 @@ QString QFormScreen::formatValue(const double &val, const DataOutputFormat fmt, 
         s.replace(QLocale(QLocale::English).decimalPoint(), QLocale::system().decimalPoint());
     } break;
     default:
-        if (fmt.prec == DEFAULT_DATA_OUTPUT_PRECISION) {
+        if (fmt.prec == kDefaultDataOutputPrecision) {
             if (prec >= 0) {
                 int precx = trimZeroes(val, prec);
                 s = QString("%1").arg(val, 0, 'f', precx);
@@ -1068,7 +1033,7 @@ void QFormScreen::onResizeScene() {
 
     emit toSceneResized(w, h);
 
-    onUpdateScene(SOURCE_MAIN);
+    onUpdateScene(kSourceMain);
 }
 //-------------------------------------------------------------------------
 void QFormScreen::onZoom(const QPointF &pt, const int &delta) {
@@ -1122,20 +1087,20 @@ void QFormScreen::onClearScene() {
     }
     scales_.clear();
 
-    onUpdateScene(SOURCE_MAIN);
+    onUpdateScene(kSourceMain);
     scene_->blockSignals(false);
 }
 //-------------------------------------------------------------------------
-void QFormScreen::onRefreshScene() { onUpdateScene(SOURCE_MAIN); }
+void QFormScreen::onRefreshScene() { onUpdateScene(kSourceMain); }
 //-------------------------------------------------------------------------
 void QFormScreen::onGroupupScene() {
-    int x = AXIS_Y_DIAG_INTERVAL;
-    int y = SCREEN_OFFSET_TOP;
+    int x = kAxisYDiagInterval;
+    int y = kScreenOffsetTop;
 
-    int dx = AXIS_Y_WIDTH;  // + AXIS_Y_DIAG_INTERVAL;
-    int dy = AXIS_Y_DIAG_INTERVAL;
+    int dx = kAxisYWidth;  // + AXIS_Y_DIAG_INTERVAL;
+    int dy = kAxisYDiagInterval;
 
-    int h = scene_->height() - SCREEN_OFFSET_TOP;  // - SCREEN_OFFSET_BOTTOM;
+    int h = scene_->height() - kScreenOffsetTop;  // - SCREEN_OFFSET_BOTTOM;
 
     int c = 0;
 
@@ -1144,14 +1109,14 @@ void QFormScreen::onGroupupScene() {
 
         y += (d->rect().height() + dy);
 
-        if (y > (h - AXIS_Y_DIAG_INTERVAL)) {
+        if (y > (h - kAxisYDiagInterval)) {
             c++;
             x += dx;
-            y = SCREEN_OFFSET_LEFT + (0.5 * AXIS_Y_HEIGHT_DEFAULT * (c & 0x1));
+            y = kScreenOffsetLeft + (0.5 * kAxisYHeightDefault * (c & 0x1));
         }
     }
 
-    onUpdateScene(SOURCE_MAIN);
+    onUpdateScene(kSourceMain);
 }
 //-------------------------------------------------------------------------
 void QFormScreen::onUpdateScene(const int &src) {
@@ -1226,7 +1191,7 @@ void QFormScreen::onUpdateScene(const int &src) {
 
     scene_->setBackgroundBrush(pmScene);
 
-    if (warning & saving_.autosave) onMakeShotAuto();
+    if (warning & saving_.auto_save) onMakeShotAuto();
 
     emit toSceneChanged();
 }
@@ -1235,20 +1200,20 @@ void QFormScreen::onUpdateFocus(const int &src, const int &index_last) {
     QString s = "";
 
     switch (src) {
-    case SOURCE_SCALE:
+    case kSourceScale:
         // diagIndex   = indexLast;
         // s = tr("Фокус: %1 (%2)").arg(diagrams.at(indexLast)->sName).arg(indexLast
         // + 1);
         break;
-    case SOURCE_LABEL:
+    case kSourceLabel:
         label_index_ = index_last;
         s = tr("Фокус: Надпись %1").arg(index_last + 1);
         break;
-    case SOURCE_MARKER:
+    case kSourceMarker:
         marker_index_ = index_last;
         s = tr("Фокус: Маркер %1").arg(index_last + 1);
         break;
-    case SOURCE_BORDER:
+    case kSourceBorder:
         if (index_last) s = tr("Фокус: Правая граница области отображения графиков");
         else
             s = tr("Фокус: Левая граница области отображения графиков");
@@ -1304,8 +1269,8 @@ void QFormScreen::onAddMarker(const QPointF &pt) {
     markers_.push_back(mrk);
     scene_->addItem(mrk);
 
-    emit mrk->to_focused(SOURCE_MARKER, index);
-    emit mrk->to_changed(SOURCE_MARKER);
+    emit mrk->to_focused(kSourceMarker, index);
+    emit mrk->to_changed(kSourceMarker);
 }
 //-------------------------------------------------------------------------
 void QFormScreen::onAddMarkerFromMenu() {
@@ -1340,7 +1305,7 @@ void QFormScreen::onAddMarkerAnchor(const QPointF &pt) {
     mark_a_.y = pt.y();  // not used
     mark_a_.t = axis_x_->scale_.at(static_cast<int>(pt.x()));
 
-    onUpdateScene(SOURCE_MARKER_ANCHOR);
+    onUpdateScene(kSourceMarkerAnchor);
 }
 
 //-------------------------------------------------------------------------
@@ -1358,13 +1323,13 @@ void QFormScreen::onUpdateMarkerFloat(const QPointF &pt) {
     mark_f_.y = pt.y();
     mark_f_.t = axis_x_->scale_.at(static_cast<int>(pt.x()));
 
-    onUpdateScene(SOURCE_MARKER_FLOAT);
+    onUpdateScene(kSourceMarkerFloat);
 }
 //-------------------------------------------------------------------------
-void QFormScreen::onChangeSettings(const QString &title, const SettingsCommon stx_cmn) {
+void QFormScreen::onChangeSettings(const QString &title, const SettingsCommon &stx_cmn) {
     title_ = title;
 
-    setWindowTitle(getTitle());
+    // setWindowTitle(getTitle());
 
     time_step_ = stx_cmn.timing.step;
     time_width_ = stx_cmn.timing.width;
@@ -1389,7 +1354,7 @@ void QFormScreen::onRemoveItem(const int &src, const int &index) {
     scene_->blockSignals(true);
 
     switch (src) {
-    case SOURCE_SCALE: {
+    case kSourceScale: {
         QList<int> list;
         list.push_back(index);
         if (index < 0) {
@@ -1417,7 +1382,7 @@ void QFormScreen::onRemoveItem(const int &src, const int &index) {
 
         scale_index_ = scales_.count() - 1;
     } break;
-    case SOURCE_MARKER: {
+    case kSourceMarker: {
         QList<int> list;
         list.push_back(index);
         if (index < 0) {
@@ -1513,7 +1478,7 @@ void QFormScreen::onTuneItem(const int &src, const int &index) {
 }
 //-------------------------------------------------------------------------
 void QFormScreen::onAlignItem(const int &src, const int &index, const int &val) {
-    if (src != SOURCE_SCALE) return;
+    if (src != kSourceScale) return;
 
     if (index < 0) return;
 
@@ -1569,7 +1534,7 @@ void QFormScreen::onAlignItem(const int &src, const int &index, const int &val) 
         }
     }
 
-    onUpdateScene(SOURCE_MAIN);
+    onUpdateScene(kSourceMain);
 }
 //-------------------------------------------------------------------------
 void QFormScreen::onSetAxisXHeight(const int &h) { height_axis_x_ = h; }
@@ -1585,7 +1550,7 @@ void QFormScreen::onHideScale() {
 }
 //-------------------------------------------------------------------------
 void QFormScreen::onShowSettings() {
-    QFormScreenSettings *fs = new QFormScreenSettings(this);
+    auto *fs = new QFormScreenSettings(this);
 
     SettingsCommon stx;
     stx.lining = lining_;
@@ -1677,10 +1642,10 @@ void QFormScreen::onProgress2(const int &j, const int &n) {
 void QFormScreen::onReport(const QString &s) { statusbar_->showMessage(s); }
 //-------------------------------------------------------------------------
 void QFormScreen::onMakeShotManual() {
-    QSettings ini(g_supportPath + INI_FILENAME_EO, QSettings::IniFormat);
-    QString path = ini.value(INI_IMAGE_SAVE_PATH, g_supportPath).toString();
+    QSettings ini(g_support_path + ini_filename_eo_, QSettings::IniFormat);
+    QString path = ini.value(ini_image_save_path_, g_support_path).toString();
 
-    QString selectedFilter;
+    QString selected_filter;
 
     QFileDialog dlg(this, tr("Сохранение в графический файл"), path);
     dlg.setDefaultSuffix(".png");
@@ -1699,15 +1664,13 @@ void QFormScreen::onMakeShotManual() {
     bool success = saveShot(filename);
     Q_UNUSED(success)
 
-    ini.setValue(INI_IMAGE_SAVE_PATH, QFileInfo(filename).path());
+    ini.setValue(ini_image_save_path_, QFileInfo(filename).path());
     ini.sync();
 }
 //-------------------------------------------------------------------------
 void QFormScreen::onMakeShotAuto() {
-    QString filename = QString("%1/%2_%3.png")
-                           .arg(g_supportPath)
-                           .arg(getTitle())
-                           .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss"));
+    QString filename =
+        QString("%1/%3.png").arg(g_support_path).arg(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss"));
 
     filename.replace(" ", "_");
 
@@ -1716,7 +1679,7 @@ void QFormScreen::onMakeShotAuto() {
 }
 //-------------------------------------------------------------------------
 void QFormScreen::onSaveImageFilterChange(const QString &filter) {
-    QFileDialog *dlg = qobject_cast<QFileDialog *>(sender());
+    auto *dlg = qobject_cast<QFileDialog *>(sender());
 
     if (filter.contains(".png")) {
         dlg->setDefaultSuffix(".png");

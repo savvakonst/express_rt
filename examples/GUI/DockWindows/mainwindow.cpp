@@ -1,12 +1,11 @@
-#include "Receiver/Receiver.h"
+//#include "Receiver/Receiver.h"
+
 //
 #include <QtWidgets>
 //
 #include "Actions.h"
 #include "GUI/TreeEditor.h"
 #include "GUI/WidgetWrappers.h"
-#include "Ping/ksdconnected.h"
-#include "TopWindow.h"
 #include "common/BindingUtils.h"
 #include "common/ExtensionManager.h"
 #include "common/IO_ifs.h"
@@ -15,7 +14,10 @@
 #include "convtemplate/PrmBuffer_ifs.h"
 #include "device/Device.h"
 #include "mainwindow.h"
-#include "qformscreen.h"
+
+//#include "Ping/ksdconnected.h"
+//#include "TopWindow.h"
+
 class Parameter_ifs;
 
 class OpenAction : public QAction {
@@ -39,6 +41,7 @@ class OpenAction : public QAction {
     IO_ifs *io_;
 };
 
+/*
 ModuleStream_ifs *generateStream(ExtensionManager *manager, const std::string &type, Device *device,
                                  const std::list<Parameter_ifs *> &parameters) {
     ModuleStream_ifs *top_m_stream = device->createModuleStream();
@@ -61,6 +64,7 @@ ModuleStream_ifs *generateStream(ExtensionManager *manager, const std::string &t
 
     return top_m_stream;
 }
+*/
 
 ExtensionUnit *g_top_gui_units = nullptr;
 ExtensionInfo g_top_gui_info;
@@ -110,9 +114,12 @@ MainWindow::MainWindow(ExtensionManager *manager) : manager_(manager) {
     // auto dock = new QDockWidget(QObject::tr("&plotter"));
     // dock->setObjectName(QObject::tr("&plotter"));
     // dock->setWidget(new QWidget);
-    setCentralWidget(new TopWindow());
+
+    auto plotter = (QWidget *)manager->getLastVersionExtensionObject("plotter", "plotter");
+    if (plotter) setCentralWidget(plotter);
 
     auto file_menu = menuBar()->addMenu(tr("&Файл"));
+    auto prop_menu = menuBar()->addMenu(tr("&Настройки"));
 
     auto io_units = manager_->getLastVersionExtensionUnitsByType("io");
 

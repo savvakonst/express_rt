@@ -31,18 +31,16 @@ class QFormScreen;
 class QFormScreen : public QDialog {
     Q_OBJECT
 
-    const QString INI_FILENAME_EO = "/ksdeo.ini";
-    const QString INI_IMAGE_SAVE_PATH = "IMAGE_SAVE/PATH";
-    const QString INI_IMAGE_SAVE_AUTO = "IMAGE_SAVE/AUTO";
+    const QString ini_filename_eo_ = "/ksdeo.ini";
+    const QString ini_image_save_path_ = "IMAGE_SAVE/PATH";
+    const QString ini_image_save_auto_ = "IMAGE_SAVE/AUTO";
 
    public:
-    explicit QFormScreen(const int &index, const LineProperties &dstx_0, QWidget *parent = nullptr) {}
-
-    explicit QFormScreen(/*const int &index, const SETTINGS_DIAGITEM &dstx0,*/ QWidget *parent = nullptr);
+    explicit QFormScreen(QWidget *parent = nullptr);
 
     ~QFormScreen() override;
 
-    int getIndex();
+    int getIndex() const;
 
     void setTitle(const QString &title);
 
@@ -67,7 +65,7 @@ class QFormScreen : public QDialog {
 
     void onExit();
 
-    void onIndexReduce(const int &index_0);
+    // void onIndexReduce(const int &index_0);
 
     void onRefresh(const RelativeTime &t, bool zoomed = false);
 
@@ -104,7 +102,7 @@ class QFormScreen : public QDialog {
 
     static void placeAxisX(QPainter *painter, const QScreenAxisX *axis);
 
-    void placeDiag(QPainter *painter, const QScreenScale *scl);
+    void placeDiag(QPainter *painter, const QScreenScale *scl) const;
 
     void placeScale(QPainter *painter, const QScreenScale *scl);
 
@@ -118,7 +116,7 @@ class QFormScreen : public QDialog {
 
     void placeMarkerValues(QPainter *painter, int x);
 
-    QString formatValue(const double &val, const DataOutputFormat fmt, const int &prec = -1, const bool &trim = false);
+    QString formatValue(const double &val, DataOutputFormat fmt, const int &prec = -1, const bool &trim = false);
 
     int trimZeroes(const double &val, const int &prec = -1);
 
@@ -151,9 +149,9 @@ class QFormScreen : public QDialog {
     QMenu *mn_help_;
     QAction *act_help_;
 
-    QAction *act_next_;
-    QAction *act_prev_;
-    QToolButton *toolbtn_goto_;
+    QAction *act_next_{};
+    QAction *act_prev_{};
+    QToolButton *toolbtn_goto_{};
 
     QScreenScene *scene_;
     QScreenAxisX *axis_x_;
@@ -162,7 +160,6 @@ class QFormScreen : public QDialog {
     QList<QScreenMarker *> markers_;
     // QList<QScreenLabel*>                labels;
 
-    int index_ = 0;
     QString title_ = "";
 
     TimeInterval ti_;
@@ -178,9 +175,9 @@ class QFormScreen : public QDialog {
     // Settings
     bool is_axis_t_hms_ = true;
     bool is_axis_hidden_ = false;
-    int height_axis_x_ = SCREEN_OFFSET_BOTTOM;
+    int height_axis_x_ = int(kScreenOffsetBottom);
 
-    AxisYStats stats_;
+    AxisYStats stats_{};
 
     // TODO: only one occurrence in the code. no assignments. maybe remove it?
     bool axis_y_marker_ = false;
@@ -217,7 +214,7 @@ class QFormScreen : public QDialog {
 
     void onGroupupScene();
 
-    void onUpdateScene(const int &src = SOURCE_MAIN);
+    void onUpdateScene(const int &src = kSourceMain);
 
     void onUpdateFocus(const int &src, const int &index_last);
 
@@ -235,7 +232,7 @@ class QFormScreen : public QDialog {
 
     void onUpdateMarkerFloat(const QPointF &pt);
 
-    void onChangeSettings(const QString &title, const SettingsCommon stx_cmn);
+    void onChangeSettings(const QString &title, const SettingsCommon &stx_cmn);
 
     // void                                on_addParameter();
 
@@ -272,7 +269,7 @@ class QFormScreen : public QDialog {
 
     void toRemoved(const int &index);
 
-    void toPaused(const bool is_paused);
+    void toPaused(bool is_paused);
 
     void toSceneChanged();
 

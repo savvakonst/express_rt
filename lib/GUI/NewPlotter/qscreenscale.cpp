@@ -33,15 +33,15 @@ QScreenScale::QScreenScale(Reader_ifs *reader, const int &index0, const QSizeF &
     QRectF r;
     r.setTop(0);
     r.setLeft(0);
-    r.setWidth(AXIS_Y_WIDTH);
-    r.setHeight(AXIS_Y_HEIGHT_DEFAULT);
+    r.setWidth(kAxisYWidth);
+    r.setHeight(kAxisYHeightDefault);
 
     // Position
     int i = 0;
     int c = 0;
     int h = scene_size_.height() - margin_.top;
-    int dx = AXIS_Y_WIDTH + AXIS_Y_DIAG_INTERVAL;
-    int dy = AXIS_Y_HEIGHT_DEFAULT + AXIS_Y_DIAG_INTERVAL;
+    int dx = kAxisYWidth + kAxisYDiagInterval;
+    int dy = kAxisYHeightDefault + kAxisYDiagInterval;
     qreal n = floor(h / dy);
     for (int j = 0; j < index_; ++j) {
         i++;
@@ -50,7 +50,7 @@ QScreenScale::QScreenScale(Reader_ifs *reader, const int &index0, const QSizeF &
             c++;
         }
     }
-    qreal x = (dx * c) + SCREEN_OFFSET_LEFT;
+    qreal x = (dx * c) + kScreenOffsetLeft;
     qreal y = (dy * i) + margin_.top;
 
     setRect(r);
@@ -124,7 +124,7 @@ QScreenScale::QScreenScale(Reader_ifs *reader, const int &index0, const QSizeF &
     SINGLE_PRM prm;
 
     prm.rdr = reader;
-    prm.buf = new Reader_ifs::Point[MAX_SCREEM_WIDTH];
+    prm.buf = new Reader_ifs::Point[kMaxScreenWidth];
     prm.plevels = &levels_;
 
     parameters_.push_back(std::move(prm));
@@ -161,15 +161,15 @@ QScreenScale::QScreenScale(const int &index0, const QSizeF &sz, const LineProper
     QRectF r;
     r.setTop(0);
     r.setLeft(0);
-    r.setWidth(AXIS_Y_WIDTH);
-    r.setHeight(AXIS_Y_HEIGHT_DEFAULT);
+    r.setWidth(kAxisYWidth);
+    r.setHeight(kAxisYHeightDefault);
 
     // Position
     int i = 0;
     int c = 0;
     int h = scene_size_.height() - margin_.top;
-    int dx = AXIS_Y_WIDTH + AXIS_Y_DIAG_INTERVAL;
-    int dy = AXIS_Y_HEIGHT_DEFAULT + AXIS_Y_DIAG_INTERVAL;
+    int dx = kAxisYWidth + kAxisYDiagInterval;
+    int dy = kAxisYHeightDefault + kAxisYDiagInterval;
     qreal n = floor(h / dy);
     for (int j = 0; j < index_; ++j) {
         i++;
@@ -178,7 +178,7 @@ QScreenScale::QScreenScale(const int &index0, const QSizeF &sz, const LineProper
             c++;
         }
     }
-    qreal x = (dx * c) + SCREEN_OFFSET_LEFT;
+    qreal x = (dx * c) + kScreenOffsetLeft;
     qreal y = (dy * i) + margin_.top;
 
     setRect(r);
@@ -252,7 +252,7 @@ QScreenScale::QScreenScale(const int &index0, const QSizeF &sz, const LineProper
     SINGLE_PRM prm;
 
     prm.rdr = getReaderExample(p_);
-    prm.buf = new Reader_ifs::Point[MAX_SCREEM_WIDTH];
+    prm.buf = new Reader_ifs::Point[kMaxScreenWidth];
     prm.plevels = &levels_;
 
     parameters_.push_back(std::move(prm));
@@ -299,7 +299,7 @@ void QScreenScale::recountScaleValues(const int &w, AxisYStatistics &stat, Reade
 
     AxisXyDot last_dot;
     QVector<AxisXyDot> dots;
-    dots.reserve(MAX_SCREEM_WIDTH);
+    dots.reserve(kMaxScreenWidth);
 
     while (c_ptr) {
         Reader_ifs::Point *pb = c_ptr->first_point_;
@@ -416,7 +416,7 @@ void QScreenScale::drawDiag() {
 
     img_shift_y_ = static_cast<int>(floor((scale_max - data_max) * shift_k + 0.5));
 
-    QPixmap *pm = new QPixmap(image_w + DIAGRAM_MARGIN, image_h + DIAGRAM_MARGIN + DIAGRAM_MARGIN);
+    QPixmap *pm = new QPixmap(image_w + kDiagramMargin, image_h + kDiagramMargin + kDiagramMargin);
     pm->fill(Qt::transparent);
     QPainter *painter = new QPainter(pm);
 
@@ -444,7 +444,7 @@ void QScreenScale::drawDiag() {
                 if (lvl.cross) {
                     if (d.val_max > lvl.value) {
                         warning = true;
-                        int y = image_h - static_cast<int>(floor((d.val_max - data_min) * k + 0.5)) + DIAGRAM_MARGIN;
+                        int y = image_h - static_cast<int>(floor((d.val_max - data_min) * k + 0.5)) + kDiagramMargin;
                         painter->drawPoint(d.x, y);
                         // int y0 = image_h - static_cast<int>(floor((lvl.value - data_min) * k + 0.5));
                         // painter->drawLine(d.x, 0, d.x, image_h);
@@ -453,7 +453,7 @@ void QScreenScale::drawDiag() {
                 } else {
                     if (d.val_min < lvl.value) {
                         warning = true;
-                        int y = image_h - static_cast<int>(floor((d.val_min - data_min) * k + 0.5)) + DIAGRAM_MARGIN;
+                        int y = image_h - static_cast<int>(floor((d.val_min - data_min) * k + 0.5)) + kDiagramMargin;
                         painter->drawPoint(d.x, y);
                         // int y0 = image_h - static_cast<int>(floor((lvl.value - data_min) * k + 0.5));
                         // painter->drawLine(d.x, 0, d.x, image_h);
@@ -477,8 +477,8 @@ void QScreenScale::drawDiag() {
         for (auto &d : dots) {
             if (d.ghost) continue;
 
-            d.y0 = image_h - static_cast<int>(floor((d.val_min - data_min) * k + 0.5)) + DIAGRAM_MARGIN;
-            d.y1 = image_h - static_cast<int>(floor((d.val_max - data_min) * k + 0.5)) + DIAGRAM_MARGIN;
+            d.y0 = image_h - static_cast<int>(floor((d.val_min - data_min) * k + 0.5)) + kDiagramMargin;
+            d.y1 = image_h - static_cast<int>(floor((d.val_max - data_min) * k + 0.5)) + kDiagramMargin;
 
             // if(last_dot.x >= 0 && !last_dot.ghost)
             //     painter->drawLine(last_dot.x, last_dot.y1, d.x, d.y1);
@@ -496,7 +496,7 @@ void QScreenScale::drawDiag() {
 
     for (const auto lvl : levels_) {
         int y = image_h - static_cast<int>(floor((lvl.value - data_min) * k + 0.5));
-        painter->drawLine(0, y + DIAGRAM_MARGIN, image_w, y + DIAGRAM_MARGIN);
+        painter->drawLine(0, y + kDiagramMargin, image_w, y + kDiagramMargin);
     }
 
     delete painter;
@@ -800,7 +800,7 @@ void QScreenScale::keyPressEvent(QKeyEvent *event) {
         emit toChanged(type_);
         break;
     case Qt::Key_Right:
-        if (pt.x() > scene_size_.width() - SCREEN_OFFSET) break;
+        if (pt.x() > scene_size_.width() - kScreenOffset) break;
         moveBy(speed, 0);
         emit toChanged(type_);
         break;
@@ -810,7 +810,7 @@ void QScreenScale::keyPressEvent(QKeyEvent *event) {
         emit toChanged(type_);
         break;
     case Qt::Key_Down:
-        if (pt.y() > scene_size_.height() - SCREEN_OFFSET) break;
+        if (pt.y() > scene_size_.height() - kScreenOffset) break;
         moveBy(0, speed);
         emit toChanged(type_);
         break;
@@ -850,16 +850,16 @@ void QScreenScale::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
             pt.setX(0);
             setPos(pt);
         }
-        if (pt.x() > scene_size_.width() - SCREEN_OFFSET) {
-            pt.setX(scene_size_.width() - SCREEN_OFFSET);
+        if (pt.x() > scene_size_.width() - kScreenOffset) {
+            pt.setX(scene_size_.width() - kScreenOffset);
             setPos(pt);
         }
         if (pt.y() < 0) {
             pt.setY(0);
             setPos(pt);
         }
-        if (pt.y() > scene_size_.height() - SCREEN_OFFSET) {
-            pt.setY(scene_size_.height() - SCREEN_OFFSET);
+        if (pt.y() > scene_size_.height() - kScreenOffset) {
+            pt.setY(scene_size_.height() - kScreenOffset);
             setPos(pt);
         }
 
@@ -906,10 +906,10 @@ void QScreenScale::wheelEvent(QGraphicsSceneWheelEvent *event) {
         if (event->delta() == 0) return;
         if (event->delta() > 0) {
             h += 20;
-            if (h > AXIS_Y_HEIGHT_MAX) h = AXIS_Y_HEIGHT_MAX;
+            if (h > kAxisYHeightMax) h = kAxisYHeightMax;
         } else {
             h -= 20;
-            if (h < AXIS_Y_HEIGHT_MIN) h = AXIS_Y_HEIGHT_MIN;
+            if (h < kAxisYHeightMin) h = kAxisYHeightMin;
         }
         r.setHeight(h);
         setRect(r);

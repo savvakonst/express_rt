@@ -1,16 +1,17 @@
 ﻿#ifndef QSCREENMARKER_H
 #define QSCREENMARKER_H
 
-#include <QObject>
+#include <QCursor>
 #include <QGraphicsItem>
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneWheelEvent>
 #include <QKeyEvent>
-#include <QCursor>
-#include <QPen>
+#include <QObject>
 #include <QPainter>
+#include <QPen>
 #include <QSizeF>
+
 #include "qscreenaxisx.h"
 
 //#include "Helper_Works2.h"
@@ -18,11 +19,10 @@
 const qreal MARKER_WIDTH = 5;
 const qreal MARKER_SHIFT = 0;
 
-class QScreenMarker : public QObject, public QGraphicsRectItem
-{
+class QScreenMarker : public QObject, public QGraphicsRectItem {
     Q_OBJECT
 
-public:
+   public:
     explicit QScreenMarker(const int &index0, const QPointF &pt, const QSizeF &sz, const LineProperties &dstx0,
                            QWidget *parent = nullptr);
 
@@ -53,26 +53,26 @@ public:
     QVector<RelativeTime> *pScale_;
     QColor color_ = Qt::blue;
 
-public slots:
+   public slots:
     void on_resize(const qreal &w, const qreal &h);
 
     void on_setValid(const TimeInterval &ti, const bool &total);
 
     void on_indexReduce(const int &src, const int &index);
 
-private:
+   private:
     void drawMarker();
 
     qreal getXbyTime(const RelativeTime &time);
 
-    const int Type_ = SOURCE_MARKER;
+    const int Type_ = kSourceMarker;
 
     QSizeF sceneSize_;
 
     LineProperties dstx_;
     Margin margin_;
 
-protected:
+   protected:
     void keyPressEvent(QKeyEvent *event) override;
 
     void keyReleaseEvent(QKeyEvent *event) override;
@@ -85,7 +85,7 @@ protected:
 
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
-signals:
+   signals:
     void to_removed(const int &src, const int &index);
 
     void to_changed(const int &src);
@@ -95,4 +95,4 @@ signals:
     void to_moved(const int &x);
 };
 
-#endif // QSCREENMARKER_H
+#endif  // QSCREENMARKER_H

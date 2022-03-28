@@ -1,11 +1,10 @@
 ﻿#include "qscreenmarker.h"
+
 #include "qscreenaxisx.h"
 
 //-------------------------------------------------------------------------
-QScreenMarker::QScreenMarker(const int &index0, const QPointF &pt,
-                             const QSizeF &sz, const LineProperties &dstx0,
-                             QWidget *parent)
-{
+QScreenMarker::QScreenMarker(const int &index0, const QPointF &pt, const QSizeF &sz, const LineProperties &dstx0,
+                             QWidget *parent) {
     Q_UNUSED(parent)
     Q_UNUSED(dstx0)
 
@@ -26,7 +25,7 @@ QScreenMarker::QScreenMarker(const int &index0, const QPointF &pt,
     rt.setTop(0);
     rt.setLeft(0);
     rt.setWidth(MARKER_WIDTH);
-    rt.setHeight(sceneSize_.height() - SCREEN_OFFSET_BOTTOM);
+    rt.setHeight(sceneSize_.height() - kScreenOffsetBottom);
     setRect(rt);
 
     QPointF ptReal;
@@ -45,26 +44,15 @@ QScreenMarker::QScreenMarker(const int &index0, const QPointF &pt,
     drawMarker();
 }
 //-------------------------------------------------------------------------
-QScreenMarker::~QScreenMarker()
-{
-
-}
+QScreenMarker::~QScreenMarker() {}
 //-------------------------------------------------------------------------
-int QScreenMarker::getIndex()
-{
-    return index_;
-}
+int QScreenMarker::getIndex() { return index_; }
 //-------------------------------------------------------------------------
-void QScreenMarker::setTime(const RelativeTime &time)
-{
-    t_ = time;
-}
+void QScreenMarker::setTime(const RelativeTime &time) { t_ = time; }
 //-------------------------------------------------------------------------
-void QScreenMarker::checkState(const qreal &x)
-{
+void QScreenMarker::checkState(const qreal &x) {
     bool miss = false;
-    if ((x < (margin_.left - MARKER_SHIFT)) ||
-        (x > (sceneSize_.width() - margin_.right - MARKER_SHIFT))) {
+    if ((x < (margin_.left - MARKER_SHIFT)) || (x > (sceneSize_.width() - margin_.right - MARKER_SHIFT))) {
         miss = true;
     }
 
@@ -72,44 +60,29 @@ void QScreenMarker::checkState(const qreal &x)
     valid_ = !miss;
 }
 //-------------------------------------------------------------------------
-void QScreenMarker::setSettings(const LineProperties &dstx)
-{
-    dstx_ = dstx;
-}
+void QScreenMarker::setSettings(const LineProperties &dstx) { dstx_ = dstx; }
 //-------------------------------------------------------------------------
-void QScreenMarker::setMargin(const Margin &margin)
-{
-    margin_ = margin;
-}
+void QScreenMarker::setMargin(const Margin &margin) { margin_ = margin; }
 //-------------------------------------------------------------------------
-void QScreenMarker::advance(int phase)
-{
-    Q_UNUSED(phase)
-}
+void QScreenMarker::advance(int phase) { Q_UNUSED(phase) }
 //-------------------------------------------------------------------------
-int QScreenMarker::type() const
-{
-    return Type;
-}
+int QScreenMarker::type() const { return Type; }
 //-------------------------------------------------------------------------
-void QScreenMarker::on_resize(const qreal &w, const qreal &h)
-{
+void QScreenMarker::on_resize(const qreal &w, const qreal &h) {
     sceneSize_.setWidth(w);
     sceneSize_.setHeight(h);
 
     QRectF rt = rect();
-    rt.setHeight(h - SCREEN_OFFSET_BOTTOM);
+    rt.setHeight(h - kScreenOffsetBottom);
     setRect(rt);
     setPos(QPointF(getXbyTime(t_), 0));
 
     drawMarker();
 }
 //-------------------------------------------------------------------------
-void QScreenMarker::on_setValid(const TimeInterval &ti, const bool &total)
-{
+void QScreenMarker::on_setValid(const TimeInterval &ti, const bool &total) {
     valid_ = true;
-    if (t_ < ti.bgn || t_ > ti.end)
-        valid_ = false;
+    if (t_ < ti.bgn || t_ > ti.end) valid_ = false;
     else
         setPos(QPointF(getXbyTime(t_), 0));
 
@@ -117,20 +90,15 @@ void QScreenMarker::on_setValid(const TimeInterval &ti, const bool &total)
     setEnabled(valid_);
 }
 //-------------------------------------------------------------------------
-void QScreenMarker::on_indexReduce(const int &src, const int &index)
-{
-    if (src != Type)
-        return;
-    if (index_ > index)
-        index_--;
+void QScreenMarker::on_indexReduce(const int &src, const int &index) {
+    if (src != Type) return;
+    if (index_ > index) index_--;
 }
 //-------------------------------------------------------------------------
-void QScreenMarker::drawMarker()
-{
+void QScreenMarker::drawMarker() {
     QRectF rt = rect();
 
-    QPixmap *pm = new QPixmap(static_cast<int>(MARKER_WIDTH),
-                              static_cast<int>(rt.height()));
+    QPixmap *pm = new QPixmap(static_cast<int>(MARKER_WIDTH), static_cast<int>(rt.height()));
     // pm->fill(Qt::gray);
     pm->fill(Qt::transparent);
     QPainter *p = new QPainter(pm);
@@ -157,10 +125,9 @@ void QScreenMarker::drawMarker()
     delete pm;
 }
 //-------------------------------------------------------------------------
-qreal QScreenMarker::getXbyTime(const RelativeTime &time)
-{
+qreal QScreenMarker::getXbyTime(const RelativeTime &time) {
     qreal x = -1;
-    for (int j = 0; j < sceneSize_.width() - SCREEN_OFFSET_RIGHT - 1; j++) {
+    for (int j = 0; j < sceneSize_.width() - kScreenOffsetRight - 1; j++) {
         if (time >= pScale_->at(j) && time < pScale_->at(j + 1)) {
             x = j;
             break;
@@ -170,20 +137,19 @@ qreal QScreenMarker::getXbyTime(const RelativeTime &time)
     return (x);
 }
 //-------------------------------------------------------------------------
-void QScreenMarker::keyPressEvent(QKeyEvent *event)
-{
+void QScreenMarker::keyPressEvent(QKeyEvent *event) {
     bool changed = false;
 
     switch (event->key()) {
-        case Qt::Key_Left:
-            moveBy(-1, 0);
-            changed = true;
-            break;
-        case Qt::Key_Right:
-            moveBy(1, 0);
-            changed = true;
-            break;
-        default:;
+    case Qt::Key_Left:
+        moveBy(-1, 0);
+        changed = true;
+        break;
+    case Qt::Key_Right:
+        moveBy(1, 0);
+        changed = true;
+        break;
+    default:;
     }
 
     if (changed) {
@@ -203,32 +169,27 @@ void QScreenMarker::keyPressEvent(QKeyEvent *event)
     QGraphicsItem::keyPressEvent(event);
 }
 //-------------------------------------------------------------------------
-void QScreenMarker::keyReleaseEvent(QKeyEvent *event)
-{
+void QScreenMarker::keyReleaseEvent(QKeyEvent *event) {
     update();
     QGraphicsItem::keyPressEvent(event);
 }
 //-------------------------------------------------------------------------
-void QScreenMarker::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
+void QScreenMarker::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     switch (event->button()) {
     case Qt::LeftButton: {
         setFlag(QGraphicsItem::ItemIsSelectable);
 
         leftPressed_ = true;
         emit to_focused(Type, index_);
-    }
-    break;
-    default:
-        ;
+    } break;
+    default:;
     }
 
     update();
     QGraphicsItem::mousePressEvent(event);
 }
 //-------------------------------------------------------------------------
-void QScreenMarker::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-{
+void QScreenMarker::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     switch (event->button()) {
     case Qt::LeftButton: {
         setFlags(flags() & ~QGraphicsItem::ItemIsSelectable);
@@ -245,18 +206,15 @@ void QScreenMarker::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
         emit to_changed(Type);
         leftPressed_ = false;
-    }
-    break;
-    default:
-        ;
+    } break;
+    default:;
     }
 
     update();
     QGraphicsItem::mouseReleaseEvent(event);
 }
 //-------------------------------------------------------------------------
-void QScreenMarker::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
+void QScreenMarker::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     switch (event->button()) {
     case Qt::LeftButton: {
         setFlags(flags() & ~QGraphicsItem::ItemIsSelectable);
@@ -273,18 +231,15 @@ void QScreenMarker::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
         emit to_changed(Type);
         leftPressed_ = false;
-    }
-    break;
-    default:
-        ;
+    } break;
+    default:;
     }
 
     update();
     QGraphicsItem::mouseMoveEvent(event);
 }
 //-------------------------------------------------------------------------
-void QScreenMarker::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
-{
+void QScreenMarker::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
     to_removed(Type, index_);
 
     update();

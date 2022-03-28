@@ -47,7 +47,7 @@ class DeviceListModel : public QAbstractItemModel {
 
     struct TreeNode;
 
-    [[nodiscard]] TreeNode *getNode(const QModelIndex &index) const;
+    [[nodiscard]] static TreeNode *getNode(const QModelIndex &index);
     [[nodiscard]] QList<QModelIndex> getTreeIndexList(const std::string &source, const std::string &path) const;
     [[nodiscard]] std::list<TreeNode *> getTreeNodeList(const std::string &source, const std::string &path) const;
     [[nodiscard]] TreeNode *getTreeNode(const std::string &source, const std::string &path) const;

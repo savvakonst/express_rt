@@ -174,7 +174,6 @@ void ParameterTableModel::selectParameter(const QModelIndex &index) {
 #include <QToolButton>
 
 #include "CustomQActions.h"
-#include "qformscreen.h"
 
 QPixmap getPixmap(QString str) {
     auto pixmap_path = QCoreApplication::applicationDirPath() + str;
@@ -186,7 +185,7 @@ class ParameterViewWrapper : public ParameterViewWrapper_ifs {
     ParameterViewWrapper() : widget_(new ParameterTreeView()) {
         widget_->setAlternatingRowColors(true);
         widget_->setStyleSheet(
-            "QTreeView {background-color: #D2DCDF; alternate-background-color: #f6fafb; show-decoration-selected: 1;}"
+            "QWidget {background-color: #D2DCDF; alternate-background-color: #f6fafb; show-decoration-selected: 1;}"
             "QHeaderView::section {background-color: #D2DCDF}");
 
         top_widget_ = new QWidget();
@@ -205,17 +204,6 @@ class ParameterViewWrapper : public ParameterViewWrapper_ifs {
             run_icon, QObject::tr("Ru&n"),
             [&]() {
                 if (main_window_ == nullptr) return false;
-
-                auto top_window = (QMainWindow *)main_window_->centralWidget();
-
-                auto dock = new QDockWidget(QObject::tr("&plotter"), top_window);
-                dock->setObjectName(QObject::tr("&plotter"));
-
-                // QWidget *form_screen = !action_run_->isChecked() ? new QWidget : new QFormScreen();
-                QWidget *form_screen = new QFormScreen();
-                dock->setWidget(form_screen);
-                top_window->addDockWidget(Qt::LeftDockWidgetArea, dock, Qt::Orientation::Horizontal);
-
                 return true;
             },
             widget_);

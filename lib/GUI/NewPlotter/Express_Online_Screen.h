@@ -5,153 +5,153 @@
 
 #include "common/TimeRepresentation.h"
 
-const qreal MAX_SCREEM_WIDTH = 2048;
+const qreal kMaxScreenWidth = 2048;
 
-const qreal DIAGRAM_OFFSET_LEFT = 150;
-const qreal DIAGRAM_OFFSET_RIGHT = 150;
-const int DIAGRAM_MARGIN = 5;
+const qreal kDiagramOffsetLeft = 150;
+const qreal kDiagramOffsetRight = 150;
+const int kDiagramMargin = 5;
 
-const qreal SCREEN_OFFSET = 50;
-const qreal SCREEN_OFFSET_TOP = 50;
-const qreal SCREEN_OFFSET_BOTTOM = 50;
-const qreal SCREEN_OFFSET_LEFT = 50;
-const qreal SCREEN_OFFSET_RIGHT = 50;
+const qreal kScreenOffset = 50;
+const qreal kScreenOffsetTop = 50;
+const qreal kScreenOffsetBottom = 50;
+const qreal kScreenOffsetLeft = 50;
+const qreal kScreenOffsetRight = 50;
 
-const qreal AXIS_Y_HEIGHT_MIN = 20;
-const qreal AXIS_Y_HEIGHT_DEFAULT = 40;
-const qreal AXIS_Y_HEIGHT_MAX = 1000;
-const qreal AXIS_Y_WIDTH = 40;
-const qreal AXIS_Y_CUTOFF_STEP = 20;
-const qreal AXIS_Y_DIAG_INTERVAL = 20;
+const qreal kAxisYHeightMin = 20;
+const qreal kAxisYHeightDefault = 40;
+const qreal kAxisYHeightMax = 1000;
+const qreal kAxisYWidth = 40;
+const qreal kAxisYCutoffStep = 20;
+const qreal kAxisYDiagInterval = 20;
 
-const int MAX_CUTOFF_NUMBER = 7;
-const int DEFAULT_DATA_OUTPUT_PRECISION = -1;
+const int kMaxCutoffNumber = 7;
+const int kDefaultDataOutputPrecision = -1;
 
-enum {
-    SOURCE_UNDEFINED = 65536,
-    SOURCE_MAIN,
-    SOURCE_SCALE,
-    SOURCE_MARKER,
-    SOURCE_AXIS_X,
-    SOURCE_MARKER_FLOAT,
-    SOURCE_MARKER_ANCHOR,
-    SOURCE_LABEL,
-    SOURCE_HARMONIC,
-    SOURCE_BORDER
+enum
+{
+    kSourceUndefined = 65536,
+    kSourceMain,
+    kSourceScale,
+    kSourceMarker,
+    kSourceAxisX,
+    kSourceMarkerFloat,
+    kSourceMarkerAnchor,
+    kSourceLabel,
+    kSourceHarmonic,
+    kSourceBorder
 };
 
-enum {
-    DATA_OUTPUT_FORMAT_FLOAT = 0,
-    DATA_OUTPUT_FORMAT_INT_16,
-    DATA_OUTPUT_FORMAT_INT_10,
-    DATA_OUTPUT_FORMAT_INT_8,
-    DATA_OUTPUT_FORMAT_INT_2,
-    DATA_OUTPUT_FORMAT_ANGLE,
-    DATA_OUTPUT_FORMAT_TIME
+enum
+{
+    kDataOutputFormatFloat = 0,
+    kDataOutputFormatInt16,
+    kDataOutputFormatInt10,
+    kDataOutputFormatInt8,
+    kDataOutputFormatInt2,
+    kDataOutputFormatAngle,
+    kDataOutputFormatTime
 };
 
 #pragma pack(push, 1)
-typedef struct _FILE_VERSION {
+struct FileVersion {
     union {
         uint32_t version;
         struct {
-            uint8_t v1;
-            uint8_t v2;
-            uint8_t v3;
-            uint8_t v4;
+            uint8_t v_1;
+            uint8_t v_2;
+            uint8_t v_3;
+            uint8_t v_4;
         };
     };
-} FILE_VERSION;
-Q_DECLARE_METATYPE(FILE_VERSION);
+};
+Q_DECLARE_METATYPE(FileVersion);
 
-typedef struct _DataOutputFormat {
-    int32_t type = DATA_OUTPUT_FORMAT_FLOAT;
-    int32_t prec = DEFAULT_DATA_OUTPUT_PRECISION;
-} DataOutputFormat;
+struct DataOutputFormat {
+    int32_t type = kDataOutputFormatFloat;
+    int32_t prec = kDefaultDataOutputPrecision;
+};
 Q_DECLARE_METATYPE(DataOutputFormat);
 
-typedef struct _MarkerSimple {
+struct MarkerSimple {
     bool enabled = false;
-    qreal x;
-    qreal y;      // for horizontal line
-    RelativeTime t;
-} MarkerSimple;
+    qreal x{};
+    qreal y{};  // for horizontal line
+    RelativeTime t{};
+};
 Q_DECLARE_METATYPE(MarkerSimple);
 
-typedef struct _AxisXCutoff {
+struct AxisXCutoff {
     qreal val;
     int pos;
     bool enabled;
     bool reserved[3];
-} AxisXCutoff;
+};
 Q_DECLARE_METATYPE(AxisXCutoff);
 
-typedef struct _TimeInterval {
-    RelativeTime bgn;
-    RelativeTime end;
-    //double bgn = 0;    // [s]
-    //double end = 100;  // [s]
-    int64_t offs = 0;    // reserved
-} TimeInterval;
+struct TimeInterval {
+    RelativeTime bgn{};
+    RelativeTime end{};
+    // double bgn = 0;    // [s]
+    // double end = 100;  // [s]
+    int64_t offs = 0;  // reserved
+};
 Q_DECLARE_METATYPE(TimeInterval);
 
-typedef struct _ControlLevel {
+struct ControlLevel {
     double value = 0;
-    bool cross = false;         // 0 -  below, 1 - above
-} ControlLevel;
+    bool cross = false;  // 0 -  below, 1 - above
+};
 Q_DECLARE_METATYPE(ControlLevel);
 
-typedef struct _LineProperties {
+struct LineProperties {
     int32_t dot_weight = 3;
     int32_t line_weight = 1;
     int32_t interpolation = 2;
     int32_t font_size = 8;
-} LineProperties;
+};
 Q_DECLARE_METATYPE(LineProperties);
 
-typedef struct _Margins {
-    int32_t left = SCREEN_OFFSET_LEFT;
-    int32_t top = SCREEN_OFFSET_TOP;
+struct Margin {
+    int32_t left = int32_t(kScreenOffsetLeft);
+    int32_t top = int32_t(kScreenOffsetTop);
     union {
-        int32_t right = SCREEN_OFFSET_RIGHT;
+        int32_t right = int32_t(kScreenOffsetRight);
         int32_t width;
     };
     union {
-        int32_t bottom = SCREEN_OFFSET_BOTTOM;
+        int32_t bottom = int32_t(kScreenOffsetBottom);
         int32_t height;
     };
-} Margin;
+};
 Q_DECLARE_METATYPE(Margin);
 
-typedef struct _Timing {
+struct Timing {
     RelativeTime width = {0};
     RelativeTime step = {0};
-} Timing;
+};
 Q_DECLARE_METATYPE(Timing);
 
-typedef struct _ImageSaving {
-    bool autosave = false;
-    int filetype = 0;   // unused
-} ImageSaving;
+struct ImageSaving {
+    bool auto_save = false;
+    int filetype = 0;  // unused
+};
 Q_DECLARE_METATYPE(ImageSaving);
 
-typedef struct _SettingsCommon {
+struct SettingsCommon {
     LineProperties lining;
-    Margin  margin;
+    Margin margin;
     Timing timing;
     ImageSaving saving;
-} SettingsCommon;
+};
 Q_DECLARE_METATYPE(SettingsCommon);
 
-typedef struct _SettingsScale {
-    LineProperties      line;
-    DataOutputFormat    fmt;
-    uint32_t            color;
-
-} SettingsScale;
-
+struct SettingsScale {
+    LineProperties line;
+    DataOutputFormat fmt;
+    uint32_t color;
+};
 Q_DECLARE_METATYPE(SettingsScale);
 
 #pragma pack(pop)
 
-#endif // EXPRESS_ONLINE_SCREEN_H
+#endif  // EXPRESS_ONLINE_SCREEN_H

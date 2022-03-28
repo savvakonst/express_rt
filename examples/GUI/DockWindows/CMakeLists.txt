@@ -36,8 +36,7 @@ add_dependencies(ExampleDockWindows PyEmbedder)
 add_dependencies(ExampleDockWindows CommonIO)
 add_dependencies(ExampleDockWindows TreeEditor)
 add_dependencies(ExampleDockWindows CommonViews)
-
-target_link_libraries(ExampleDockWindows PUBLIC ksdExpressOnlineScreen)
+add_dependencies(ExampleDockWindows Plotter)
 
 #add_custom_command(
 #        TARGET ExampleDockWindows POST_BUILD

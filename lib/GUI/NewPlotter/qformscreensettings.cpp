@@ -1,11 +1,9 @@
 ﻿#include "qformscreensettings.h"
+
 #include "ui_qformscreensettings.h"
 
 //-------------------------------------------------------------------------
-QFormScreenSettings::QFormScreenSettings(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::QFormScreenSettings)
-{
+QFormScreenSettings::QFormScreenSettings(QWidget *parent) : QDialog(parent), ui(new Ui::QFormScreenSettings) {
     ui->setupUi(this);
 
     setAttribute(Qt::WA_DeleteOnClose);
@@ -18,7 +16,7 @@ QFormScreenSettings::QFormScreenSettings(QWidget *parent) :
     setWindowIcon(QIcon("://settings"));
 
     list_precisions_.push_back(tr("Авто"));
-    for(int j = 0; j < 21; j ++){
+    for (int j = 0; j < 21; j++) {
         list_precisions_.push_back(QString::number(j));
     }
 
@@ -48,30 +46,30 @@ QFormScreenSettings::QFormScreenSettings(QWidget *parent) :
     mrMarginLeft = new QtVariantPropertyManager;
     prMarginLeft = mrMarginLeft->addProperty(QVariant::Int, tr("Слева"));
     prMarginLeft->setToolTip(tr("Размер шрифта"));
-    prMarginLeft->setAttribute("minimum", static_cast<int>(DIAGRAM_OFFSET_LEFT));
+    prMarginLeft->setAttribute("minimum", static_cast<int>(kDiagramOffsetLeft));
     prMarginLeft->setAttribute("maximum", 600);
-    prMarginLeft->setValue(static_cast<int>(DIAGRAM_OFFSET_LEFT));
+    prMarginLeft->setValue(static_cast<int>(kDiagramOffsetLeft));
 
     mrMarginRight = new QtVariantPropertyManager;
     prMarginRight = mrMarginRight->addProperty(QVariant::Int, tr("Справа"));
     prMarginRight->setToolTip(tr("Размер шрифта"));
-    prMarginRight->setAttribute("minimum", static_cast<int>(DIAGRAM_OFFSET_LEFT));
+    prMarginRight->setAttribute("minimum", static_cast<int>(kDiagramOffsetLeft));
     prMarginRight->setAttribute("maximum", 600);
-    prMarginRight->setValue(static_cast<int>(DIAGRAM_OFFSET_LEFT));
+    prMarginRight->setValue(static_cast<int>(kDiagramOffsetLeft));
 
     mrMarginTop = new QtVariantPropertyManager;
     prMarginTop = mrMarginTop->addProperty(QVariant::Int, tr("Сверху"));
     prMarginTop->setToolTip(tr("Размер шрифта"));
-    prMarginTop->setAttribute("minimum", static_cast<int>(SCREEN_OFFSET));
+    prMarginTop->setAttribute("minimum", static_cast<int>(kScreenOffset));
     prMarginTop->setAttribute("maximum", 300);
-    prMarginTop->setValue(static_cast<int>(SCREEN_OFFSET));
+    prMarginTop->setValue(static_cast<int>(kScreenOffset));
 
     mrMarginBottom = new QtVariantPropertyManager;
     prMarginBottom = mrMarginBottom->addProperty(QVariant::Int, tr("Снизу"));
     prMarginBottom->setToolTip(tr("Размер шрифта"));
-    prMarginBottom->setAttribute("minimum", static_cast<int>(SCREEN_OFFSET));
+    prMarginBottom->setAttribute("minimum", static_cast<int>(kScreenOffset));
     prMarginBottom->setAttribute("maximum", 300);
-    prMarginBottom->setValue(static_cast<int>(SCREEN_OFFSET));
+    prMarginBottom->setValue(static_cast<int>(kScreenOffset));
 
     grMargins = new QtGroupPropertyManager;
     prMargins = grMargins->addProperty(tr("Отступы области графиков, пикс"));
@@ -131,7 +129,7 @@ QFormScreenSettings::QFormScreenSettings(QWidget *parent) :
     prImageSave->addSubProperty(prImageSaveAuto);
 
     factory = new QtVariantEditorFactory;
-    brCommon  = new QtTreePropertyBrowser;
+    brCommon = new QtTreePropertyBrowser;
 
     brCommon->setFactoryForManager(mrTimeWidth, factory);
     brCommon->setFactoryForManager(mrTimeStep, factory);
@@ -149,7 +147,7 @@ QFormScreenSettings::QFormScreenSettings(QWidget *parent) :
     brCommon->setFactoryForManager(mrCmnDotWeight, factory);
     brCommon->setFactoryForManager(mrCmnLineWeight, factory);
     brCommon->setFactoryForManager(mrCmnInterpol, factory);
-    //brCommon->addProperty(prCmnLineDisplay);
+    // brCommon->addProperty(prCmnLineDisplay);
 
     brCommon->setFactoryForManager(mrImageSaveAuto, factory);
     brCommon->addProperty(prImageSave);
@@ -266,8 +264,8 @@ QFormScreenSettings::QFormScreenSettings(QWidget *parent) :
 
     factoryColor = new QtColorEditorFactory;
     brScales->setFactoryForManager(mrSclColor, factoryColor);
-    //factorySpinBox = new QtSpinBoxFactory;
-    //brScales->setFactoryForManager(mrSclColor->subIntPropertyManager(), factorySpinBox);
+    // factorySpinBox = new QtSpinBoxFactory;
+    // brScales->setFactoryForManager(mrSclColor->subIntPropertyManager(), factorySpinBox);
     brScales->addProperty(prSclColor);
 
     brScales->setFactoryForManager(mrMaxAuto, factory);
@@ -292,8 +290,8 @@ QFormScreenSettings::QFormScreenSettings(QWidget *parent) :
 
     // TODO: other
 
-    //ui->groupScale->setEnabled(false);
-    //  Single
+    // ui->groupScale->setEnabled(false);
+    //   Single
     ui->treeWidget->setColumnCount(3);
     ui->treeWidget->setColumnWidth(0, 50);
     ui->treeWidget->setColumnWidth(1, 16);
@@ -309,13 +307,9 @@ QFormScreenSettings::QFormScreenSettings(QWidget *parent) :
     connect(ui->btnCancel, &QPushButton::clicked, this, &QFormScreenSettings::on_close);
 }
 //-------------------------------------------------------------------------
-QFormScreenSettings::~QFormScreenSettings()
-{
-    delete ui;
-}
+QFormScreenSettings::~QFormScreenSettings() { delete ui; }
 //-------------------------------------------------------------------------
-void QFormScreenSettings::setCommon(const QString &title, const SettingsCommon &stx)
-{
+void QFormScreenSettings::setCommon(const QString &title, const SettingsCommon &stx) {
     title_ = title;
 
     stx_common_ = stx;
@@ -323,50 +317,45 @@ void QFormScreenSettings::setCommon(const QString &title, const SettingsCommon &
     fill();
 }
 //-------------------------------------------------------------------------
-void QFormScreenSettings::setScales()
-{
+void QFormScreenSettings::setScales() {
     //
 
-    fill(SOURCE_SCALE);
+    fill(kSourceScale);
 }
 //-------------------------------------------------------------------------
-void QFormScreenSettings::setActiveTab(const int &index)
-{
-    ui->tabWidget->setCurrentIndex(index);
-}
+void QFormScreenSettings::setActiveTab(const int &index) { ui->tabWidget->setCurrentIndex(index); }
 //-------------------------------------------------------------------------
-void QFormScreenSettings::on_confirm()
-{
+void QFormScreenSettings::on_confirm() {
     bool ok = false;
-    SettingsCommon  stx;
+    SettingsCommon stx;
 
     stx.timing.width.fromInt(prTimeWidth->value().toInt(&ok));
     stx.timing.step.fromDouble(prTimeStep->value().toDouble(&ok));
 
-    stx.lining.font_size    = prFontSize->value().toInt(&ok);
+    stx.lining.font_size = prFontSize->value().toInt(&ok);
 
-    stx.saving.autosave     = prImageSaveAuto->value().toBool();
+    stx.saving.auto_save = prImageSaveAuto->value().toBool();
 
-    stx.lining.line_weight    = prCmnLineWeight->value().toInt(&ok);
-    stx.lining.dot_weight     = prCmnDotWeight->value().toInt(&ok);
-    stx.lining.interpolation  = prCmnInterpol->value().toInt(&ok);
+    stx.lining.line_weight = prCmnLineWeight->value().toInt(&ok);
+    stx.lining.dot_weight = prCmnDotWeight->value().toInt(&ok);
+    stx.lining.interpolation = prCmnInterpol->value().toInt(&ok);
 
-    stx.margin.left         = prMarginLeft->value().toInt(&ok);
-    stx.margin.right        = prMarginRight->value().toInt(&ok);
-    stx.margin.top          = prMarginTop->value().toInt(&ok);
-    stx.margin.bottom       = prMarginBottom->value().toInt(&ok);
+    stx.margin.left = prMarginLeft->value().toInt(&ok);
+    stx.margin.right = prMarginRight->value().toInt(&ok);
+    stx.margin.top = prMarginTop->value().toInt(&ok);
+    stx.margin.bottom = prMarginBottom->value().toInt(&ok);
 
     emit to_confirmed(ui->editTitle->text(), stx);
 
-    SettingsScale   stx_scale;
+    SettingsScale stx_scale;
 
-    stx_scale.color         = mrSclColor->value(prSclColor).rgb();
+    stx_scale.color = mrSclColor->value(prSclColor).rgb();
 
-    stx_scale.fmt.type      = prDataType->value().toInt(&ok);
-    stx_scale.fmt.prec      = prPrec->value().toInt(&ok) - 1;
+    stx_scale.fmt.type = prDataType->value().toInt(&ok);
+    stx_scale.fmt.prec = prPrec->value().toInt(&ok) - 1;
 
-    stx_scale.line.line_weight   = prSclLineWeight->value().toInt(&ok);
-    stx_scale.line.dot_weight    = prSclDotWeight->value().toInt(&ok);
+    stx_scale.line.line_weight = prSclLineWeight->value().toInt(&ok);
+    stx_scale.line.dot_weight = prSclDotWeight->value().toInt(&ok);
     stx_scale.line.interpolation = prSclInterpol->value().toInt(&ok);
 
     emit to_confirm_scale();
@@ -374,192 +363,160 @@ void QFormScreenSettings::on_confirm()
     close();
 }
 //-------------------------------------------------------------------------
-void QFormScreenSettings::on_close()
-{
-    close();
-}
+void QFormScreenSettings::on_close() { close(); }
 //-------------------------------------------------------------------------
-void QFormScreenSettings::on_scaleTreeClicked(QTreeWidgetItem *item, int column)
-{
-
-}
+void QFormScreenSettings::on_scaleTreeClicked(QTreeWidgetItem *item, int column) {}
 //-------------------------------------------------------------------------
-void QFormScreenSettings::on_scaleTreeSelected()
-{
-
-}
+void QFormScreenSettings::on_scaleTreeSelected() {}
 //-------------------------------------------------------------------------
-void QFormScreenSettings::on_scaleTreeCurrentChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
-{
-    QList<QTreeWidgetItem*> list = ui->treeWidget->selectedItems();
+void QFormScreenSettings::on_scaleTreeCurrentChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous) {
+    QList<QTreeWidgetItem *> list = ui->treeWidget->selectedItems();
 
     ui->groupScale->setEnabled(!list.isEmpty());
 
-    if(list.isEmpty()){
+    if (list.isEmpty()) {
         ui->groupScale->setTitle(tr("Шкала не выбрана..."));
         return;
     }
 
-    fill(SOURCE_SCALE);
+    fill(kSourceScale);
 }
 //-------------------------------------------------------------------------
-void QFormScreenSettings::on_scaleColor(QtProperty *_t1, const QVariant &_t2)
-{
+void QFormScreenSettings::on_scaleColor(QtProperty *_t1, const QVariant &_t2) {
     Q_UNUSED(_t1)
     Q_UNUSED(_t2)
 
     uint32_t color = mrSclColor->value(prSclColor).rgb();
 
-    QList<QTreeWidgetItem*> list = ui->treeWidget->selectedItems();
-    if(list.isEmpty())
-        return;
+    QList<QTreeWidgetItem *> list = ui->treeWidget->selectedItems();
+    if (list.isEmpty()) return;
 }
 //-------------------------------------------------------------------------
-void QFormScreenSettings::on_scaleMinAuto(QtProperty *_t1, const QVariant &_t2)
-{
+void QFormScreenSettings::on_scaleMinAuto(QtProperty *_t1, const QVariant &_t2) {
     Q_UNUSED(_t1)
     Q_UNUSED(_t2)
 
-    bool    ok = false;
-    bool    enabled = !prMinAuto->value().toBool();
+    bool ok = false;
+    bool enabled = !prMinAuto->value().toBool();
 
     prMinValue->setEnabled(enabled);
 
     int val = prMinAuto->value().toInt(&ok);
 
-    QList<QTreeWidgetItem*> list = ui->treeWidget->selectedItems();
-    if(list.isEmpty())
-        return;
+    QList<QTreeWidgetItem *> list = ui->treeWidget->selectedItems();
+    if (list.isEmpty()) return;
 }
 //-------------------------------------------------------------------------
-void QFormScreenSettings::on_scaleMinValue(QtProperty *_t1, const QVariant &_t2)
-{
+void QFormScreenSettings::on_scaleMinValue(QtProperty *_t1, const QVariant &_t2) {
     Q_UNUSED(_t1)
     Q_UNUSED(_t2)
 
-    bool    ok  = false;
-    int     val = prMinValue->value().toInt(&ok) - 1;
+    bool ok = false;
+    int val = prMinValue->value().toInt(&ok) - 1;
 
-    QList<QTreeWidgetItem*> list = ui->treeWidget->selectedItems();
-    if(list.isEmpty())
-        return;
+    QList<QTreeWidgetItem *> list = ui->treeWidget->selectedItems();
+    if (list.isEmpty()) return;
 }
 //-------------------------------------------------------------------------
-void QFormScreenSettings::on_scaleMaxAuto(QtProperty *_t1, const QVariant &_t2)
-{
+void QFormScreenSettings::on_scaleMaxAuto(QtProperty *_t1, const QVariant &_t2) {
     Q_UNUSED(_t1)
     Q_UNUSED(_t2)
 
-    bool    ok = false;
-    bool    enabled = !prMaxAuto->value().toBool();
+    bool ok = false;
+    bool enabled = !prMaxAuto->value().toBool();
 
     prMaxValue->setEnabled(enabled);
 
     int val = prMaxAuto->value().toInt(&ok);
 
-    QList<QTreeWidgetItem*> list = ui->treeWidget->selectedItems();
-    if(list.isEmpty())
-        return;
+    QList<QTreeWidgetItem *> list = ui->treeWidget->selectedItems();
+    if (list.isEmpty()) return;
 }
 //-------------------------------------------------------------------------
-void QFormScreenSettings::on_scaleMaxValue(QtProperty *_t1, const QVariant &_t2)
-{
+void QFormScreenSettings::on_scaleMaxValue(QtProperty *_t1, const QVariant &_t2) {
     Q_UNUSED(_t1)
     Q_UNUSED(_t2)
 
-    bool    ok  = false;
-    int     val = prMaxValue->value().toInt(&ok) - 1;
+    bool ok = false;
+    int val = prMaxValue->value().toInt(&ok) - 1;
 
-    QList<QTreeWidgetItem*> list = ui->treeWidget->selectedItems();
-    if(list.isEmpty())
-        return;
+    QList<QTreeWidgetItem *> list = ui->treeWidget->selectedItems();
+    if (list.isEmpty()) return;
 }
 //-------------------------------------------------------------------------
-void QFormScreenSettings::on_scaleDataType(QtProperty *_t1, const QVariant &_t2)
-{
+void QFormScreenSettings::on_scaleDataType(QtProperty *_t1, const QVariant &_t2) {
     Q_UNUSED(_t1)
     Q_UNUSED(_t2)
 
-    bool    ok = false;
-    int     index = prDataType->value().toInt(&ok);
+    bool ok = false;
+    int index = prDataType->value().toInt(&ok);
 
-    switch(index){
-    case DATA_OUTPUT_FORMAT_INT_16:
-    case DATA_OUTPUT_FORMAT_INT_10:
-    case DATA_OUTPUT_FORMAT_INT_8:
-    case DATA_OUTPUT_FORMAT_INT_2:
+    switch (index) {
+    case kDataOutputFormatInt16:
+    case kDataOutputFormatInt10:
+    case kDataOutputFormatInt8:
+    case kDataOutputFormatInt2:
         prPrec->setEnabled(false);
         break;
     default:
         prPrec->setEnabled(true);
     }
 
-    int     val = prDataType->value().toInt(&ok);
+    int val = prDataType->value().toInt(&ok);
 
-    QList<QTreeWidgetItem*> list = ui->treeWidget->selectedItems();
-    if(list.isEmpty())
-        return;
+    QList<QTreeWidgetItem *> list = ui->treeWidget->selectedItems();
+    if (list.isEmpty()) return;
 }
 //-------------------------------------------------------------------------
-void QFormScreenSettings::on_scalePrec(QtProperty *_t1, const QVariant &_t2)
-{
+void QFormScreenSettings::on_scalePrec(QtProperty *_t1, const QVariant &_t2) {
     Q_UNUSED(_t1)
     Q_UNUSED(_t2)
 
-    bool    ok  = false;
-    int     val = prPrec->value().toInt(&ok);
+    bool ok = false;
+    int val = prPrec->value().toInt(&ok);
 
-    QList<QTreeWidgetItem*> list = ui->treeWidget->selectedItems();
-    if(list.isEmpty())
-        return;
+    QList<QTreeWidgetItem *> list = ui->treeWidget->selectedItems();
+    if (list.isEmpty()) return;
 }
 //-------------------------------------------------------------------------
-void QFormScreenSettings::on_scaleLineWeight(QtProperty *_t1, const QVariant &_t2)
-{
+void QFormScreenSettings::on_scaleLineWeight(QtProperty *_t1, const QVariant &_t2) {
     Q_UNUSED(_t1)
     Q_UNUSED(_t2)
 
-    bool    ok  = false;
-    int     val = prSclLineWeight->value().toInt(&ok);
+    bool ok = false;
+    int val = prSclLineWeight->value().toInt(&ok);
 
-    QList<QTreeWidgetItem*> list = ui->treeWidget->selectedItems();
-    if(list.isEmpty())
-        return;
+    QList<QTreeWidgetItem *> list = ui->treeWidget->selectedItems();
+    if (list.isEmpty()) return;
 }
 //-------------------------------------------------------------------------
-void QFormScreenSettings::on_scaleDotWeight(QtProperty *_t1, const QVariant &_t2)
-{
+void QFormScreenSettings::on_scaleDotWeight(QtProperty *_t1, const QVariant &_t2) {
     Q_UNUSED(_t1)
     Q_UNUSED(_t2)
 
-    bool    ok  = false;
-    int     val = prSclDotWeight->value().toInt(&ok);
+    bool ok = false;
+    int val = prSclDotWeight->value().toInt(&ok);
 
-    QList<QTreeWidgetItem*> list = ui->treeWidget->selectedItems();
-    if(list.isEmpty())
-        return;
+    QList<QTreeWidgetItem *> list = ui->treeWidget->selectedItems();
+    if (list.isEmpty()) return;
 }
 //-------------------------------------------------------------------------
-void QFormScreenSettings::on_scaleInterpol(QtProperty *_t1, const QVariant &_t2)
-{
+void QFormScreenSettings::on_scaleInterpol(QtProperty *_t1, const QVariant &_t2) {
     Q_UNUSED(_t1)
     Q_UNUSED(_t2)
 
-    bool    ok  = false;
-    int     val = prSclInterpol->value().toInt(&ok);
+    bool ok = false;
+    int val = prSclInterpol->value().toInt(&ok);
 
-    QList<QTreeWidgetItem*> list = ui->treeWidget->selectedItems();
-    if(list.isEmpty())
-        return;
+    QList<QTreeWidgetItem *> list = ui->treeWidget->selectedItems();
+    if (list.isEmpty()) return;
 }
 //-------------------------------------------------------------------------
-void QFormScreenSettings::fill(const int &src)
-{
-    switch(src){
-    case SOURCE_SCALE:{
+void QFormScreenSettings::fill(const int &src) {
+    switch (src) {
+    case kSourceScale: {
         ui->treeWidget->clear();
-    }
-    break;
+    } break;
     default:
         ui->editTitle->setText(title_);
 
@@ -573,7 +530,7 @@ void QFormScreenSettings::fill(const int &src)
 
         mrFontSize->setValue(prFontSize, stx_common_.lining.font_size);
 
-        mrImageSaveAuto->setValue(prImageSaveAuto, stx_common_.saving.autosave);
+        mrImageSaveAuto->setValue(prImageSaveAuto, stx_common_.saving.auto_save);
 
         mrCmnLineWeight->setValue(prCmnLineWeight, stx_common_.lining.line_weight);
         mrCmnDotWeight->setValue(prCmnDotWeight, stx_common_.lining.dot_weight);
@@ -581,8 +538,5 @@ void QFormScreenSettings::fill(const int &src)
     }
 }
 //-------------------------------------------------------------------------
-void QFormScreenSettings::closeEvent(QCloseEvent *event)
-{
-    event->accept();
-}
+void QFormScreenSettings::closeEvent(QCloseEvent *event) { event->accept(); }
 //-------------------------------------------------------------------------

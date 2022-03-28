@@ -68,8 +68,8 @@ void QScreenScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
     do {
         QPointF pt = event->scenePos();
 
-        if (pt.x() > (width() - DIAGRAM_OFFSET_RIGHT)) break;
-        if (pt.x() < DIAGRAM_OFFSET_LEFT) break;
+        if (pt.x() > (width() - kDiagramOffsetRight)) break;
+        if (pt.x() < kDiagramOffsetLeft) break;
 
         emit to_leftClicked(pt);
     } while (false);
@@ -81,8 +81,8 @@ void QScreenScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 void QScreenScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
     QPointF pt = event->scenePos();
 
-    int leftX = DIAGRAM_OFFSET_LEFT;
-    int rightX = DIAGRAM_OFFSET_RIGHT;
+    int leftX = kDiagramOffsetLeft;
+    int rightX = kDiagramOffsetRight;
 
     switch (event->button()) {
     case Qt::LeftButton: {
@@ -156,8 +156,8 @@ void QScreenScene::wheelEvent(QGraphicsSceneWheelEvent* event) {
     QPointF pt = event->scenePos();
 
     do {
-        if (pt.x() < DIAGRAM_OFFSET_LEFT) break;
-        if (pt.x() > (width() - DIAGRAM_OFFSET_RIGHT)) break;
+        if (pt.x() < kDiagramOffsetLeft) break;
+        if (pt.x() > (width() - kDiagramOffsetRight)) break;
 
         if (event->delta() == 0) break;
 

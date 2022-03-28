@@ -139,7 +139,7 @@ void DeviceListModel::buildTree() {
     emit layoutChanged();
 }
 
-DeviceListModel::TreeNode *DeviceListModel::getNode(const QModelIndex &index) const {
+DeviceListModel::TreeNode *DeviceListModel::getNode(const QModelIndex &index) {
     return (TreeNode *)index.internalPointer();
 }
 
@@ -208,15 +208,21 @@ QStringList DeviceListModel::mimeTypes() const {
 
 QMimeData *DeviceListModel::mimeData(const QModelIndexList &indexes) const {
     auto mime_data = new QMimeData();
-    std::stringstream s_stream;
+    std::stringstream modules_s_stream;
+    std::stringstream devices_s_stream;
 
     for (auto &i : indexes) {
         auto c = getNode(i)->getPath();
-        s_stream << c.first << "//" << c.second << "\n";
+
+        modules_s_stream << c.first << "//" << c.second << "\n";
+        if (getNode(i)->isDevice()) devices_s_stream << c.first << "//" << c.second << "\n";
     }
-    auto s = s_stream.str();
-    mime_data->setData("text/module", QByteArray::fromStdString(s));
-    mime_data->setData("text/uri-list", QByteArray::fromStdString(s));
+    auto modules_s = modules_s_stream.str();
+    mime_data->setData("text/module", QByteArray::fromStdString(modules_s));
+
+    auto devices_s = devices_s_stream.str();
+    if (!devices_s.empty()) mime_data->setData("text/device", QByteArray::fromStdString(devices_s));
+
     return mime_data;
 }
 

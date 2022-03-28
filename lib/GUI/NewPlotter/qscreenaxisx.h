@@ -1,24 +1,24 @@
 ﻿#ifndef QSCREENAXISX_H
 #define QSCREENAXISX_H
 
-#include <QObject>
 #include <QImage>
-#include <QPixmap>
+#include <QLocale>
+#include <QObject>
 #include <QPainter>
 #include <QPen>
+#include <QPixmap>
 #include <QSizeF>
-#include <QLocale>
 
 #include "Express_Online_Screen.h"
 #include "common/TimeRepresentation.h"
 
 class QScreenAxisX : public QObject {
-Q_OBJECT
-public:
+    Q_OBJECT
+   public:
+    // AXIS_Y_WIDTH
 
-    //AXIS_Y_WIDTH
-
-    explicit QScreenAxisX(const TimeInterval &ti0, const LineProperties &dstx, const Margin &margin, QObject *parent = nullptr);
+    explicit QScreenAxisX(const TimeInterval &ti0, const LineProperties &dstx, const Margin &margin,
+                          QObject *parent = nullptr);
 
     ~QScreenAxisX();
 
@@ -49,35 +49,33 @@ public:
     QVector<AxisXCutoff> cutoffs_;
     QVector<RelativeTime> scale_;
 
-public slots:
+   public slots:
 
     void onResize(const qreal &w, const qreal &h);
 
-private:
-
+   private:
     RelativeTime getLength(const TimeInterval &ti);
 
-    const int type_ = SOURCE_AXIS_X;
+    const int type_ = kSourceAxisX;
 
     TimeInterval ti_;
-    //int32_t step_ = 10;
+    // int32_t step_ = 10;
     LineProperties dstx_;
     Margin margin_;
 
-    RelativeTime t_ = {0};    // s * 1024
+    RelativeTime t_ = {0};  // s * 1024
     RelativeTime t_last_ = {0};
     RelativeTime t_fisrt_ = {0};
     bool b_ = false;
 
-
-    QSizeF scene_size_ = QSizeF(DIAGRAM_OFFSET_LEFT + DIAGRAM_OFFSET_RIGHT + SCREEN_OFFSET, SCREEN_OFFSET);
+    QSizeF scene_size_ = QSizeF(kDiagramOffsetLeft + kDiagramOffsetRight + kScreenOffset, kScreenOffset);
     QString label_ = "";
 
-private slots:
+   private slots:
 
-signals:
+   signals:
 
     void to_height(const int &h);
 };
 
-#endif // QSCREENAXISX_H
+#endif  // QSCREENAXISX_H

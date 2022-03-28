@@ -5,14 +5,12 @@ project(ksdExpressOnlineScreen VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
-
-if (CMAKE_VERSION VERSION_LESS "3.7.0")
-    set(CMAKE_INCLUDE_CURRENT_DIR ON)
-endif ()
+#set(CMAKE_AUTORCC ON)
+#set(CMAKE_AUTOUIC ON)
 
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
@@ -28,23 +26,24 @@ file(GLOB QtResources *.qrc)
 
 
 qt5_wrap_ui(UiHeaders ${UiFiles})
+qt5_add_resources(QrcSources icons.qrc)
 
-
-add_library(ksdExpressOnlineScreen
+message(STATUS "________QtResources:${QrcSources}")
+add_library(Plotter SHARED
         ${Sources}
         ${Headers}
         ${UiHeaders}
-        ${QtResources}
+        ${QrcSources}
         )
 
-target_include_directories(ksdExpressOnlineScreen PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-target_include_directories(ksdExpressOnlineScreen PUBLIC .)
+#target_include_directories(ksdExpressOnlineScreen PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(Plotter PUBLIC .)
 
-target_link_libraries(ksdExpressOnlineScreen QtPropertyBrowser)
-target_link_libraries(ksdExpressOnlineScreen ReaderExample)
-target_link_libraries(ksdExpressOnlineScreen Ping)
-target_link_libraries(ksdExpressOnlineScreen Modules)
-target_link_libraries(ksdExpressOnlineScreen Qt5::Widgets)
+target_link_libraries(Plotter QtPropertyBrowser)
+target_link_libraries(Plotter ReaderExample)
+target_link_libraries(Plotter Ping)
+target_link_libraries(Plotter Modules)
+target_link_libraries(Plotter Qt5::Widgets)
 
 
 source_group(src FILES ${Sources})
@@ -53,6 +52,8 @@ source_group(uis FILES ${UiFiles})
 source_group(qrc FILES ${QtResources})
 
 
+target_compile_definitions(Plotter PRIVATE PLOTTER_LIB_NAME=Plotter)
+
 if (MSVC)
-    set_target_properties(ksdExpressOnlineScreen PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=%PATH%;${CMAKE_PREFIX_PATH}\\bin")
+    set_target_properties(Plotter PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=%PATH%;${CMAKE_PREFIX_PATH}\\bin")
 endif ()

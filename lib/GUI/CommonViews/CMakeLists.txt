@@ -13,7 +13,7 @@ add_library(${COMMON_VIEWS} SHARED
 target_include_directories(${COMMON_VIEWS} PRIVATE .)
 #set_target_properties(${COMMON_VIEWS} PROPERTIES AUTOMOC TRUE)
 
-target_link_libraries(${COMMON_VIEWS} PUBLIC ksdExpressOnlineScreen)
+#target_link_libraries(${COMMON_VIEWS} PUBLIC ksdExpressOnlineScreen)
 target_link_libraries(${COMMON_VIEWS} PRIVATE Qt5::Widgets)
 target_link_libraries(${COMMON_VIEWS} PRIVATE CommonLib)
 

@@ -1,28 +1,27 @@
 ﻿#ifndef QSCREENSCALE_H
 #define QSCREENSCALE_H
 
-#include <memory>
-#include <QObject>
+#include <QAction>
+#include <QColor>
 #include <QGraphicsItem>
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneWheelEvent>
-#include <QKeyEvent>
 #include <QImage>
-#include <QPixmap>
+#include <QKeyEvent>
+#include <QMenu>
+#include <QObject>
 #include <QPainter>
 #include <QPen>
-#include <QSizeF>
-#include <QMenu>
-#include <QAction>
+#include <QPixmap>
 #include <QRect>
-#include <QColor>
+#include <QSizeF>
+#include <memory>
 
-#include "qscreenaxisx.h"
-#include "qformlevel.h"
-
-#include "common/Reader_ifs.h"
 #include "ReaderExample/ReaderExample.h"
+#include "common/Reader_ifs.h"
+#include "qformlevel.h"
+#include "qscreenaxisx.h"
 
 #pragma pack(push, 1)
 struct AxisYCutoff {
@@ -30,7 +29,7 @@ struct AxisYCutoff {
     int pos;
     bool enabled;
     bool reserved[3];
-} ;
+};
 
 /*struct Dot {
     qint64 ct;
@@ -41,12 +40,12 @@ struct AxisYCutoff {
 struct AxisXyDot {
     double val_max = 0;
     double val_min = 0;
-    //double val_fst = 0;
-    //double val_lst = 0;
+    // double val_fst = 0;
+    // double val_lst = 0;
     int y0 = 0;
     int y1 = 0;
-    //int yF = 0;
-    //int yL = 0;
+    // int yF = 0;
+    // int yL = 0;
     int x = 0;
     int ct = 0;
     bool ghost = true;
@@ -64,7 +63,7 @@ struct AxisYStatistics {
     double val_min = 0;
     long double m = 0;
     long double d = 0;
-    //long double         mo;
+    // long double         mo;
     long double sd = 0;
     //
     double time_length = 0;
@@ -86,13 +85,9 @@ typedef struct _SINGLE_PRM {
 } POINT;*/
 
 class QScreenScale : public QObject, public QGraphicsRectItem {
+    Q_OBJECT
 
-Q_OBJECT
-
-
-
-public:
-
+   public:
     struct AxisYSettings {
         DataOutputFormat fmt_value;
         DataOutputFormat fmt_scale;
@@ -104,16 +99,15 @@ public:
         qreal value = 10;
     };
 
-
     static const QList<uint32_t> DIAG_COLORS;
 
     /*, 0x8D6E63 , 0x795548 , 0x6D4C41 , 0x5D4037 , 0x4E342E , 0x3E2723;*/
 
     explicit QScreenScale(Reader_ifs *reader, const int &index0, const QSizeF &sz, const LineProperties &dstx,
-                 const Margin &margin, QWidget *parent);
+                          const Margin &margin, QWidget *parent);
 
-    explicit QScreenScale(const int &index0, const QSizeF &sz, const LineProperties &dstx,
-                           const Margin &margin, QWidget *parent = nullptr);
+    explicit QScreenScale(const int &index0, const QSizeF &sz, const LineProperties &dstx, const Margin &margin,
+                          QWidget *parent = nullptr);
 
     ~QScreenScale() override;
 
@@ -131,7 +125,7 @@ public:
 
     int type() const override;
 
-    void recountScaleValues(const int &w, AxisYStatistics &stat, Reader_ifs::Chunk* c_ptr);
+    void recountScaleValues(const int &w, AxisYStatistics &stat, Reader_ifs::Chunk *c_ptr);
 
     void drawDiag();
 
@@ -169,7 +163,7 @@ public:
     int precision_ = -1;
     int precision_scale_ = -1;
 
-    //QList<QVector<AxisXReference>> list_refs_;
+    // QList<QVector<AxisXReference>> list_refs_;
     QList<QVector<AxisXyDot>> list_dots_;
 
     AxisYStatistics stat_;
@@ -177,7 +171,7 @@ public:
 
     bool warning_ = false;
 
-public slots:
+   public slots:
 
     void onRemove();
 
@@ -195,9 +189,8 @@ public slots:
 
     void onSetPause(const bool is_paused);
 
-private:
+   private:
     void changeScaleBorder(const bool &high, const int &delta);
-
 
     QAction *act_settings_;
     QAction *act_remove_;
@@ -215,11 +208,10 @@ private:
     QAction *act_scale_auto_;
     QAction *act_scale_fix_;
 
-    const int type_ = SOURCE_SCALE;
+    const int type_ = kSourceScale;
 
     std::list<SINGLE_PRM> parameters_;
     PrmBuffer_ifs *p_;
-
 
     bool disabled_ = false;
     QPair<qint64, qint64> offs_;
@@ -234,7 +226,7 @@ private:
     bool left_pressed_ = false;
     bool right_pressed_ = false;
 
-private slots:
+   private slots:
 
     void onAlignT();
     void onAlignB();
@@ -245,7 +237,7 @@ private slots:
     void onScaleAuto();
     void onScaleFix();
 
-protected:
+   protected:
     void keyPressEvent(QKeyEvent *event) override;
 
     void keyReleaseEvent(QKeyEvent *event) override;
@@ -260,7 +252,7 @@ protected:
 
     void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 
-signals:
+   signals:
 
     void toTuned(const int &src, const int &index);
 
@@ -272,8 +264,7 @@ signals:
 
     void toAlign(const int &src, const int &index, const int &val);
 
-    void toProgressed(const int &index);    // not used
+    void toProgressed(const int &index);  // not used
 };
 
-
-#endif // QSCREENSCALE_H
+#endif  // QSCREENSCALE_H
