@@ -149,7 +149,7 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
     Margin margin_;
 
     TimeInterval ti_;
-    RelativeTime t_step_;
+    // RelativeTime t_step_;
 
     QVector<RelativeTime> *p_scale_;
 
@@ -183,7 +183,7 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
 
     void onSettingsShow();
 
-    void onAddLevelBegin();
+    void onAddLevelBegin() const;
 
     void onAddLevelEnd(const ControlLevel &lvl, const bool &flag, const int &index);
 
@@ -251,6 +251,9 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
     void wheelEvent(QGraphicsSceneWheelEvent *event) override;
+
+
+
 
    signals:
 

@@ -252,7 +252,7 @@ QScreenScale::QScreenScale(const int &index0, const QSizeF &sz, const LineProper
     SINGLE_PRM prm;
 
     prm.rdr = getReaderExample(p_);
-    prm.buf = new Reader_ifs::Point[kMaxScreenWidth];
+    prm.buf = new Reader_ifs::Point[(int)kMaxScreenWidth];
     prm.plevels = &levels_;
 
     parameters_.push_back(std::move(prm));
@@ -261,7 +261,7 @@ QScreenScale::QScreenScale(const int &index0, const QSizeF &sz, const LineProper
     drawScale();
 }
 //-------------------------------------------------------------------------
-QScreenScale::~QScreenScale() {}
+QScreenScale::~QScreenScale() = default;
 //-------------------------------------------------------------------------
 int QScreenScale::getIndex() const { return index_; }
 //-------------------------------------------------------------------------
@@ -278,7 +278,7 @@ void QScreenScale::setScale(QVector<RelativeTime> *xs) { p_scale_ = xs; }
 //-------------------------------------------------------------------------
 void QScreenScale::setTiming(const TimeInterval &ti0, const RelativeTime &step) {
     ti_ = ti0;
-    t_step_ = step;
+    // t_step_ = step;
     intervalOn = true;
 
     drawDiag();
@@ -299,7 +299,7 @@ void QScreenScale::recountScaleValues(const int &w, AxisYStatistics &stat, Reade
 
     AxisXyDot last_dot;
     QVector<AxisXyDot> dots;
-    dots.reserve(kMaxScreenWidth);
+    dots.reserve((int)kMaxScreenWidth);
 
     while (c_ptr) {
         Reader_ifs::Point *pb = c_ptr->first_point_;
@@ -371,7 +371,7 @@ void QScreenScale::drawDiag() {
 
     RelativeTime dt = ti_.end - ti_.bgn;
     dt.ms_fractional = 0;
-    int fresh_index = image_w * (dt.toDouble() - t_step_.toDouble()) / dt.toDouble();
+    // int fresh_index = image_w * (dt.toDouble() - t_step_.toDouble()) / dt.toDouble();
 
     if (!is_paused_) {
         memset(&stat_, 0, sizeof(stat_));
@@ -416,9 +416,9 @@ void QScreenScale::drawDiag() {
 
     img_shift_y_ = static_cast<int>(floor((scale_max - data_max) * shift_k + 0.5));
 
-    QPixmap *pm = new QPixmap(image_w + kDiagramMargin, image_h + kDiagramMargin + kDiagramMargin);
+    auto *pm = new QPixmap(image_w + kDiagramMargin, image_h + kDiagramMargin + kDiagramMargin);
     pm->fill(Qt::transparent);
-    QPainter *painter = new QPainter(pm);
+    auto *painter = new QPainter(pm);
 
     QFont ft = painter->font();
     ft.setPointSize(dstx_.font_size);
@@ -462,7 +462,7 @@ void QScreenScale::drawDiag() {
                 }
             }
 
-            if (d.x >= fresh_index) warning_ |= warning;
+            // if (d.x >= fresh_index) warning_ |= warning;
         }
     }
 
@@ -511,10 +511,10 @@ void QScreenScale::drawDiag() {
 void QScreenScale::drawScale() {
     QRectF rt = rect();
 
-    QPixmap *pm = new QPixmap(static_cast<int>(rt.width()), static_cast<int>(rt.height() + 1));
+    auto *pm = new QPixmap(static_cast<int>(rt.width()), static_cast<int>(rt.height() + 1));
     pm->fill(Qt::transparent);
 
-    QPainter *painter = new QPainter(pm);
+    auto *painter = new QPainter(pm);
 
     QFont ft = painter->font();
     ft.setPointSize(dstx_.font_size);
@@ -551,87 +551,87 @@ void QScreenScale::drawScale() {
     // Cutoffs Definition
     qreal rng = val_max - val_min;
     if (rng <= 0) rng = 1;
-    qreal rngAbs = abs(rng);
-    qreal rngPow = floor(log10(rngAbs) + 0.5);
+    qreal rng_abs = abs(rng);
+    qreal rng_pow = floor(log10(rng_abs) + 0.5);
 
-    qreal step = pow(10, rngPow);
+    qreal step = pow(10, rng_pow);
     qreal nmbr = step_.value;
 
-    qreal dotWeight = rngAbs / h;
+    qreal dot_weight = rng_abs / h;
 
-    qreal yFrom = val_max;
-    int lastPos = 0;
+    qreal y_from = val_max;
+    int last_pos = 0;
 
     if (step_.automatic) {
-        nmbr = floor(rngAbs / step);
+        nmbr = floor(rng_abs / step);
         while ((nmbr > 10) || (nmbr < 2)) {
             if (nmbr > 10) step *= 10;
             else
                 step /= 2;
-            nmbr = floor(rngAbs / step);
+            nmbr = floor(rng_abs / step);
         }
 
-        yFrom = ceil(val_max / step) * step;
+        y_from = ceil(val_max / step) * step;
     } else {
-        qreal pMax = std::max(log10(val_max), log10(val_min));
-        pMax = floor(pMax);
+        qreal p_max = std::max(log10(val_max), log10(val_min));
+        p_max = floor(p_max);
 
-        yFrom = ceil(floor(val_max) / pow(10, pMax)) * pow(10, pMax);
+        y_from = ceil(floor(val_max) / pow(10, p_max)) * pow(10, p_max);
 
         if (nmbr == 0) nmbr = 1;
 
-        step = (rngAbs / (nmbr));
+        step = (rng_abs / (nmbr));
 
         qreal p = floor(log10(step));
 
         step = floor(step / pow(10, p)) * pow(10, p);
 
-        int nx = rngAbs / step;
+        int nx = rng_abs / step;
         while (nx / nmbr > 2) {
             step *= 2;
-            nx = rngAbs / step;
+            nx = rng_abs / step;
         }
     }
 
-    qreal y = yFrom;
+    qreal y = y_from;
     int ct = 0;
 
     cutoffs_.clear();
     while (y >= val_min) {
         if (y <= val_max) {
-            AxisYCutoff co;
+            AxisYCutoff co{};
             memset(&co, 0, sizeof(co));
             co.val = y;
-            co.pos = static_cast<int>(h - floor(((y - val_min) / dotWeight) + 0.5));
+            co.pos = static_cast<int>(h - floor(((y - val_min) / dot_weight) + 0.5));
             if (cutoffs_.empty()) {
                 co.enabled = true;
-                lastPos = co.pos;
+                last_pos = co.pos;
             } else {
-                if ((co.pos - lastPos) >= txtH) {
+                if ((co.pos - last_pos) >= txtH) {
                     co.enabled = true;
-                    lastPos = co.pos;
+                    last_pos = co.pos;
                 }
             }
             cutoffs_.push_back(co);
         }
 
         ct++;
-        y = yFrom - (ct * step);
+        y = y_from - (ct * step);
     }
 
     if (step_.automatic) step_.value = cutoffs_.size();
 
     precision_ = -1;
-    rngPow = static_cast<int>(floor(log10(rngAbs)));
-    if (rngPow > 0) precision_ = 0;
-    else if (rngPow < -8)
+    rng_pow = static_cast<int>(floor(log10(rng_abs)));
+    if (rng_pow > 0) precision_ = 0;
+    else if (rng_pow < -8)
         precision_ = 9;
     else
-        precision_ = static_cast<int>(fabs(rngPow) + 1);
+        precision_ = static_cast<int>(fabs(rng_pow) + 1);
 
     precision_scale_ = precision_;
     int stepPow = static_cast<int>(floor(log10(step)));
-    if (stepPow < rngPow) precision_scale_++;
+    if (stepPow < rng_pow) precision_scale_++;
 
     for (auto co : cutoffs_) {
         painter->drawLine(1, co.pos, 6, co.pos);
@@ -652,7 +652,7 @@ void QScreenScale::createPopupMenu(const QPoint &pt) {
     act_scale_auto_->setVisible(!scaleAutoState);
     act_scale_fix_->setVisible(scaleAutoState);
 
-    QMenu *menu = new QMenu();
+    auto *menu = new QMenu();
     menu->addAction(act_settings_);
     menu->addSeparator();
     menu->addMenu(menu_align_);
@@ -694,8 +694,8 @@ void QScreenScale::onIndexReduce(const int &src, const int &index0) {
 //-------------------------------------------------------------------------
 void QScreenScale::onSettingsShow() { emit toTuned(type_, index_); }
 //-------------------------------------------------------------------------
-void QScreenScale::onAddLevelBegin() {
-    QFormLevel *fl = new QFormLevel(ControlLevel(), false);
+void QScreenScale::onAddLevelBegin() const {
+    auto *fl = new QFormLevel(ControlLevel(), false);
 
     connect(fl, &QFormLevel::to_confirmed, this, &QScreenScale::onAddLevelEnd);
 

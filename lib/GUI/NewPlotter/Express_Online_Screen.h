@@ -5,10 +5,10 @@
 
 #include "common/TimeRepresentation.h"
 
-const qreal kMaxScreenWidth = 2048;
+const int32_t kMaxScreenWidth = 2048;
 
-const qreal kDiagramOffsetLeft = 150;
-const qreal kDiagramOffsetRight = 150;
+const int32_t kDiagramOffsetLeft = 150;
+const int32_t kDiagramOffsetRight = 150;
 const int kDiagramMargin = 5;
 
 const qreal kScreenOffset = 50;

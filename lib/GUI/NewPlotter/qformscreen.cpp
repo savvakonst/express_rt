@@ -7,7 +7,22 @@
 //
 QString g_support_path;
 //
-
+template <typename Func2>
+class ActionC : public QAction {
+   public:
+    ActionC(const QIcon &icon, const QString &text, const typename QtPrivate::FunctionPointer<Func2>::Object *parent,
+            const QKeySequence &shortcut, Func2 slot)
+        : QAction(icon, text, (QObject *)parent) {
+        if (!shortcut.isEmpty()) setShortcut(shortcut);
+        connect(this, &QAction::triggered, parent, slot);
+    }
+    ActionC(const QString &text, const typename QtPrivate::FunctionPointer<Func2>::Object *parent,
+            const QKeySequence &shortcut, Func2 slot)
+        : QAction(text, (QObject *)parent) {
+        if (!shortcut.isEmpty()) setShortcut(shortcut);
+        connect(this, &QAction::triggered, parent, slot);
+    }
+};
 //-------------------------------------------------------------------------
 QFormScreen::QFormScreen(QWidget *parent) : QDialog(parent), ui_(new Ui::QFormScreen) {
     ui_->setupUi(this);
@@ -24,7 +39,7 @@ QFormScreen::QFormScreen(QWidget *parent) : QDialog(parent), ui_(new Ui::QFormSc
     QSettings ini(QDir::currentPath() + ini_filename_eo_, QSettings::IniFormat);
     if (ini.isWritable()) g_support_path = QDir::currentPath();
     else {
-        QString program_data_folder = QDir().toNativeSeparators(program_data_path_);
+        QString program_data_folder = QDir::toNativeSeparators(program_data_path_);
         if (!QDir(program_data_folder).exists()) QDir().mkdir(program_data_folder);
 
         g_support_path = program_data_folder;
@@ -37,20 +52,17 @@ QFormScreen::QFormScreen(QWidget *parent) : QDialog(parent), ui_(new Ui::QFormSc
     setWindowFlags(flags);
     setWindowIcon(QIcon("://image_w"));
 
-    t_.fromDouble(30);
+    time_width_.fromInt(30);
 
-    time_width_.fromDouble(30);
-    time_step_.fromDouble(0.1);
-
-    ti_.end.fromDouble(30);
-    ti_.bgn = ti_.end - time_width_;
+    current_time_.end.fromInt(30);
+    current_time_.bgn = current_time_.end - time_width_;
 
     // scene
     scene_ = new QScreenScene(this);
 
     connect(this, &QFormScreen::toSceneChanged, scene_, &QGraphicsScene::advance);
-    connect(scene_, &QScreenScene::to_markerPlaced, this, &QFormScreen::onAddMarker);
-    connect(scene_, &QScreenScene::to_menuCalled, this, &QFormScreen::onPopupMenuAdd);
+    connect(scene_, &QScreenScene::toMarkerPlaced, this, &QFormScreen::onAddMarker);
+    connect(scene_, &QScreenScene::toMenuCalled, this, &QFormScreen::onPopupMenuAdd);
 
     ui_->graphicsView->setScene(scene_);
     ui_->graphicsView->setMouseTracking(true);
@@ -60,11 +72,11 @@ QFormScreen::QFormScreen(QWidget *parent) : QDialog(parent), ui_(new Ui::QFormSc
     sz.setHeight(scene_->height());
 
     // Axis X
-    axis_x_ = new QScreenAxisX(ti_, lining_, margin_, this);
+    axis_x_ = new QScreenAxisX(current_time_, lining_, margin_, this);
 
     connect(this, &QFormScreen::toSceneResized, axis_x_, &QScreenAxisX::onResize);
     // connect(scene, &QScreenScene::to_leftGestured, axisX, &QScreenAxisX::on_zoom);
-    connect(scene_, &QScreenScene::to_leftClicked, this, &QFormScreen::onAddMarkerAnchor);
+    connect(scene_, &QScreenScene::toLeftClicked, this, &QFormScreen::onAddMarkerAnchor);
     // connect(scene, &QScreenScene::to_rightGestured, axisX, &QScreenAxisX::on_move);
     connect(scene_, &QScreenScene::to_mouseWheeled, this, &QFormScreen::onZoom);
     connect(scene_, &QScreenScene::to_paused, this, &QFormScreen::onPause);
@@ -82,38 +94,29 @@ QFormScreen::QFormScreen(QWidget *parent) : QDialog(parent), ui_(new Ui::QFormSc
     setStatusTip(tr("run"));
 
     // menu File
-    {
-        act_shot_ = new QAction(QIcon("://shot"), tr("Снимок"), this);
-        act_shot_->setShortcut(Qt::CTRL + Qt::Key_S);
-        connect(act_shot_, &QAction::triggered, this, &QFormScreen::onMakeShotAuto);
+    act_shot_ = new ActionC(QIcon("://shot"), tr("Снимок"), this,  //
+                            Qt::CTRL + Qt::Key_S, &QFormScreen::onMakeShotAuto);
 
-        act_shot_as_ = new QAction(QIcon("://shot"), tr("Сохранить снимок как ..."), this);
-        act_shot_as_->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_S);
-        connect(act_shot_as_, &QAction::triggered, this, &QFormScreen::onMakeShotManual);
+    act_shot_as_ = new ActionC(QIcon("://shot"), tr("Сохранить снимок как ..."), this,  //
+                               Qt::CTRL + Qt::SHIFT + Qt::Key_S, &QFormScreen::onMakeShotManual);
 
-        act_refresh_ = new QAction(QIcon("://refresh"), tr("Обновить"), this);
-        act_refresh_->setShortcut(Qt::CTRL + Qt::Key_R);
-        connect(act_refresh_, &QAction::triggered, this, &QFormScreen::onRefreshScene);
+    act_refresh_ = new ActionC(QIcon("://refresh"), tr("Обновить"), this,  //
+                               Qt::CTRL + Qt::Key_R, &QFormScreen::onRefreshScene);
 
-        act_group_up_ = new QAction(QIcon("://greed"), tr("Сгруппировать"), this);
-        act_group_up_->setShortcut(Qt::CTRL + Qt::Key_G);
-        connect(act_group_up_, &QAction::triggered, this, &QFormScreen::onGroupupScene);
+    act_group_up_ = new ActionC(QIcon("://greed"), tr("Сгруппировать"), this,  //
+                                Qt::CTRL + Qt::Key_G, &QFormScreen::onGroupupScene);
 
-        act_scale_hide_ = new QAction(QIcon("://hidden"), tr("Скрыть все шкалы"), this);
-        act_scale_hide_->setCheckable(true);
-        act_scale_hide_->setShortcut(Qt::Key_Delete);
-        act_scale_hide_->setChecked(is_axis_hidden_);
-        if (is_axis_hidden_) act_scale_hide_->setText(tr("Показать шкалы"));
-        connect(act_scale_hide_, &QAction::triggered, this, &QFormScreen::onHideScale);
+    act_scale_hide_ = new QAction(QIcon("://hidden"), tr("Скрыть все шкалы"), this);
+    act_scale_hide_->setCheckable(true);
+    act_scale_hide_->setChecked(is_axis_hidden_);
+    if (is_axis_hidden_) act_scale_hide_->setText(tr("Показать шкалы"));
+    connect(act_scale_hide_, &QAction::triggered, this, &QFormScreen::onHideScale);
 
-        act_clear_ = new QAction(QIcon("://clear"), tr("Очистить"), this);
-        act_clear_->setShortcut(Qt::CTRL + Qt::Key_Delete);
-        connect(act_clear_, &QAction::triggered, this, &QFormScreen::onClearScene);
+    act_clear_ = new ActionC(QIcon("://clear"), tr("Очистить"), this,  //
+                             Qt::CTRL + Qt::Key_Delete, &QFormScreen::onClearScene);
 
-        act_exit_ = new QAction(QIcon("://close"), tr("Выход"), this);
-        act_exit_->setShortcut(Qt::ALT + Qt::Key_F4);
-        connect(act_exit_, &QAction::triggered, this, &QFormScreen::onExit);
-    }
+    act_exit_ = new ActionC(QIcon("://close"), tr("Выход"), this,  //
+                            Qt::ALT + Qt::Key_F4, &QFormScreen::onExit);
 
     mn_file_ = new QMenu(tr("Экран"), this);
     mn_file_->addAction(act_shot_);
@@ -179,20 +182,13 @@ QFormScreen::QFormScreen(QWidget *parent) : QDialog(parent), ui_(new Ui::QFormSc
     // statusbar_->showMessage(getTitle());
     p_layout->addWidget(statusbar_);
 
-    timer_ = new QTimer();
-    QObject::connect(timer_, &QTimer::timeout, this, &QFormScreen::onTimer);
-    timer_->setInterval(static_cast<int>(1000 * time_step_.toDouble()));
-    timer_->start(static_cast<int>(time_step_.toDouble() * 1000));
-
     // show();
 }
 #include <QDebug>
 //-------------------------------------------------------------------------
 QFormScreen::~QFormScreen() {
     qDebug() << "~QFormScreen()";
-    if (timer_) timer_->stop();
 
-    delete timer_;
     delete ui_;
 }
 
@@ -281,7 +277,7 @@ QScreenScale *QFormScreen::addScale() {
     sz.setHeight(scene_->height());
 
     int index = scales_.count();
-    QScreenScale *scl = new QScreenScale(index, sz, lining_, margin_, this);
+    auto *scl = new QScreenScale(index, sz, lining_, margin_, this);
 
     // scl->setParameter(name, prm);
     scl->setScale(&axis_x_->scale_);
@@ -326,30 +322,21 @@ void QFormScreen::onExit() {}
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
-void QFormScreen::onRefresh(const RelativeTime &t0, const bool zoomed) {
-    ti_.end = t0;
-    ti_.bgn = t0 - time_width_;
+void QFormScreen::onRefresh(const RelativeTime &t, const bool zoomed) {
+    current_time_.end = t;
+    current_time_.bgn = t - time_width_;
 
-    axis_x_->setInterval(ti_, zoomed);
+    axis_x_->setInterval(current_time_, zoomed);
     for (auto scale : scales_) {
-        scale->setTiming(ti_, time_step_);
+        scale->setTiming(current_time_, {});
     }
 
     onUpdateScene();
+}
+//-------------------------------------------------------------------------
 
-    t_last_ = t0;
-}
 //-------------------------------------------------------------------------
-void QFormScreen::onTimer() {
-    t_ = t_ + time_step_;
-    if (is_pause_) return;
-    onRefresh(t_);
-}
-//-------------------------------------------------------------------------
-void QFormScreen::onSetTimeVariables(const RelativeTime &t_width, const RelativeTime &t_step) {
-    time_width_ = t_width;
-    time_step_ = t_step;
-}
+void QFormScreen::onSetTimeVariables(const RelativeTime &t_width, const RelativeTime &t_step) { time_width_ = t_width; }
 //-------------------------------------------------------------------------
 void QFormScreen::onAddLabelExt(const RelativeTime &t_0, const int &y_0, const QString &txt,
                                 const LineProperties &properties) {}
@@ -714,7 +701,7 @@ void QFormScreen::placeMarkerFloat(QPainter *painter) {
     int prec = 0;
     if (pixelPow < 0) prec = static_cast<int>(fabs(pixelPow)) + 1;
 
-    RelativeTime t = mark_f_.t + ti_.end;
+    RelativeTime t = mark_f_.t + current_time_.end;
     // QString s = QString("%1").arg(t_, 0, 'f', prec);
     // if(dstx.axisT.hms)
     QString s = secToHMS(t, prec);
@@ -771,7 +758,7 @@ void QFormScreen::placeMarkerAnchor(QPainter *painter) {
     int prec = 0;
     if (pixelPow < 0) prec = static_cast<int>(fabs(pixelPow)) + 1;
 
-    RelativeTime t = mark_a_.t + ti_.end;
+    RelativeTime t = mark_a_.t + current_time_.end;
     QString s = secToHMS(t, prec);
     painter->drawText(ptT, s);
 
@@ -1049,7 +1036,7 @@ void QFormScreen::onZoom(const QPointF &pt, const int &delta) {
 
     time_width_.fromDouble(t);
 
-    onRefresh(t_, true);
+    onRefresh(current_time_.end, true);
 }
 //-------------------------------------------------------------------------
 void QFormScreen::onPause() {
@@ -1331,7 +1318,6 @@ void QFormScreen::onChangeSettings(const QString &title, const SettingsCommon &s
 
     // setWindowTitle(getTitle());
 
-    time_step_ = stx_cmn.timing.step;
     time_width_ = stx_cmn.timing.width;
 
     margin_ = stx_cmn.margin;
@@ -1339,14 +1325,13 @@ void QFormScreen::onChangeSettings(const QString &title, const SettingsCommon &s
     saving_ = stx_cmn.saving;
 
     // scales
-    ti_.end = t_;
-    ti_.bgn = t_ - time_width_;
+    current_time_.bgn = current_time_.end - time_width_;
 
     axis_x_->setMargin(margin_);
-    axis_x_->setInterval(ti_, true);
+    axis_x_->setInterval(current_time_, true);
     for (auto scale : scales_) {
         scale->setMargins(margin_);
-        scale->setTiming(ti_, time_step_);
+        scale->setTiming(current_time_, {});
     }
 }
 //-------------------------------------------------------------------------

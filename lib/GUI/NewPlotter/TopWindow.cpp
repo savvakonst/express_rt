@@ -46,7 +46,15 @@ void TopWindow::dropEvent(QDropEvent *e) {
     //     qDebug() << "text/module:" << e->mimeData()->data("text/module").data();
 
     if (e->mimeData()->hasFormat("text/device")) {
-        // qDebug() << "text/device:" << e->mimeData()->data("text/device").data();
+
+        /*
+        timer_ = new QTimer();
+        QObject::connect(timer_, &QTimer::timeout, this, &QFormScreen::onTimer);
+        timer_->setInterval(static_cast<int>(1000 * time_step_.toDouble()));
+        timer_->start(static_cast<int>(time_step_.toDouble() * 1000));
+        */
+
+
         auto dock = new QDockWidget(e->mimeData()->data("text/device").data(), this);
         dock->setObjectName(QObject::tr("&plotter"));
 
@@ -54,6 +62,9 @@ void TopWindow::dropEvent(QDropEvent *e) {
         QWidget *form_screen = new QFormScreen();
         dock->setWidget(form_screen);
         addDockWidget(Qt::LeftDockWidgetArea, dock, Qt::Orientation::Horizontal);
+
+
+        //if (timer_) timer_->stop();
     }
 }
 

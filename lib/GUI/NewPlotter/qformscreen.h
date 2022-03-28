@@ -69,8 +69,6 @@ class QFormScreen : public QDialog {
 
     void onRefresh(const RelativeTime &t, bool zoomed = false);
 
-    void onTimer();
-
     void onSetTimeVariables(const RelativeTime &t_width, const RelativeTime &t_step);
 
     void onAddLabelExt(const RelativeTime &t_0, const int &y_0, const QString &txt, const LineProperties &properties);
@@ -162,10 +160,9 @@ class QFormScreen : public QDialog {
 
     QString title_ = "";
 
-    TimeInterval ti_;
-    RelativeTime t_last_ = {0};
 
-    RelativeTime t_ = {0};
+
+    // RelativeTime t_ = {0};
 
     // Float Marker
     MarkerSimple mark_f_;
@@ -183,13 +180,12 @@ class QFormScreen : public QDialog {
     bool axis_y_marker_ = false;
     bool axis_y_current_ = true;
 
-    QString label_main_ = "";
 
-    QTimer *timer_;
-
-    RelativeTime time_step_ = {0};
+    TimeInterval current_time_;
     RelativeTime time_width_ = {0};
     Timing time_;
+
+
     ImageSaving saving_;
     LineProperties lining_;
     Margin margin_;

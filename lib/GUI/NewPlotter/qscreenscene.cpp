@@ -71,7 +71,7 @@ void QScreenScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
         if (pt.x() > (width() - kDiagramOffsetRight)) break;
         if (pt.x() < kDiagramOffsetLeft) break;
 
-        emit to_leftClicked(pt);
+        emit toLeftClicked(pt);
     } while (false);
 
     update();
@@ -88,7 +88,7 @@ void QScreenScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
     case Qt::LeftButton: {
         do {
             if (event->modifiers() & Qt::SHIFT) {
-                emit to_markerPlaced(pt_left_);
+                emit toMarkerPlaced(pt_left_);
                 break;
             }
             if (b_left_pressed_) {
@@ -100,14 +100,14 @@ void QScreenScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
 
                 if (abs((pt.x() - pt_left_.x())) <= 1) break;
 
-                emit to_leftGestured(pt_left_, pt);
+                emit toLeftGestured(pt_left_, pt);
             }
         } while (false);
     } break;
     case Qt::RightButton: {
         do {
             if (event->modifiers() & Qt::CTRL) {
-                emit to_menuCalled(pt);
+                emit toMenuCalled(pt);
                 break;
             }
             if (event->modifiers() & Qt::SHIFT) {
@@ -167,15 +167,24 @@ void QScreenScene::wheelEvent(QGraphicsSceneWheelEvent* event) {
     update();
     QGraphicsScene::wheelEvent(event);
 }
-/*
+#include <QDebug>
 void QScreenScene::dragEnterEvent(QGraphicsSceneDragDropEvent* event) {
-    if (event->mimeData()->hasFormat("text/module"))
-        event->accept();
+    if (event->mimeData()->hasFormat("text/parameter")) {
+        event->acceptProposedAction();
+    }
     QGraphicsScene::dragEnterEvent(event);
 }
+
 void QScreenScene::dragMoveEvent(QGraphicsSceneDragDropEvent* event) {
-    if (event->mimeData()->hasFormat("text/module"))
+    if (event->mimeData()->hasFormat("text/parameter")) {
         event->accept();
+    }
     QGraphicsScene::dragMoveEvent(event);
 }
- */
+
+void QScreenScene::dropEvent(QGraphicsSceneDragDropEvent* event) {
+    if (event->mimeData()->hasFormat("text/parameter")) {
+        // qDebug() << "QScreenScene::dropEvent";
+    }
+    QGraphicsScene::dropEvent(event);
+}
