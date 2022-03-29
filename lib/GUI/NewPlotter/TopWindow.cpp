@@ -11,6 +11,8 @@
 
 ///
 #include "TopWindow.h"
+#include "common/StringProcessingTools.h"
+#include "device/DeviceManager.h"
 #include "qformscreen.h"
 
 TopWindow::TopWindow(QWidget *parent) {
@@ -19,7 +21,10 @@ TopWindow::TopWindow(QWidget *parent) {
     setUnifiedTitleAndToolBarOnMac(true);
 }
 
-void TopWindow::init(ExtensionManager *extension_manager) {}
+void TopWindow::init(ExtensionManager *extension_manager) {
+    device_manager_ =
+        (DeviceManager *)extension_manager->getLastVersionExtensionObject("device_manager", "device_manager");
+}
 
 void TopWindow::dragEnterEvent(QDragEnterEvent *e) {
     if (e->mimeData()->hasFormat("text/module")) {
@@ -27,82 +32,37 @@ void TopWindow::dragEnterEvent(QDragEnterEvent *e) {
     }
 }
 
-/*
-
-void TopWindow::dragMoveEvent(QDragMoveEvent *event) {
-    qDebug() << "dropEvent";
-    // if some actions should not be usable, like move, this code must be adopted
-    event->acceptProposedAction();
-}
-
-void TopWindow::dragLeaveEvent(QDragLeaveEvent *event) {
-    qDebug() << "dropEvent";
-    event->accept();
-}
-*/
-
 void TopWindow::dropEvent(QDropEvent *e) {
     // if (e->mimeData()->hasFormat("text/module"))
     //     qDebug() << "text/module:" << e->mimeData()->data("text/module").data();
 
     if (e->mimeData()->hasFormat("text/device")) {
+        auto list = split(e->mimeData()->data("text/device").data(), '\n');
 
-        /*
-        timer_ = new QTimer();
-        QObject::connect(timer_, &QTimer::timeout, this, &QFormScreen::onTimer);
-        timer_->setInterval(static_cast<int>(1000 * time_step_.toDouble()));
-        timer_->start(static_cast<int>(time_step_.toDouble() * 1000));
-        */
+        for (const auto &i : list) {
+            /*
+timer_ = new QTimer();
+QObject::connect(timer_, &QTimer::timeout, this, &QFormScreen::onTimer);
+timer_->setInterval(static_cast<int>(1000 * time_step_.toDouble()));
+timer_->start(static_cast<int>(time_step_.toDouble() * 1000));
+*/
+            auto dock_widgets = findChildren<QDockWidget *>();
+            auto title = QString::fromStdString(i);
 
+            bool exists = false;
+            for (auto dock : dock_widgets)
+                if (dock->windowTitle() == title) {
+                    exists = true;
+                    break;
+                }
 
-        auto dock = new QDockWidget(e->mimeData()->data("text/device").data(), this);
-        dock->setObjectName(QObject::tr("&plotter"));
+            if (!exists) {
+                auto dock = new QDockWidget(i.data(), this);
 
-        // QWidget *form_screen = !action_run_->isChecked() ? new QWidget : new QFormScreen();
-        QWidget *form_screen = new QFormScreen();
-        dock->setWidget(form_screen);
-        addDockWidget(Qt::LeftDockWidgetArea, dock, Qt::Orientation::Horizontal);
-
-
-        //if (timer_) timer_->stop();
-    }
-}
-
-#ifndef PLOTTER_LIB_NAME
-#    error "PLOTTER_LIB_NAME undefined"
-#endif
-
-static const version_t kPlotterVersion = 0;
-static ExtensionUnit *g_plotter_extension_uint;
-static ExtensionInfo g_plotter_extension_info;
-
-static int initPlotter_(ExtensionManager *manager);
-
-
-InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, PLOTTER_LIB_NAME)(void) {
-    if (QCoreApplication::instance() == nullptr) return nullptr;
-
-    g_plotter_extension_uint = new ExtensionUnit[]{{"plotter", "plotter", "", new TopWindow(nullptr), 0x00},
-                                                   {"plotter", "init", "", &initPlotter_, 0x00},
-                                                   {nullptr, nullptr, nullptr, nullptr, 0}};
-
-    g_plotter_extension_info = {"tree_widget_extension", 0x01, g_plotter_extension_uint};
-
-    return &g_plotter_extension_info;
-}
-
-
-static int initPlotter_(ExtensionManager *manager) {
-    auto p_unit = manager->getLastVersionExtensionUnit("plotter", "plotter");
-
-    if (p_unit) {
-        auto plotter = (TopWindow *)p_unit->ptr;
-        if ((p_unit->version == kPlotterVersion) && plotter) {
-            plotter->init(manager);
-            return 0;
+                QWidget *form_screen = new QFormScreen();
+                dock->setWidget(form_screen);
+                addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, dock, Qt::Orientation::Horizontal);
+            }
         }
     }
-
-    return 1;
 }
-

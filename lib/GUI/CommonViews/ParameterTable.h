@@ -34,11 +34,19 @@ class ParameterTableModel : public QAbstractTableModel {
 
     [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
 
+    [[nodiscard]] Qt::ItemFlags flags(const QModelIndex &index) const override;
+
     [[nodiscard]] QModelIndex getIndex(const std::string &name) const;
 
     //////////////
     [[nodiscard]] Parameter_ifs *getParameter(const QModelIndex &index) const;
     [[nodiscard]] std::vector<Parameter_ifs *> getParameters(const QList<QModelIndex> &indexes) const;
+
+    [[nodiscard]] QStringList mimeTypes() const override;
+    [[nodiscard]] QMimeData *mimeData(const QModelIndexList &indexes) const override;
+    [[nodiscard]] Qt::DropActions supportedDropActions() const override;
+    bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
+                      const QModelIndex &parent) override;
 
    protected:
     [[nodiscard]] ConversionTemplate *getCurrentConversionTemplate() const;
@@ -69,6 +77,7 @@ class ParameterTreeView : public QTreeView {
     explicit ParameterTreeView(QWidget *parent = nullptr) : QTreeView(parent) {}
 
     void currentChanged(const QModelIndex &current, const QModelIndex &previous) override;
+
 
    public:
    signals:

@@ -78,9 +78,9 @@ QFormScreen::QFormScreen(QWidget *parent) : QDialog(parent), ui_(new Ui::QFormSc
     // connect(scene, &QScreenScene::to_leftGestured, axisX, &QScreenAxisX::on_zoom);
     connect(scene_, &QScreenScene::toLeftClicked, this, &QFormScreen::onAddMarkerAnchor);
     // connect(scene, &QScreenScene::to_rightGestured, axisX, &QScreenAxisX::on_move);
-    connect(scene_, &QScreenScene::to_mouseWheeled, this, &QFormScreen::onZoom);
-    connect(scene_, &QScreenScene::to_paused, this, &QFormScreen::onPause);
-    connect(scene_, &QScreenScene::to_mouseMoved, this, &QFormScreen::onUpdateMarkerFloat);
+    connect(scene_, &QScreenScene::toMouseWheeled, this, &QFormScreen::onZoom);
+    connect(scene_, &QScreenScene::toPaused, this, &QFormScreen::onPause);
+    connect(scene_, &QScreenScene::toMouseMoved, this, &QFormScreen::onUpdateMarkerFloat);
 
     // connect(axisX, &QScreenAxisX::toChanged, this, &QFormScreen::onUpdateScene);
     connect(axis_x_, &QScreenAxisX::to_height, this, &QFormScreen::onSetAxisXHeight);
@@ -131,18 +131,14 @@ QFormScreen::QFormScreen(QWidget *parent) : QDialog(parent), ui_(new Ui::QFormSc
     mn_file_->addAction(act_run);
 
     // menu Settings
-    {
-        act_settings_ = new QAction(QIcon(":/settings"), tr("Настройки"), this);
-        act_settings_->setShortcut(Qt::CTRL + Qt::Key_Q);
-        connect(act_settings_, &QAction::triggered, this, &QFormScreen::onShowSettings);
+    act_settings_ = new ActionC(QIcon(":/settings"), tr("Настройки"), this,  //
+                                Qt::CTRL + Qt::Key_Q, &QFormScreen::onShowSettings);
+    act_conf_save_ = new ActionC(QIcon(":/save_conf"), tr("Сохранить конфигурацию"), this,  //
+                                 {}, &QFormScreen::onSaveConf);
 
-        act_conf_save_ = new QAction(QIcon(":/save_conf"), tr("Сохранить конфигурацию"), this);
-        connect(act_conf_save_, &QAction::triggered, this, &QFormScreen::onSaveConf);
-
-        mn_settings_ = new QMenu(tr("Настройки"), this);
-        mn_settings_->addAction(act_settings_);
-        mn_settings_->addAction(act_conf_save_);
-    }
+    mn_settings_ = new QMenu(tr("Настройки"), this);
+    mn_settings_->addAction(act_settings_);
+    mn_settings_->addAction(act_conf_save_);
 
     // menu help
     {
@@ -195,14 +191,6 @@ QFormScreen::~QFormScreen() {
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
-void QFormScreen::setTitle(const QString &title) {
-    title_ = title;
-    // setWindowTitle(title_);
-
-    emit to_titleChanged();
-}
-
-//-------------------------------------------------------------------------
 QSizeF QFormScreen::getSceneSize() {
     QSizeF sz;
     sz.setWidth(scene_->width());
@@ -222,7 +210,7 @@ void QFormScreen::setSettings(const LineProperties &dstx) {
 }
 
 //-------------------------------------------------------------------------
-void QFormScreen::setInterval(const TimeInterval &ti0) {
+void QFormScreen::setInterval(const TimeInterval &ti_0) {
     /*axisX->setInterval(ti0);
     for(auto scale_ : scales){
         scale_->onSetInterval(ti);
@@ -238,46 +226,6 @@ QScreenScale *QFormScreen::addScale(Reader_ifs *reader) {
 
     int index = scales_.count();
     auto *scl = new QScreenScale(reader, index, sz, lining_, margin_, this);
-
-    // scl->setParameter(name, prm);
-    scl->setScale(&axis_x_->scale_);
-    // scl->setToolTip(prm->info().join("\n"));
-
-    connect(scl, &QScreenScale::toRemoved, this, &QFormScreen::onRemoveItem);
-    connect(scl, &QScreenScale::toTuned, this, &QFormScreen::onTuneItem);
-    connect(scl, &QScreenScale::toAlign, this, &QFormScreen::onAlignItem);
-    connect(scl, &QScreenScale::toProgressed, this, &QFormScreen::onProgress);
-
-    connect(scl, &QScreenScale::toChanged, this, &QFormScreen::onUpdateScene);
-    connect(scl, &QScreenScale::toFocused, this, &QFormScreen::onUpdateFocus);
-    connect(scl, &QScreenScale::toFocused, scene_, &QScreenScene::onSelectItem);
-
-    connect(this, &QFormScreen::toIndexReduced, scl, &QScreenScale::onIndexReduce);
-    connect(this, &QFormScreen::toSceneResized, scl, &QScreenScale::onResize);
-    connect(this, &QFormScreen::toPaused, scl, &QScreenScale::onSetPause);
-
-    // connect(axisX, &QScreenAxisX::to_changedInterval, scl,
-    // &QScreenScale::onSetInterval); connect(scl, &QScreenScale::to_definedTime,
-    // axisX, &QScreenAxisX::on_getXByTime); connect(axisX,
-    // &QScreenAxisX::to_definedX, scl, &QScreenScale::onSetX);
-
-    scales_.push_back(scl);
-    scale_index_ = scales_.count() - 1;
-
-    scene_->addItem(scl);
-
-    onResizeScene();
-
-    return scl;
-}
-
-QScreenScale *QFormScreen::addScale() {
-    QSizeF sz;
-    sz.setWidth(scene_->width());
-    sz.setHeight(scene_->height());
-
-    int index = scales_.count();
-    auto *scl = new QScreenScale(index, sz, lining_, margin_, this);
 
     // scl->setParameter(name, prm);
     scl->setScale(&axis_x_->scale_);
@@ -1121,11 +1069,11 @@ void QFormScreen::onUpdateScene(const int &src) {
     }*/
 
     bool warning = false;
-    qreal sceneW = scene_->width();
-    qreal sceneH = scene_->height();
-    QPixmap pmScene(static_cast<int>(sceneW), static_cast<int>(sceneH));
-    pmScene.fill(Qt::white);
-    QPainter *painter = new QPainter(&pmScene);
+    qreal scene_w = scene_->width();
+    qreal scene_h = scene_->height();
+    QPixmap pm_scene(static_cast<int>(scene_w), static_cast<int>(scene_h));
+    pm_scene.fill(Qt::white);
+    auto *painter = new QPainter(&pm_scene);
 
     QFont ft = painter->font();
     ft.setPointSize(lining_.font_size);
@@ -1176,7 +1124,7 @@ void QFormScreen::onUpdateScene(const int &src) {
 
     delete painter;
 
-    scene_->setBackgroundBrush(pmScene);
+    scene_->setBackgroundBrush(pm_scene);
 
     if (warning & saving_.auto_save) onMakeShotAuto();
 
@@ -1235,7 +1183,7 @@ void QFormScreen::onAddMarker(const QPointF &pt) {
     sz.setHeight(scene_->height());
 
     int index = markers_.count();
-    QScreenMarker *mrk = new QScreenMarker(index, pt, sz, lining_, this);
+    auto *mrk = new QScreenMarker(index, pt, sz, lining_, this);
 
     mrk->pScale_ = &axis_x_->scale_;
 

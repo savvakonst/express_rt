@@ -6,6 +6,7 @@
 #include <QGraphicsSceneWheelEvent>
 #include <QKeyEvent>
 
+#include "qscreenscale.h"
 //#include "Helper_Works2.h"
 
 class QScreenScene : public QGraphicsScene {
@@ -35,8 +36,6 @@ class QScreenScene : public QGraphicsScene {
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
     void wheelEvent(QGraphicsSceneWheelEvent* event) override;
 
-    // void dragLeaveEvent(QGraphicsSceneDragDropEvent* event) override;
-    // void dropEvent(QGraphicsSceneDragDropEvent* event) override;
     void dragEnterEvent(QGraphicsSceneDragDropEvent* event) override;
     void dragMoveEvent(QGraphicsSceneDragDropEvent* event) override;
     void dropEvent(QGraphicsSceneDragDropEvent* event) override;
@@ -44,14 +43,13 @@ class QScreenScene : public QGraphicsScene {
    signals:
     void toMenuCalled(const QPointF& pt);
     void toMarkerPlaced(const QPointF& pt);
-    void toLeftGestured(const QPointF& pt1, const QPointF& pt2);
+    void toLeftGestured(const QPointF& pt_1, const QPointF& pt_2);
     void toLeftClicked(const QPointF& pt);
-    void to_rightGestured(const QPointF& pt1, const QPointF& pt2);
-    void to_rightClicked(const QPointF& pt);
-    void to_mouseWheeled(const QPointF& pt, const int& delta);
-    void to_paused();
-
-    void to_mouseMoved(const QPointF& pt);
+    void toRightGestured(const QPointF& pt_1, const QPointF& pt_2);
+    void toRightClicked(const QPointF& pt);
+    void toMouseWheeled(const QPointF& pt, const int& delta);
+    void toPaused();
+    void toMouseMoved(const QPointF& pt);
 };
 
 #endif  // QSCREENSCENE_H

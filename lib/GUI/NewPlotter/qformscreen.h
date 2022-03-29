@@ -40,20 +40,13 @@ class QFormScreen : public QDialog {
 
     ~QFormScreen() override;
 
-    int getIndex() const;
-
-    void setTitle(const QString &title);
-
-    QString getTitle();
-
     QSizeF getSceneSize();
 
     void setSettings(const LineProperties &dstx);
 
-    void setInterval(const TimeInterval &ti0);
+    void setInterval(const TimeInterval &ti_0);
 
     QScreenScale *addScale(Reader_ifs *reader);
-    QScreenScale *addScale(/*const QString &name, QFileParameter *prm*/);
 
     QScreenScale *getScale(const int &index);
 
@@ -160,8 +153,6 @@ class QFormScreen : public QDialog {
 
     QString title_ = "";
 
-
-
     // RelativeTime t_ = {0};
 
     // Float Marker
@@ -180,11 +171,9 @@ class QFormScreen : public QDialog {
     bool axis_y_marker_ = false;
     bool axis_y_current_ = true;
 
-
     TimeInterval current_time_;
     RelativeTime time_width_ = {0};
     Timing time_;
-
 
     ImageSaving saving_;
     LineProperties lining_;

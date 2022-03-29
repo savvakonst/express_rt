@@ -114,8 +114,6 @@ int DeviceListModel::columnCount(const QModelIndex &parent) const {
     return (int)1;
 }
 
-Qt::DropActions DeviceListModel::supportedDropActions() const { return QAbstractItemModel::supportedDropActions(); }
-
 void DeviceListModel::buildTree() {
     beginResetModel();
     delete root_;
@@ -225,6 +223,8 @@ QMimeData *DeviceListModel::mimeData(const QModelIndexList &indexes) const {
 
     return mime_data;
 }
+
+Qt::DropActions DeviceListModel::supportedDropActions() const { return QAbstractItemModel::supportedDropActions(); }
 
 bool DeviceListModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
                                    const QModelIndex &parent) {

@@ -26,12 +26,18 @@ class DeviceManager : public BaseClass_ifs {
         return vector_[index];
     }
 
+    Device* getDeviceByPath(const std::string & path) {
+        for (auto i : vector_)
+            if (i->getModulePath(true) == path) return i;
+        return nullptr;
+    }
+
     bool removeDeviceByIndex(size_t index) {
         if (index >= vector_.size()) {
             error_message_ = "index is out of range";
             return false;
         }
-        vector_.erase(vector_.begin() + index);
+        vector_.erase(vector_.begin() + ptrdiff_t(index));
         emit_();
         return true;
     }
@@ -44,6 +50,7 @@ class DeviceManager : public BaseClass_ifs {
         }
         return std::numeric_limits<size_t>::max();
     }
+
 
     bool removeDevice(Device* device) {
         if (device == nullptr) return false;

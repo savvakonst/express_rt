@@ -5,14 +5,51 @@
 
 #include <cstring>
 #include <regex>
-
+#include <list>
 #include "common/Port.h"
 
+inline std::list<std::string> split(const std::string &text, char character) {
+    auto begin_ptr = text.c_str();
+    auto current_ptr = begin_ptr;
+
+    std::list<std::string> ret;
+
+    while (*current_ptr) {
+        if (*current_ptr == character) {
+            if (current_ptr != begin_ptr) ret.emplace_back(begin_ptr, current_ptr - begin_ptr);
+            begin_ptr = current_ptr + 1;
+        }
+        current_ptr++;
+    }
+
+    if (current_ptr != begin_ptr) ret.emplace_back(begin_ptr, current_ptr - begin_ptr);
+
+    return ret;
+}
+
+inline std::list<std::string> split(const char *text, char character) {
+    auto begin_ptr = text;
+    auto current_ptr = begin_ptr;
+
+    std::list<std::string> ret;
+
+    while (*current_ptr) {
+        if (*current_ptr == character) {
+            if (current_ptr != begin_ptr) ret.emplace_back(begin_ptr, current_ptr - begin_ptr);
+            begin_ptr = current_ptr + 1;
+        }
+        current_ptr++;
+    }
+
+    if (current_ptr != begin_ptr) ret.emplace_back(begin_ptr, current_ptr - begin_ptr);
+
+    return ret;
+}
 
 inline std::pair<std::string, std::string> firstCharPos(const std::string &text, char character) {
     auto c_str = text.c_str();
     auto first_point = c_str;
-    while ((*first_point!=0) && (*first_point != character)) first_point++;
+    while ((*first_point != 0) && (*first_point != character)) first_point++;
     auto size = first_point - c_str;
 
     std::string begin_path(c_str, size);

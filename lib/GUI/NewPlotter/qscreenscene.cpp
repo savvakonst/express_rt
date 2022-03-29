@@ -10,7 +10,7 @@ QScreenScene::QScreenScene(QWidget* parent) : QGraphicsScene(nullptr) {
     // setAcceptDrops(true);
 }
 //-------------------------------------------------------------------------
-QScreenScene::~QScreenScene() {}
+QScreenScene::~QScreenScene() = default;
 //-------------------------------------------------------------------------
 QRect QScreenScene::setRect(const QRect& rt_0) {
     QRect rt = rt_0;
@@ -38,7 +38,7 @@ void QScreenScene::keyPressEvent(QKeyEvent* event) {
     case Qt::RightArrow:
         break;
     case Qt::Key_Pause:
-        emit to_paused();
+        emit toPaused();
         break;
     default:;
     }
@@ -123,7 +123,7 @@ void QScreenScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
 
                 if (pt.x() < leftX) pt.setX(leftX);
 
-                emit to_rightGestured(pt_right_, pt);
+                emit toRightGestured(pt_right_, pt);
             }
         } while (false);
     } break;
@@ -135,7 +135,7 @@ void QScreenScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
 }
 //-------------------------------------------------------------------------
 void QScreenScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
-    emit to_mouseMoved(event->scenePos());
+    emit toMouseMoved(event->scenePos());
 
     update();
     QGraphicsScene::mouseMoveEvent(event);
@@ -161,25 +161,25 @@ void QScreenScene::wheelEvent(QGraphicsSceneWheelEvent* event) {
 
         if (event->delta() == 0) break;
 
-        emit to_mouseWheeled(pt, event->delta());
+        emit toMouseWheeled(pt, event->delta());
     } while (false);
 
     update();
     QGraphicsScene::wheelEvent(event);
 }
-#include <QDebug>
+
 void QScreenScene::dragEnterEvent(QGraphicsSceneDragDropEvent* event) {
     if (event->mimeData()->hasFormat("text/parameter")) {
+        // what difference? event->accept();
         event->acceptProposedAction();
     }
     QGraphicsScene::dragEnterEvent(event);
 }
 
 void QScreenScene::dragMoveEvent(QGraphicsSceneDragDropEvent* event) {
-    if (event->mimeData()->hasFormat("text/parameter")) {
-        event->accept();
-    }
-    QGraphicsScene::dragMoveEvent(event);
+    if (event->mimeData()->hasFormat("text/parameter")) event->accept();
+    else
+        event->ignore();
 }
 
 void QScreenScene::dropEvent(QGraphicsSceneDragDropEvent* event) {

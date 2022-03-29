@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
     auto v = devices.front()->getTask();
 
     Device device = Device(v.data(), v.size(), manager);
-    
+
     /////////////////////////////////////
 
     if (device.hasTransceiver()) {
@@ -52,4 +52,49 @@ int main(int argc, char *argv[]) {
     }
 
     return QApplication::exec();
+}
+/*
+ *
+ *
+ *
+ *
+ *
+ */
+
+#include "TopWindow.h"
+
+#ifndef PLOTTER_LIB_NAME
+#    error "PLOTTER_LIB_NAME undefined"
+#endif
+
+static const version_t kPlotterVersion = 0;
+static ExtensionUnit *g_plotter_extension_uint;
+static ExtensionInfo g_plotter_extension_info;
+
+static int initPlotter_(ExtensionManager *manager);
+
+InitExtension(ExtensionInfo *) POST_CONCATENATOR(init, PLOTTER_LIB_NAME)(void) {
+    if (QCoreApplication::instance() == nullptr) return nullptr;
+
+    g_plotter_extension_uint = new ExtensionUnit[]{{"plotter", "plotter", "", new TopWindow(nullptr), 0x00},
+                                                   {"plotter", "init", "", &initPlotter_, 0x00},
+                                                   {nullptr, nullptr, nullptr, nullptr, 0}};
+
+    g_plotter_extension_info = {"tree_widget_extension", 0x01, g_plotter_extension_uint};
+
+    return &g_plotter_extension_info;
+}
+
+static int initPlotter_(ExtensionManager *manager) {
+    auto p_unit = manager->getLastVersionExtensionUnit("plotter", "plotter");
+
+    if (p_unit) {
+        auto plotter = (TopWindow *)p_unit->ptr;
+        if ((p_unit->version == kPlotterVersion) && plotter) {
+            plotter->init(manager);
+            return 0;
+        }
+    }
+
+    return 1;
 }

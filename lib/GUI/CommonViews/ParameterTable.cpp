@@ -1,9 +1,11 @@
 
 
+#include <sstream>
+//
+#include <QDebug>
 #include <QHeaderView>
+#include <QMimeData>
 #include <QTableView>
-
-#include "QDebug"
 //
 #include "GUI/TreeEditor.h"
 #include "common/ExtensionManager.h"
@@ -94,6 +96,13 @@ QVariant ParameterTableModel::data(const QModelIndex &index, int role) const {
     return {};
 }
 
+Qt::ItemFlags ParameterTableModel::flags(const QModelIndex &index) const {
+    Qt::ItemFlags flags = QAbstractTableModel::flags(index);
+    if (index.isValid()) return flags | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+    else
+        return flags | Qt::ItemIsDropEnabled;
+}
+
 QModelIndex ParameterTableModel::getIndex(const std::string &name) const {
     auto conv_template = getCurrentConversionTemplate();
     auto &prm_map = conv_template->getAllParameters();
@@ -130,8 +139,8 @@ std::vector<Parameter_ifs *> ParameterTableModel::getParameters(const QList<QMod
     auto conv_template = getCurrentConversionTemplate();
     auto &prm_map = conv_template->getAllParameters();
 
-    auto it = prm_map.begin();
     for (auto i : indexes) {
+        auto it = prm_map.begin();
         std::advance(it, i.row());
         if (it == prm_map.end()) break;
         ret.push_back(it->second);
@@ -156,6 +165,33 @@ void ParameterTableModel::selectParameter(const QModelIndex &index) {
     if (prm) child_view_->setupProperties(prm);
 }
 
+QStringList ParameterTableModel::mimeTypes() const { return {QAbstractItemModel::mimeTypes().at(0), "text/parameter"}; }
+
+QMimeData *ParameterTableModel::mimeData(const QModelIndexList &indexes) const {
+    auto mime_data = new QMimeData();
+    std::stringstream parameters_s_stream;
+
+    for (auto &i : indexes) {
+        if (i.column() != 0) continue;
+
+        auto parameters = getParameter(i);
+
+        auto name = parameters->getProperty("common/name")->getValue().asString();
+        parameters_s_stream << name << "\n";
+    }
+
+    mime_data->setData("text/parameter", QByteArray::fromStdString(parameters_s_stream.str()));
+    return mime_data;
+}
+
+Qt::DropActions ParameterTableModel::supportedDropActions() const { return QAbstractItemModel::supportedDropActions(); }
+
+bool ParameterTableModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
+                                       const QModelIndex &parent) {
+    // qDebug() << data->data("module").data();
+    return QAbstractTableModel::dropMimeData(data, action, row, column, parent);
+}
+
 /*
  *
  */
@@ -175,7 +211,7 @@ void ParameterTableModel::selectParameter(const QModelIndex &index) {
 
 #include "CustomQActions.h"
 
-QPixmap getPixmap(QString str) {
+QPixmap getPixmap(const QString &str) {
     auto pixmap_path = QCoreApplication::applicationDirPath() + str;
     return QPixmap(pixmap_path);
 }
@@ -188,9 +224,17 @@ class ParameterViewWrapper : public ParameterViewWrapper_ifs {
             "QWidget {background-color: #D2DCDF; alternate-background-color: #f6fafb; show-decoration-selected: 1;}"
             "QHeaderView::section {background-color: #D2DCDF}");
 
+        widget_->setContextMenuPolicy(Qt::ActionsContextMenu);
+        widget_->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
+
+        // widget_->setSelectionMode(QAbstractItemView::SingleSelection);
+        widget_->setDragDropMode(QAbstractItemView::DragDrop);
+        widget_->setDragEnabled(true);
+        widget_->setDropIndicatorShown(true);
+        widget_->setAcceptDrops(true);
+
         top_widget_ = new QWidget();
         auto layout = new QVBoxLayout(top_widget_);
-
         layout->addWidget(widget_);
 
         auto p_layout = reinterpret_cast<QHBoxLayout *>(top_widget_->layout());
