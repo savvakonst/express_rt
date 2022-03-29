@@ -41,31 +41,6 @@ class OpenAction : public QAction {
     IO_ifs *io_;
 };
 
-/*
-ModuleStream_ifs *generateStream(ExtensionManager *manager, const std::string &type, Device *device,
-                                 const std::list<Parameter_ifs *> &parameters) {
-    ModuleStream_ifs *top_m_stream = device->createModuleStream();
-
-    for (auto prm : parameters) {
-        auto constructor = (prmBufferConstructor_f)manager->getLastVersionExtensionObject(type, prm->getType());
-        if (constructor) {
-            auto prm_buffer = constructor(prm, manager);
-
-            auto full_path = prm->getProperty("common/path")->getValue().asString();
-
-            auto path = lastCharPos(full_path, '/');
-            auto sub_modules = ::getSubmodules(device, path.first);
-            if (sub_modules.size() == 1) {
-                auto m = sub_modules.front()->getModuleStream();
-                if (m) top_m_stream->addPrmBuffer(path.second, prm_buffer);
-            }
-        }
-    }
-
-    return top_m_stream;
-}
-*/
-
 ExtensionUnit *g_top_gui_units = nullptr;
 ExtensionInfo g_top_gui_info;
 

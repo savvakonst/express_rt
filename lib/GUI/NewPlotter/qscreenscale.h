@@ -71,18 +71,21 @@ struct AxisYStatistics {
 
 #pragma pack(pop)
 
-typedef struct _SINGLE_PRM {
+struct SinglePrm {
     AxisYStatistics stat;
     Reader_ifs *rdr;
     Reader_ifs::Point *buf;
     std::unique_ptr<Reader_ifs::Chunk> chunks;
     std::vector<ControlLevel> *plevels;
-} SINGLE_PRM;
+};
 
 /*typedef struct _POINT : Reader_ifs::Point {
     int32_t     y_min;
     int32_t     y_max;
 } POINT;*/
+
+class Parameter_ifs;
+class Device;
 
 class QScreenScale : public QObject, public QGraphicsRectItem {
     Q_OBJECT
@@ -99,31 +102,31 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
         qreal value = 10;
     };
 
-    static const QList<uint32_t> DIAG_COLORS;
+    static const QList<uint32_t> diag_colors_;
 
     /*, 0x8D6E63 , 0x795548 , 0x6D4C41 , 0x5D4037 , 0x4E342E , 0x3E2723;*/
 
-    explicit QScreenScale(Reader_ifs *reader, const int &index0, const QSizeF &sz, const LineProperties &dstx,
+    explicit QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &sz, const LineProperties &dstx,
                           const Margin &margin, QWidget *parent);
 
-    explicit QScreenScale(const int &index0, const QSizeF &sz, const LineProperties &dstx, const Margin &margin,
-                          QWidget *parent = nullptr);
+    explicit QScreenScale(Parameter_ifs *prm, const int &index, const QSizeF &sz, const LineProperties &dstx,
+                          const Margin &margin, QWidget *parent = nullptr);
 
     ~QScreenScale() override;
 
-    int getIndex() const;
+    [[nodiscard]] int getIndex() const;
 
-    void setTemporaryValues(const double valMin = -100, double const valMax = 100);
+    void setTemporaryValues(double val_min = -100, double val_max = 100);
 
     void setScale(QVector<RelativeTime> *xs);
 
-    void setTiming(const TimeInterval &ti0, const RelativeTime &step);
+    void setTiming(const TimeInterval &ti_0, const RelativeTime &step);
 
     void setMargins(const Margin &margin);
 
     void advance(int phase) override;
 
-    int type() const override;
+    [[nodiscard]] int type() const override;
 
     void recountScaleValues(const int &w, AxisYStatistics &stat, Reader_ifs::Chunk *c_ptr);
 
@@ -167,7 +170,7 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
     QList<QVector<AxisXyDot>> list_dots_;
 
     AxisYStatistics stat_;
-    bool intervalOn = false;
+    bool interval_on_ = false;
 
     bool warning_ = false;
 
@@ -177,9 +180,9 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
 
     void onResize(const qreal &w, const qreal &h);
 
-    void onSetX(const int &index0, const int &x);
+    void onSetX(const int &index, const int &x);
 
-    void onIndexReduce(const int &src, const int &index0);
+    void onIndexReduce(const int &src, const int &index_0);
 
     void onSettingsShow();
 
@@ -187,10 +190,12 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
 
     void onAddLevelEnd(const ControlLevel &lvl, const bool &flag, const int &index);
 
-    void onSetPause(const bool is_paused);
+    void onSetPause(bool is_paused);
 
    private:
     void changeScaleBorder(const bool &high, const int &delta);
+
+    Device *device_ = nullptr;
 
     QAction *act_settings_;
     QAction *act_remove_;
@@ -210,7 +215,7 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
 
     const int type_ = kSourceScale;
 
-    std::list<SINGLE_PRM> parameters_;
+    std::list<SinglePrm> parameters_;
     PrmBuffer_ifs *p_;
 
     bool disabled_ = false;
@@ -251,9 +256,6 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
     void wheelEvent(QGraphicsSceneWheelEvent *event) override;
-
-
-
 
    signals:
 

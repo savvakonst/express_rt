@@ -28,6 +28,8 @@ namespace Ui {
 class QFormScreen;
 }
 
+class ExtensionManager;
+class Device;
 class QFormScreen : public QDialog {
     Q_OBJECT
 
@@ -36,9 +38,11 @@ class QFormScreen : public QDialog {
     const QString ini_image_save_auto_ = "IMAGE_SAVE/AUTO";
 
    public:
-    explicit QFormScreen(QWidget *parent = nullptr);
+    explicit QFormScreen(Device *device, QWidget *parent = nullptr);
 
     ~QFormScreen() override;
+
+    void init(ExtensionManager *manager) { manager_ = manager; }
 
     QSizeF getSceneSize();
 
@@ -46,7 +50,11 @@ class QFormScreen : public QDialog {
 
     void setInterval(const TimeInterval &ti_0);
 
+    QScreenScale *addScale(QScreenScale *p_scale);
+
     QScreenScale *addScale(Reader_ifs *reader);
+
+    QScreenScale *addScale(Parameter_ifs *prm);
 
     QScreenScale *getScale(const int &index);
 
@@ -59,6 +67,7 @@ class QFormScreen : public QDialog {
     void onExit();
 
     // void onIndexReduce(const int &index_0);
+    void onDropParameter(const QPointF &pt, const std::string &name);
 
     void onRefresh(const RelativeTime &t, bool zoomed = false);
 
@@ -112,6 +121,9 @@ class QFormScreen : public QDialog {
     int trimZeroes(const double &val, const int &prec = -1);
 
     QString secToHMS(const RelativeTime &val, const int &prec = QLocale::FloatingPointShortest);
+
+    Device *device_;
+    ExtensionManager *manager_ = nullptr;
 
     Ui::QFormScreen *ui_;
     QMenuBar *menubar_;

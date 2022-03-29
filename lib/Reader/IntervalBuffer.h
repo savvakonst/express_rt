@@ -11,9 +11,12 @@
 #define EXRT_remainder(X, Y) (((X) < (Y)) ? (X) : (X - Y))
 
 class PseudoSyncPrmBuffer;
+class Parameter_ifs;
 
 class IntervalBuffer : public Reader_ifs {
    public:
+    Parameter_ifs *getParameter() override;
+
     IntervalBuffer(PseudoSyncPrmBuffer *parent, const Borders &borders) : parent_(parent), borders_(borders){};
     ~IntervalBuffer() override { delete[] data_; }
 

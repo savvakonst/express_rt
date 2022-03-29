@@ -7,17 +7,19 @@
 #include "TimeRepresentation.h"
 #include "common\Port.h"
 
+class Parameter_ifs;
+
 class Reader_ifs {
    public:
-    virtual ~Reader_ifs() {}
+    virtual ~Reader_ifs() = default;
 
-    typedef double ReaderData;
+    typedef double readerData_t;
 
     struct Point {
         uint64_t pos;
-        ReaderData sum;
-        ReaderData max;
-        ReaderData min;
+        readerData_t sum;
+        readerData_t max;
+        readerData_t min;
     };
 
     class Chunk {
@@ -55,6 +57,8 @@ class Reader_ifs {
 
         Chunk* next_ = nullptr;
     };
+
+    virtual Parameter_ifs* getParameter() { return nullptr; }
 
     virtual bool lock(bool arg) = 0;
     virtual bool isLock() = 0;

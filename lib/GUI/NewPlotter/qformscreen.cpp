@@ -2,29 +2,62 @@
 
 #include <QIcon>
 
+#include "GUI/WidgetWrappers.h"
+#include "common/ExtensionManager.h"
+#include "common/StringProcessingTools.h"
+#include "convtemplate/ConversionTemplate.h"
+#include "convtemplate/Parameter_ifs.h"
+#include "convtemplate/PrmBuffer_ifs.h"
+#include "device/Device.h"
+#include "device/ModuleStream_ifs.h"
 #include "ui_qformscreen.h"
-
 //
 QString g_support_path;
 //
 template <typename Func2>
-class ActionC : public QAction {
+class CAction : public QAction {
    public:
-    ActionC(const QIcon &icon, const QString &text, const typename QtPrivate::FunctionPointer<Func2>::Object *parent,
+    CAction(const QIcon &icon, const QString &text, const typename QtPrivate::FunctionPointer<Func2>::Object *parent,
             const QKeySequence &shortcut, Func2 slot)
         : QAction(icon, text, (QObject *)parent) {
         if (!shortcut.isEmpty()) setShortcut(shortcut);
         connect(this, &QAction::triggered, parent, slot);
     }
-    ActionC(const QString &text, const typename QtPrivate::FunctionPointer<Func2>::Object *parent,
+    CAction(const QString &text, const typename QtPrivate::FunctionPointer<Func2>::Object *parent,
             const QKeySequence &shortcut, Func2 slot)
         : QAction(text, (QObject *)parent) {
         if (!shortcut.isEmpty()) setShortcut(shortcut);
         connect(this, &QAction::triggered, parent, slot);
     }
 };
+
 //-------------------------------------------------------------------------
-QFormScreen::QFormScreen(QWidget *parent) : QDialog(parent), ui_(new Ui::QFormScreen) {
+
+ModuleStream_ifs *generateStream(ExtensionManager *manager, const std::string &type, Device *device,
+                                 const std::list<Parameter_ifs *> &parameters) {
+    ModuleStream_ifs *top_m_stream = device->createModuleStream();
+
+    for (auto prm : parameters) {
+        auto constructor = (prmBufferConstructor_f)manager->getLastVersionExtensionObject(type, prm->getType());
+        if (constructor) {
+            auto prm_buffer = constructor(prm, manager);
+
+            auto full_path = prm->getProperty("common/path")->getValue().asString();
+
+            auto path = lastCharPos(full_path, '/');
+            auto sub_modules = ::getSubmodules(device, path.first);
+            if (sub_modules.size() == 1) {
+                auto m = sub_modules.front()->getModuleStream();
+                if (m) top_m_stream->addPrmBuffer(path.second, prm_buffer);
+            }
+        }
+    }
+
+    return top_m_stream;
+}
+
+//-------------------------------------------------------------------------
+QFormScreen::QFormScreen(Device *device, QWidget *parent) : QDialog(parent), ui_(new Ui::QFormScreen), device_(device) {
     ui_->setupUi(this);
 
     margin_.left = kDiagramOffsetLeft;
@@ -53,16 +86,17 @@ QFormScreen::QFormScreen(QWidget *parent) : QDialog(parent), ui_(new Ui::QFormSc
     setWindowIcon(QIcon("://image_w"));
 
     time_width_.fromInt(30);
-
     current_time_.end.fromInt(30);
     current_time_.bgn = current_time_.end - time_width_;
 
     // scene
     scene_ = new QScreenScene(this);
+    scene_->device_ = device;
 
     connect(this, &QFormScreen::toSceneChanged, scene_, &QGraphicsScene::advance);
     connect(scene_, &QScreenScene::toMarkerPlaced, this, &QFormScreen::onAddMarker);
     connect(scene_, &QScreenScene::toMenuCalled, this, &QFormScreen::onPopupMenuAdd);
+    connect(scene_, &QScreenScene::toDropParameter, this, &QFormScreen::onDropParameter);
 
     ui_->graphicsView->setScene(scene_);
     ui_->graphicsView->setMouseTracking(true);
@@ -94,16 +128,16 @@ QFormScreen::QFormScreen(QWidget *parent) : QDialog(parent), ui_(new Ui::QFormSc
     setStatusTip(tr("run"));
 
     // menu File
-    act_shot_ = new ActionC(QIcon("://shot"), tr("Снимок"), this,  //
+    act_shot_ = new CAction(QIcon("://shot"), tr("Снимок"), this,  //
                             Qt::CTRL + Qt::Key_S, &QFormScreen::onMakeShotAuto);
 
-    act_shot_as_ = new ActionC(QIcon("://shot"), tr("Сохранить снимок как ..."), this,  //
+    act_shot_as_ = new CAction(QIcon("://shot"), tr("Сохранить снимок как ..."), this,  //
                                Qt::CTRL + Qt::SHIFT + Qt::Key_S, &QFormScreen::onMakeShotManual);
 
-    act_refresh_ = new ActionC(QIcon("://refresh"), tr("Обновить"), this,  //
+    act_refresh_ = new CAction(QIcon("://refresh"), tr("Обновить"), this,  //
                                Qt::CTRL + Qt::Key_R, &QFormScreen::onRefreshScene);
 
-    act_group_up_ = new ActionC(QIcon("://greed"), tr("Сгруппировать"), this,  //
+    act_group_up_ = new CAction(QIcon("://greed"), tr("Сгруппировать"), this,  //
                                 Qt::CTRL + Qt::Key_G, &QFormScreen::onGroupupScene);
 
     act_scale_hide_ = new QAction(QIcon("://hidden"), tr("Скрыть все шкалы"), this);
@@ -112,10 +146,10 @@ QFormScreen::QFormScreen(QWidget *parent) : QDialog(parent), ui_(new Ui::QFormSc
     if (is_axis_hidden_) act_scale_hide_->setText(tr("Показать шкалы"));
     connect(act_scale_hide_, &QAction::triggered, this, &QFormScreen::onHideScale);
 
-    act_clear_ = new ActionC(QIcon("://clear"), tr("Очистить"), this,  //
+    act_clear_ = new CAction(QIcon("://clear"), tr("Очистить"), this,  //
                              Qt::CTRL + Qt::Key_Delete, &QFormScreen::onClearScene);
 
-    act_exit_ = new ActionC(QIcon("://close"), tr("Выход"), this,  //
+    act_exit_ = new CAction(QIcon("://close"), tr("Выход"), this,  //
                             Qt::ALT + Qt::Key_F4, &QFormScreen::onExit);
 
     mn_file_ = new QMenu(tr("Экран"), this);
@@ -131,9 +165,9 @@ QFormScreen::QFormScreen(QWidget *parent) : QDialog(parent), ui_(new Ui::QFormSc
     mn_file_->addAction(act_run);
 
     // menu Settings
-    act_settings_ = new ActionC(QIcon(":/settings"), tr("Настройки"), this,  //
+    act_settings_ = new CAction(QIcon(":/settings"), tr("Настройки"), this,  //
                                 Qt::CTRL + Qt::Key_Q, &QFormScreen::onShowSettings);
-    act_conf_save_ = new ActionC(QIcon(":/save_conf"), tr("Сохранить конфигурацию"), this,  //
+    act_conf_save_ = new CAction(QIcon(":/save_conf"), tr("Сохранить конфигурацию"), this,  //
                                  {}, &QFormScreen::onSaveConf);
 
     mn_settings_ = new QMenu(tr("Настройки"), this);
@@ -184,7 +218,6 @@ QFormScreen::QFormScreen(QWidget *parent) : QDialog(parent), ui_(new Ui::QFormSc
 //-------------------------------------------------------------------------
 QFormScreen::~QFormScreen() {
     qDebug() << "~QFormScreen()";
-
     delete ui_;
 }
 
@@ -219,44 +252,44 @@ void QFormScreen::setInterval(const TimeInterval &ti_0) {
 
 //-------------------------------------------------------------------------
 
-QScreenScale *QFormScreen::addScale(Reader_ifs *reader) {
-    QSizeF sz;
-    sz.setWidth(scene_->width());
-    sz.setHeight(scene_->height());
-
-    int index = scales_.count();
-    auto *scl = new QScreenScale(reader, index, sz, lining_, margin_, this);
-
+QScreenScale *QFormScreen::addScale(QScreenScale *p_scale) {
     // scl->setParameter(name, prm);
-    scl->setScale(&axis_x_->scale_);
+    p_scale->setScale(&axis_x_->scale_);
     // scl->setToolTip(prm->info().join("\n"));
 
-    connect(scl, &QScreenScale::toRemoved, this, &QFormScreen::onRemoveItem);
-    connect(scl, &QScreenScale::toTuned, this, &QFormScreen::onTuneItem);
-    connect(scl, &QScreenScale::toAlign, this, &QFormScreen::onAlignItem);
-    connect(scl, &QScreenScale::toProgressed, this, &QFormScreen::onProgress);
+    connect(p_scale, &QScreenScale::toRemoved, this, &QFormScreen::onRemoveItem);
+    connect(p_scale, &QScreenScale::toTuned, this, &QFormScreen::onTuneItem);
+    connect(p_scale, &QScreenScale::toAlign, this, &QFormScreen::onAlignItem);
+    connect(p_scale, &QScreenScale::toProgressed, this, &QFormScreen::onProgress);
 
-    connect(scl, &QScreenScale::toChanged, this, &QFormScreen::onUpdateScene);
-    connect(scl, &QScreenScale::toFocused, this, &QFormScreen::onUpdateFocus);
-    connect(scl, &QScreenScale::toFocused, scene_, &QScreenScene::onSelectItem);
+    connect(p_scale, &QScreenScale::toChanged, this, &QFormScreen::onUpdateScene);
+    connect(p_scale, &QScreenScale::toFocused, this, &QFormScreen::onUpdateFocus);
+    connect(p_scale, &QScreenScale::toFocused, scene_, &QScreenScene::onSelectItem);
 
-    connect(this, &QFormScreen::toIndexReduced, scl, &QScreenScale::onIndexReduce);
-    connect(this, &QFormScreen::toSceneResized, scl, &QScreenScale::onResize);
-    connect(this, &QFormScreen::toPaused, scl, &QScreenScale::onSetPause);
+    connect(this, &QFormScreen::toIndexReduced, p_scale, &QScreenScale::onIndexReduce);
+    connect(this, &QFormScreen::toSceneResized, p_scale, &QScreenScale::onResize);
+    connect(this, &QFormScreen::toPaused, p_scale, &QScreenScale::onSetPause);
 
-    // connect(axisX, &QScreenAxisX::to_changedInterval, scl,
-    // &QScreenScale::onSetInterval); connect(scl, &QScreenScale::to_definedTime,
-    // axisX, &QScreenAxisX::on_getXByTime); connect(axisX,
-    // &QScreenAxisX::to_definedX, scl, &QScreenScale::onSetX);
-
-    scales_.push_back(scl);
+    scales_.push_back(p_scale);
     scale_index_ = scales_.count() - 1;
 
-    scene_->addItem(scl);
+    scene_->addItem(p_scale);
 
     onResizeScene();
 
-    return scl;
+    return p_scale;
+}
+
+QScreenScale *QFormScreen::addScale(Reader_ifs *reader) {
+    auto *p_scale =
+        new QScreenScale(reader, scales_.count(), QSizeF(scene_->width(), scene_->height()), lining_, margin_, this);
+    return addScale(p_scale);
+}
+
+QScreenScale *QFormScreen::addScale(Parameter_ifs *prm) {
+    auto *p_scale =
+        new QScreenScale(prm, scales_.count(), QSizeF(scene_->width(), scene_->height()), lining_, margin_, this);
+    return addScale(p_scale);
 }
 
 //-------------------------------------------------------------------------
@@ -270,6 +303,20 @@ void QFormScreen::onExit() {}
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
+
+void QFormScreen::onDropParameter(const QPointF &pt, const std::string &name) {
+    auto parameter_view_wrapper =
+        (ParameterViewWrapper_ifs *)manager_->getLastVersionExtensionObject("widget_wrapper", "parameter_view_wrapper");
+    auto cnv_template = parameter_view_wrapper->currentConversionTemplate();
+
+    if (cnv_template) {
+        auto parameter = (Parameter_ifs *)cnv_template->getParameter(name);
+        if (parameter) addScale(parameter);
+    }
+}
+
+//-------------------------------------------------------------------------
+
 void QFormScreen::onRefresh(const RelativeTime &t, const bool zoomed) {
     current_time_.end = t;
     current_time_.bgn = t - time_width_;
@@ -328,11 +375,11 @@ void QFormScreen::onMessageShow(const QString &s) { QMessageBox::warning(this, t
 void QFormScreen::onHelp() { emit to_help(); }
 //-------------------------------------------------------------------------
 bool QFormScreen::saveShot(const QString &filename) {
-    bool success = QFile().exists(filename);
+    bool success = QFile::exists(filename);
 
-    QFile imageFile(filename);
+    QFile image_file(filename);
 
-    success = imageFile.open(QIODevice::WriteOnly);
+    success = image_file.open(QIODevice::WriteOnly);
 
     scene_->clearSelection();  // Selections would also render to the file
     // scene->setSceneRect(scene->itemsBoundingRect()); // Re-shrink the scene to
@@ -348,9 +395,9 @@ bool QFormScreen::saveShot(const QString &filename) {
     QPainter painter(&image);
     painter.setRenderHint(QPainter::Antialiasing);
     scene_->render(&painter);
-    success = image.save(imageFile.fileName());
+    success = image.save(image_file.fileName());
 
-    imageFile.close();
+    image_file.close();
 
     return success;
 }
@@ -622,7 +669,7 @@ void QFormScreen::placeMarkerFloat(QPainter *painter) {
 
     if (!mark_f_.enabled) return;
 
-    qreal sceneH = scene_->height();
+    qreal scene_h = scene_->height();
 
     int x = static_cast<int>(mark_f_.x);
 
@@ -636,7 +683,7 @@ void QFormScreen::placeMarkerFloat(QPainter *painter) {
     ft.setPointSize(lining_.font_size);
     painter->setFont(ft);
 
-    painter->drawLine(QPointF(mark_f_.x, 0), QPointF(mark_f_.x, sceneH));
+    painter->drawLine(QPointF(mark_f_.x, 0), QPointF(mark_f_.x, scene_h));
     if (axis_y_marker_)
         painter->drawLine(QPointF(margin_.left - kDiagramMargin, mark_f_.y),
                           QPointF(scene_->width() - margin_.right + kDiagramMargin, mark_f_.y));
@@ -683,7 +730,7 @@ void QFormScreen::placeMarkerAnchor(QPainter *painter) {
 
     if (!mark_a_.enabled) return;
 
-    qreal sceneH = scene_->height();
+    qreal scene_h = scene_->height();
     int x = static_cast<int>(mark_a_.x);
 
     mark_a_.t = axis_x_->scale_.at(x);
@@ -696,7 +743,7 @@ void QFormScreen::placeMarkerAnchor(QPainter *painter) {
     ft.setPointSize(lining_.font_size);
     painter->setFont(ft);
 
-    painter->drawLine(QPointF(mark_a_.x, 0), QPointF(mark_a_.x, sceneH));
+    painter->drawLine(QPointF(mark_a_.x, 0), QPointF(mark_a_.x, scene_h));
 
     QPointF ptT;
     ptT.setX(x + 5);
@@ -937,6 +984,7 @@ QString QFormScreen::secToHMS(const RelativeTime &val, const int &prec) {
 }
 
 //-------------------------------------------------------------------------
+
 void QFormScreen::onResizeScene() {
     mark_a_.enabled = false;
     mark_f_.enabled = false;
@@ -1035,7 +1083,7 @@ void QFormScreen::onGroupupScene() {
     int dx = kAxisYWidth;  // + AXIS_Y_DIAG_INTERVAL;
     int dy = kAxisYDiagInterval;
 
-    int h = scene_->height() - kScreenOffsetTop;  // - SCREEN_OFFSET_BOTTOM;
+    int h = int(scene_->height()) - kScreenOffsetTop;  // - SCREEN_OFFSET_BOTTOM;
 
     int c = 0;
 
@@ -1161,16 +1209,16 @@ void QFormScreen::onUpdateFocus(const int &src, const int &index_last) {
 }
 //-------------------------------------------------------------------------
 void QFormScreen::onPopupMenuAdd(const QPointF &pt) {
-    QAction *actAddMarker = new QAction(tr("Добавить маркер"), this);
-    actAddMarker->setData(pt);
-    connect(actAddMarker, &QAction::triggered, this, &QFormScreen::onAddMarkerFromMenu);
+    auto *act_add_marker = new QAction(tr("Добавить маркер"), this);
+    act_add_marker->setData(pt);
+    connect(act_add_marker, &QAction::triggered, this, &QFormScreen::onAddMarkerFromMenu);
 
-    QAction *actAddLabel = new QAction(tr("Добавить надпись"), this);
+    auto *actAddLabel = new QAction(tr("Добавить надпись"), this);
     actAddLabel->setData(pt);
     connect(actAddLabel, &QAction::triggered, this, &QFormScreen::onAddLabelFromMenu);
 
-    QMenu *menu = new QMenu(this);
-    menu->addAction(actAddMarker);
+    auto *menu = new QMenu(this);
+    menu->addAction(act_add_marker);
     menu->addAction(actAddLabel);
     menu->exec(QCursor::pos());
 
@@ -1209,9 +1257,9 @@ void QFormScreen::onAddMarker(const QPointF &pt) {
 }
 //-------------------------------------------------------------------------
 void QFormScreen::onAddMarkerFromMenu() {
-    QAction *actSrc = qobject_cast<QAction *>(sender());
+    auto *actSrc = qobject_cast<QAction *>(sender());
 
-    QPointF pt = qvariant_cast<QPointF>(actSrc->data());
+    auto pt = qvariant_cast<QPointF>(actSrc->data());
 
     onAddMarker(pt);
 }
@@ -1219,9 +1267,9 @@ void QFormScreen::onAddMarkerFromMenu() {
 void QFormScreen::onAddLabel(const QPointF &pt) {}
 //-------------------------------------------------------------------------
 void QFormScreen::onAddLabelFromMenu() {
-    QAction *actSrc = qobject_cast<QAction *>(sender());
+    auto *actSrc = qobject_cast<QAction *>(sender());
 
-    QPointF pt = qvariant_cast<QPointF>(actSrc->data());
+    auto pt = qvariant_cast<QPointF>(actSrc->data());
 
     onAddLabel(pt);
 }

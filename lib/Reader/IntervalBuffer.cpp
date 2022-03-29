@@ -155,3 +155,8 @@ std::unique_ptr<Reader_ifs::Chunk> IntervalBuffer::getPoints(const Borders &bord
 
     return ret;
 }
+
+Parameter_ifs *IntervalBuffer::getParameter() {
+    // TODO: bad conversion
+    return const_cast<Parameter_ifs *>(parent_->parameter_);
+}

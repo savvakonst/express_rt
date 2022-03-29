@@ -77,9 +77,12 @@ class DeviceViewWrapper_ifs : public WidgetWrapper_ifs {
 };
 
 class Parameter_ifs;
+class ConversionTemplate;
 
 class ParameterViewWrapper_ifs : public WidgetWrapper_ifs {
    public:
+    virtual ConversionTemplate *currentConversionTemplate() = 0;
+
     virtual bool setActive(size_t row_index) = 0;
     virtual bool setActive(const std::string &name) = 0;
     virtual bool removeFromActive() = 0;
@@ -91,8 +94,6 @@ class ParameterViewWrapper_ifs : public WidgetWrapper_ifs {
     virtual Parameter_ifs *getActive() = 0;
     virtual std::vector<Parameter_ifs *> getSelected() = 0;
 };
-
-class ConversionTemplate;
 
 class ConversionTemplateViewWrapper_if : public WidgetWrapper_ifs {
    public:

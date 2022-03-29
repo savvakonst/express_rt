@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
     /////////////////////////////////////
 
     if (device.hasTransceiver()) {
-        QFormScreen w;
+        QFormScreen w(nullptr);
         ModuleStream_ifs *m_stream = device.getTopModule()->createModuleStream();
         auto *receiver = new Receiver(m_stream, device.getSrcAddress());
 

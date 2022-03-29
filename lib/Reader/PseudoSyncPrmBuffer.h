@@ -90,7 +90,7 @@ inline void PseudoSyncPrmBuffer::initPoint(Reader_ifs::Point &p, size_t index) {
 }
 
 inline void PseudoSyncPrmBuffer::addToPoint(Reader_ifs::Point &p, size_t index) {
-    Reader_ifs::ReaderData val = buffer_[index];
+    Reader_ifs::readerData_t val = buffer_[index];
     p.sum += val;
     p.max = val > p.max ? val : p.max;  // std::max(val, p.max);
     p.min = val < p.min ? val : p.min;

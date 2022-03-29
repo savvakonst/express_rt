@@ -259,13 +259,13 @@ class ParameterViewWrapper : public ParameterViewWrapper_ifs {
     }
 
     void init(ExtensionManager *manager) {
-        auto model = new ParameterTableModel(manager);
+        model_ = new ParameterTableModel(manager);
 
         main_window_ = (QMainWindow *)manager->getLastVersionExtensionObject("main_window", "main_window");
 
-        QObject::connect(widget_, &ParameterTreeView::currentChangedSignal, model,
+        QObject::connect(widget_, &ParameterTreeView::currentChangedSignal, model_,
                          &ParameterTableModel::selectParameter);
-        widget_->setModel(model);
+        widget_->setModel(model_);
     }
 
     status addSignal(Signal_ifs *signal) override {
@@ -274,6 +274,8 @@ class ParameterViewWrapper : public ParameterViewWrapper_ifs {
     }
 
     QWidget *getWidget() override { return top_widget_; }
+
+    ConversionTemplate *currentConversionTemplate() override { return model_->getCurrentConversionTemplate(); }
 
     bool setActive(size_t row_index) override {
         auto cnt = rowCount();

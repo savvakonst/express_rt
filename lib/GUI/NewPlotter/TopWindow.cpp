@@ -21,9 +21,9 @@ TopWindow::TopWindow(QWidget *parent) {
     setUnifiedTitleAndToolBarOnMac(true);
 }
 
-void TopWindow::init(ExtensionManager *extension_manager) {
-    device_manager_ =
-        (DeviceManager *)extension_manager->getLastVersionExtensionObject("device_manager", "device_manager");
+void TopWindow::init(ExtensionManager *manager) {
+    manager_ = manager;
+    device_manager_ = (DeviceManager *)manager->getLastVersionExtensionObject("device_manager", "device_manager");
 }
 
 void TopWindow::dragEnterEvent(QDragEnterEvent *e) {
@@ -58,8 +58,9 @@ timer_->start(static_cast<int>(time_step_.toDouble() * 1000));
 
             if (!exists) {
                 auto dock = new QDockWidget(i.data(), this);
-
-                QWidget *form_screen = new QFormScreen();
+                auto device = device_manager_->getDeviceByPath(i);
+                auto *form_screen = new QFormScreen(device);
+                form_screen->init(manager_);
                 dock->setWidget(form_screen);
                 addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, dock, Qt::Orientation::Horizontal);
             }

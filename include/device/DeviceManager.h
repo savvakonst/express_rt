@@ -26,9 +26,11 @@ class DeviceManager : public BaseClass_ifs {
         return vector_[index];
     }
 
-    Device* getDeviceByPath(const std::string & path) {
-        for (auto i : vector_)
-            if (i->getModulePath(true) == path) return i;
+    Device* getDeviceByPath(const std::string& path) {
+        for (auto i : vector_) {
+            auto current_path = i->getSource() + "//";
+            if (current_path == path) return i;
+        }
         return nullptr;
     }
 
@@ -50,7 +52,6 @@ class DeviceManager : public BaseClass_ifs {
         }
         return std::numeric_limits<size_t>::max();
     }
-
 
     bool removeDevice(Device* device) {
         if (device == nullptr) return false;

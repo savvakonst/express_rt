@@ -168,6 +168,10 @@ void QScreenScene::wheelEvent(QGraphicsSceneWheelEvent* event) {
     QGraphicsScene::wheelEvent(event);
 }
 
+#include "common/StringProcessingTools.h"
+#include "device/Device.h"
+#include "device/DeviceManager.h"
+
 void QScreenScene::dragEnterEvent(QGraphicsSceneDragDropEvent* event) {
     if (event->mimeData()->hasFormat("text/parameter")) {
         // what difference? event->accept();
@@ -177,14 +181,16 @@ void QScreenScene::dragEnterEvent(QGraphicsSceneDragDropEvent* event) {
 }
 
 void QScreenScene::dragMoveEvent(QGraphicsSceneDragDropEvent* event) {
-    if (event->mimeData()->hasFormat("text/parameter")) event->accept();
-    else
+    if (event->mimeData()->hasFormat("text/parameter")) {
+        Device->event->accept();
+    } else
         event->ignore();
 }
 
 void QScreenScene::dropEvent(QGraphicsSceneDragDropEvent* event) {
     if (event->mimeData()->hasFormat("text/parameter")) {
-        // qDebug() << "QScreenScene::dropEvent";
+        for (const auto& i : split(event->mimeData()->data("text/parameter").data(), '\n'))
+            emit toDropParameter(event->pos(), i);
     }
     QGraphicsScene::dropEvent(event);
 }

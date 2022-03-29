@@ -1,11 +1,12 @@
 ﻿#include "qscreenscale.h"
 
+#include "convtemplate/Parameter_ifs.h"
 //-------------------------------------------------------------------------
-QScreenScale::QScreenScale(Reader_ifs *reader, const int &index0, const QSizeF &sz, const LineProperties &dstx,
+QScreenScale::QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &sz, const LineProperties &dstx,
                            const Margin &margin, QWidget *parent) {
     Q_UNUSED(parent)
 
-    index_ = index0;
+    index_ = index;
     scene_size_ = sz;
 
     // if (index_ == 0) s_label_ = QString("синус");
@@ -14,9 +15,11 @@ QScreenScale::QScreenScale(Reader_ifs *reader, const int &index0, const QSizeF &
     // else
     //     s_label_ = QString("канал_%1").arg(index_ + 1);
 
+    //parameter->getPropertyAsTxt("common/name").data()
+
     dstx_ = dstx;
     margin_ = margin;
-    color_ = DIAG_COLORS.at(rand() % (DIAG_COLORS.count() - 1));
+    color_ = diag_colors_.at(rand() % (diag_colors_.count() - 1));
     // QColor(rand()%255, rand()%255, rand()%255).rgb();
 
     setFlag(QGraphicsItem::ItemIsSelectable);
@@ -37,19 +40,15 @@ QScreenScale::QScreenScale(Reader_ifs *reader, const int &index0, const QSizeF &
     r.setHeight(kAxisYHeightDefault);
 
     // Position
-    int i = 0;
-    int c = 0;
-    int h = scene_size_.height() - margin_.top;
+
+    int h = int(scene_size_.height()) - margin_.top;
     int dx = kAxisYWidth + kAxisYDiagInterval;
     int dy = kAxisYHeightDefault + kAxisYDiagInterval;
     qreal n = floor(h / dy);
-    for (int j = 0; j < index_; ++j) {
-        i++;
-        if (i >= n) {
-            i = 0;
-            c++;
-        }
-    }
+
+    int c = int(float(index_) / n);
+    int i = int(float(index_) - n * c);
+
     qreal x = (dx * c) + kScreenOffsetLeft;
     qreal y = (dy * i) + margin_.top;
 
@@ -121,7 +120,7 @@ QScreenScale::QScreenScale(Reader_ifs *reader, const int &index0, const QSizeF &
     lvl.value = -0.75;
     levels_.push_back(lvl);
 
-    SINGLE_PRM prm;
+    SinglePrm prm;
 
     prm.rdr = reader;
     prm.buf = new Reader_ifs::Point[kMaxScreenWidth];
@@ -133,18 +132,18 @@ QScreenScale::QScreenScale(Reader_ifs *reader, const int &index0, const QSizeF &
     drawScale();
 }
 
-QScreenScale::QScreenScale(const int &index0, const QSizeF &sz, const LineProperties &dstx, const Margin &margin,
-                           QWidget *parent) {
+QScreenScale::QScreenScale(Parameter_ifs *parameter, const int &index, const QSizeF &sz, const LineProperties &dstx,
+                           const Margin &margin, QWidget *parent) {
     Q_UNUSED(parent)
 
-    index_ = index0;
+    index_ = index;
     scene_size_ = sz;
 
-    s_label_ = QString("Имя_параметра_%1").arg(index_ + 1);
+    s_label_ = QString(parameter->getPropertyAsTxt("common/name").data());
 
     dstx_ = dstx;
     margin_ = margin;
-    color_ = DIAG_COLORS.at(rand() % (DIAG_COLORS.count() - 1));
+    color_ = diag_colors_.at(rand() % (diag_colors_.count() - 1));
     // QColor(rand()%255, rand()%255, rand()%255).rgb();
 
     setFlag(QGraphicsItem::ItemIsSelectable);
@@ -184,9 +183,7 @@ QScreenScale::QScreenScale(const int &index0, const QSizeF &sz, const LineProper
     setRect(r);
     setPos(x, y);
 
-    /*QSizeF   sceneSize;
-    sceneSize.setWidth(sceneW);
-    sceneSize.setHeight(sceneH);*/
+
 
     img_diag_ = new QImage;
     img_scale_ = new QImage;
@@ -237,19 +234,16 @@ QScreenScale::QScreenScale(const int &index0, const QSizeF &sz, const LineProper
 
     setTemporaryValues(0, 0);  //
 
-    // Example
-    // p_ = createNewPrmBufferSimulator(16);
+
     p_ = createNewPrmBufferSimulator(16, 1 << 12, {0, 30}, (0.1 * (2 - index_)));
 
     ControlLevel lvl;
-    // lvl.cross = true;
-    // lvl.value = 0.75;
-    // levels_.push_back(lvl);
+
     lvl.cross = false;
     lvl.value = -0.75;
     levels_.push_back(lvl);
 
-    SINGLE_PRM prm;
+    SinglePrm prm;
 
     prm.rdr = getReaderExample(p_);
     prm.buf = new Reader_ifs::Point[(int)kMaxScreenWidth];
@@ -265,21 +259,21 @@ QScreenScale::~QScreenScale() = default;
 //-------------------------------------------------------------------------
 int QScreenScale::getIndex() const { return index_; }
 //-------------------------------------------------------------------------
-void QScreenScale::setTemporaryValues(const double valMin, double const valMax) {
+void QScreenScale::setTemporaryValues(const double val_min, double const val_max) {
     stat_.ct = 1;
-    stat_.val_max = valMax;
-    stat_.val_min = valMin;
+    stat_.val_max = val_max;
+    stat_.val_min = val_min;
 
-    maximum_.value = valMax;
-    minimum_.value = valMin;
+    maximum_.value = val_max;
+    minimum_.value = val_min;
 }
 //-------------------------------------------------------------------------
 void QScreenScale::setScale(QVector<RelativeTime> *xs) { p_scale_ = xs; }
 //-------------------------------------------------------------------------
-void QScreenScale::setTiming(const TimeInterval &ti0, const RelativeTime &step) {
-    ti_ = ti0;
+void QScreenScale::setTiming(const TimeInterval &ti_0, const RelativeTime &step) {
+    ti_ = ti_0;
     // t_step_ = step;
-    intervalOn = true;
+    interval_on_ = true;
 
     drawDiag();
     drawScale();
@@ -359,7 +353,7 @@ void QScreenScale::recountScaleValues(const int &w, AxisYStatistics &stat, Reade
 
 //-------------------------------------------------------------------------
 void QScreenScale::drawDiag() {
-    if (!intervalOn) return;
+    if (!interval_on_) return;
 
     int scale_h = static_cast<int>(rect().height());
 
@@ -683,13 +677,13 @@ void QScreenScale::onResize(const qreal &w, const qreal &h) {
     emit toProgressed(index_);
 }
 //-------------------------------------------------------------------------
-void QScreenScale::onSetX(const int &index0, const int &x) {
-    if (index0 == index_) X_ = x;
+void QScreenScale::onSetX(const int &index, const int &x) {
+    if (index == index_) X_ = x;
 }
 //-------------------------------------------------------------------------
-void QScreenScale::onIndexReduce(const int &src, const int &index0) {
+void QScreenScale::onIndexReduce(const int &src, const int &index_0) {
     if (src != type_) return;
-    if (index_ > index0) index_--;
+    if (index_ > index_0) index_--;
 }
 //-------------------------------------------------------------------------
 void QScreenScale::onSettingsShow() { emit toTuned(type_, index_); }
@@ -925,96 +919,96 @@ void QScreenScale::wheelEvent(QGraphicsSceneWheelEvent *event) {
 }
 
 //-------------------------------------------------------------------------
-const QList<uint32_t> QScreenScale::DIAG_COLORS = {0xEF5350,
-                                                   0xF44336,
-                                                   0xE53935,
-                                                   0xD32F2F,
-                                                   0xC62828,
-                                                   0xB71C1C,
-                                                   0xEC407A,
-                                                   0xE91E63,
-                                                   0xD81B60,
-                                                   0xC2185B,
-                                                   0xAD1457,
-                                                   0x880E4F,
-                                                   0xAB47BC,
-                                                   0x9C27B0,
-                                                   0x8E24AA,
-                                                   0x7B1FA2,
-                                                   0x6A1B9A,
-                                                   0x4A148C,
-                                                   0x7E57C2,
-                                                   0x673AB7,
-                                                   0x5E35B1,
-                                                   0x512DA8,
-                                                   0x4527A0,
-                                                   0x311B92,
-                                                   0x5C6BC0,
-                                                   0x3F51B5,
-                                                   0x3949AB,
-                                                   0x303F9F,
-                                                   0x283593,
-                                                   0x1A237E,
-                                                   0x42A5F5,
-                                                   0x2196F3,
-                                                   0x1E88E5,
-                                                   0x1976D2,
-                                                   0x1565C0,
-                                                   0x0D47A1,
-                                                   0x29B6F6,
-                                                   0x03A9F4,
-                                                   0x039BE5,
-                                                   0x0288D1,
-                                                   0x0277BD,
-                                                   0x01579B,
-                                                   0x26C6DA,
-                                                   0x00BCD4,
-                                                   0x00ACC1,
-                                                   0x0097A7,
-                                                   0x00838F,
-                                                   0x006064,
-                                                   0x26A69A,
-                                                   0x009688,
-                                                   0x00897B,
-                                                   0x00796B,
-                                                   0x00695C,
-                                                   0x004D40,
-                                                   0x66BB6A,
-                                                   0x4CAF50,
-                                                   0x43A047,
-                                                   0x388E3C,
-                                                   0x2E7D32,
-                                                   0x1B5E20,
-                                                   0x9CCC65,
-                                                   0x8BC34A,
-                                                   0x7CB342,
-                                                   0x689F38,
-                                                   0x558B2F,
-                                                   0x33691E,
-                                                   0xD4E157,
-                                                   0xCDDC39,
-                                                   0xC0CA33,
-                                                   0xAFB42B,
-                                                   0x9E9D24,
-                                                   0x827717,
-                                                   /*0xFFEE58, 0xFFEB3B, 0xFDD835*/ 0xFBC02D,
-                                                   0xF9A825,
-                                                   0xF57F17,
-                                                   /*0xFFCA28, 0xFFC107*/ 0xFFB300,
-                                                   0xFFA000,
-                                                   0xFF8F00,
-                                                   0xFF6F00,
-                                                   0xFFA726,
-                                                   0xFF9800,
-                                                   0xFB8C00,
-                                                   0xF57C00,
-                                                   0xEF6C00,
-                                                   0xE65100,
-                                                   0xFF7043,
-                                                   0xFF5722,
-                                                   0xF4511E,
-                                                   0xE64A19,
-                                                   0xD84315,
-                                                   0xBF360C};
+const QList<uint32_t> QScreenScale::diag_colors_ = {0xEF5350,
+                                                    0xF44336,
+                                                    0xE53935,
+                                                    0xD32F2F,
+                                                    0xC62828,
+                                                    0xB71C1C,
+                                                    0xEC407A,
+                                                    0xE91E63,
+                                                    0xD81B60,
+                                                    0xC2185B,
+                                                    0xAD1457,
+                                                    0x880E4F,
+                                                    0xAB47BC,
+                                                    0x9C27B0,
+                                                    0x8E24AA,
+                                                    0x7B1FA2,
+                                                    0x6A1B9A,
+                                                    0x4A148C,
+                                                    0x7E57C2,
+                                                    0x673AB7,
+                                                    0x5E35B1,
+                                                    0x512DA8,
+                                                    0x4527A0,
+                                                    0x311B92,
+                                                    0x5C6BC0,
+                                                    0x3F51B5,
+                                                    0x3949AB,
+                                                    0x303F9F,
+                                                    0x283593,
+                                                    0x1A237E,
+                                                    0x42A5F5,
+                                                    0x2196F3,
+                                                    0x1E88E5,
+                                                    0x1976D2,
+                                                    0x1565C0,
+                                                    0x0D47A1,
+                                                    0x29B6F6,
+                                                    0x03A9F4,
+                                                    0x039BE5,
+                                                    0x0288D1,
+                                                    0x0277BD,
+                                                    0x01579B,
+                                                    0x26C6DA,
+                                                    0x00BCD4,
+                                                    0x00ACC1,
+                                                    0x0097A7,
+                                                    0x00838F,
+                                                    0x006064,
+                                                    0x26A69A,
+                                                    0x009688,
+                                                    0x00897B,
+                                                    0x00796B,
+                                                    0x00695C,
+                                                    0x004D40,
+                                                    0x66BB6A,
+                                                    0x4CAF50,
+                                                    0x43A047,
+                                                    0x388E3C,
+                                                    0x2E7D32,
+                                                    0x1B5E20,
+                                                    0x9CCC65,
+                                                    0x8BC34A,
+                                                    0x7CB342,
+                                                    0x689F38,
+                                                    0x558B2F,
+                                                    0x33691E,
+                                                    0xD4E157,
+                                                    0xCDDC39,
+                                                    0xC0CA33,
+                                                    0xAFB42B,
+                                                    0x9E9D24,
+                                                    0x827717,
+                                                    /*0xFFEE58, 0xFFEB3B, 0xFDD835*/ 0xFBC02D,
+                                                    0xF9A825,
+                                                    0xF57F17,
+                                                    /*0xFFCA28, 0xFFC107*/ 0xFFB300,
+                                                    0xFFA000,
+                                                    0xFF8F00,
+                                                    0xFF6F00,
+                                                    0xFFA726,
+                                                    0xFF9800,
+                                                    0xFB8C00,
+                                                    0xF57C00,
+                                                    0xEF6C00,
+                                                    0xE65100,
+                                                    0xFF7043,
+                                                    0xFF5722,
+                                                    0xF4511E,
+                                                    0xE64A19,
+                                                    0xD84315,
+                                                    0xBF360C};
 
 //-------------------------------------------------------------------------

@@ -291,8 +291,14 @@ class PyParameterViewWrapper : public ParameterViewWrapper_ifs {
    public:
     QWidget *getWidget() override { return nullptr; }
 
+
+
     status addSignal(Signal_ifs *signal) override {
         PYBIND11_OVERRIDE_PURE(status, ParameterViewWrapper_ifs, addSignal, signal);
+    }
+
+    ConversionTemplate* currentConversionTemplate() override{
+        PYBIND11_OVERRIDE_PURE(ConversionTemplate*, ParameterViewWrapper_ifs, currentConversionTemplate);
     }
 
     bool setActive(size_t row_index) override {

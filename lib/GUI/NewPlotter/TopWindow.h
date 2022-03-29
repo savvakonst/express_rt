@@ -15,7 +15,7 @@ class TopWindow : public QMainWindow {
    public:
     explicit TopWindow(QWidget* parent = nullptr);
 
-    void init(ExtensionManager* extension_manager);
+    void init(ExtensionManager* manager);
 
     void dragEnterEvent(QDragEnterEvent* e) override;
     void dropEvent(QDropEvent* e) override;
@@ -24,6 +24,8 @@ class TopWindow : public QMainWindow {
     DeviceManager* device_manager_ = nullptr;
     // void dragMoveEvent(QDragMoveEvent* event) override;
     // void dragLeaveEvent(QDragLeaveEvent* event) override;
+
+    ExtensionManager *manager_ = nullptr;
 };
 
 #endif  // EXRT_TOPWINDOW_H

@@ -9,6 +9,9 @@
 #include "qscreenscale.h"
 //#include "Helper_Works2.h"
 
+class Parameter_ifs;
+class Device;
+
 class QScreenScene : public QGraphicsScene {
     Q_OBJECT
    public:
@@ -17,10 +20,13 @@ class QScreenScene : public QGraphicsScene {
 
     QRect setRect(const QRect& rt_0);
 
+    Device * device_ = nullptr;
    public slots:
     void onSelectItem(const int& index);
 
    private:
+
+
     bool b_left_pressed_ = false;
     bool b_right_pressed_ = false;
 
@@ -41,6 +47,7 @@ class QScreenScene : public QGraphicsScene {
     void dropEvent(QGraphicsSceneDragDropEvent* event) override;
 
    signals:
+
     void toMenuCalled(const QPointF& pt);
     void toMarkerPlaced(const QPointF& pt);
     void toLeftGestured(const QPointF& pt_1, const QPointF& pt_2);
@@ -50,6 +57,8 @@ class QScreenScene : public QGraphicsScene {
     void toMouseWheeled(const QPointF& pt, const int& delta);
     void toPaused();
     void toMouseMoved(const QPointF& pt);
+    void toDropParameter(const QPointF& pt,const std::string & name);
+
 };
 
 #endif  // QSCREENSCENE_H

@@ -11,18 +11,18 @@ const int32_t kDiagramOffsetLeft = 150;
 const int32_t kDiagramOffsetRight = 150;
 const int kDiagramMargin = 5;
 
-const qreal kScreenOffset = 50;
-const qreal kScreenOffsetTop = 50;
-const qreal kScreenOffsetBottom = 50;
-const qreal kScreenOffsetLeft = 50;
-const qreal kScreenOffsetRight = 50;
+const int kScreenOffset = 50;
+const int kScreenOffsetTop = 50;
+const int kScreenOffsetBottom = 50;
+const int kScreenOffsetLeft = 50;
+const int kScreenOffsetRight = 50;
 
-const qreal kAxisYHeightMin = 20;
-const qreal kAxisYHeightDefault = 40;
-const qreal kAxisYHeightMax = 1000;
-const qreal kAxisYWidth = 40;
+const int kAxisYHeightMin = 20;
+const int kAxisYHeightDefault = 40;
+const int kAxisYHeightMax = 1000;
+const int kAxisYWidth = 40;
 const qreal kAxisYCutoffStep = 20;
-const qreal kAxisYDiagInterval = 20;
+const int kAxisYDiagInterval = 20;
 
 const int kMaxCutoffNumber = 7;
 const int kDefaultDataOutputPrecision = -1;
