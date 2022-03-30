@@ -23,6 +23,7 @@ class CAction : public QAction {
         if (!shortcut.isEmpty()) setShortcut(shortcut);
         connect(this, &QAction::triggered, parent, slot);
     }
+
     CAction(const QString &text, const typename QtPrivate::FunctionPointer<Func2>::Object *parent,
             const QKeySequence &shortcut, Func2 slot)
         : QAction(text, (QObject *)parent) {
@@ -32,32 +33,7 @@ class CAction : public QAction {
 };
 
 //-------------------------------------------------------------------------
-
-ModuleStream_ifs *generateStream(ExtensionManager *manager, const std::string &type, Device *device,
-                                 const std::list<Parameter_ifs *> &parameters) {
-    ModuleStream_ifs *top_m_stream = device->createModuleStream();
-
-    for (auto prm : parameters) {
-        auto constructor = (prmBufferConstructor_f)manager->getLastVersionExtensionObject(type, prm->getType());
-        if (constructor) {
-            auto prm_buffer = constructor(prm, manager);
-
-            auto full_path = prm->getProperty("common/path")->getValue().asString();
-
-            auto path = lastCharPos(full_path, '/');
-            auto sub_modules = ::getSubmodules(device, path.first);
-            if (sub_modules.size() == 1) {
-                auto m = sub_modules.front()->getModuleStream();
-                if (m) top_m_stream->addPrmBuffer(path.second, prm_buffer);
-            }
-        }
-    }
-
-    return top_m_stream;
-}
-
-//-------------------------------------------------------------------------
-QFormScreen::QFormScreen(Device *device, QWidget *parent) : QDialog(parent), ui_(new Ui::QFormScreen), device_(device) {
+QFormScreen::QFormScreen(QWidget *parent) : QDialog(parent), ui_(new Ui::QFormScreen) {
     ui_->setupUi(this);
 
     margin_.left = kDiagramOffsetLeft;
@@ -91,7 +67,6 @@ QFormScreen::QFormScreen(Device *device, QWidget *parent) : QDialog(parent), ui_
 
     // scene
     scene_ = new QScreenScene(this);
-    scene_->device_ = device;
 
     connect(this, &QFormScreen::toSceneChanged, scene_, &QGraphicsScene::advance);
     connect(scene_, &QScreenScene::toMarkerPlaced, this, &QFormScreen::onAddMarker);
@@ -174,21 +149,10 @@ QFormScreen::QFormScreen(Device *device, QWidget *parent) : QDialog(parent), ui_
     mn_settings_->addAction(act_settings_);
     mn_settings_->addAction(act_conf_save_);
 
-    // menu help
-    {
-        act_help_ = new QAction(tr("Справка"), this);
-        act_help_->setShortcut(Qt::Key_F1);
-        connect(act_help_, &QAction::triggered, this, &QFormScreen::onHelp);
-
-        mn_help_ = new QMenu(tr("Справка"), this);
-        mn_help_->addAction(act_help_);
-    }
-
     // main menu
     menubar_ = new QMenuBar(this);
     menubar_->addMenu(mn_file_);
     menubar_->addMenu(mn_settings_);
-    menubar_->addMenu(mn_help_);
     p_layout->setMenuBar(menubar_);
 
     // toolbar
@@ -372,7 +336,7 @@ void QFormScreen::onAddMakerExt(const RelativeTime &t_0) {
 //-------------------------------------------------------------------------
 void QFormScreen::onMessageShow(const QString &s) { QMessageBox::warning(this, tr("Внимание!"), s, QMessageBox::Ok); }
 //-------------------------------------------------------------------------
-void QFormScreen::onHelp() { emit to_help(); }
+
 //-------------------------------------------------------------------------
 bool QFormScreen::saveShot(const QString &filename) {
     bool success = QFile::exists(filename);
@@ -1686,6 +1650,15 @@ void QFormScreen::resizeEvent(QResizeEvent *event) {
     Q_UNUSED(event)
 
     onResizeScene();
+}
+
+bool QFormScreen::event(QEvent *e) {
+    if (e->type() == QEvent::WindowActivate) {
+        //  auto device_view_wrapper = (DeviceViewWrapper_ifs
+        //  *)manager_->getLastVersionExtensionObject("widget_wrapper","device_view_wrapper");
+        qDebug() << "QFormScreen::";
+    }
+    return QDialog::event(e);
 }
 
 //-------------------------------------------------------------------------

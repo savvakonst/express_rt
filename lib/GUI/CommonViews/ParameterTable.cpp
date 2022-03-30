@@ -90,9 +90,7 @@ QVariant ParameterTableModel::data(const QModelIndex &index, int role) const {
         auto name = list_of_entries_[index.column()]->name_;
         auto h_data = prm->getProperty("common/" + name);
         return h_data->getValue().asString().data();
-    }  // else if (role == Qt::CheckStateRole) {
-       //    if (index.column() == 0) return Qt::Unchecked;
-    //}
+    }
     return {};
 }
 
@@ -192,6 +190,12 @@ bool ParameterTableModel::dropMimeData(const QMimeData *data, Qt::DropAction act
     return QAbstractTableModel::dropMimeData(data, action, row, column, parent);
 }
 
+bool ParameterTableModel::canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
+                                          const QModelIndex &parent) const {
+    qDebug() << "Qt::DropActions ParameterTableModel::supportedDropActions()";
+    return QAbstractItemModel::canDropMimeData(data, action, row, column, parent);
+}
+
 /*
  *
  */
@@ -209,12 +213,7 @@ bool ParameterTableModel::dropMimeData(const QMimeData *data, Qt::DropAction act
 #include <QToolBar>
 #include <QToolButton>
 
-#include "CustomQActions.h"
-
-QPixmap getPixmap(const QString &str) {
-    auto pixmap_path = QCoreApplication::applicationDirPath() + str;
-    return QPixmap(pixmap_path);
-}
+#include "GUI/CustomQActions.h"
 
 class ParameterViewWrapper : public ParameterViewWrapper_ifs {
    public:
@@ -239,18 +238,6 @@ class ParameterViewWrapper : public ParameterViewWrapper_ifs {
 
         auto p_layout = reinterpret_cast<QHBoxLayout *>(top_widget_->layout());
         auto toolbar = new QToolBar();
-
-        QIcon run_icon;
-        run_icon.addPixmap(getPixmap("/png/common/play.png"), QIcon::Normal, QIcon::Off);
-        run_icon.addPixmap(getPixmap("/png/common/stop.png"), QIcon::Normal, QIcon::On);
-
-        action_run_ = new FuncProxyQAction(
-            run_icon, QObject::tr("Ru&n"),
-            [&]() {
-                if (main_window_ == nullptr) return false;
-                return true;
-            },
-            widget_);
 
         /// action_run_->setCheckable(true);
 

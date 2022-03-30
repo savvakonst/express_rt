@@ -3,14 +3,13 @@
 #include <QApplication>
 #include <QLibraryInfo>
 #include <QTranslator>
-#include <iostream>
 
 #include "Ping/ksdconnected.h"
 #include "common/Extension.h"
 #include "common/ExtensionManager.h"
 #include "device/Device.h"
 #include "qformscreen.h"
-
+/*
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
@@ -53,6 +52,7 @@ int main(int argc, char *argv[]) {
 
     return QApplication::exec();
 }
+ */
 /*
  *
  *

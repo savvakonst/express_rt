@@ -29,7 +29,7 @@ class QFormScreen;
 }
 
 class ExtensionManager;
-class Device;
+
 class QFormScreen : public QDialog {
     Q_OBJECT
 
@@ -38,11 +38,16 @@ class QFormScreen : public QDialog {
     const QString ini_image_save_auto_ = "IMAGE_SAVE/AUTO";
 
    public:
-    explicit QFormScreen(Device *device, QWidget *parent = nullptr);
+    explicit QFormScreen( QWidget *parent = nullptr);
 
     ~QFormScreen() override;
 
-    void init(ExtensionManager *manager) { manager_ = manager; }
+    void init(ExtensionManager *manager) {
+        manager_ = manager;
+        scene_->manager_ = manager;
+    }
+
+    bool event(QEvent *e) override;
 
     QSizeF getSceneSize();
 
@@ -78,8 +83,6 @@ class QFormScreen : public QDialog {
     void onAddMakerExt(const RelativeTime &t_0);
 
     void onMessageShow(const QString &s);
-
-    void onHelp();
 
    private:
     struct AxisYStats {
@@ -122,7 +125,6 @@ class QFormScreen : public QDialog {
 
     QString secToHMS(const RelativeTime &val, const int &prec = QLocale::FloatingPointShortest);
 
-    Device *device_;
     ExtensionManager *manager_ = nullptr;
 
     Ui::QFormScreen *ui_;
@@ -132,29 +134,18 @@ class QFormScreen : public QDialog {
     QProgressBar *progress_;
 
     QMenu *mn_file_;
+    QMenu *mn_settings_;
+
     QAction *act_exit_;
-    // QAction                             *actAdd;
     QAction *act_shot_;
     QAction *act_shot_as_;
     QAction *act_clear_;
     QAction *act_refresh_;
     QAction *act_group_up_;
     QAction *act_scale_hide_;
-    // QAction                             *actListScale;
-    // QAction                             *actListMarker;
-    // QAction                             *actListLabel;
 
-    QMenu *mn_settings_;
     QAction *act_settings_;
-    // QMenu                               *mnConf;
     QAction *act_conf_save_;
-
-    QMenu *mn_help_;
-    QAction *act_help_;
-
-    QAction *act_next_{};
-    QAction *act_prev_{};
-    QToolButton *toolbtn_goto_{};
 
     QScreenScene *scene_;
     QScreenAxisX *axis_x_;

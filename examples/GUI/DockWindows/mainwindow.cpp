@@ -56,39 +56,6 @@ MainWindow::MainWindow(ExtensionManager *manager) : manager_(manager) {
 
     auto eval_file = (evalFile_t)manager->getLastVersionExtensionObject("eval_file", "py_eval_file");
     if (eval_file) eval_file("exrt_config.py");
-    ////////////////////////////////////////////////////////////////////////////
-    /*
-    std::string error_msg;
-
-    EthernetAddress addr;
-    addr.ip = inet_addr("192.168.001.176");
-    addr.port = 0;
-
-    auto devices = devicePing(addr, error_msg);
-
-    if (!error_msg.empty()) {
-        std::cout << error_msg;
-        return;
-    }
-    auto v = devices.front()->getTask();
-
-    Device *device = new Device(v.data(), v.size(), manager_);
-
-    auto form_screen = new QFormScreen;
-
-    ModuleStream_ifs *m_stream = device->getTopModule()->createModuleStream();
-    auto *receiver = new Receiver(m_stream, device->getSrcAddress());
-
-    auto prm_buff = device->getTopModule()->getPrmBufferMap();
-    for (const auto &i : prm_buff) form_screen->addScale(getReaderExample(i.second));
-
-    receiver->start();
-     */
-    //////////////////////////////////////////////////////////////////////////
-    // setCentralWidget(new QTextEdit);
-    // auto dock = new QDockWidget(QObject::tr("&plotter"));
-    // dock->setObjectName(QObject::tr("&plotter"));
-    // dock->setWidget(new QWidget);
 
     auto plotter = (QWidget *)manager->getLastVersionExtensionObject("plotter", "plotter");
     if (plotter) setCentralWidget(plotter);

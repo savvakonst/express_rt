@@ -11,6 +11,11 @@
 
 #include "common/ExrtAction_ifs.h"
 
+inline QPixmap getPixmap(const QString &str) {
+    auto pixmap_path = QCoreApplication::applicationDirPath() + str;
+    return QPixmap(pixmap_path);
+}
+
 class FuncProxyQAction : public QAction {
    public:
     using function_t = std::function<bool()>;

@@ -22,7 +22,7 @@ Module_DCU_::Module_DCU_(const std::string &module_id)
 Module_DCU_::Module_DCU_(size_t number_of_slots, const void *ptr, size_t size, ExtensionManager *manager)
     : Module_DCU_(createCHxxId(number_of_slots)) {
     task_ = *((Task *)ptr);
-    number_of_slots_ = number_of_slots;
+    number_of_slots_ = number_of_slots + 1;
     size_ = (size_t)task_.header.size;
     size_t offset = sizeof(Task);
 
@@ -30,8 +30,9 @@ Module_DCU_::Module_DCU_(size_t number_of_slots, const void *ptr, size_t size, E
         char *current_ptr = (char *)ptr + offset;
         auto *header = (MODULE_HEADER *)(current_ptr);
 
-        auto constructor = (moduleConstructor_f)manager->getLastVersionExtensionObject("module", stringId(header->id));
-        Module_ifs *module = constructor(current_ptr, (size_t)header->size, manager);
+        auto id = stringId(header->id);
+        auto constructor = (moduleConstructor_f)manager->getLastVersionExtensionObject("module", id);
+        Module_ifs *module = constructor ? constructor(current_ptr, (size_t)header->size, manager) : nullptr;
 
         if (module == nullptr) {
             error_message_ = "cant find module with \"" + stringId(header->id) + "\" id";

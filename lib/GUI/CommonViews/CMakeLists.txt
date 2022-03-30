@@ -5,8 +5,8 @@ file(GLOB Headers *.h)
 file(GLOB Sources *.cpp)
 
 add_library(${COMMON_VIEWS} SHARED
-        ${Sources}
         ${Headers}
+        ${Sources}
         )
 
 # TODO: remove it

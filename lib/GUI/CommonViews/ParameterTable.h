@@ -48,6 +48,9 @@ class ParameterTableModel : public QAbstractTableModel {
     bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
                       const QModelIndex &parent) override;
 
+    bool canDropMimeData(const QMimeData *data, Qt::DropAction action,
+                                 int row, int column, const QModelIndex &parent) const override;
+
     [[nodiscard]] ConversionTemplate *getCurrentConversionTemplate() const;
    protected:
 

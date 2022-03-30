@@ -3,6 +3,15 @@
 #include <QMimeData>
 
 #include "qscreenaxisx.h"
+//
+#include "GUI/WidgetWrappers.h"
+#include "common/ExtensionManager.h"
+#include "common/StringProcessingTools.h"
+#include "convtemplate/ConversionTemplate.h"
+#include "convtemplate/Parameter_ifs.h"
+#include "convtemplate/PrmBuffer_ifs.h"
+#include "device/ModuleStream_ifs.h"
+
 //-------------------------------------------------------------------------
 QScreenScene::QScreenScene(QWidget* parent) : QGraphicsScene(nullptr) {
     Q_UNUSED(parent);
@@ -182,9 +191,29 @@ void QScreenScene::dragEnterEvent(QGraphicsSceneDragDropEvent* event) {
 
 void QScreenScene::dragMoveEvent(QGraphicsSceneDragDropEvent* event) {
     if (event->mimeData()->hasFormat("text/parameter")) {
-        Device->event->accept();
-    } else
-        event->ignore();
+        auto list = split(event->mimeData()->data("text/parameter").data(), '\n');
+        if (list.size() > 1) event->accept();
+
+        auto name = list.front();
+        {
+            auto parameter_view_wrapper = (ParameterViewWrapper_ifs*)manager_->getLastVersionExtensionObject(
+                "widget_wrapper", "parameter_view_wrapper");
+            auto cnv_template = parameter_view_wrapper->currentConversionTemplate();
+
+            if (cnv_template) {
+                auto parameter = (Parameter_ifs*)cnv_template->getParameter(name);
+                if (parameter) {
+                    auto path = firstCharPos(parameter->getProperty("common/path")->getValue().asString(), '/');
+
+                    if (device_->isChannelAvailable(path.second)) {
+                        event->accept();
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    event->ignore();
 }
 
 void QScreenScene::dropEvent(QGraphicsSceneDragDropEvent* event) {

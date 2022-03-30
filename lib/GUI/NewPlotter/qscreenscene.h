@@ -11,6 +11,7 @@
 
 class Parameter_ifs;
 class Device;
+class ExtensionManager;
 
 class QScreenScene : public QGraphicsScene {
     Q_OBJECT
@@ -20,13 +21,11 @@ class QScreenScene : public QGraphicsScene {
 
     QRect setRect(const QRect& rt_0);
 
-    Device * device_ = nullptr;
+    ExtensionManager* manager_ = nullptr;
    public slots:
     void onSelectItem(const int& index);
 
    private:
-
-
     bool b_left_pressed_ = false;
     bool b_right_pressed_ = false;
 
@@ -57,8 +56,7 @@ class QScreenScene : public QGraphicsScene {
     void toMouseWheeled(const QPointF& pt, const int& delta);
     void toPaused();
     void toMouseMoved(const QPointF& pt);
-    void toDropParameter(const QPointF& pt,const std::string & name);
-
+    void toDropParameter(const QPointF& pt, const std::string& name);
 };
 
 #endif  // QSCREENSCENE_H

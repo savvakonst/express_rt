@@ -19,8 +19,8 @@
 #include "convtemplate/Parameter_ifs.h"
 #include "device/DeviceManager.h"
 //
-#include "CustomQActions.h"
 #include "DeviceList.h"
+#include "GUI/CustomQActions.h"
 
 DeviceListModel::DeviceListModel(ExtensionManager *manager) {
     auto image_dir = QDir(QCoreApplication::applicationDirPath() + "/png/modules");
