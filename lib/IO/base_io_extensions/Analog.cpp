@@ -103,7 +103,7 @@ PrmBuffer_ifs* ThermocoupleTemperatureParameter::createBuffer() const {
     return nullptr;
 }
 
-std::string ThermocoupleTemperatureParameter::getType() const { return "thermocouple_emf"; }
+std::string ThermocoupleTemperatureParameter::getType() const { return "thermocouple_temperature"; }
 
 bool ThermocoupleTemperatureParameter::isValid() const { return false; }
 

@@ -38,16 +38,9 @@ class QFormScreen : public QDialog {
     const QString ini_image_save_auto_ = "IMAGE_SAVE/AUTO";
 
    public:
-    explicit QFormScreen( QWidget *parent = nullptr);
+    explicit QFormScreen(ExtensionManager *manager, PlotterContext_ifs *plotter_context, QWidget *parent = nullptr);
 
     ~QFormScreen() override;
-
-    void init(ExtensionManager *manager) {
-        manager_ = manager;
-        scene_->manager_ = manager;
-    }
-
-    bool event(QEvent *e) override;
 
     QSizeF getSceneSize();
 
@@ -125,7 +118,8 @@ class QFormScreen : public QDialog {
 
     QString secToHMS(const RelativeTime &val, const int &prec = QLocale::FloatingPointShortest);
 
-    ExtensionManager *manager_ = nullptr;
+    PlotterContext_ifs *plotter_context_;
+    ExtensionManager *manager_;
 
     Ui::QFormScreen *ui_;
     QMenuBar *menubar_;

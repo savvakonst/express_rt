@@ -7,27 +7,26 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
-#include_directories(.)
+set(READER Reader)
 
 file(GLOB Headers *.h)
 file(GLOB Sources *.cpp)
 
-add_library(Reader
+add_library(${READER} SHARED
         ${Sources}
         ${Headers}
-        PseudoSyncPrmBuffer.cpp
         )
 
-target_include_directories(Reader PUBLIC ..)
+target_include_directories(${READER} PUBLIC ..)
 
 source_group(src FILES ${Sources})
 source_group(headers FILES ${Headers})
 
-
-set_property(TARGET Reader PROPERTY OUTPUT_NAME Reader)
-
-#add_subdirectory("../../express_rt" CommonLib EXCLUDE_FROM_ALL)
-target_link_libraries(Reader CommonLib)
+target_link_libraries(${READER} CommonLib)
 
 
-set_target_properties(Reader PROPERTIES CXX_STANDARD_REQUIRED ON OUTPUT_NAME Reader)
+set_property(TARGET ${READER} PROPERTY OUTPUT_NAME ${READER})
+
+
+set_target_properties(${READER} PROPERTIES CXX_STANDARD_REQUIRED ON OUTPUT_NAME ${READER})
+target_compile_definitions(${READER} PRIVATE READER_LIB_NAME=${READER})

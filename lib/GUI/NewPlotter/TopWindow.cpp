@@ -12,9 +12,17 @@
 #include <QTreeView>
 ///
 #include "GUI/CustomQActions.h"
+#include "GUI/WidgetWrappers.h"
 #include "TopWindow.h"
 #include "common/StringProcessingTools.h"
+#include "convtemplate/ConversionTemplate.h"
+#include "convtemplate/Parameter_ifs.h"
+#include "convtemplate/PrmBuffer_ifs.h"
+#include "device/Device.h"
 #include "device/DeviceManager.h"
+#include "device/ModuleStream_ifs.h"
+
+//
 #include "qformscreen.h"
 
 TopWindow::TopWindow(QWidget *parent) {
@@ -52,8 +60,8 @@ void TopWindow::dropEvent(QDropEvent *e) {
             if (!exists) {
                 auto dock = new QDockWidget(i.data(), this);
                 auto device = device_manager_->getDeviceByPath(i);
-                auto pre_plotter = new PrePlotter(device, manager_);
-                connect(pre_plotter, &PrePlotter::toRemove, this, &TopWindow::onRemoveDocWidget);
+                auto pre_plotter = new ParametersToPlot(this, device, manager_);
+                connect(pre_plotter, &ParametersToPlot::toRemove, this, &TopWindow::onRemoveDocWidget);
 
                 dock->setAttribute(Qt::WA_DeleteOnClose);
                 dock->setWidget(pre_plotter);
@@ -73,6 +81,13 @@ void TopWindow::onRemoveDocWidget(QWidget *widget) {
         }
 }
 
+void TopWindow::addPlotter(const std::string &name, QFormScreen *form_screen) {
+    auto dock = new QDockWidget(name.data(), this);
+    dock->setAttribute(Qt::WA_DeleteOnClose);
+    dock->setWidget(form_screen);
+    addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, dock, Qt::Orientation::Horizontal);
+}
+
 /*
  *
  *
@@ -87,7 +102,6 @@ ModuleStream_ifs *generateStream(ExtensionManager *manager, const std::string &t
         auto constructor = (prmBufferConstructor_f)manager->getLastVersionExtensionObject(type, prm->getType());
         if (constructor) {
             auto prm_buffer = constructor(prm, manager);
-
             auto full_path = prm->getProperty("common/path")->getValue().asString();
 
             auto path = lastCharPos(full_path, '/');
@@ -108,9 +122,26 @@ ModuleStream_ifs *generateStream(ExtensionManager *manager, const std::string &t
  *
  *
  */
-PrePlotter::PrePlotter(Device *device, ExtensionManager *manager, QWidget *parent) : QWidget(parent) {
+
+class OnlinePlotterContext : public PlotterContext_ifs {
+    ~OnlinePlotterContext() override = default;
+    bool start() override { return true; }
+
+    bool stop() override { return true; }
+};
+
+/*
+ *
+ *
+ *
+ *
+ */
+
+ParametersToPlot::ParametersToPlot(TopWindow *plotter_main_window, Device *device, ExtensionManager *manager,
+                                   QWidget *parent)
+    : plotter_main_window_(plotter_main_window), device_(device), manager_(manager), QWidget(parent) {
     auto table = new QTreeView();
-    // model_ = new ParameterBufferTableModel(device, manager);
+    model_ = new ParameterBufferTableModel(device, manager);
 
     table->setParent(this);
     model_->setParent(this);
@@ -123,7 +154,7 @@ PrePlotter::PrePlotter(Device *device, ExtensionManager *manager, QWidget *paren
     run_icon.addPixmap(getPixmap("/png/common/stop.png"), QIcon::Normal, QIcon::On);
 
     auto *action_run = new QAction(run_icon, QObject::tr("Ru&n"), this);
-    connect(action_run, &QAction::triggered, this, &PrePlotter::runAndClose);
+    connect(action_run, &QAction::triggered, this, &ParametersToPlot::runAndClose);
 
     table->setDragDropMode(QAbstractItemView::DragDrop);
     table->setDragEnabled(true);
@@ -137,22 +168,21 @@ PrePlotter::PrePlotter(Device *device, ExtensionManager *manager, QWidget *paren
     p_layout->insertWidget(0, toolbar);
 }
 
-PrePlotter::~PrePlotter() = default;
+ParametersToPlot::~ParametersToPlot() = default;
 
-void PrePlotter::runAndClose() { emit toRemove(this); }
-void PrePlotter::createPlotter(QFormScreen *form_screen) { auto vector = model_->getParameters().toStdList(); }
+void ParametersToPlot::runAndClose() {
+    auto list = model_->getParameters().toStdList();
+    auto module_stream = generateStream(manager_, "simple_online_prm_buffer", device_, list);
+    auto form_screen = new QFormScreen(manager_, new OnlinePlotterContext());
+    plotter_main_window_->addPlotter(device_->getSource() + "//", form_screen);
+    emit toRemove(this);
+}
 
 /*
  *
  *
  *
  */
-
-#include "GUI/WidgetWrappers.h"
-#include "convtemplate/ConversionTemplate.h"
-#include "convtemplate/ConversionTemplateManager.h"
-#include "convtemplate/Parameter_ifs.h"
-#include "device/Device.h"
 
 ParameterBufferTableModel::ParameterBufferTableModel(Device *device, ExtensionManager *manager) : device_(device) {
     parameter_view_wrapper_ =

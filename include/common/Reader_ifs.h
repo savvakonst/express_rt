@@ -68,4 +68,11 @@ class Reader_ifs {
     virtual Borders getAvailableBorders() = 0;
 };
 
+class PlotterContext_ifs {
+   public:
+    virtual ~PlotterContext_ifs() = default;
+    virtual bool start() = 0;
+    virtual bool stop() = 0;
+};
+
 #endif

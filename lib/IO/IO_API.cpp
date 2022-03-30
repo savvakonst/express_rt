@@ -6,6 +6,7 @@
 #include <regex>
 
 #include "base_io/BaseIO.h"
+#include "base_io_extensions/Analog.h"
 #include "base_io_extensions/EthernetUDP.h"
 #include "base_io_extensions/SpecificPParserBuilder.h"
 #include "common/Extension.h"
@@ -23,8 +24,7 @@ static int initDefaultBaseIO(ExtensionManager *manager);
 static ExtensionUnit g_default_parameters_units[] = {
     {"ksd_io", "io", "instance of class which provides reading \"*.ksd\" files", (void *)new KsdIO, 0x00},
     {"base_io", "io", "instance of class which provides reading \"*.base\" files", (void *)new BaseIO, 0x00},
-    {"EthernetUdp", "parameter", "parameter for processing Ethernet UDP",
-     (void *)&createParameter<EthernetUdpParameter>, 0x00},
+
     {"EthernetUdp", "prm_parser_builder", "module for parsing and building EthernetUdp ",
      (void *)(new EthernetUdParserBuilder), 0x00},
     {"Analog", "prm_parser_builder", "module for parsing and building parameter", (void *)(new AnalogParserBuilder),
@@ -38,6 +38,25 @@ static ExtensionUnit g_default_parameters_units[] = {
     {"DefaultBaseIO", "init",
      "unit with type \"init\" are functions which are running after all modules initialization",
      (void *)initDefaultBaseIO, 0x00},
+
+    {"ethernet_udp", "parameter", "parameter for processing Ethernet UDP",
+     (void *)&createParameter<EthernetUdpParameter>, 0x00},
+    {"analog", "parameter", "parameter for processing simple analog voltage signals",
+     (void *)&createParameter<AnalogParameter>, 0x00},
+    {"acceleration", "parameter", "parameter for processing acceleration",
+     (void *)&createParameter<AccelerationParameter>, 0x00},
+    {"velocity", "parameter", "parameter for processing velocity",
+     (void *)&createParameter<VelocityParameter>, 0x00},
+    {"displacement", "parameter", "parameter for processing displacement",
+     (void *)&createParameter<DisplacementParameter>, 0x00},
+    {"thermocouple_emf", "parameter", "parameter for processing thermocouple_emf",
+     (void *)&createParameter<ThermocoupleEmfParameter>, 0x00},
+    {"thermocouple_temperature", "parameter", "parameter for processing thermocouple_temperature",
+     (void *)&createParameter<ThermocoupleTemperatureParameter>, 0x00},
+    {"thermistor_resistance", "parameter", "parameter for processing thermistor_resistance",
+     (void *)&createParameter<ThermistorResistanceParameter>, 0x00},
+    {"thermistor_temperature", "parameter", "parameter for processing thermistor_temperature",
+     (void *)&createParameter<ThermistorTemperatureParameter>, 0x00},
 
     {nullptr, nullptr, nullptr, nullptr, 0}};
 

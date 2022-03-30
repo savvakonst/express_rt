@@ -7,7 +7,7 @@ file(GLOB Sources *.cpp)
 set(COMMON_IO CommonIO)
 
 add_library(${COMMON_IO} SHARED
-        main.cpp
+        IO_API.cpp
         )
 
 source_group(src FILES ${Sources})

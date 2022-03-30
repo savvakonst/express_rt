@@ -17,11 +17,11 @@ inline size_t getLen(void **array) {
 
 PseudoSyncPrmBuffer::PseudoSyncPrmBuffer(  //
     const Parameter_ifs *parent,           //
-    size_t sample_frequency_log2,          //
+    size_t sample_frequency_log_2,         //
     bufferType_t *init_buffer,             //
     size_t intervals_buffer_length,        //
     RelativeTime buffer_interval)
-    : sample_frequency_log_2_(sample_frequency_log2),
+    : sample_frequency_log_2_(sample_frequency_log_2),
       seed_intervals_length_(intervals_buffer_length),
       buffer_time_interval_(buffer_interval),
       buffer_length_(uint64_t(uint64_t(buffer_interval.time) * uint64_t(uint64_t(1) << sample_frequency_log_2_)) >> 32),

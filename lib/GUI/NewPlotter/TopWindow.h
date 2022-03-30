@@ -12,6 +12,7 @@
 
 class DeviceManager;
 class DeviceViewWrapper_ifs;
+class QFormScreen;
 
 class TopWindow : public QMainWindow {
     Q_OBJECT
@@ -22,9 +23,11 @@ class TopWindow : public QMainWindow {
 
     void dragEnterEvent(QDragEnterEvent *e) override;
     void dropEvent(QDropEvent *e) override;
+    void addPlotter(const std::string &name, QFormScreen *form_screen);
 
    private slots:
     void onRemoveDocWidget(QWidget *widget);
+
 
    private:
     DeviceManager *device_manager_ = nullptr;
@@ -36,23 +39,27 @@ class Parameter_ifs;
 class Device;
 class DataSchema_ifs;
 class ParameterViewWrapper_ifs;
-class QFormScreen;
 class ParameterBufferTableModel;
 
-class PrePlotter : public QWidget {
+class ParametersToPlot : public QWidget {
     Q_OBJECT
    public:
-    explicit PrePlotter(Device *device, ExtensionManager *manager, QWidget *parent = nullptr);
-    ~PrePlotter() override;
+    explicit ParametersToPlot(TopWindow* plotter_main_window ,Device *device, ExtensionManager *manager, QWidget *parent = nullptr);
+    ~ParametersToPlot() override;
    public slots:
-    void createPlotter(QFormScreen *form_screen);
+
     void runAndClose();
 
    private:
+    TopWindow *plotter_main_window_ = nullptr;
     ParameterBufferTableModel *model_ = nullptr;
+    ExtensionManager *manager_ = nullptr;
+    Device *device_ = nullptr;
+
 
    signals:
     void toRemove(QWidget *widget);
+
 };
 
 class ParameterBufferTableModel : public QAbstractTableModel {

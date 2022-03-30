@@ -14,7 +14,7 @@ class PseudoSyncPrmBuffer : public PrmBuffer_ifs {
     typedef double bufferType_t;
 
     PseudoSyncPrmBuffer(const Parameter_ifs *parent,
-                        size_t sample_frequency_log2,                //
+                        size_t sample_frequency_log_2,               //
                         bufferType_t *init_buffer = nullptr,         //
                         size_t intervals_buffer_length = (1 << 12),  //
                         RelativeTime buffer_interval = {0, 30}       //

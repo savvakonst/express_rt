@@ -33,7 +33,8 @@ class CAction : public QAction {
 };
 
 //-------------------------------------------------------------------------
-QFormScreen::QFormScreen(QWidget *parent) : QDialog(parent), ui_(new Ui::QFormScreen) {
+QFormScreen::QFormScreen(ExtensionManager *manager, PlotterContext_ifs *plotter_context, QWidget *parent)
+    : manager_(manager), plotter_context_(plotter_context), QDialog(parent), ui_(new Ui::QFormScreen) {
     ui_->setupUi(this);
 
     margin_.left = kDiagramOffsetLeft;
@@ -66,7 +67,7 @@ QFormScreen::QFormScreen(QWidget *parent) : QDialog(parent), ui_(new Ui::QFormSc
     current_time_.bgn = current_time_.end - time_width_;
 
     // scene
-    scene_ = new QScreenScene(this);
+    scene_ = new QScreenScene(manager, this);
 
     connect(this, &QFormScreen::toSceneChanged, scene_, &QGraphicsScene::advance);
     connect(scene_, &QScreenScene::toMarkerPlaced, this, &QFormScreen::onAddMarker);
@@ -176,12 +177,14 @@ QFormScreen::QFormScreen(QWidget *parent) : QDialog(parent), ui_(new Ui::QFormSc
     // statusbar_->showMessage(getTitle());
     p_layout->addWidget(statusbar_);
 
+    if (plotter_context_) plotter_context_->start();
     // show();
 }
 #include <QDebug>
 //-------------------------------------------------------------------------
 QFormScreen::~QFormScreen() {
     qDebug() << "~QFormScreen()";
+    delete plotter_context_;
     delete ui_;
 }
 
@@ -1650,15 +1653,6 @@ void QFormScreen::resizeEvent(QResizeEvent *event) {
     Q_UNUSED(event)
 
     onResizeScene();
-}
-
-bool QFormScreen::event(QEvent *e) {
-    if (e->type() == QEvent::WindowActivate) {
-        //  auto device_view_wrapper = (DeviceViewWrapper_ifs
-        //  *)manager_->getLastVersionExtensionObject("widget_wrapper","device_view_wrapper");
-        qDebug() << "QFormScreen::";
-    }
-    return QDialog::event(e);
 }
 
 //-------------------------------------------------------------------------

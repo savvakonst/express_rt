@@ -16,7 +16,7 @@ class ExtensionManager;
 class QScreenScene : public QGraphicsScene {
     Q_OBJECT
    public:
-    explicit QScreenScene(QWidget* parent = nullptr);
+    explicit QScreenScene(ExtensionManager* manager, QWidget* parent = nullptr);
     ~QScreenScene() override;
 
     QRect setRect(const QRect& rt_0);
@@ -41,9 +41,9 @@ class QScreenScene : public QGraphicsScene {
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
     void wheelEvent(QGraphicsSceneWheelEvent* event) override;
 
-    void dragEnterEvent(QGraphicsSceneDragDropEvent* event) override;
-    void dragMoveEvent(QGraphicsSceneDragDropEvent* event) override;
-    void dropEvent(QGraphicsSceneDragDropEvent* event) override;
+    /// void dragEnterEvent(QGraphicsSceneDragDropEvent* event) override;
+    // void dragMoveEvent(QGraphicsSceneDragDropEvent* event) override;
+    // void dropEvent(QGraphicsSceneDragDropEvent* event) override;
 
    signals:
 
