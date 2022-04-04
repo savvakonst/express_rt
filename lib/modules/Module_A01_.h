@@ -59,6 +59,8 @@ class Module_A01_ : public KSDModule {
 
     [[nodiscard]] bool isChannelAvailable(const std::string& prop_path) const override;
 
+    [[nodiscard]]  Value getChannelProperty(const std::string &channel, const std::string &type) const override;
+
     bool storeTaskToBuffer(void* pointer) const override {
         memcpy(pointer, (void*)&task_, sizeof(Task));
         return true;

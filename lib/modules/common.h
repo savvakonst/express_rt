@@ -13,6 +13,8 @@
 
 std::vector<unsigned char> createChannelsMap(const std::vector<int>& vec);
 
+const uint8_t kBaudRateLog2 = 10;
+
 template <typename ModuleClass>
 class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
 #define COUNT_OF(x) ((sizeof(x) / sizeof(0 [x])) / ((size_t)(!(sizeof(x) % sizeof(0 [x])))))
@@ -33,16 +35,23 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
         auto temp_size_buffers = size_buffers_;
         auto temp_current_buffers = current_buffers_;
 
+        // frequency of packet
+        decltype(task.cnl->frequency) min_frequency = kBaudRateLog2;
+
+        for (auto& i : task.cnl)
+            if (min_frequency > i.frequency) min_frequency = i.frequency;
+
+        idle_counter_max_ =  (size_t(1) << (kBaudRateLog2 - min_frequency))-1;
+
         for (auto& i : task.cnl) {
             int fr = i.frequency;
 
             if (0xff != fr) {
                 active_freq.push_back(fr);
 
-                auto buffer = nullptr;
-                prm_buff_vec_.push_back(buffer);
+                prm_buff_vec_.push_back(nullptr);
 
-                auto temp_size = 1 << (fr - 10);
+                size_t temp_size = 1 << (fr - min_frequency);
 
                 auto* d_ptr = new double[temp_size];
                 *(temp_buffers++) = d_ptr;
@@ -77,16 +86,28 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
             if (map_ptr == channels_map_end_) map_ptr = channels_map_;
         }
 
+        current_ptr_ = map_ptr;
+
+
+        if (idle_counter_max_ !=idle_counter_) {
+            idle_counter_++;
+            return;
+        }
+
+        idle_counter_ = 0;
+
         temp_current_buffers = current_buffers_;
 
         auto temp_prm = prm_buff_vec_.data();
-        while (temp_prm <= prm_buff_end_ptr_) {
+        while (temp_prm < prm_buff_end_ptr_) {
             *(temp_current_buffers++) = *temp_buffers;
-            if (temp_prm) (*temp_prm)->setData((char*)*(temp_buffers), *(temp_size_buffers), DataStatus::success);
+            if (*temp_prm) {
+                (*temp_prm)->setData((char*)*(temp_buffers), *(temp_size_buffers), DataStatus::success);
+            }
             (temp_prm++, temp_buffers++, temp_size_buffers++);
         }
 
-        current_ptr_ = map_ptr;
+
     }
 
     int getStatistic() override {
@@ -110,6 +131,7 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
             auto fr = task.cnl[i].frequency;
             if (0xff != fr) cnt++;
         }
+
         prm_buff_vec_[cnt] = prm_buffer;
         return true;
     }
@@ -149,6 +171,9 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
     double** buffers_ = nullptr;
     size_t* size_buffers_ = nullptr;
     double** current_buffers_ = nullptr;
+
+    size_t idle_counter_max_ = 0;
+    size_t idle_counter_ = 0;
 
 #undef COUNT_OF
 };

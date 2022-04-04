@@ -31,12 +31,16 @@ PseudoSyncPrmBuffer::PseudoSyncPrmBuffer(  //
     buffer_ = new bufferType_t[buffer_length_];
     buffer_start_pos_ = 0;
 
+
+
     { std::memset(buffer_, 0, buffer_length_ * sizeof(bufferType_t)); }
 
     if (init_buffer) {
         buffer_start_time_ = buffer_start_time_ - buffer_time_interval_;
         initBuffer((char *)init_buffer, buffer_length_);
     }
+
+
 
     ir_buffers_ = new IntervalBuffer *[1];
     *ir_buffers_ = nullptr;
@@ -52,12 +56,18 @@ PseudoSyncPrmBuffer::~PseudoSyncPrmBuffer() {
     delete[] ir_buffers;
 }
 
-Reader_ifs *PseudoSyncPrmBuffer::createIntervalBuffer() {
+Reader_ifs *PseudoSyncPrmBuffer::createReader() {
     IntervalBuffer *ir = new IntervalBuffer(this, Borders(buffer_start_time_, buffer_time_interval_));
 
     ir->seed_length_ = seed_intervals_length_;
     ir->borders_ = Borders(buffer_start_time_, buffer_time_interval_);
+
+    auto size = 2 * ir->seed_length_ + 2;
     ir->data_ = new Reader_ifs::Point[2 * ir->seed_length_ + 2];
+
+    for(size_t i=0;i<size;i++)
+        ir->data_[i] = {0,0,0,0};
+
     ir->capacity_ = getIntervalCapacity(ir->borders_);
     ir->step_ = (ir->capacity_ / ir->seed_length_);
     ir->start_pos_ = ir->capacity_ / ir->step_ + 2;

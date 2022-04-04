@@ -6,6 +6,34 @@
 #include "common/StringProcessingTools.h"
 #include "device/Device.h"
 
+class EthernetDCU_Stream : public ModuleStream_ifs {
+   public:
+    explicit EthernetDCU_Stream(Module_DCU_ *module);
+
+    ~EthernetDCU_Stream() override;
+
+    void readFramePeace(ModuleStreamContext_ifs *context, char *ptr, size_t size) override;
+
+    int getStatistic() override {
+        // TODO:
+        return 0;
+    }
+
+    const RelativeTime &getTime() const override;
+
+    const Module_ifs *getModule() override { return module_; }
+
+   protected:
+    bool lock_ = true;
+
+    RelativeTime time_;
+
+    Module_ifs *module_;
+    ModuleStream_ifs **sub_streams_;
+    size_t number_of_slots_ = 0;
+    size_t data_offset_ = 0;
+};
+
 static std::string createCHxxId(size_t slots) {
     char data[3] = {0, 0, 0};
     std::sprintf(data, "%02d", int(slots));
@@ -159,6 +187,8 @@ EthernetDCU_Stream::EthernetDCU_Stream(Module_DCU_ *module) : module_(module) {
         }
     *(ptr) = nullptr;
 
+    time_ = {0, 0};
+
     data_offset_ = 2 + 4 + number_of_slots_ * 2 + 2;
 }
 
@@ -166,11 +196,15 @@ EthernetDCU_Stream::~EthernetDCU_Stream() = default;
 
 const size_t g_cnt_offset = 6;
 
+const RelativeTime &EthernetDCU_Stream::getTime() const { return time_; }
+
 void EthernetDCU_Stream::readFramePeace(ModuleStreamContext_ifs *context, char *ptr, size_t size) {
     uint32_t time = *((uint32_t *)(ptr + 2));
 
     if ((0x3ff & time) == 0) lock_ = false;
     if (lock_) return;
+
+    time_ = time_ + RelativeTime{1 << (32 - 10), 0};
 
     ModuleStream_ifs **module_ptr = sub_streams_;
 

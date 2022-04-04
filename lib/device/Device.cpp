@@ -115,7 +115,7 @@ class EthernetDeviceStream : public ModuleStream_ifs {
 
         if (modules.empty()) return;
 
-        sub_stream_ = modules.front().second->getModuleStream();
+        sub_stream_ = modules.front().second->createModuleStream();
     }
 
     ~EthernetDeviceStream() override = default;

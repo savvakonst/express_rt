@@ -91,7 +91,12 @@ class COMMON_API_ Device : public Module_ifs {
 
     bool removeProperty(const std::string &prop_path) override { return false; }
 
-    [[nodiscard]] bool isChannelAvailable(const std::string &prop_path) const override;
+    [[nodiscard]] bool isChannelAvailable(const std::string &path) const override;
+
+    [[nodiscard]] Value getChannelProperty(const std::string &channel, const std::string &type) const override {
+        return Value();
+        ;
+    }
 
     /* not yet implemented inherited members  end*/
 

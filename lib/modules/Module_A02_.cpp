@@ -53,6 +53,14 @@ bool Module_A02_::isChannelAvailable(const std::string& prop_path) const {
     return hd->getValue().value_.u8 != 0xff;
 }
 
+Value Module_A02_::getChannelProperty(const std::string& channel, const std::string& type) const {
+    if (type == "frequency") {
+        auto hd = getProperty("cnl/" + channel + "/frequency");
+        return hd ? hd->getValue() : Value(int64_t(0xff));
+    }
+    return KSDModule::getChannelProperty(channel, type);
+}
+
 ModuleStream_ifs* Module_A02_::createModuleStream() {
     if (ethernet_stream_ != nullptr) return nullptr;
     ethernet_stream_ = new EthernetA02_Stream(this);

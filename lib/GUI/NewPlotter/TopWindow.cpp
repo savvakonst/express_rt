@@ -1,7 +1,8 @@
 //
 // Created by SVK on 27.03.2022.
 //
-
+#include "Receiver/Receiver.h"
+//
 #include <QBoxLayout>
 #include <QCoreApplication>
 #include <QDebug>
@@ -32,10 +33,16 @@ TopWindow::TopWindow(QWidget *parent) {
 
 void TopWindow::init(ExtensionManager *manager) {
     manager_ = manager;
+    device_view_wrapper_ =
+        (DeviceViewWrapper_ifs *)manager->getLastVersionExtensionObject("widget_wrapper", "device_view_wrapper");
     device_manager_ = (DeviceManager *)manager->getLastVersionExtensionObject("device_manager", "device_manager");
 }
 
 void TopWindow::dragEnterEvent(QDragEnterEvent *e) {
+    if (block_) {
+        e->ignore();
+        return;
+    }
     if (e->mimeData()->hasFormat("text/module")) {
         auto list = split(e->mimeData()->data("text/device").data(), '\n');
         if (list.size() == 1) e->acceptProposedAction();
@@ -44,29 +51,37 @@ void TopWindow::dragEnterEvent(QDragEnterEvent *e) {
 
 void TopWindow::dropEvent(QDropEvent *e) {
     if (e->mimeData()->hasFormat("text/device")) {
+        // if (block_) return;
+
         auto list = split(e->mimeData()->data("text/device").data(), '\n');
 
-        for (const auto &i : list) {
-            auto dock_widgets = findChildren<QDockWidget *>();
-            auto title = QString::fromStdString(i);
+        if (list.size() > 1) return;
+        const auto &i = list.front();
 
-            bool exists = false;
-            for (auto dock : dock_widgets)
-                if (dock->windowTitle() == title) {
-                    exists = true;
-                    break;
-                }
+        auto dock_widgets = findChildren<QDockWidget *>();
+        auto title = QString::fromStdString(i);
 
-            if (!exists) {
-                auto dock = new QDockWidget(i.data(), this);
-                auto device = device_manager_->getDeviceByPath(i);
-                auto pre_plotter = new ParametersToPlot(this, device, manager_);
-                connect(pre_plotter, &ParametersToPlot::toRemove, this, &TopWindow::onRemoveDocWidget);
-
-                dock->setAttribute(Qt::WA_DeleteOnClose);
-                dock->setWidget(pre_plotter);
-                addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, dock, Qt::Orientation::Horizontal);
+        bool exists = false;
+        for (auto dock : dock_widgets)
+            if (dock->windowTitle() == title) {
+                exists = true;
+                break;
             }
+
+        if (!exists) {
+
+
+
+            auto dock = new QDockWidget(i.data(), this);
+            auto device = device_manager_->getDeviceByPath(i);
+            auto pre_plotter = new ParametersToPlot(this, device, manager_);
+            connect(pre_plotter, &ParametersToPlot::toRemove, this, &TopWindow::onRemoveDocWidget);
+
+            dock->setAttribute(Qt::WA_DeleteOnClose);
+            dock->setWidget(pre_plotter);
+            addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, dock, Qt::Orientation::Horizontal);
+            device_view_wrapper_->setActive(device->getSource(),"");
+            block_ = true;
         }
     }
 }
@@ -101,14 +116,17 @@ ModuleStream_ifs *generateStream(ExtensionManager *manager, const std::string &t
     for (auto prm : parameters) {
         auto constructor = (prmBufferConstructor_f)manager->getLastVersionExtensionObject(type, prm->getType());
         if (constructor) {
-            auto prm_buffer = constructor(prm, manager);
             auto full_path = prm->getProperty("common/path")->getValue().asString();
 
             auto path = lastCharPos(full_path, '/');
             auto sub_modules = ::getSubmodules(device, path.first);
             if (sub_modules.size() == 1) {
-                auto m = sub_modules.front()->getModuleStream();
-                if (m) top_m_stream->addPrmBuffer(path.second, prm_buffer);
+                auto module = sub_modules.front()->getModuleStream();
+
+                if (module) {
+                    auto prm_buffer = constructor(module->getModule(), prm, manager);
+                    top_m_stream->addPrmBuffer(path.second, prm_buffer);
+                }
             }
         }
     }
@@ -123,11 +141,53 @@ ModuleStream_ifs *generateStream(ExtensionManager *manager, const std::string &t
  *
  */
 
-class OnlinePlotterContext : public PlotterContext_ifs {
-    ~OnlinePlotterContext() override = default;
-    bool start() override { return true; }
+const RelativeTime t_{30, 0};
+class Timer : public QTimer {
+   public:
+    Timer(QFormScreen *q_form_screen, ModuleStream_ifs *redused_module_stream)
+        : q_form_screen_(q_form_screen), redused_module_stream_(redused_module_stream) {
+        QObject::connect(this, &Timer::timeout, this, &Timer::onTimer);
+        setInterval(static_cast<int>(100));
+        start(static_cast<int>(0));
+    }
 
-    bool stop() override { return true; }
+   public slots:
+    void onTimer() { q_form_screen_->onRefresh(redused_module_stream_->getTime()); };
+
+   private:
+    ModuleStream_ifs *redused_module_stream_;
+    QFormScreen *q_form_screen_;
+};
+
+class OnlinePlotterContext : public PlotterContext_ifs {
+   public:
+    explicit OnlinePlotterContext(Receiver *receiver, ModuleStream_ifs *module_stream)
+        : receiver_(receiver), module_stream_(module_stream) {}
+    ~OnlinePlotterContext() override {
+        if (timer_) timer_->stop();
+        delete timer_;
+        delete receiver_;
+    };
+
+    void setPlotter(QFormScreen *q_form_screen) {
+        timer_ = new Timer(q_form_screen, module_stream_->reduce());
+        start();
+    }
+
+    bool start() override {
+        receiver_->start();
+        return true;
+    }
+
+    bool stop() override {
+        receiver_->stop();
+        return true;
+    }
+
+   private:
+    Timer *timer_ = nullptr;
+    ModuleStream_ifs *module_stream_;
+    Receiver *receiver_;
 };
 
 /*
@@ -168,13 +228,44 @@ ParametersToPlot::ParametersToPlot(TopWindow *plotter_main_window, Device *devic
     p_layout->insertWidget(0, toolbar);
 }
 
-ParametersToPlot::~ParametersToPlot() = default;
+ParametersToPlot::~ParametersToPlot() {
+    qDebug() << "ParametersToPlot::~ParametersToPlot()";
+    plotter_main_window_->block_ = false;
+};
 
 void ParametersToPlot::runAndClose() {
     auto list = model_->getParameters().toStdList();
-    auto module_stream = generateStream(manager_, "simple_online_prm_buffer", device_, list);
-    auto form_screen = new QFormScreen(manager_, new OnlinePlotterContext());
+    // auto module_stream = generateStream(manager_, "dynamic_prm_buffer", device_, list);
+
+    ModuleStream_ifs *top_m_stream = device_->createModuleStream();
+
+    auto receiver = new Receiver(top_m_stream->reduce(), device_->getSrcAddress());
+    auto plotter_context = new OnlinePlotterContext(receiver, top_m_stream);
+
+    auto form_screen = new QFormScreen(manager_, plotter_context);
+
+    for (auto prm : list) {
+        auto constructor =
+            (prmBufferConstructor_f)manager_->getLastVersionExtensionObject("dynamic_prm_buffer", prm->getType());
+        if (constructor) {
+            auto full_path = prm->getProperty("common/path")->getValue().asString();
+
+            auto path = lastCharPos(full_path, '/');
+            auto sub_modules = ::getSubmodules(device_, path.first);
+            if (sub_modules.size() == 1) {
+                auto module_stream = sub_modules.front()->getModuleStream();
+
+                if (module_stream) {
+                    auto prm_buffer = constructor(module_stream->getModule(), prm, manager_);
+                    module_stream->addPrmBuffer(path.second, prm_buffer);
+                    form_screen->addScale(prm_buffer->createReader());
+                }
+            }
+        }
+    }
+
     plotter_main_window_->addPlotter(device_->getSource() + "//", form_screen);
+    plotter_context->setPlotter(form_screen);
     emit toRemove(this);
 }
 
@@ -218,8 +309,6 @@ Qt::ItemFlags ParameterBufferTableModel::flags(const QModelIndex &index) const {
 
 bool ParameterBufferTableModel::canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
                                                 const QModelIndex &parent) const {
-    qDebug() << "Qt::DropActions ParameterTableModel::supportedDropActions()";
-
     if (data->hasFormat("text/parameter")) {
         auto list = split(data->data("text/parameter").data(), '\n');
         if (list.size() > 1) return true;

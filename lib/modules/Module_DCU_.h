@@ -8,34 +8,10 @@
 #include "KsdModule.h"
 #include "device/ModuleStream_ifs.h"
 
-class Module_DCU_;
-
-class EthernetDCU_Stream : public ModuleStream_ifs {
-   public:
-    explicit EthernetDCU_Stream(Module_DCU_ *module);
-
-    ~EthernetDCU_Stream() override;
-
-    void readFramePeace(ModuleStreamContext_ifs *context, char *ptr, size_t size) override;
-
-    int getStatistic() override {
-        // TODO:
-        return 0;
-    }
-
-    const Module_ifs *getModule() override { return module_; }
-
-   protected:
-    bool lock_ = true;
-
-    Module_ifs *module_;
-    ModuleStream_ifs **sub_streams_;
-    size_t number_of_slots_ = 0;
-    size_t data_offset_ = 0;
-};
+class EthernetDCU_Stream;
 
 class Module_DCU_ : public KSDModule {
-    friend EthernetDCU_Stream;
+    friend class EthernetDCU_Stream;
 
    protected:
 #pragma pack(1)

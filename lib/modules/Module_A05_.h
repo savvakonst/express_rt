@@ -35,7 +35,7 @@ class Module_A05_ : public KSDModule {
 
     Module_A05_(const void* ptr, size_t size, ExtensionManager* context);
 
-    ~Module_A05_();
+    ~Module_A05_() override;
 
     [[nodiscard]] std::string getID() const override { return "A05_"; }
 
@@ -47,6 +47,10 @@ class Module_A05_ : public KSDModule {
     bool setProperty(const std::string& prop_path, const Value& value) override;
     bool setPropertyAsTxt(const std::string& prop_path, const std::string& valie) override;
 
+    [[nodiscard]] bool isChannelAvailable(const std::string& prop_path) const override;
+
+    [[nodiscard]]  Value getChannelProperty(const std::string &channel, const std::string &type) const override;
+
     bool storeTaskToBuffer(void* pointer) const override {
         memcpy(pointer, (void*)&task_, sizeof(Task));
         return true;
@@ -56,6 +60,8 @@ class Module_A05_ : public KSDModule {
     ModuleStream_ifs* createModuleStream() override;
 
     [[nodiscard]] const ErrorInfo_ifs* getErrorInfo(void) const override;
+
+    [[nodiscard]] const Task& getTask() const { return task_; }
 };
 
 #endif

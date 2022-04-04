@@ -122,6 +122,8 @@ PYBIND11_MODULE(PY_BINDLIB_NAME, m) {
         .def<bool (Module_ifs::*)(const std::string &, const HierarchicalData_ifs *)>("setProperty",
                                                                                       &Module_ifs::setProperty)
         .def("setPropertyAsTxt", &Module_ifs::setPropertyAsTxt)
+        .def("isChannelAvailable", &Module_ifs::isChannelAvailable)
+        .def("getFrequency", &Module_ifs::getChannelProperty)
         .def("storeTaskToBuffer", &Module_ifs::storeTaskToBuffer)
         .def("getTaskSize", &Module_ifs::getTaskSize)
         .def("getSubModules", &Module_ifs::getSubModules, py::return_value_policy::reference)

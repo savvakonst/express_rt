@@ -36,9 +36,14 @@ class PrmBuffer_ifs {
     virtual bool lock(bool arg) = 0;
     virtual bool isLock() = 0;
 
+    virtual Reader_ifs* createReader() { return nullptr; }
+
     const Parameter_ifs* parameter_ = nullptr;
 };
 
-typedef PrmBuffer_ifs* (*prmBufferConstructor_f)(Parameter_ifs* parameter, ExtensionManager* manager);
+class Module_ifs;
+
+typedef PrmBuffer_ifs* (*prmBufferConstructor_f)(const Module_ifs* module, Parameter_ifs* parameter,
+                                                 ExtensionManager* manager);
 
 #endif

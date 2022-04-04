@@ -57,6 +57,8 @@ class Module_A07_ : public KSDModule {
     ModuleStream_ifs* createModuleStream() override;
 
     [[nodiscard]] const ErrorInfo_ifs* getErrorInfo() const override;
+
+    [[nodiscard]] const Task& getTask() const { return task_; }
 };
 
 #endif

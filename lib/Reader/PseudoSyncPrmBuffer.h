@@ -4,12 +4,12 @@
 #include <algorithm>
 #include <atomic>
 
+#include "ReaderPort.h"
 #include "common/Reader_ifs.h"
 #include "convtemplate/PrmBuffer_ifs.h"
-
 class IntervalBuffer;
 
-class PseudoSyncPrmBuffer : public PrmBuffer_ifs {
+class READER_API_ PseudoSyncPrmBuffer : public PrmBuffer_ifs {
    public:
     typedef double bufferType_t;
 
@@ -28,7 +28,7 @@ class PseudoSyncPrmBuffer : public PrmBuffer_ifs {
     void increasePoints(size_t number_of_points, IntervalBuffer *ir);
 
    public:
-    Reader_ifs *createIntervalBuffer();
+    Reader_ifs *createReader() override;
 
     void setData(char *data, size_t length, DataStatus status) override;
 

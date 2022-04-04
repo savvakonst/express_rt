@@ -25,13 +25,13 @@ class TopWindow : public QMainWindow {
     void dropEvent(QDropEvent *e) override;
     void addPlotter(const std::string &name, QFormScreen *form_screen);
 
+    bool block_ = false;
    private slots:
     void onRemoveDocWidget(QWidget *widget);
 
-
    private:
     DeviceManager *device_manager_ = nullptr;
-
+    DeviceViewWrapper_ifs *device_view_wrapper_ = nullptr;
     ExtensionManager *manager_ = nullptr;
 };
 
@@ -44,7 +44,8 @@ class ParameterBufferTableModel;
 class ParametersToPlot : public QWidget {
     Q_OBJECT
    public:
-    explicit ParametersToPlot(TopWindow* plotter_main_window ,Device *device, ExtensionManager *manager, QWidget *parent = nullptr);
+    explicit ParametersToPlot(TopWindow *plotter_main_window, Device *device, ExtensionManager *manager,
+                              QWidget *parent = nullptr);
     ~ParametersToPlot() override;
    public slots:
 
@@ -56,10 +57,10 @@ class ParametersToPlot : public QWidget {
     ExtensionManager *manager_ = nullptr;
     Device *device_ = nullptr;
 
+    QTimer *timer_ = nullptr;
 
    signals:
     void toRemove(QWidget *widget);
-
 };
 
 class ParameterBufferTableModel : public QAbstractTableModel {

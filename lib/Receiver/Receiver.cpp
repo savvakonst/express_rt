@@ -1,7 +1,7 @@
 //
 // Created by SVK on 17.11.2021.
 //
-//#include <winsock2.h>
+#include <winsock2.h>
 //
 #include "Receiver.h"
 //
@@ -52,8 +52,16 @@ std::string getWSALastErrorText() {
     return "unknown. error_code: " + std::to_string(error_code);
 }
 // 2952898752
+
+struct ReceiverHidden {
+    SOCKET sock_;
+};
+
 Receiver::Receiver(ModuleStream_ifs *m_stream, Sockaddr dst_address, Sockaddr src_address)
-    : dst_address_(dst_address), src_address_(src_address), m_stream_(m_stream) {
+    : hidden_(new ReceiverHidden{INVALID_SOCKET}),
+      dst_address_(dst_address),
+      src_address_(src_address),
+      m_stream_(m_stream) {
     WSADATA wsa;
     auto status = ::WSAStartup(MAKEWORD(2, 2), &wsa);
     if (status != 0) {
@@ -61,26 +69,27 @@ Receiver::Receiver(ModuleStream_ifs *m_stream, Sockaddr dst_address, Sockaddr sr
         return;
     }
 
-    sock_ = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (sock_ == INVALID_SOCKET) {
+    hidden_->sock_ = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (hidden_->sock_ == INVALID_SOCKET) {
         this->error_message_ = getWSALastErrorText();
         return;
     }
 
-    status = ::setsockopt(sock_, SOL_SOCKET, SO_RCVBUF, (char *)&socket_buffer_size_, sizeof(socket_buffer_size_));
+    status =
+        ::setsockopt(hidden_->sock_, SOL_SOCKET, SO_RCVBUF, (char *)&socket_buffer_size_, sizeof(socket_buffer_size_));
     if (status != 0) {
         this->error_message_ = getWSALastErrorText();
         return;
     }
 
     bool val = true;
-    status = ::setsockopt(sock_, SOL_SOCKET, SO_REUSEADDR, (char *)&val, sizeof(val));
+    status = ::setsockopt(hidden_->sock_, SOL_SOCKET, SO_REUSEADDR, (char *)&val, sizeof(val));
     if (status != 0) {
         this->error_message_ = getWSALastErrorText();
         return;
     }
 
-    status = ::bind(sock_, (const sockaddr *)&dst_address_, sizeof(dst_address_));
+    status = ::bind(hidden_->sock_, (const sockaddr *)&dst_address_, sizeof(dst_address_));
     if (status != 0) {
         this->error_message_ = getWSALastErrorText();
         return;
@@ -158,13 +167,25 @@ void receiverThread(ModuleStream_ifs *m_stream, SOCKET sock_, char *data_buffer_
 }
 
 void Receiver::start() {
+    if (in_run_) return;
+    in_run_ = true;
     cmd_ = 0;
-    thread_ = new std::thread(receiverThread, m_stream_, sock_, data_buffer_, data_buffer_size_, src_address_,
+    thread_ = new std::thread(receiverThread, m_stream_, hidden_->sock_, data_buffer_, data_buffer_size_, src_address_,
                               std::ref(cmd_));
     // thread_->join();
 }
 
 void Receiver::stop() {
+    if (!in_run_) return;
+    in_run_ = false;
     cmd_ = 1;
     thread_->join();
+}
+
+Receiver::Sockaddr::Sockaddr(EthernetAddress address) {
+    sin_family = AF_INET;
+
+    sin_port = htons(address.port);
+    sin_addr = address.ip;
+    sin_zero = 0;
 }

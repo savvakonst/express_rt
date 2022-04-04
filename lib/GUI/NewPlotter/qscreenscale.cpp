@@ -9,13 +9,15 @@ QScreenScale::QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &s
     index_ = index;
     scene_size_ = sz;
 
+    auto parameter = reader->getParameter();
+    if (parameter) s_label_ = parameter->getPropertyAsTxt("common/name").data();
     // if (index_ == 0) s_label_ = QString("синус");
     // else if (index_ == 1)
     //     s_label_ = QString("меандр");
     // else
     //     s_label_ = QString("канал_%1").arg(index_ + 1);
 
-    //parameter->getPropertyAsTxt("common/name").data()
+    // parameter->getPropertyAsTxt("common/name").data()
 
     dstx_ = dstx;
     margin_ = margin;
@@ -132,128 +134,6 @@ QScreenScale::QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &s
     drawScale();
 }
 
-QScreenScale::QScreenScale(Parameter_ifs *parameter, const int &index, const QSizeF &sz, const LineProperties &dstx,
-                           const Margin &margin, QWidget *parent) {
-    Q_UNUSED(parent)
-
-    index_ = index;
-    scene_size_ = sz;
-
-    s_label_ = QString(parameter->getPropertyAsTxt("common/name").data());
-
-    dstx_ = dstx;
-    margin_ = margin;
-    color_ = diag_colors_.at(rand() % (diag_colors_.count() - 1));
-    // QColor(rand()%255, rand()%255, rand()%255).rgb();
-
-    setFlag(QGraphicsItem::ItemIsSelectable);
-    setFlag(QGraphicsItem::ItemIsFocusable);
-    setFlag(QGraphicsItem::ItemIsMovable);
-    setFocus();
-    // setOpacity(50);
-
-    setPen(QColor(color_));
-    setPen(Qt::NoPen);
-    setCursor(Qt::PointingHandCursor);
-    setBrush(Qt::transparent);
-
-    QRectF r;
-    r.setTop(0);
-    r.setLeft(0);
-    r.setWidth(kAxisYWidth);
-    r.setHeight(kAxisYHeightDefault);
-
-    // Position
-    int i = 0;
-    int c = 0;
-    int h = scene_size_.height() - margin_.top;
-    int dx = kAxisYWidth + kAxisYDiagInterval;
-    int dy = kAxisYHeightDefault + kAxisYDiagInterval;
-    qreal n = floor(h / dy);
-    for (int j = 0; j < index_; ++j) {
-        i++;
-        if (i >= n) {
-            i = 0;
-            c++;
-        }
-    }
-    qreal x = (dx * c) + kScreenOffsetLeft;
-    qreal y = (dy * i) + margin_.top;
-
-    setRect(r);
-    setPos(x, y);
-
-
-
-    img_diag_ = new QImage;
-    img_scale_ = new QImage;
-
-    // Popup Menu
-    act_settings_ = new QAction(QIcon("://settings"), tr("Настройки"), this);
-    connect(act_settings_, &QAction::triggered, this, &QScreenScale::onSettingsShow);
-
-    act_level_add_ = new QAction(QIcon("://"), tr("Добавить уровень"), this);
-    connect(act_level_add_, &QAction::triggered, this, &QScreenScale::onAddLevelBegin);
-
-    act_align_t_ = new QAction(tr("Поверху"), this);
-    connect(act_align_t_, &QAction::triggered, this, &QScreenScale::onAlignT);
-
-    act_align_b_ = new QAction(tr("Понизу"), this);
-    connect(act_align_b_, &QAction::triggered, this, &QScreenScale::onAlignB);
-
-    act_align_l_ = new QAction(tr("Слева"), this);
-    connect(act_align_l_, &QAction::triggered, this, &QScreenScale::onAlignL);
-
-    act_align_r_ = new QAction(tr("Справа"), this);
-    connect(act_align_r_, &QAction::triggered, this, &QScreenScale::onAlignR);
-
-    act_align_h_ = new QAction(tr("По высоте"), this);
-    connect(act_align_h_, &QAction::triggered, this, &QScreenScale::onAlignH);
-
-    menu_align_ = new QMenu(tr("Выровнять"));
-    menu_align_->addAction(act_align_t_);
-    menu_align_->addAction(act_align_b_);
-    menu_align_->addAction(act_align_l_);
-    menu_align_->addAction(act_align_r_);
-    menu_align_->addAction(act_align_h_);
-
-    act_scale_auto_ = new QAction(tr("Авто"), this);
-    // actScaleAuto->setShortcut(Qt::Key_Y);
-    connect(act_scale_auto_, &QAction::triggered, this, &QScreenScale::onScaleAuto);
-
-    act_scale_fix_ = new QAction(tr("Зафиксировать"), this);
-    // actScaleFix->setShortcut(Qt::CTRL + Qt::Key_Y);
-    connect(act_scale_fix_, &QAction::triggered, this, &QScreenScale::onScaleFix);
-
-    menu_scale_ = new QMenu(tr("Границы"));
-    menu_scale_->addAction(act_scale_auto_);
-    menu_scale_->addAction(act_scale_fix_);
-
-    act_remove_ = new QAction(QIcon("://close"), tr("Удалить"), this);
-    connect(act_remove_, &QAction::triggered, this, &QScreenScale::onRemove);
-
-    setTemporaryValues(0, 0);  //
-
-
-    p_ = createNewPrmBufferSimulator(16, 1 << 12, {0, 30}, (0.1 * (2 - index_)));
-
-    ControlLevel lvl;
-
-    lvl.cross = false;
-    lvl.value = -0.75;
-    levels_.push_back(lvl);
-
-    SinglePrm prm;
-
-    prm.rdr = getReaderExample(p_);
-    prm.buf = new Reader_ifs::Point[(int)kMaxScreenWidth];
-    prm.plevels = &levels_;
-
-    parameters_.push_back(std::move(prm));
-    //
-
-    drawScale();
-}
 //-------------------------------------------------------------------------
 QScreenScale::~QScreenScale() = default;
 //-------------------------------------------------------------------------

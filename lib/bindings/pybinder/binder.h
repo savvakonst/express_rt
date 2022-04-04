@@ -170,8 +170,11 @@ class PyModule : public Module_ifs {
         PYBIND11_OVERRIDE_PURE(bool, Module_ifs, removeProperty, prop_path);
     }
 
-    bool isChannelAvailable(const std::string &prop_path) const override {
+    [[nodiscard]] bool isChannelAvailable(const std::string &prop_path) const override {
         PYBIND11_OVERRIDE_PURE(bool, Module_ifs, isChannelAvailable, prop_path);
+    }
+    [[nodiscard]] Value getChannelProperty(const std::string &channel, const std::string &type) const override {
+        PYBIND11_OVERRIDE_PURE(Value, Module_ifs, getChannelProperty, channel, type);
     }
 
     [[nodiscard]] bool storeTaskToBuffer(void *pointer) const override {
@@ -291,14 +294,12 @@ class PyParameterViewWrapper : public ParameterViewWrapper_ifs {
    public:
     QWidget *getWidget() override { return nullptr; }
 
-
-
     status addSignal(Signal_ifs *signal) override {
         PYBIND11_OVERRIDE_PURE(status, ParameterViewWrapper_ifs, addSignal, signal);
     }
 
-    ConversionTemplate* currentConversionTemplate() override{
-        PYBIND11_OVERRIDE_PURE(ConversionTemplate*, ParameterViewWrapper_ifs, currentConversionTemplate);
+    ConversionTemplate *currentConversionTemplate() override {
+        PYBIND11_OVERRIDE_PURE(ConversionTemplate *, ParameterViewWrapper_ifs, currentConversionTemplate);
     }
 
     bool setActive(size_t row_index) override {

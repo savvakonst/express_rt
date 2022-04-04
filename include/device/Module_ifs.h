@@ -55,7 +55,9 @@ class COMMON_API_ Module_ifs : public Properties_ifs {
 
     bool removeProperty(const std::string &prop_path) override = 0;  // { return false;}
 
-    [[nodiscard]] virtual bool isChannelAvailable(const std::string &prop_path) const = 0;
+    [[nodiscard]] virtual bool isChannelAvailable(const std::string &path) const = 0;
+
+    [[nodiscard]] virtual Value getChannelProperty(const std::string &channel, const std::string &type) const = 0;
 
     [[nodiscard]] virtual bool storeTaskToBuffer(void *pointer) const = 0;
 

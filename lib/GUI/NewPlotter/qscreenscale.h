@@ -109,8 +109,6 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
     explicit QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &sz, const LineProperties &dstx,
                           const Margin &margin, QWidget *parent);
 
-    explicit QScreenScale(Parameter_ifs *prm, const int &index, const QSizeF &sz, const LineProperties &dstx,
-                          const Margin &margin, QWidget *parent = nullptr);
 
     ~QScreenScale() override;
 

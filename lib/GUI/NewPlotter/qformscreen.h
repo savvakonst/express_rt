@@ -52,8 +52,6 @@ class QFormScreen : public QDialog {
 
     QScreenScale *addScale(Reader_ifs *reader);
 
-    QScreenScale *addScale(Parameter_ifs *prm);
-
     QScreenScale *getScale(const int &index);
 
     int scale_index_ = -1;
@@ -65,7 +63,6 @@ class QFormScreen : public QDialog {
     void onExit();
 
     // void onIndexReduce(const int &index_0);
-    void onDropParameter(const QPointF &pt, const std::string &name);
 
     void onRefresh(const RelativeTime &t, bool zoomed = false);
 

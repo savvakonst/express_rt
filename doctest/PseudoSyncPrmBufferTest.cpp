@@ -37,8 +37,8 @@ TEST_CASE("Check PseudoSyncPrmBuffer") {
         long_intervals->setData((char*)long_buffer, long_size, DataStatus::success);
     }
 
-    auto short_reader = (IntervalBuffer*)short_intervals->createIntervalBuffer();
-    auto long_reader = (IntervalBuffer*)long_intervals->createIntervalBuffer();
+    auto short_reader = (IntervalBuffer*)short_intervals->createReader();
+    auto long_reader = (IntervalBuffer*)long_intervals->createReader();
 
     {
         bool reader_buffers_are_similar = true;

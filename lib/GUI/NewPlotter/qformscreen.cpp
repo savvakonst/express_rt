@@ -72,7 +72,6 @@ QFormScreen::QFormScreen(ExtensionManager *manager, PlotterContext_ifs *plotter_
     connect(this, &QFormScreen::toSceneChanged, scene_, &QGraphicsScene::advance);
     connect(scene_, &QScreenScene::toMarkerPlaced, this, &QFormScreen::onAddMarker);
     connect(scene_, &QScreenScene::toMenuCalled, this, &QFormScreen::onPopupMenuAdd);
-    connect(scene_, &QScreenScene::toDropParameter, this, &QFormScreen::onDropParameter);
 
     ui_->graphicsView->setScene(scene_);
     ui_->graphicsView->setMouseTracking(true);
@@ -177,7 +176,7 @@ QFormScreen::QFormScreen(ExtensionManager *manager, PlotterContext_ifs *plotter_
     // statusbar_->showMessage(getTitle());
     p_layout->addWidget(statusbar_);
 
-    if (plotter_context_) plotter_context_->start();
+
     // show();
 }
 #include <QDebug>
@@ -253,12 +252,6 @@ QScreenScale *QFormScreen::addScale(Reader_ifs *reader) {
     return addScale(p_scale);
 }
 
-QScreenScale *QFormScreen::addScale(Parameter_ifs *prm) {
-    auto *p_scale =
-        new QScreenScale(prm, scales_.count(), QSizeF(scene_->width(), scene_->height()), lining_, margin_, this);
-    return addScale(p_scale);
-}
-
 //-------------------------------------------------------------------------
 QScreenScale *QFormScreen::getScale(const int &index) {
     if (index >= scales_.count()) return nullptr;
@@ -268,19 +261,6 @@ QScreenScale *QFormScreen::getScale(const int &index) {
 //-------------------------------------------------------------------------
 void QFormScreen::onExit() {}
 //-------------------------------------------------------------------------
-
-//-------------------------------------------------------------------------
-
-void QFormScreen::onDropParameter(const QPointF &pt, const std::string &name) {
-    auto parameter_view_wrapper =
-        (ParameterViewWrapper_ifs *)manager_->getLastVersionExtensionObject("widget_wrapper", "parameter_view_wrapper");
-    auto cnv_template = parameter_view_wrapper->currentConversionTemplate();
-
-    if (cnv_template) {
-        auto parameter = (Parameter_ifs *)cnv_template->getParameter(name);
-        if (parameter) addScale(parameter);
-    }
-}
 
 //-------------------------------------------------------------------------
 

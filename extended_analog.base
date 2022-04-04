@@ -593,7 +593,7 @@
   "Parameters.List.Analog": [
     {
       " Name": "analog_A01_",
-      "Line": 4
+      "Line": 1
     },
     {
       " Name": "analog_A05_",

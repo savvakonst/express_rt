@@ -8,6 +8,9 @@
 
 #include "PseudoSyncPrmBuffer.h"
 
+IntervalBuffer::IntervalBuffer(PseudoSyncPrmBuffer *parent, const Borders &borders)
+    : parent_(parent), borders_(borders) {}
+
 bool IntervalBuffer::lock(bool arg) { return parent_->lock(arg); }
 
 bool IntervalBuffer::isLock() { return parent_->is_locked_; }

@@ -146,6 +146,10 @@ class KSDModule : public Module_ifs {
 
     [[nodiscard]] bool isChannelAvailable(const std::string &prop_path) const override;
 
+    [[nodiscard]] Value getChannelProperty(const std::string &prop_path, const std::string &type) const override {
+        return Value();
+    }
+
     [[nodiscard]] std::vector<std::pair<std::string, Module_ifs *>> getSubModules() const override { return {}; }
 
     ModuleStream_ifs *getModuleStream() { return ethernet_stream_; }

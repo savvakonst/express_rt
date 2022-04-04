@@ -7,17 +7,19 @@
 
 #include <memory>
 
+#include "ReaderPort.h"
 #include "common/Reader_ifs.h"
 #define EXRT_remainder(X, Y) (((X) < (Y)) ? (X) : (X - Y))
 
 class PseudoSyncPrmBuffer;
 class Parameter_ifs;
 
-class IntervalBuffer : public Reader_ifs {
+class READER_API_ IntervalBuffer : public Reader_ifs {
    public:
     Parameter_ifs *getParameter() override;
 
-    IntervalBuffer(PseudoSyncPrmBuffer *parent, const Borders &borders) : parent_(parent), borders_(borders){};
+    IntervalBuffer(PseudoSyncPrmBuffer *parent, const Borders &borders);
+    ;
     ~IntervalBuffer() override { delete[] data_; }
 
     std::unique_ptr<Reader_ifs::Chunk> getPoints(const Borders &borders, Point *ptr, size_t target_len) override;

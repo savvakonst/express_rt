@@ -1,7 +1,7 @@
 #ifndef EXRT_RECEIVER_H
 #define EXRT_RECEIVER_H
 
-#include <winsock2.h>
+//#include <winsock2.h>
 
 #include <atomic>
 #include <string>
@@ -15,19 +15,15 @@ namespace std {
 class thread;
 }
 
+struct ReceiverHidden;
+
 class Receiver : public BaseClass_ifs {
    public:
     struct Sockaddr {
         Sockaddr(uint16_t sin_family, uint16_t sin_port, uint32_t sin_addr, uint64_t sin_zero)
             : sin_family(sin_family), sin_port(sin_port), sin_addr(sin_addr), sin_zero(sin_zero) {}
 
-        Sockaddr(EthernetAddress address) {
-            sin_family = AF_INET;
-
-            sin_port = htons(address.port);
-            sin_addr = address.ip;
-            sin_zero = 0;
-        }
+        explicit Sockaddr(EthernetAddress address);
 
         uint16_t sin_family;
         uint16_t sin_port;
@@ -36,7 +32,7 @@ class Receiver : public BaseClass_ifs {
     };
 
     explicit Receiver(ModuleStream_ifs *m_stream_,
-                      Sockaddr dst_address = {AF_INET, htons(4660), inet_addr("192.168.0.176"), 0},
+                      Sockaddr dst_address /*= {AF_INET, htons(4660), inet_addr("192.168.0.176"), 0}*/,
                       const Sockaddr src_address = Sockaddr{0, 0, 0, 0});
 
     explicit Receiver(ModuleStream_ifs *m_stream, const EthernetSettings &ethernet_settings);
@@ -49,7 +45,10 @@ class Receiver : public BaseClass_ifs {
    protected:
     ModuleStream_ifs *m_stream_ = nullptr;
 
-    SOCKET sock_ = INVALID_SOCKET;
+    ReceiverHidden *hidden_;
+
+    bool in_run_ = false;
+
     const Sockaddr src_address_;
     const Sockaddr dst_address_;
 

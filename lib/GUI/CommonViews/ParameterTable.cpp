@@ -192,7 +192,6 @@ bool ParameterTableModel::dropMimeData(const QMimeData *data, Qt::DropAction act
 
 bool ParameterTableModel::canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
                                           const QModelIndex &parent) const {
-    qDebug() << "Qt::DropActions ParameterTableModel::supportedDropActions()";
     return QAbstractItemModel::canDropMimeData(data, action, row, column, parent);
 }
 

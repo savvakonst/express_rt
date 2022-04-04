@@ -179,7 +179,7 @@ Reader_ifs* getReaderExample(PrmBuffer_ifs* arg) {
 
     while (false == pbf->lock(true)) {
     }
-    auto ret = pbf->createIntervalBuffer();
+    auto ret = pbf->createReader();
     pbf->lock(false);
     return ret;
 }
