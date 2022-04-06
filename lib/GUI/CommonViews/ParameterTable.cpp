@@ -13,7 +13,7 @@
 #include "convtemplate/ConversionTemplate.h"
 #include "convtemplate/ConversionTemplateManager.h"
 #include "convtemplate/Parameter_ifs.h"
-#include "device/Device.h"
+#include "device/Device_ifs.h"
 //
 #include "ParameterTable.h"
 

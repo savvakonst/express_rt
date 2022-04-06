@@ -14,7 +14,8 @@ class READER_API_ PseudoSyncPrmBuffer : public PrmBuffer_ifs {
     typedef double bufferType_t;
 
     PseudoSyncPrmBuffer(const Parameter_ifs *parent,
-                        size_t sample_frequency_log_2,               //
+                        size_t sample_frequency_log_2,  //
+                        double factor = 1, bool is_signed = true,
                         bufferType_t *init_buffer = nullptr,         //
                         size_t intervals_buffer_length = (1 << 12),  //
                         RelativeTime buffer_interval = {0, 30}       //
@@ -39,6 +40,9 @@ class READER_API_ PseudoSyncPrmBuffer : public PrmBuffer_ifs {
     bool isLock() override;
 
    protected:
+    double factor_;
+    bool is_signed_;
+
     std::atomic_bool updating_borders_ = false;
 
     std::atomic_bool is_locked_ = false;

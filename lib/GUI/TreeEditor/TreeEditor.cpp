@@ -290,7 +290,7 @@ class TreeNumEdit : public QLineEdit {
 
    private:
     void initSettings() {
-        QRegExp rx(R"([0-9]*)");
+        QRegExp rx(R"([0-9]*(.[0-9]+)?)");
         validator_ = new QRegExpValidator(rx);
         setValidator(validator_);
     }

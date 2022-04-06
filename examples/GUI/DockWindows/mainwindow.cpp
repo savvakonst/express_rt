@@ -12,7 +12,7 @@
 #include "common/StringProcessingTools.h"
 #include "convtemplate/Parameter_ifs.h"
 #include "convtemplate/PrmBuffer_ifs.h"
-#include "device/Device.h"
+#include "device/Device_ifs.h"
 #include "mainwindow.h"
 
 //#include "Ping/ksdconnected.h"

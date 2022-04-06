@@ -234,6 +234,52 @@ inline ArbitraryData copyArbitraryData(const void *ptr, DataType type) {
     return res;
 }
 
+#define TRANSFORM_CASE(TARGET, FROM)    \
+case DataType::FROM: {                  \
+    return (TARGET)arbitrary_data.FROM; \
+}
+
+#define TRANSFORM_MATRIX(TARGET) \
+    TRANSFORM_CASE(TARGET, i8)   \
+    TRANSFORM_CASE(TARGET, i16)  \
+    TRANSFORM_CASE(TARGET, i32)  \
+    TRANSFORM_CASE(TARGET, i64)  \
+    TRANSFORM_CASE(TARGET, u8)   \
+    TRANSFORM_CASE(TARGET, u16)  \
+    TRANSFORM_CASE(TARGET, u32)  \
+    TRANSFORM_CASE(TARGET, u64)
+
+template <typename T>
+T castTo(const ArbitraryData &arbitrary_data, DataType src_type) {
+    switch (src_type) {
+    case DataType::i8:
+        return (T)arbitrary_data.i8;
+    case DataType::i16:
+        return (T)arbitrary_data.i16;
+    case DataType::i32:
+        return (T)arbitrary_data.i32;
+    case DataType::i64:
+        return (T)arbitrary_data.i64;
+    case DataType::u8:
+        return (T)arbitrary_data.u8;
+    case DataType::u16:
+        return (T)arbitrary_data.u16;
+    case DataType::u32:
+        return (T)arbitrary_data.u32;
+    case DataType::u64:
+        return (T)arbitrary_data.u64;
+    case DataType::f32:
+        return (T)arbitrary_data.f32;
+    case DataType::f64:
+        return (T)arbitrary_data.f64;
+    default:
+        return (T)0;
+    }
+    return (T)0;
+}
+
+ArbitraryData castFromTo(const ArbitraryData &arbitrary_data, DataType src_type, DataType target_type);
+
 struct Value {
     Value() : type_(DataType::none_v) {}
 
@@ -248,11 +294,18 @@ struct Value {
     }
 
     Value(const Value &arg, DataType target_type) : type_(DataType::none_v) {
-        if (arg.type_ == type_) {
+        if (arg.type_ == target_type) {
             value_ = copyArbitraryData(arg.value_, arg.type_);
             type_ = arg.type_;
         } else if (isInt(arg.type_)) {
-            if (!isInt(target_type)) return;
+            if (!isInt(target_type)) {
+                if (target_type == DataType::f64) value_.f64 = castTo<double>(arg.value_, arg.type_);
+                else if (target_type == DataType::f32)
+                    value_.f32 = castTo<float>(arg.value_, arg.type_);
+                type_ = target_type;
+                return;
+            }
+
             auto s = getTSize(arg.type_);
             if (((int8_t *)&(arg.value_))[s - 1] < 0) value_.i64 = -1;
             else
@@ -265,7 +318,12 @@ struct Value {
             type_ = target_type;
             value_ = copyArbitraryData(arg.value_, arg.type_);
         } else if (isFloat(arg.type_)) {
-            if (!isFloat(target_type)) return;
+            if (!isFloat(target_type)) {
+                value_ = castFromTo(arg.value_, arg.type_, target_type);
+                type_ = target_type;
+                return;
+            }
+
             type_ = target_type;
             if (arg.type_ == DataType::f64) value_.f32 = (float)arg.value_.f64;
             else if (arg.type_ == DataType::f32)

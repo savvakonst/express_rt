@@ -164,7 +164,7 @@ DeviceListModel::TreeNode *DeviceListModel::getTreeNode(const std::string &sourc
     if (path.empty()) {
         TreeNode *node = nullptr;
         for (auto i : root_->child_vector)
-            if (source == ((Device *)i->m_object)->getSource()) {
+            if (source == ((Device_ifs *)i->m_object)->getSource()) {
                 node = i;
                 break;
             }
@@ -260,7 +260,7 @@ void DeviceListModel::TreeNode::addNodesRecursively(Module_ifs *ptr, const std::
 
 std::pair<std::string, std::string> DeviceListModel::TreeNode::getPath() const {
     if (parent == nullptr) return {};
-    if (isDevice()) return {((Device *)m_object)->getSource(), ""};
+    if (isDevice()) return {((Device_ifs *)m_object)->getSource(), ""};
 
     std::string path = path_chunk;
     auto ptr = parent;
@@ -268,7 +268,7 @@ std::pair<std::string, std::string> DeviceListModel::TreeNode::getPath() const {
         path = ptr->path_chunk + "/" + path;
         ptr = ptr->parent;
     }
-    auto dev = (Device *)ptr->m_object;
+    auto dev = (Device_ifs *)ptr->m_object;
     return {dev->getSource(), dev->getID() + "/" + path};
 }
 
@@ -410,9 +410,9 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
         return !list.empty();
     }
 
-    Device *getActiveDevice() override {
+    Device_ifs *getActiveDevice() override {
         auto node = model_->getActiveDevice();
-        return node ? (Device *)node->m_object : nullptr;
+        return node ? (Device_ifs *)node->m_object : nullptr;
     };
 
     std::string getActiveDeviceSource() override { return getActiveDevice()->getSource(); }

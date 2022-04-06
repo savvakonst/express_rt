@@ -15,7 +15,7 @@
 #include "ReaderExample/ReaderExample.h"
 #include "TopWindow.h"
 #include "common/Extension.h"
-#include "device/Device.h"
+#include "device/Device_ifs.h"
 
 InitExtension(ExtensionInfo *) initModules(void);
 
@@ -63,7 +63,7 @@ void TopWindow::initScene() {
     }
     auto v = devices.front()->getTask();
 
-    Device device = Device(v.data(), v.size(), manager_);
+    Device_ifs device = Device_ifs(v.data(), v.size(), manager_);
 
     if (device.hasTransceiver()) {
         ModuleStream_ifs *m_stream = device.getTopModule()->createModuleStream();

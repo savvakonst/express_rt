@@ -7,7 +7,7 @@
 #include "Ping/ksdconnected.h"
 #include "common/Extension.h"
 #include "common/ExtensionManager.h"
-#include "device/Device.h"
+#include "device/Device_ifs.h"
 #include "qformscreen.h"
 /*
 int main(int argc, char *argv[]) {

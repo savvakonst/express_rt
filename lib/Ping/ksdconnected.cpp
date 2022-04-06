@@ -497,20 +497,21 @@ bool KsdConnected::ask() {
                                       transferred);
         if (status) break;
 
-        record_modules_map_buffer_.resize(sizeof(TNMLIB_RECORD_MODULES_MAP));
-        // record_modules_map_buffer_.fill(0);
+        record_modules_map_.resize(TNMLIB_CFG_MAX_MODULES_ENTRIES);
+        // record_modules_map_.fill(0);
 
-        auto *ksd_rmm = reinterpret_cast<TNMLIB_RECORD_MODULES_MAP *>(record_modules_map_buffer_.data());
+        // auto *ksd_rmm = reinterpret_cast<TNMLIB_RECORD_MODULES_MAP *>(record_modules_map_buffer_.data());
+
+        // auto *ksd_rmm = reinterpret_cast<TNMLIB_RECORD_MODULES_MAP *>(record_modules_map_.data());
 
         for (int j = 0; j < TNMLIB_CFG_MAX_MODULES_ENTRIES; j++) {
             auto *udp_mi = reinterpret_cast<ModuleInfo *>(&record_modules_map.module_info[j]);
-            auto *ksd_mi = reinterpret_cast<TNMLIB_RECORD_MODULE_INFO *>(&ksd_rmm->MI[j]);
-
-            ksd_mi->dwModuleID = udp_mi->mid.id;
-            ksd_mi->wSerialNumber = udp_mi->mid.serial_number;
-            ksd_mi->wVersion = udp_mi->mid.version;
-            ksd_mi->iMIBAddress = int32_t(udp_mi->mib_addr);
-            ksd_mi->uiStatus = udp_mi->status;
+            auto ksd_mi = &record_modules_map_[j];
+            ksd_mi->module_id = udp_mi->mid.id;
+            ksd_mi->serial_number = udp_mi->mid.serial_number;
+            ksd_mi->version = udp_mi->mid.version;
+            ksd_mi->mib_address = int32_t(udp_mi->mib_addr);
+            ksd_mi->status = udp_mi->status;
         }
 
         uint32_t task_size;
@@ -546,7 +547,7 @@ std::string KsdConnected::getSource() const {
 const std::vector<char> &KsdConnected::getTask() const { return task_buffer_; }
 
 //-------------------------------------------------------------------------
-const std::vector<char> &KsdConnected::getRecordModulesMap() const { return record_modules_map_buffer_; }
+const std::vector<TNMLIB_RECORD_MODULE_INFO> &KsdConnected::getRecordModulesMap() const { return record_modules_map_; }
 
 /*
  *

@@ -8,7 +8,7 @@
 #include "convtemplate/ConversionTemplate.h"
 #include "convtemplate/Parameter_ifs.h"
 #include "convtemplate/PrmBuffer_ifs.h"
-#include "device/Device.h"
+#include "device/Device_ifs.h"
 #include "device/ModuleStream_ifs.h"
 #include "ui_qformscreen.h"
 //
@@ -175,7 +175,6 @@ QFormScreen::QFormScreen(ExtensionManager *manager, PlotterContext_ifs *plotter_
     statusbar_->addPermanentWidget(progress_);
     // statusbar_->showMessage(getTitle());
     p_layout->addWidget(statusbar_);
-
 
     // show();
 }

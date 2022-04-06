@@ -153,11 +153,15 @@ void receiverThread(ModuleStream_ifs *m_stream, SOCKET sock_, char *data_buffer_
         auto length =
             recvfrom(sock_, data_buffer_, data_buffer_size_, 0, (sockaddr *)&source_address, &source_address_length);
 
+
+
         if (length == SOCKET_ERROR) {
             std::cout << getWSALastErrorText() << "\n";
             return;
         }
-        m_stream->readFramePeace(nullptr, data_buffer_, length);
+
+        //if (3372263616 == source_address.sin_addr)
+            m_stream->readFramePeace(nullptr, data_buffer_, length);
         // std::cout << "received from: " << source_address.sin_addr << "\n";
         if (cmd_) {
             return;

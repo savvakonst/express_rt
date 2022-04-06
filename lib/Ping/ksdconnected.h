@@ -48,7 +48,7 @@ class KsdConnected {
     [[nodiscard]] std::string getSource() const;
 
     [[nodiscard]] const std::vector<char> &getTask() const;
-    [[nodiscard]] const std::vector<char> &getRecordModulesMap() const;
+    [[nodiscard]] const std::vector<TNMLIB_RECORD_MODULE_INFO> &getRecordModulesMap() const;
 
     [[maybe_unused]] bool hasError() { return !error_msg_.empty(); }
     std::string getErrorMsg() { return error_msg_; }
@@ -67,7 +67,7 @@ class KsdConnected {
     uint32_t device_id_ = 0;
 
     std::vector<char> task_buffer_;
-    std::vector<char> record_modules_map_buffer_;
+    std::vector<TNMLIB_RECORD_MODULE_INFO> record_modules_map_;
 
     uint16_t sequence_id_ = 0;
     uint16_t sequence_cnt_ = 0;

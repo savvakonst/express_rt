@@ -6,8 +6,8 @@
 //
 #include "KsdIO.h"
 #include "common/ExtensionManager.h"
-#include "device/Device.h"
 #include "device/DeviceManager.h"
+#include "device/Device_ifs.h"
 //
 #include "KsdApi/tnmdefs.h"
 
@@ -40,11 +40,13 @@ bool KsdIO::readDocument(ExtensionManager *manager, const std::string &source_pa
         std::unique_ptr<char[]> u_buffer(new char[task_size]);
         in.read(u_buffer.get(), std::streamsize(task_size));
 
-        std::unique_ptr<Device> device(new Device(u_buffer.get(), task_size, manager));
+        std::unique_ptr<Device_ifs> device(new Device_ifs(u_buffer.get(), task_size, manager));
 
         device->setSource("file://" + source_path);
+        device
+            ->
 
-        device_manager->addDevice(device.release());
+            device_manager->addDevice(device.release());
         return true;
     }
     return false;

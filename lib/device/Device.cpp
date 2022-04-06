@@ -3,7 +3,7 @@
 //
 #include "common/ExtensionManager.h"
 #include "common/StringProcessingTools.h"
-#include "device/Device.h"
+#include "device/Device_ifs.h"
 #include "device/ModuleStream_ifs.h"
 
 // TODO:
@@ -22,7 +22,7 @@ struct MODULE_HEADER {
 };
 #pragma pack()
 
-Device::Device(const void *ptr, size_t size, ExtensionManager *context) {
+Device_ifs::Device_ifs(const void *ptr, size_t size, ExtensionManager *context) {
     auto manager = (ExtensionManager *)context;
 
     if (size < sizeof(TaskHeader)) {
@@ -57,32 +57,32 @@ Device::Device(const void *ptr, size_t size, ExtensionManager *context) {
     // modules_.push_back()
 }
 
-Device::~Device() = default;
+Device_ifs::~Device_ifs() = default;
 
-bool Device::hasTransceiver() const {
+bool Device_ifs::hasTransceiver() const {
     for (auto i : modules_)
         if (i->hasTransceiver()) return true;
 
     return false;
 }
 
-EthernetSettings Device::getSrcAddress() const {
+EthernetSettings Device_ifs::getSrcAddress() const {
     for (auto i : modules_) {
         if (i->hasTransceiver()) return i->getSrcAddress();
     }
     return {};
 }
 
-std::string Device::getID() const { return stringId(task_header_.device_id); }
+std::string Device_ifs::getID() const { return stringId(task_header_.device_id); }
 
-std::list<Module_ifs *> Device::getSubModulesFromPath(const std::string &modules_path) const {
+std::list<Module_ifs *> Device_ifs::getSubModulesFromPath(const std::string &modules_path) const {
     std::list<Module_ifs *> ret_list;
     for (auto i : modules_) ret_list.splice(ret_list.cend(), ::getSubmodules(i, modules_path));
 
     return ret_list;
 }
 
-std::vector<std::pair<std::string, Module_ifs *>> Device::getSubModules() const {
+std::vector<std::pair<std::string, Module_ifs *>> Device_ifs::getSubModules() const {
     std::vector<std::pair<std::string, Module_ifs *>> ret;
 
     ret.reserve(modules_.size());
@@ -97,7 +97,7 @@ std::vector<std::pair<std::string, Module_ifs *>> Device::getSubModules() const 
     return ret;
 }
 
-bool Device::isChannelAvailable(const std::string &prop_path) const {
+bool Device_ifs::isChannelAvailable(const std::string &prop_path) const {
     auto path = lastCharPos(prop_path, '/');
     auto modules = getSubModulesFromPath(path.first);  //::getSubmodules(this, path.first);
 
@@ -106,11 +106,11 @@ bool Device::isChannelAvailable(const std::string &prop_path) const {
     return false;
 }
 
-size_t Device::getTaskSize() const { return size_; }
+size_t Device_ifs::getTaskSize() const { return size_; }
 
 class EthernetDeviceStream : public ModuleStream_ifs {
    public:
-    explicit EthernetDeviceStream(Device *device) : device_(device) {
+    explicit EthernetDeviceStream(Device_ifs *device) : device_(device) {
         auto modules = device->getSubModules();
 
         if (modules.empty()) return;
@@ -131,19 +131,19 @@ class EthernetDeviceStream : public ModuleStream_ifs {
     ModuleStream_ifs *reduce() override { return sub_stream_; }
 
    protected:
-    Device *device_{};
+    Device_ifs *device_{};
     ModuleStream_ifs *sub_stream_ = nullptr;
 };
 
-ModuleStream_ifs *Device::createModuleStream() {
+ModuleStream_ifs *Device_ifs::createModuleStream() {
     if (current_stream_) return nullptr;
     current_stream_ = new EthernetDeviceStream(this);
     return current_stream_;
 }
 
-ModuleStream_ifs *Device::getModuleStream() { return current_stream_; }
+ModuleStream_ifs *Device_ifs::getModuleStream() { return current_stream_; }
 
-bool Device::removeModuleStream() {
+bool Device_ifs::removeModuleStream() {
     delete current_stream_;
     if (current_stream_) {
         current_stream_ = nullptr;

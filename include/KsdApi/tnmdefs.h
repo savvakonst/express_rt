@@ -47,64 +47,64 @@ typedef struct _TNMLIB_DEVICE_DATE {
 typedef struct _TNMLIB_DEVICE_TIME {
     union {
         struct {
-            uint8_t bHour;
-            uint8_t bMinute;
-            uint8_t bSecond;
-            uint8_t bMillisecond;
+            uint8_t hour;
+            uint8_t minute;
+            uint8_t second;
+            uint8_t millisecond;
         };
-        uint32_t dwUTime;
+        uint32_t u_time;
     };
 } TNMLIB_DEVICE_TIME, *LPTNMLIB_DEVICE_TIME;
 
 typedef struct _TNMLIB_DEVICE_VERSION_INFO {
-    uint16_t wTNVersion;
-    uint16_t wTNSerialNumber;
+    uint16_t tn_version;
+    uint16_t tn_serial_number;
 } TNMLIB_DEVICE_VERSION_INFO, *LPTNMLIB_DEVICE_VERSION_INFO;
 
 typedef struct _TNMLIB_DEVICE_MEMORY_INFO {
-    uint64_t ldwTotalMainMemorySize;
-    uint64_t ldwInstalledMainMemorySize;
-    uint64_t ldwFreeMainMemorySize;
-    uint32_t dwRecordsMemorySize;
-    uint32_t dwTasksMemorySize;
-    uint32_t dwBadBlocksMemorySize;
-    uint32_t dwBlockSize;
-    uint32_t dwNumberOfMainMemoryChips;
-    uint32_t dwNumberOfRecords;
-    uint32_t dwNumberOfTasks;
-    uint32_t dwNumberOfBadBlocks;
-    uint32_t dwNumberOfMemoryTypes;
-    uint8_t Reserved[4];
+    uint64_t total_main_memory_size;
+    uint64_t installed_main_memory_size;
+    uint64_t free_main_memory_size;
+    uint32_t records_memory_size;
+    uint32_t tasks_memory_size;
+    uint32_t bad_blocks_memory_size;
+    uint32_t block_size;
+    uint32_t number_of_main_memory_chips;
+    uint32_t number_of_records;
+    uint32_t number_of_tasks;
+    uint32_t number_of_bad_blocks;
+    uint32_t number_of_memory_types;
+    uint8_t reserved[4];
 } TNMLIB_DEVICE_MEMORY_INFO, *LPTNMLIB_DEVICE_MEMORY_INFO;
 
 typedef struct _TNMLIB_DEVICE_RECORD_INFO {
-    uint64_t ldwSize;
-    TNMLIB_DEVICE_DATE rdDate;
-    TNMLIB_DEVICE_TIME rtStart;
-    TNMLIB_DEVICE_TIME rtStop;
-    uint16_t wTaskNumber;
-    uint16_t wFlyNumber;
-    uint16_t wDataUnitSerial;
-    uint16_t wDataUnitVersion;
-    uint8_t Reserved[4];
+    uint64_t size;
+    TNMLIB_DEVICE_DATE rd_date;
+    TNMLIB_DEVICE_TIME rt_start;
+    TNMLIB_DEVICE_TIME rt_stop;
+    uint16_t task_number;
+    uint16_t fly_number;
+    uint16_t data_unit_serial;
+    uint16_t data_unit_version;
+    uint8_t reserved[4];
 } TNMLIB_DEVICE_RECORD_INFO, *LPTNMLIB_DEVICE_RECORD_INFO;
 
 typedef struct _TNMLIB_RECORD_MODULE_INFO {
-    uint32_t dwModuleID;
+    uint32_t module_id;
     union {
         struct {
-            uint16_t wVersion;
-            uint16_t wSerialNumber;
+            uint16_t version;
+            uint16_t serial_number;
         };
-        uint32_t dwVersionSerial;
+        uint32_t version_serial;
     };
 
-    int32_t iMIBAddress;
-    uint32_t uiStatus;
+    int32_t mib_address;
+    uint32_t status;
     /*
     #define MSTATUS_VALID_MATCH_ENABLED			0
-    #define MSTATUS_VALID_NA_DISABLED			1	// answered, task unknown, denied
-    #define MSTATUS_NI_NI_DISABLED				2   // didn't answer, task unknown, denied >> not found
+    #define MSTATUS_VALID_NA_DISABLED			1   // answered, task unknown, denied
+    #define MSTATUS_NI_NI_DISABLED			2   // didn't answer, task unknown, denied >> not found
     #define MSTATUS_INVALID_NI_DISABLED			3   // answered incorrect
     #define MSTATUS_VALID_MISMATCH_DISABLED		4   // answered, task miss
     #define MSTATUS_VALID_MATCH_DISABLED		5   // answered, task ok, disabled
@@ -120,45 +120,45 @@ typedef struct _TNM_RECORD_MODULES_MAP {
 } TNMLIB_RECORD_MODULES_MAP, *LPTNMLIB_RECORD_MODULES_MAP;
 
 typedef struct _TNMLIB_DEVICE_TASK_INFO {
-    uint32_t dwOffset;
-    uint32_t dwSize;
-    uint32_t dwTag;
-    uint16_t wMinVersion;
-    uint16_t Reserved;
+    uint32_t offset;
+    uint32_t size;
+    uint32_t tag;
+    uint16_t min_version;
+    uint16_t reserved;
 } TNMLIB_DEVICE_TASK_INFO, *LPTNMLIB_DEVICE_TASK_INFO;
 
 typedef struct _TNMLIB_DEVICE_MEMORY_RWINFO {
-    uint32_t dwTotalPages;
-    uint32_t dwPageSize;
+    uint32_t total_pages;
+    uint32_t page_size;
 } TNMLIB_DEVICE_MEMORY_RWINFO, *LPTNMLIB_DEVICE_MEMORY_RWINFO;
 
 typedef struct _TNMLIB_DEVICE_MEMORY_EXINFO {
-    TNMLIB_DEVICE_MEMORY_RWINFO RW[2];
+    TNMLIB_DEVICE_MEMORY_RWINFO rw[2];
 } TNMLIB_DEVICE_MEMORY_EXINFO, *LPTNMLIB_DEVICE_MEMORY_EXINFO;
 
 typedef struct _TNMLIB_DEVICE_RECORD_PARAM {
-    TNMLIB_DEVICE_TIME rsTime;
-    TNMLIB_DEVICE_DATE rsDate;
+    TNMLIB_DEVICE_TIME rs_time;
+    TNMLIB_DEVICE_DATE rs_date;
 
     union {
         struct {
-            uint16_t wTaskNumber;
-            uint16_t wFlyNumber;
+            uint16_t task_number;
+            uint16_t fly_number;
         };
-        uint32_t dwUTaskFly;
+        uint32_t u_task_fly;
     };
 
     union {
         struct {
-            uint16_t wDataUnitSerial;
-            uint16_t wDataUnitVersion;
+            uint16_t data_unit_serial;
+            uint16_t data_unit_version;
         };
-        uint32_t dwUSerialVersion;
+        uint32_t u_serial_version;
     };
 
     union {
-        uint8_t Reserved[4];
-        uint32_t dwUReserved;
+        uint8_t reserved[4];
+        uint32_t u_reserved;
     };
 
 } TNMLIB_DEVICE_RECORD_PARAM, *LPTNMLIB_DEVICE_RECORD_PARAM;

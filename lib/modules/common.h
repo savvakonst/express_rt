@@ -27,9 +27,9 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
 
         std::string name = module_->getID() + "[" + std::to_string(task.header.slot) + "]";
 
-        buffers_ = new double*[channels_number];
+        buffers_ = new targetType_t*[channels_number];
         size_buffers_ = new size_t[channels_number];
-        current_buffers_ = new double*[channels_number];
+        current_buffers_ = new targetType_t*[channels_number];
 
         auto temp_buffers = buffers_;
         auto temp_size_buffers = size_buffers_;
@@ -41,7 +41,7 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
         for (auto& i : task.cnl)
             if (min_frequency > i.frequency) min_frequency = i.frequency;
 
-        idle_counter_max_ =  (size_t(1) << (kBaudRateLog2 - min_frequency))-1;
+        idle_counter_max_ = (size_t(1) << (kBaudRateLog2 - min_frequency)) - 1;
 
         for (auto& i : task.cnl) {
             int fr = i.frequency;
@@ -53,7 +53,7 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
 
                 size_t temp_size = 1 << (fr - min_frequency);
 
-                auto* d_ptr = new double[temp_size];
+                auto* d_ptr = new targetType_t[temp_size];
                 *(temp_buffers++) = d_ptr;
                 *(temp_size_buffers++) = temp_size;
                 *(temp_current_buffers++) = d_ptr;
@@ -81,15 +81,14 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
 
         while (c_ptr < end_ptr) {
             auto k = *(map_ptr++);
-            *((temp_current_buffers[k])++) = double(*(c_ptr++)) / (1 << 16);
+            *((temp_current_buffers[k])++) = targetType_t(*(c_ptr++));  /// (1 << 16);
 
             if (map_ptr == channels_map_end_) map_ptr = channels_map_;
         }
 
         current_ptr_ = map_ptr;
 
-
-        if (idle_counter_max_ !=idle_counter_) {
+        if (idle_counter_max_ != idle_counter_) {
             idle_counter_++;
             return;
         }
@@ -106,8 +105,6 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
             }
             (temp_prm++, temp_buffers++, temp_size_buffers++);
         }
-
-
     }
 
     int getStatistic() override {
@@ -156,6 +153,8 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
     }
 
    protected:
+    typedef int16_t targetType_t;
+
     ModuleClass* module_ = nullptr;
     std::vector<unsigned char> vec_;
 
@@ -168,9 +167,9 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
     unsigned char* channels_map_end_ = nullptr;
     unsigned char* current_ptr_ = nullptr;
 
-    double** buffers_ = nullptr;
+    targetType_t** buffers_ = nullptr;
     size_t* size_buffers_ = nullptr;
-    double** current_buffers_ = nullptr;
+    targetType_t** current_buffers_ = nullptr;
 
     size_t idle_counter_max_ = 0;
     size_t idle_counter_ = 0;

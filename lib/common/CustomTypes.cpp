@@ -48,6 +48,59 @@ const HierarchicalData_ifs *getBranch(const HierarchicalData_ifs *h_data, const 
     return h_data;
 }
 
+
+ArbitraryData castFromTo(const ArbitraryData &arbitrary_data, DataType src_type, DataType target_type) {
+    ArbitraryData ret;
+    ret.u64 = 0;
+
+    switch (target_type) {
+    case DataType::i8: {
+        ret.i8 = castTo<i8_t>(arbitrary_data, src_type);
+        return ret;
+    }
+    case DataType::i16: {
+        ret.i16 = castTo<i16_t>(arbitrary_data, src_type);
+        return ret;
+    }
+    case DataType::i32: {
+        ret.i32 = castTo<i32_t>(arbitrary_data, src_type);
+        return ret;
+    }
+    case DataType::i64: {
+        ret.i64 = castTo<i64_t>(arbitrary_data, src_type);
+        return ret;
+    }
+    case DataType::u8: {
+        ret.u8 = castTo<u8_t>(arbitrary_data, src_type);
+        return ret;
+    }
+    case DataType::u16: {
+        ret.u16 = castTo<u16_t>(arbitrary_data, src_type);
+        return ret;
+    }
+    case DataType::u32: {
+        ret.u32 = castTo<u32_t>(arbitrary_data, src_type);
+        return ret;
+    }
+    case DataType::u64: {
+        ret.u64 = castTo<u64_t>(arbitrary_data, src_type);
+        return ret;
+    }
+    case DataType::f32: {
+        ret.f32 = castTo<f32_t>(arbitrary_data, src_type);
+        return ret;
+    }
+    case DataType::f64: {
+        ret.f64 = castTo<f64_t>(arbitrary_data, src_type);
+        return ret;
+    }
+    default:
+        return ret;
+    }
+    return ret;
+}
+
+
 Value getValue(const HierarchicalData_ifs *h_data, const std::string &src) {
     auto u = getBranch(h_data, src);
     if (u) return u->getValue();

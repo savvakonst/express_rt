@@ -155,9 +155,9 @@ PrmBuffer_ifs* createNewPrmBufferSimulator(size_t sample_frequency_log2, size_t 
 
     size_t time_ = 0;
 
-    ParameterProp* pr = new ParameterProp;
-    pr->reader_ =
-        new PseudoSyncPrmBuffer(nullptr, sample_frequency_log2, nullptr, reader_buffer_length, buffer_interval);
+    auto* pr = new ParameterProp;
+    pr->reader_ = new PseudoSyncPrmBuffer(nullptr, sample_frequency_log2, 1, true, nullptr, reader_buffer_length,
+                                          buffer_interval);
     pr->cnt = size_t(size_t(1) << (sample_frequency_log2 - 10)) * g_update_period;
     pr->data_ = nullptr;
     pr->signal_frequency_ = signal_frequency / (int64_t(1) << 32);
@@ -175,7 +175,7 @@ PrmBuffer_ifs* createNewPrmBufferSimulator(size_t sample_frequency_log2, size_t 
 }
 
 Reader_ifs* getReaderExample(PrmBuffer_ifs* arg) {
-    PseudoSyncPrmBuffer* pbf = (PseudoSyncPrmBuffer*)(arg);
+    auto* pbf = (PseudoSyncPrmBuffer*)(arg);
 
     while (false == pbf->lock(true)) {
     }

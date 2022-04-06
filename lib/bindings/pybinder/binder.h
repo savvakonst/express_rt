@@ -16,7 +16,7 @@
 #include "convtemplate/ConversionTemplate.h"
 #include "convtemplate/Parameter_ifs.h"
 #include "convtemplate/PrmBuffer_ifs.h"
-#include "device/Device.h"
+#include "device/Device_ifs.h"
 #include "device/ModuleStream_ifs.h"
 
 PYBIND11_MAKE_OPAQUE(std::map<std::string, PrmBuffer_ifs *>);
@@ -262,7 +262,9 @@ class PyDeviceViewWrapper : public DeviceViewWrapper_ifs {
         PYBIND11_OVERRIDE_PURE(bool, DeviceViewWrapper_ifs, removeFromSelected, source, path);
     }
 
-    Device *getActiveDevice() override { PYBIND11_OVERRIDE_PURE(Device *, DeviceViewWrapper_ifs, getActiveDevice); }
+    Device_ifs *getActiveDevice() override {
+        PYBIND11_OVERRIDE_PURE(Device_ifs *, DeviceViewWrapper_ifs, getActiveDevice);
+    }
 
     std::string getActiveDeviceSource() override {
         PYBIND11_OVERRIDE_PURE(std::string, DeviceViewWrapper_ifs, getActiveDeviceSource);

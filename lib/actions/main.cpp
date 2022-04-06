@@ -33,14 +33,15 @@ class RefreshAction : public ExrtAction_ifs {
             return false;
         }
 
-        auto c_device = connected_devices.front();
+        // auto c_device = connected_devices.front();
 
-        const auto &buffer = c_device->getTask();
-        std::unique_ptr<Device> device(new Device(buffer.data(), buffer.size(), manager_));
-        device->setSource(c_device->getSource());
+        for (auto &c_device : connected_devices) {
+            const auto &buffer = c_device->getTask();
+            std::unique_ptr<Device_ifs> device(new Device_ifs(buffer.data(), buffer.size(), manager_));
+            device->setSource(c_device->getSource());
 
-        device_manager_->addDevice(device.release());
-
+            device_manager_->addDevice(device.release());
+        }
         return true;
     }
 
@@ -57,7 +58,8 @@ static int initActions(ExtensionManager *manager);
 
 static ExtensionUnit g_actions_units[] = {
     {"file/refresh_ethernet_devices", "exrt_action",
-     "checks the status of connected ethernet devices and looks for new ones ", (void *)new RefreshAction, REFRESH_ACTION_VER},
+     "checks the status of connected ethernet devices and looks for new ones ", (void *)new RefreshAction,
+     REFRESH_ACTION_VER},
     {"adapters", "adapters", "provide available adapters and init socket system", (void *)newAdapters(), 0x00},
     {"actions", "init", "", (void *)&initActions, 0x00},
     {nullptr, nullptr, nullptr, nullptr, 0}};
@@ -72,8 +74,7 @@ static int initActions(ExtensionManager *manager) {
         DEBUG_CERR("cant init (name: " << p_unit->name << ", type: " << p_unit->type << ", ver.:" << p_unit->version
                                        << ") unit, since there is a newer unit.\n");
     } else
-        ((RefreshAction*)p_unit->ptr)->init(manager);
-
+        ((RefreshAction *)p_unit->ptr)->init(manager);
 
     return 0;
 }

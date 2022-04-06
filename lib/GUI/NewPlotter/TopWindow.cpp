@@ -19,8 +19,8 @@
 #include "convtemplate/ConversionTemplate.h"
 #include "convtemplate/Parameter_ifs.h"
 #include "convtemplate/PrmBuffer_ifs.h"
-#include "device/Device.h"
 #include "device/DeviceManager.h"
+#include "device/Device_ifs.h"
 #include "device/ModuleStream_ifs.h"
 
 //
@@ -69,9 +69,6 @@ void TopWindow::dropEvent(QDropEvent *e) {
             }
 
         if (!exists) {
-
-
-
             auto dock = new QDockWidget(i.data(), this);
             auto device = device_manager_->getDeviceByPath(i);
             auto pre_plotter = new ParametersToPlot(this, device, manager_);
@@ -80,7 +77,7 @@ void TopWindow::dropEvent(QDropEvent *e) {
             dock->setAttribute(Qt::WA_DeleteOnClose);
             dock->setWidget(pre_plotter);
             addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, dock, Qt::Orientation::Horizontal);
-            device_view_wrapper_->setActive(device->getSource(),"");
+            device_view_wrapper_->setActive(device->getSource(), "");
             block_ = true;
         }
     }
@@ -109,7 +106,7 @@ void TopWindow::addPlotter(const std::string &name, QFormScreen *form_screen) {
  *
  */
 
-ModuleStream_ifs *generateStream(ExtensionManager *manager, const std::string &type, Device *device,
+ModuleStream_ifs *generateStream(ExtensionManager *manager, const std::string &type, Device_ifs *device,
                                  const std::list<Parameter_ifs *> &parameters) {
     ModuleStream_ifs *top_m_stream = device->createModuleStream();
 
@@ -197,7 +194,7 @@ class OnlinePlotterContext : public PlotterContext_ifs {
  *
  */
 
-ParametersToPlot::ParametersToPlot(TopWindow *plotter_main_window, Device *device, ExtensionManager *manager,
+ParametersToPlot::ParametersToPlot(TopWindow *plotter_main_window, Device_ifs *device, ExtensionManager *manager,
                                    QWidget *parent)
     : plotter_main_window_(plotter_main_window), device_(device), manager_(manager), QWidget(parent) {
     auto table = new QTreeView();
@@ -275,7 +272,7 @@ void ParametersToPlot::runAndClose() {
  *
  */
 
-ParameterBufferTableModel::ParameterBufferTableModel(Device *device, ExtensionManager *manager) : device_(device) {
+ParameterBufferTableModel::ParameterBufferTableModel(Device_ifs *device, ExtensionManager *manager) : device_(device) {
     parameter_view_wrapper_ =
         (ParameterViewWrapper_ifs *)manager->getLastVersionExtensionObject("widget_wrapper", "parameter_view_wrapper");
 

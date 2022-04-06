@@ -55,10 +55,17 @@ bool Module_A01_::isChannelAvailable(const std::string& prop_path) const {
 }
 
 Value Module_A01_::getChannelProperty(const std::string& channel, const std::string& type) const {
-
     if (type == "frequency") {
         auto hd = getProperty("cnl/" + channel + "/frequency");
         return hd ? hd->getValue() : Value(int64_t(0xff));
+    } else if (type == "factor") {
+        const auto& cnl = task_.cnl[std::stoi(channel)];
+        auto factor = double(cnl.rangeH) / (1000000);
+        factor = factor / double(cnl.rangeL == 0 ? 1 << 16 : 1 << 15);
+        return Value(factor);
+    } else if (type == "signed") {
+        const auto& cnl = task_.cnl[std::stoi(channel)];
+        return Value(cnl.rangeL != 0);
     }
     return KSDModule::getChannelProperty(channel, type);
 }

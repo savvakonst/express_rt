@@ -85,7 +85,7 @@ struct SinglePrm {
 } POINT;*/
 
 class Parameter_ifs;
-class Device;
+class Device_ifs;
 
 class QScreenScale : public QObject, public QGraphicsRectItem {
     Q_OBJECT
@@ -108,7 +108,6 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
 
     explicit QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &sz, const LineProperties &dstx,
                           const Margin &margin, QWidget *parent);
-
 
     ~QScreenScale() override;
 
@@ -193,7 +192,7 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
    private:
     void changeScaleBorder(const bool &high, const int &delta);
 
-    Device *device_ = nullptr;
+    Device_ifs *device_ = nullptr;
 
     QAction *act_settings_;
     QAction *act_remove_;

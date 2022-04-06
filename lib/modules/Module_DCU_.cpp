@@ -4,7 +4,7 @@
 #include "Module_DCU_.h"
 #include "common/ExtensionManager.h"
 #include "common/StringProcessingTools.h"
-#include "device/Device.h"
+#include "device/Device_ifs.h"
 
 class EthernetDCU_Stream : public ModuleStream_ifs {
    public:

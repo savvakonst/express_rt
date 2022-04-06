@@ -36,7 +36,7 @@ class TopWindow : public QMainWindow {
 };
 
 class Parameter_ifs;
-class Device;
+class Device_ifs;
 class DataSchema_ifs;
 class ParameterViewWrapper_ifs;
 class ParameterBufferTableModel;
@@ -44,7 +44,7 @@ class ParameterBufferTableModel;
 class ParametersToPlot : public QWidget {
     Q_OBJECT
    public:
-    explicit ParametersToPlot(TopWindow *plotter_main_window, Device *device, ExtensionManager *manager,
+    explicit ParametersToPlot(TopWindow *plotter_main_window, Device_ifs *device, ExtensionManager *manager,
                               QWidget *parent = nullptr);
     ~ParametersToPlot() override;
    public slots:
@@ -55,7 +55,7 @@ class ParametersToPlot : public QWidget {
     TopWindow *plotter_main_window_ = nullptr;
     ParameterBufferTableModel *model_ = nullptr;
     ExtensionManager *manager_ = nullptr;
-    Device *device_ = nullptr;
+    Device_ifs *device_ = nullptr;
 
     QTimer *timer_ = nullptr;
 
@@ -66,7 +66,7 @@ class ParametersToPlot : public QWidget {
 class ParameterBufferTableModel : public QAbstractTableModel {
     Q_OBJECT
    public:
-    explicit ParameterBufferTableModel(Device *device, ExtensionManager *manager);
+    explicit ParameterBufferTableModel(Device_ifs *device, ExtensionManager *manager);
 
     [[nodiscard]] int rowCount(const QModelIndex &parent) const override { return parameters_.size(); }
 
@@ -96,7 +96,7 @@ class ParameterBufferTableModel : public QAbstractTableModel {
 
     QList<Parameter_ifs *> parameters_;
 
-    Device *device_ = nullptr;
+    Device_ifs *device_ = nullptr;
     DeviceViewWrapper_ifs *device_view_wrapper_ = nullptr;
     ParameterViewWrapper_ifs *parameter_view_wrapper_ = nullptr;
 };

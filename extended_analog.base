@@ -1,706 +1,875 @@
 {
-  " File.About": "KSD-Express Database File",
-  " File.Company": "АО Элистех",
-  " File.Date": "2022.3.14",
-  " File.Version": "1.0.0.0",
-  "Base. Name": "Новая база данных",
-  "Base.Alteration.List": [
-    {
-      "Date": "2022.01.12",
-      "EditedBy": "Test",
-      "Time": "11:33:43"
-    },
-    {
-      "Date": "2022.01.12",
-      "EditedBy": "Test",
-      "Time": "11:35:59"
-    },
-    {
-      "Date": "2022.01.19",
-      "EditedBy": "Test",
-      "Time": "16:17:13"
-    },
-    {
-      "Date": "2022.01.31",
-      "EditedBy": "Test",
-      "Time": "12:21:09"
-    },
-    {
-      "Date": "2022.02.03",
-      "EditedBy": "Test",
-      "Time": "11:48:35"
-    },
-    {
-      "Date": "2022.03.11",
-      "EditedBy": "Test",
-      "Time": "17:33:30"
-    },
-    {
-      "Date": "2022.03.14",
-      "EditedBy": "Test",
-      "Time": "21:07:33"
-    }
-  ],
-  "Base.Alteration.Number": 7,
-  "Base.CreatedBy": "Test",
-  "Base.Date": "2022.01.12",
-  "Base.Description": "",
-  "Base.Object": "",
-  "Base.Time": "11:32:36",
-  "Device.ID": 1279546187,
-  "Device.Modules.List": [
-    {
-      "Module.ID": 1597059149,
-      "Module.Name": "КСД/КСЛ1",
-      "Module.Slot": 0
-    },
-    {
-      "Module.ID": 1295396931,
-      "Module.Name": "КСД/Ethernet",
-      "Module.Slot": 0,
-      "Module.Subslot": 1
-    },
-    {
-      "Module.ID": 1597059137,
-      "Module.Name": "КСД/А01",
-      "Module.Slot": 1
-    },
-    {
-      "Module.ID": 1597124673,
-      "Module.Name": "КСД/А02",
-      "Module.Slot": 2
-    },
-    {
-      "Module.ID": 1597190209,
-      "Module.Name": "КСД/А03",
-      "Module.Slot": 3
-    },
-    {
-      "Module.ID": 1597255745,
-      "Module.Name": "КСД/А04",
-      "Module.Slot": 4
-    },
-    {
-      "Module.ID": 1597321281,
-      "Module.Name": "КСД/А05",
-      "Module.Slot": 5
-    },
-    {
-      "Module.ID": 1597386817,
-      "Module.Name": "КСД/А06",
-      "Module.Slot": 6
-    },
-    {
-      "Module.ID": 1597517889,
-      "Module.Name": "КСД/А08",
-      "Module.Slot": 7
-    },
-    {
-      "Module.Block": 255,
-      "Module.ID": 1129070915,
-      "Module.Name": "КСД/Рассчётный",
-      "Module.Slave": 255,
-      "Module.Slot": 255,
-      "Module.Subslot": 255
-    }
-  ],
-  "Device.Modules.Type.ARINC.Number": 0,
-  "Device.Modules.Type.IRIG.Number": 0,
-  "Device.Modules.Type.SNS.Number": 0,
-  "Device.Modules.Type.TermoCouple.Number": 1,
-  "Device.Modules.Type.TermoCouple.Settings": [
-    {
-      "Module.ColdShuts": [
+    " File.About": "KSD-Express Database File",
+    " File.Company": "АО Элистех",
+    " File.Date": "2022.4.5",
+    " File.Version": "1.0.0.0",
+    "Base. Name": "Новая база данных",
+    "Base.Alteration.List": [
         {
-          "ColdShut.Enabled": false,
-          "ColdShut.Index": 0,
-          "ColdShut.Line": 11,
-          "ColdShut.Type": 0,
-          "ColdShut.Type.Description": "Pt, 0.00385",
-          "ColdShut.Value": 100
+            "Date": "2022.01.12",
+            "EditedBy": "Test",
+            "Time": "11:33:43"
         },
         {
-          "ColdShut.Enabled": false,
-          "ColdShut.Index": 1,
-          "ColdShut.Line": 12,
-          "ColdShut.Type": 0,
-          "ColdShut.Type.Description": "Pt, 0.00385",
-          "ColdShut.Value": 100
-        }
-      ],
-      "Module.ID": 1597190209,
-      "Module.Name": "КСД/А03",
-      "Module.Slot": 3
-    }
-  ],
-  "Device.Name": "КСД/КСД",
-  "List.Categories": [
-  ],
-  "List.Departments": [
-  ],
-  "List.Dimensions": [
-      "ед",
-      "мкВ",
-      "мВ",
-      "В",
-      "кВ",
-      "мкс",
-      "мс",
-      "с",
-      "мин",
-      "ч",
-      "Гц",
-      "кГц",
-      "МГц",
-      "об/мин",
-      "об/ч",
-      "мм",
-      "м",
-      "км",
-      "м/с",
-      "км/с",
-      "км/ч",
-      "g",
-      "М",
-      "°",
-      "рад",
-      "°C",
-      "Ом",
-      "кОм",
-      "МОм",
-      "мкА",
-      "мА",
-      "А",
-      "дБ",
-      "л",
-      "л/с",
-      "л/мин",
-      "л/час"
-  ],
-  "List.Systems": [
-  ],
-  "LocalCoord.PZ90.B": 0,
-  "LocalCoord.PZ90.H": 0,
-  "LocalCoord.PZ90.L": 0,
-  "LocalCoord.PZ90.X": 0,
-  "LocalCoord.PZ90.Y": 0,
-  "LocalCoord.PZ90.Z": 0,
-  "LocalCoord.Type": false,
-  "LocalCoord.WGS84.B": 0,
-  "LocalCoord.WGS84.H": 0,
-  "LocalCoord.WGS84.L": 0,
-  "LocalCoord.WGS84.X": 0,
-  "LocalCoord.WGS84.Y": 0,
-  "LocalCoord.WGS84.Z": 0,
-  "Parameters.List": [
-    {
-      " Index": 0,
-      " Name": "analog_A01_",
-      "Category": "",
-      "Control.Levels.Number": 0,
-      "Delay": 0,
-      "Department": "",
-      "Description": "",
-      "Dimension": "",
-      "Formula": "x = param()\ny = x\nreturn double(y)\n",
-      "Method": 0,
-      "Module.ID": 1597059137,
-      "Module.Name": "КСД/А01",
-      "Module.Slot": 1,
-      "Points.Approximation": false,
-      "Points.Number": 0,
-      "Points.Polymon.List": [
-        {
-          "Index": 0,
-          "Value": 0
+            "Date": "2022.01.12",
+            "EditedBy": "Test",
+            "Time": "11:35:59"
         },
         {
-          "Index": 1,
-          "Value": 0
-        }
-      ],
-      "Points.Polymon.Rank": 1,
-      "Precision2": false,
-      "Raw": false,
-      "ShortID": "analog_",
-      "System": "",
-      "Type": 1
-    },
-    {
-      " Index": 1,
-      " Name": "analog_A05_",
-      "Category": "",
-      "Control.Levels.Number": 0,
-      "Delay": 0,
-      "Department": "",
-      "Description": "",
-      "Dimension": "",
-      "Formula": "x = param()\ny = x\nreturn double(y)\n",
-      "Method": 0,
-      "Module.ID": 1597321281,
-      "Module.Name": "КСД/А05",
-      "Module.Slot": 1,
-      "Points.Approximation": false,
-      "Points.Number": 0,
-      "Points.Polymon.List": [
-        {
-          "Index": 0,
-          "Value": 0
+            "Date": "2022.01.19",
+            "EditedBy": "Test",
+            "Time": "16:17:13"
         },
         {
-          "Index": 1,
-          "Value": 0
-        }
-      ],
-      "Points.Polymon.Rank": 1,
-      "Precision2": false,
-      "Raw": false,
-      "ShortID": "analog_",
-      "System": "",
-      "Type": 1
-    },
-    {
-      " Index": 2,
-      " Name": "analog_A06_",
-      "Category": "",
-      "Control.Levels.Number": 0,
-      "Delay": 0,
-      "Department": "",
-      "Description": "",
-      "Dimension": "",
-      "Formula": "x = param()\ny = x\nreturn double(y)\n",
-      "Method": 0,
-      "Module.ID": 1597386817,
-      "Module.Name": "КСД/А06",
-      "Module.Slot": 6,
-      "Points.Approximation": false,
-      "Points.Number": 0,
-      "Points.Polymon.List": [
-        {
-          "Index": 0,
-          "Value": 0
+            "Date": "2022.01.31",
+            "EditedBy": "Test",
+            "Time": "12:21:09"
         },
         {
-          "Index": 1,
-          "Value": 0
-        }
-      ],
-      "Points.Polymon.Rank": 1,
-      "Precision2": false,
-      "Raw": false,
-      "ShortID": "analog_",
-      "System": "",
-      "Type": 1
-    },
-    {
-      " Index": 3,
-      " Name": "vibro_A02",
-      "Category": "",
-      "Control.Levels.Number": 0,
-      "Delay": 0,
-      "Department": "",
-      "Description": "",
-      "Dimension": "",
-      "Formula": "x = param()\ny = x\nreturn double(y)\n",
-      "Method": 0,
-      "Module.ID": 1597124673,
-      "Module.Name": "КСД/А02",
-      "Module.Slot": 2,
-      "Points.Approximation": false,
-      "Points.Number": 0,
-      "Points.Polymon.List": [
-        {
-          "Index": 0,
-          "Value": 0
+            "Date": "2022.02.03",
+            "EditedBy": "Test",
+            "Time": "11:48:35"
         },
         {
-          "Index": 1,
-          "Value": 0
-        }
-      ],
-      "Points.Polymon.Rank": 1,
-      "Precision2": false,
-      "Raw": false,
-      "ShortID": "vibro_",
-      "System": "",
-      "Type": 2
-    },
-    {
-      " Index": 4,
-      " Name": "thermocouple_1_A03_",
-      "Category": "",
-      "Control.Levels.Number": 0,
-      "Delay": 0,
-      "Department": "",
-      "Description": "",
-      "Dimension": "",
-      "Formula": "x = param()\ny = x\nreturn double(y)\n",
-      "Method": 0,
-      "Module.ID": 1597190209,
-      "Module.Name": "КСД/А03",
-      "Module.Slot": 3,
-      "Points.Approximation": false,
-      "Points.Number": 0,
-      "Points.Polymon.List": [
-        {
-          "Index": 0,
-          "Value": 0
+            "Date": "2022.03.11",
+            "EditedBy": "Test",
+            "Time": "17:33:30"
         },
         {
-          "Index": 1,
-          "Value": 0
-        }
-      ],
-      "Points.Polymon.Rank": 1,
-      "Precision2": false,
-      "Raw": false,
-      "ShortID": "thermocouple_",
-      "System": "",
-      "Type": 3
-    },
-    {
-      " Index": 5,
-      " Name": "thermocouple_2_A03_",
-      "Category": "",
-      "Control.Levels.Number": 0,
-      "Delay": 0,
-      "Department": "",
-      "Description": "",
-      "Dimension": "",
-      "Formula": "x = param()\ny = x\nreturn double(y)\n",
-      "Method": 0,
-      "Module.ID": 1597190209,
-      "Module.Name": "КСД/А03",
-      "Module.Slot": 3,
-      "Points.Approximation": false,
-      "Points.Number": 0,
-      "Points.Polymon.List": [
-        {
-          "Index": 0,
-          "Value": 0
+            "Date": "2022.03.14",
+            "EditedBy": "Test",
+            "Time": "21:07:33"
         },
         {
-          "Index": 1,
-          "Value": 0
-        }
-      ],
-      "Points.Polymon.Rank": 1,
-      "Precision2": false,
-      "Raw": false,
-      "ShortID": "thermocouple_",
-      "System": "",
-      "Type": 3
-    },
-    {
-      " Index": 6,
-      " Name": "thermocouple_3_A03_",
-      "Category": "",
-      "Control.Levels.Number": 0,
-      "Delay": 0,
-      "Department": "",
-      "Description": "",
-      "Dimension": "",
-      "Formula": "x = param()\ny = x\nreturn double(y)\n",
-      "Method": 0,
-      "Module.ID": 1597190209,
-      "Module.Name": "КСД/А03",
-      "Module.Slot": 3,
-      "Points.Approximation": false,
-      "Points.Number": 0,
-      "Points.Polymon.List": [
-        {
-          "Index": 0,
-          "Value": 0
+            "Date": "2022.04.05",
+            "EditedBy": "Test",
+            "Time": "13:33:01"
         },
         {
-          "Index": 1,
-          "Value": 0
-        }
-      ],
-      "Points.Polymon.Rank": 1,
-      "Precision2": false,
-      "Raw": false,
-      "ShortID": "thermocouple_",
-      "System": "",
-      "Type": 3
-    },
-    {
-      " Index": 7,
-      " Name": "thermal_resistance_1_A04_",
-      "Category": "",
-      "Control.Levels.Number": 0,
-      "Delay": 0,
-      "Department": "",
-      "Description": "",
-      "Dimension": "",
-      "Formula": "x = param()\ny = x\nreturn double(y)\n",
-      "Method": 0,
-      "Module.ID": 1597255745,
-      "Module.Name": "КСД/А04",
-      "Module.Slot": 4,
-      "Points.Approximation": false,
-      "Points.Number": 0,
-      "Points.Polymon.List": [
-        {
-          "Index": 0,
-          "Value": 0
+            "Date": "2022.04.05",
+            "EditedBy": "Test",
+            "Time": "16:41:46"
         },
         {
-          "Index": 1,
-          "Value": 0
+            "Date": "2022.04.05",
+            "EditedBy": "Test",
+            "Time": "17:01:21"
         }
-      ],
-      "Points.Polymon.Rank": 1,
-      "Precision2": false,
-      "Raw": false,
-      "ShortID": "thermal_resistance_",
-      "System": "",
-      "Type": 4
-    },
-    {
-      " Index": 8,
-      " Name": "thermal_resistance_2_A04_",
-      "Category": "",
-      "Control.Levels.Number": 0,
-      "Delay": 0,
-      "Department": "",
-      "Description": "",
-      "Dimension": "",
-      "Formula": "x = param()\ny = x\nreturn double(y)\n",
-      "Method": 0,
-      "Module.ID": 1597255745,
-      "Module.Name": "КСД/А04",
-      "Module.Slot": 4,
-      "Points.Approximation": false,
-      "Points.Number": 0,
-      "Points.Polymon.List": [
+    ],
+    "Base.Alteration.Number": 10,
+    "Base.CreatedBy": "Test",
+    "Base.Date": "2022.01.12",
+    "Base.Description": "",
+    "Base.Object": "",
+    "Base.Time": "11:32:36",
+    "Device.ID": 1279546187,
+    "Device.Modules.List": [
         {
-          "Index": 0,
-          "Value": 0
+            "Module.ID": 1597059149,
+            "Module.Name": "КСД/КСЛ1",
+            "Module.Slot": 0
         },
         {
-          "Index": 1,
-          "Value": 0
-        }
-      ],
-      "Points.Polymon.Rank": 1,
-      "Precision2": false,
-      "Raw": false,
-      "ShortID": "thermal_resistance_",
-      "System": "",
-      "Type": 4
-    },
-    {
-      " Index": 9,
-      " Name": "thermal_resistance_3_A04_",
-      "Category": "",
-      "Control.Levels.Number": 0,
-      "Delay": 0,
-      "Department": "",
-      "Description": "",
-      "Dimension": "",
-      "Formula": "x = param()\ny = x\nreturn double(y)\n",
-      "Method": 0,
-      "Module.ID": 1597255745,
-      "Module.Name": "КСД/А04",
-      "Module.Slot": 4,
-      "Points.Approximation": false,
-      "Points.Number": 0,
-      "Points.Polymon.List": [
-        {
-          "Index": 0,
-          "Value": 0
+            "Module.ID": 1295396931,
+            "Module.Name": "КСД/Ethernet",
+            "Module.Slot": 0,
+            "Module.Subslot": 1
         },
         {
-          "Index": 1,
-          "Value": 0
-        }
-      ],
-      "Points.Polymon.Rank": 1,
-      "Precision2": false,
-      "Raw": false,
-      "ShortID": "thermal_resistance_",
-      "System": "",
-      "Type": 4
-    },
-    {
-      " Index": 10,
-      " Name": "analog_rms_1_A08",
-      "Category": "",
-      "Control.Levels.Number": 0,
-      "Delay": 0,
-      "Department": "",
-      "Description": "instantaneous voltage value",
-      "Dimension": "",
-      "Formula": "x = param()\ny = x\nreturn double(y)\n",
-      "Method": 0,
-      "Module.ID": 1597517889,
-      "Module.Name": "КСД/А08",
-      "Module.Slot": 7,
-      "Points.Approximation": false,
-      "Points.Number": 0,
-      "Points.Polymon.List": [
-        {
-          "Index": 0,
-          "Value": 0
+            "Module.ID": 1597059137,
+            "Module.Name": "КСД/А01",
+            "Module.Slot": 1
         },
         {
-          "Index": 1,
-          "Value": 0
-        }
-      ],
-      "Points.Polymon.Rank": 1,
-      "Precision2": false,
-      "Raw": false,
-      "ShortID": "analog_",
-      "System": "",
-      "Type": 8
-    },
-    {
-      " Index": 11,
-      " Name": "analog_rms_2_A08",
-      "Category": "",
-      "Control.Levels.Number": 0,
-      "Delay": 0,
-      "Department": "",
-      "Description": "rms voltage value",
-      "Dimension": "",
-      "Formula": "x = param()\ny = x\nreturn double(y)\n",
-      "Method": 0,
-      "Module.ID": 1597517889,
-      "Module.Name": "КСД/А08",
-      "Module.Slot": 7,
-      "Points.Approximation": false,
-      "Points.Number": 0,
-      "Points.Polymon.List": [
-        {
-          "Index": 0,
-          "Value": 0
+            "Module.ID": 1597124673,
+            "Module.Name": "КСД/А02",
+            "Module.Slot": 2
         },
         {
-          "Index": 1,
-          "Value": 0
+            "Module.ID": 1597190209,
+            "Module.Name": "КСД/А03",
+            "Module.Slot": 3
+        },
+        {
+            "Module.ID": 1597255745,
+            "Module.Name": "КСД/А04",
+            "Module.Slot": 4
+        },
+        {
+            "Module.ID": 1597321281,
+            "Module.Name": "КСД/А05",
+            "Module.Slot": 5
+        },
+        {
+            "Module.ID": 1597386817,
+            "Module.Name": "КСД/А06",
+            "Module.Slot": 6
+        },
+        {
+            "Module.ID": 1597517889,
+            "Module.Name": "КСД/А08",
+            "Module.Slot": 7
+        },
+        {
+            "Module.Block": 255,
+            "Module.ID": 1129070915,
+            "Module.Name": "КСД/Рассчётный",
+            "Module.Slave": 255,
+            "Module.Slot": 255,
+            "Module.Subslot": 255
         }
-      ],
-      "Points.Polymon.Rank": 1,
-      "Precision2": false,
-      "Raw": false,
-      "ShortID": "rms_",
-      "System": "",
-      "Type": 8
-    }
-  ],
-  "Parameters.List.Analog": [
-    {
-      " Name": "analog_A01_",
-      "Line": 1
-    },
-    {
-      " Name": "analog_A05_",
-      "Line": 0
-    },
-    {
-      " Name": "analog_A06_",
-      "Line": 0
-    }
-  ],
-  "Parameters.List.Analog.TermResistance": [
-    {
-      " Name": "thermal_resistance_1_A04_",
-      "Line": 0,
-      "Resistor.Description": "Pt, 0.00385",
-      "Resistor.Type": 0,
-      "Resistor.Value": 0,
-      "Type": 0
-    },
-    {
-      " Name": "thermal_resistance_2_A04_",
-      "Line": 0,
-      "Resistor.Description": "Pt, 0.00385",
-      "Resistor.Type": 0,
-      "Resistor.Value": 1,
-      "Type": 1
-    },
-    {
-      " Name": "thermal_resistance_3_A04_",
-      "Line": 0,
-      "Resistor.Description": "П, 0.00391",
-      "Resistor.Type": 1,
-      "Resistor.Value": 10,
-      "Type": 1
-    }
-  ],
-  "Parameters.List.Analog.TermoCouple": [
-    {
-      " Name": "thermocouple_1_A03_",
-      "ColdShut.Index": 0,
-      "ColdShut.Used": false,
-      "Couple.Description": "R (ТПП)",
-      "Couple.Type": 0,
-      "Line": 0,
-      "Type": 0
-    },
-    {
-      " Name": "thermocouple_2_A03_",
-      "ColdShut.Index": 0,
-      "ColdShut.Used": false,
-      "Couple.Description": "R (ТПП)",
-      "Couple.Type": 0,
-      "Line": 0,
-      "Type": 1
-    },
-    {
-      " Name": "thermocouple_3_A03_",
-      "ColdShut.Index": 0,
-      "ColdShut.Used": false,
-      "Couple.Description": "T (ТМК)",
-      "Couple.Type": 4,
-      "Line": 0,
-      "Type": 1
-    }
-  ],
-  "Parameters.List.Analog.Vibro": [
-    {
-      " Name": "vibro_A02",
-      "Line": 0,
-      "Type": 0,
-      "Vibro.Description": "Напряжение",
-      "Vibro.Length": 30,
-      "Vibro.Ration": 50
-    }
-  ],
-  "Parameters.List.Analog.Voltage": [
-    {
-      " Name": "analog_rms_1_A08",
-      "Line": 0,
-      "Type": 0,
-      "Voltage.Description": "Мгновенное",
-      "Voltage.Hysteresis": 0,
-      "Voltage.Waves": 0
-    },
-    {
-      " Name": "analog_rms_2_A08",
-      "Line": 0,
-      "Type": 1,
-      "Voltage.Description": "Действующее",
-      "Voltage.Hysteresis": 2,
-      "Voltage.Waves": 6
-    }
-  ],
-  "Parameters.Number": 12,
-  "Parameters.Number.ARINC": 0,
-  "Parameters.Number.Analog": 3,
-  "Parameters.Number.Analog.TermResistance": 3,
-  "Parameters.Number.Analog.TermoCouple": 3,
-  "Parameters.Number.Analog.Vibro": 1,
-  "Parameters.Number.Analog.Voltage": 2,
-  "Parameters.Number.CAN": 0,
-  "Parameters.Number.Counter": 0,
-  "Parameters.Number.Discrete": 0,
-  "Parameters.Number.Ethernet.UDP": 0,
-  "Parameters.Number.FC-AE-ASM": 0,
-  "Parameters.Number.IRIG": 0,
-  "Parameters.Number.MIL-STD": 0,
-  "Parameters.Number.SNS": 0,
-  "Parameters.Number.SysInfo": 0
+    ],
+    "Device.Modules.Type.ARINC.Number": 0,
+    "Device.Modules.Type.IRIG.Number": 0,
+    "Device.Modules.Type.SNS.Number": 0,
+    "Device.Modules.Type.TermoCouple.Number": 1,
+    "Device.Modules.Type.TermoCouple.Settings": [
+        {
+            "Module.ColdShuts": [
+                {
+                    "ColdShut.Enabled": false,
+                    "ColdShut.Index": 0,
+                    "ColdShut.Line": 11,
+                    "ColdShut.Type": 0,
+                    "ColdShut.Type.Description": "Pt, 0.00385",
+                    "ColdShut.Value": 100
+                },
+                {
+                    "ColdShut.Enabled": false,
+                    "ColdShut.Index": 1,
+                    "ColdShut.Line": 12,
+                    "ColdShut.Type": 0,
+                    "ColdShut.Type.Description": "Pt, 0.00385",
+                    "ColdShut.Value": 100
+                }
+            ],
+            "Module.ID": 1597190209,
+            "Module.Name": "КСД/А03",
+            "Module.Slot": 3
+        }
+    ],
+    "Device.Name": "КСД/КСД",
+    "List.Categories": [
+    ],
+    "List.Departments": [
+    ],
+    "List.Dimensions": [
+        "ед",
+        "мкВ",
+        "мВ",
+        "В",
+        "кВ",
+        "мкс",
+        "мс",
+        "с",
+        "мин",
+        "ч",
+        "Гц",
+        "кГц",
+        "МГц",
+        "об/мин",
+        "об/ч",
+        "мм",
+        "м",
+        "км",
+        "м/с",
+        "км/с",
+        "км/ч",
+        "g",
+        "М",
+        "°",
+        "рад",
+        "°C",
+        "Ом",
+        "кОм",
+        "МОм",
+        "мкА",
+        "мА",
+        "А",
+        "дБ",
+        "л",
+        "л/с",
+        "л/мин",
+        "л/час"
+    ],
+    "List.Systems": [
+    ],
+    "LocalCoord.PZ90.B": 0,
+    "LocalCoord.PZ90.H": 0,
+    "LocalCoord.PZ90.L": 0,
+    "LocalCoord.PZ90.X": 0,
+    "LocalCoord.PZ90.Y": 0,
+    "LocalCoord.PZ90.Z": 0,
+    "LocalCoord.Type": false,
+    "LocalCoord.WGS84.B": 0,
+    "LocalCoord.WGS84.H": 0,
+    "LocalCoord.WGS84.L": 0,
+    "LocalCoord.WGS84.X": 0,
+    "LocalCoord.WGS84.Y": 0,
+    "LocalCoord.WGS84.Z": 0,
+    "Parameters.List": [
+        {
+            " Index": 0,
+            " Name": "analog_A01_",
+            "Category": "",
+            "Control.Levels.Number": 0,
+            "Delay": 0,
+            "Department": "",
+            "Description": "",
+            "Dimension": "В",
+            "Formula": "x = param()\ny = x\nreturn double(y)\n",
+            "Method": 0,
+            "Module.ID": 1597059137,
+            "Module.Name": "КСД/А01",
+            "Module.Slot": 1,
+            "Points.Approximation": false,
+            "Points.Number": 0,
+            "Points.Polymon.List": [
+                {
+                    "Index": 0,
+                    "Value": 0
+                },
+                {
+                    "Index": 1,
+                    "Value": 0
+                }
+            ],
+            "Points.Polymon.Rank": 1,
+            "Precision2": false,
+            "Raw": false,
+            "ShortID": "analog_",
+            "System": "",
+            "Type": 1
+        },
+        {
+            " Index": 1,
+            " Name": "analog_A05_",
+            "Category": "",
+            "Control.Levels.Number": 0,
+            "Delay": 0,
+            "Department": "",
+            "Description": "",
+            "Dimension": "В",
+            "Formula": "x = param()\ny = x\nreturn double(y)\n",
+            "Method": 0,
+            "Module.ID": 1597059137,
+            "Module.Name": "КСД/А01",
+            "Module.Slot": 1,
+            "Points.Approximation": false,
+            "Points.Number": 0,
+            "Points.Polymon.List": [
+                {
+                    "Index": 0,
+                    "Value": 0
+                },
+                {
+                    "Index": 1,
+                    "Value": 0
+                }
+            ],
+            "Points.Polymon.Rank": 1,
+            "Precision2": false,
+            "Raw": false,
+            "ShortID": "analog_",
+            "System": "",
+            "Type": 1
+        },
+        {
+            " Index": 2,
+            " Name": "analog_A06_",
+            "Category": "",
+            "Control.Levels.Number": 0,
+            "Delay": 0,
+            "Department": "",
+            "Description": "",
+            "Dimension": "В",
+            "Formula": "x = param()\ny = x\nreturn double(y)\n",
+            "Method": 0,
+            "Module.ID": 1597386817,
+            "Module.Name": "КСД/А06",
+            "Module.Slot": 6,
+            "Points.Approximation": false,
+            "Points.Number": 0,
+            "Points.Polymon.List": [
+                {
+                    "Index": 0,
+                    "Value": 0
+                },
+                {
+                    "Index": 1,
+                    "Value": 0
+                }
+            ],
+            "Points.Polymon.Rank": 1,
+            "Precision2": false,
+            "Raw": false,
+            "ShortID": "analog_",
+            "System": "",
+            "Type": 1
+        },
+        {
+            " Index": 3,
+            " Name": "vibro_A02",
+            "Category": "Ускорение",
+            "Control.Levels.Number": 0,
+            "Delay": 0,
+            "Department": "",
+            "Description": "",
+            "Dimension": "м/с^2",
+            "Formula": "x = param()\ny = x\nreturn double(y)\n",
+            "Method": 0,
+            "Module.ID": 1597124673,
+            "Module.Name": "КСД/А02",
+            "Module.Slot": 2,
+            "Points.Approximation": false,
+            "Points.Number": 0,
+            "Points.Polymon.List": [
+                {
+                    "Index": 0,
+                    "Value": 0
+                },
+                {
+                    "Index": 1,
+                    "Value": 0
+                }
+            ],
+            "Points.Polymon.Rank": 1,
+            "Precision2": false,
+            "Raw": false,
+            "ShortID": "vibro_",
+            "System": "",
+            "Type": 2
+        },
+        {
+            " Index": 4,
+            " Name": "thermocouple_1_A03_",
+            "Category": "",
+            "Control.Levels.Number": 0,
+            "Delay": 0,
+            "Department": "",
+            "Description": "",
+            "Dimension": "",
+            "Formula": "x = param()\ny = x\nreturn double(y)\n",
+            "Method": 0,
+            "Module.ID": 1597190209,
+            "Module.Name": "КСД/А03",
+            "Module.Slot": 3,
+            "Points.Approximation": false,
+            "Points.Number": 0,
+            "Points.Polymon.List": [
+                {
+                    "Index": 0,
+                    "Value": 0
+                },
+                {
+                    "Index": 1,
+                    "Value": 0
+                }
+            ],
+            "Points.Polymon.Rank": 1,
+            "Precision2": false,
+            "Raw": false,
+            "ShortID": "thermocouple_",
+            "System": "",
+            "Type": 3
+        },
+        {
+            " Index": 5,
+            " Name": "thermocouple_2_A03_",
+            "Category": "",
+            "Control.Levels.Number": 0,
+            "Delay": 0,
+            "Department": "",
+            "Description": "",
+            "Dimension": "",
+            "Formula": "x = param()\ny = x\nreturn double(y)\n",
+            "Method": 0,
+            "Module.ID": 1597190209,
+            "Module.Name": "КСД/А03",
+            "Module.Slot": 3,
+            "Points.Approximation": false,
+            "Points.Number": 0,
+            "Points.Polymon.List": [
+                {
+                    "Index": 0,
+                    "Value": 0
+                },
+                {
+                    "Index": 1,
+                    "Value": 0
+                }
+            ],
+            "Points.Polymon.Rank": 1,
+            "Precision2": false,
+            "Raw": false,
+            "ShortID": "thermocouple_",
+            "System": "",
+            "Type": 3
+        },
+        {
+            " Index": 6,
+            " Name": "thermocouple_3_A03_",
+            "Category": "",
+            "Control.Levels.Number": 0,
+            "Delay": 0,
+            "Department": "",
+            "Description": "",
+            "Dimension": "",
+            "Formula": "x = param()\ny = x\nreturn double(y)\n",
+            "Method": 0,
+            "Module.ID": 1597190209,
+            "Module.Name": "КСД/А03",
+            "Module.Slot": 3,
+            "Points.Approximation": false,
+            "Points.Number": 0,
+            "Points.Polymon.List": [
+                {
+                    "Index": 0,
+                    "Value": 0
+                },
+                {
+                    "Index": 1,
+                    "Value": 0
+                }
+            ],
+            "Points.Polymon.Rank": 1,
+            "Precision2": false,
+            "Raw": false,
+            "ShortID": "thermocouple_",
+            "System": "",
+            "Type": 3
+        },
+        {
+            " Index": 7,
+            " Name": "thermal_resistance_1_A04_",
+            "Category": "",
+            "Control.Levels.Number": 0,
+            "Delay": 0,
+            "Department": "",
+            "Description": "",
+            "Dimension": "",
+            "Formula": "x = param()\ny = x\nreturn double(y)\n",
+            "Method": 0,
+            "Module.ID": 1597255745,
+            "Module.Name": "КСД/А04",
+            "Module.Slot": 4,
+            "Points.Approximation": false,
+            "Points.Number": 0,
+            "Points.Polymon.List": [
+                {
+                    "Index": 0,
+                    "Value": 0
+                },
+                {
+                    "Index": 1,
+                    "Value": 0
+                }
+            ],
+            "Points.Polymon.Rank": 1,
+            "Precision2": false,
+            "Raw": false,
+            "ShortID": "thermal_resistance_",
+            "System": "",
+            "Type": 4
+        },
+        {
+            " Index": 8,
+            " Name": "thermal_resistance_2_A04_",
+            "Category": "",
+            "Control.Levels.Number": 0,
+            "Delay": 0,
+            "Department": "",
+            "Description": "",
+            "Dimension": "",
+            "Formula": "x = param()\ny = x\nreturn double(y)\n",
+            "Method": 0,
+            "Module.ID": 1597255745,
+            "Module.Name": "КСД/А04",
+            "Module.Slot": 4,
+            "Points.Approximation": false,
+            "Points.Number": 0,
+            "Points.Polymon.List": [
+                {
+                    "Index": 0,
+                    "Value": 0
+                },
+                {
+                    "Index": 1,
+                    "Value": 0
+                }
+            ],
+            "Points.Polymon.Rank": 1,
+            "Precision2": false,
+            "Raw": false,
+            "ShortID": "thermal_resistance_",
+            "System": "",
+            "Type": 4
+        },
+        {
+            " Index": 9,
+            " Name": "thermal_resistance_3_A04_",
+            "Category": "",
+            "Control.Levels.Number": 0,
+            "Delay": 0,
+            "Department": "",
+            "Description": "",
+            "Dimension": "",
+            "Formula": "x = param()\ny = x\nreturn double(y)\n",
+            "Method": 0,
+            "Module.ID": 1597255745,
+            "Module.Name": "КСД/А04",
+            "Module.Slot": 4,
+            "Points.Approximation": false,
+            "Points.Number": 0,
+            "Points.Polymon.List": [
+                {
+                    "Index": 0,
+                    "Value": 0
+                },
+                {
+                    "Index": 1,
+                    "Value": 0
+                }
+            ],
+            "Points.Polymon.Rank": 1,
+            "Precision2": false,
+            "Raw": false,
+            "ShortID": "thermal_resistance_",
+            "System": "",
+            "Type": 4
+        },
+        {
+            " Index": 10,
+            " Name": "analog_rms_1_A08",
+            "Category": "",
+            "Control.Levels.Number": 0,
+            "Delay": 0,
+            "Department": "",
+            "Description": "instantaneous voltage value",
+            "Dimension": "",
+            "Formula": "x = param()\ny = x\nreturn double(y)\n",
+            "Method": 0,
+            "Module.ID": 1597517889,
+            "Module.Name": "КСД/А08",
+            "Module.Slot": 7,
+            "Points.Approximation": false,
+            "Points.Number": 0,
+            "Points.Polymon.List": [
+                {
+                    "Index": 0,
+                    "Value": 0
+                },
+                {
+                    "Index": 1,
+                    "Value": 0
+                }
+            ],
+            "Points.Polymon.Rank": 1,
+            "Precision2": false,
+            "Raw": false,
+            "ShortID": "analog_",
+            "System": "",
+            "Type": 8
+        },
+        {
+            " Index": 11,
+            " Name": "analog_rms_2_A08",
+            "Category": "",
+            "Control.Levels.Number": 0,
+            "Delay": 0,
+            "Department": "",
+            "Description": "rms voltage value",
+            "Dimension": "",
+            "Formula": "x = param()\ny = x\nreturn double(y)\n",
+            "Method": 0,
+            "Module.ID": 1597517889,
+            "Module.Name": "КСД/А08",
+            "Module.Slot": 7,
+            "Points.Approximation": false,
+            "Points.Number": 0,
+            "Points.Polymon.List": [
+                {
+                    "Index": 0,
+                    "Value": 0
+                },
+                {
+                    "Index": 1,
+                    "Value": 0
+                }
+            ],
+            "Points.Polymon.Rank": 1,
+            "Precision2": false,
+            "Raw": false,
+            "ShortID": "rms_",
+            "System": "",
+            "Type": 8
+        },
+        {
+            " Index": 12,
+            " Name": "A01__cnl_1",
+            "Category": "Напряжение",
+            "Control.Levels.Number": 0,
+            "Delay": 0,
+            "Department": "",
+            "Description": "",
+            "Dimension": "В",
+            "Formula": "x = param()\ny = x\nreturn double(y)\n",
+            "Method": 0,
+            "Module.ID": 1597059137,
+            "Module.Name": "КСД/А01",
+            "Module.Slot": 1,
+            "Points.Approximation": false,
+            "Points.Number": 0,
+            "Points.Polymon.List": [
+                {
+                    "Index": 0,
+                    "Value": 0
+                },
+                {
+                    "Index": 1,
+                    "Value": 0
+                }
+            ],
+            "Points.Polymon.Rank": 1,
+            "Precision2": false,
+            "Raw": false,
+            "ShortID": "",
+            "System": "",
+            "Type": 1
+        },
+        {
+            " Index": 13,
+            " Name": "A01__cnl_2",
+            "Category": "Напряжение",
+            "Control.Levels.Number": 0,
+            "Delay": 0,
+            "Department": "",
+            "Description": "",
+            "Dimension": "В",
+            "Formula": "x = param()\ny = x\nreturn double(y)\n",
+            "Method": 0,
+            "Module.ID": 1597059137,
+            "Module.Name": "КСД/А01",
+            "Module.Slot": 1,
+            "Points.Approximation": false,
+            "Points.Number": 0,
+            "Points.Polymon.List": [
+                {
+                    "Index": 0,
+                    "Value": 0
+                },
+                {
+                    "Index": 1,
+                    "Value": 0
+                }
+            ],
+            "Points.Polymon.Rank": 1,
+            "Precision2": false,
+            "Raw": false,
+            "ShortID": "",
+            "System": "",
+            "Type": 1
+        },
+        {
+            " Index": 14,
+            " Name": "A01__cnl_3",
+            "Category": "Напряжение",
+            "Control.Levels.Number": 0,
+            "Delay": 0,
+            "Department": "",
+            "Description": "",
+            "Dimension": "В",
+            "Formula": "x = param()\ny = x\nreturn double(y)\n",
+            "Method": 0,
+            "Module.ID": 1597059137,
+            "Module.Name": "КСД/А01",
+            "Module.Slot": 1,
+            "Points.Approximation": false,
+            "Points.Number": 0,
+            "Points.Polymon.List": [
+                {
+                    "Index": 0,
+                    "Value": 0
+                },
+                {
+                    "Index": 1,
+                    "Value": 0
+                }
+            ],
+            "Points.Polymon.Rank": 1,
+            "Precision2": false,
+            "Raw": false,
+            "ShortID": "",
+            "System": "",
+            "Type": 1
+        },
+        {
+            " Index": 15,
+            " Name": "A02__",
+            "Category": "",
+            "Control.Levels.Number": 0,
+            "Delay": 0,
+            "Department": "",
+            "Description": "",
+            "Dimension": "В",
+            "Formula": "x = param()\ny = x\nreturn double(y)\n",
+            "Method": 0,
+            "Module.ID": 1597124673,
+            "Module.Name": "КСД/А02",
+            "Module.Slot": 2,
+            "Points.Approximation": false,
+            "Points.Number": 0,
+            "Points.Polymon.List": [
+                {
+                    "Index": 0,
+                    "Value": 0
+                },
+                {
+                    "Index": 1,
+                    "Value": 0
+                }
+            ],
+            "Points.Polymon.Rank": 1,
+            "Precision2": false,
+            "Raw": false,
+            "ShortID": "",
+            "System": "",
+            "Type": 2
+        }
+    ],
+    "Parameters.List.Analog": [
+        {
+            " Name": "A01__cnl_1",
+            "Line": 1
+        },
+        {
+            " Name": "A01__cnl_2",
+            "Line": 1
+        },
+        {
+            " Name": "A01__cnl_3",
+            "Line": 2
+        },
+        {
+            " Name": "analog_A01_",
+            "Line": 1
+        },
+        {
+            " Name": "analog_A05_",
+            "Line": 0
+        },
+        {
+            " Name": "analog_A06_",
+            "Line": 0
+        }
+    ],
+    "Parameters.List.Analog.TermResistance": [
+        {
+            " Name": "thermal_resistance_1_A04_",
+            "Line": 0,
+            "Resistor.Description": "Pt, 0.00385",
+            "Resistor.Type": 0,
+            "Resistor.Value": 0,
+            "Type": 0
+        },
+        {
+            " Name": "thermal_resistance_2_A04_",
+            "Line": 0,
+            "Resistor.Description": "Pt, 0.00385",
+            "Resistor.Type": 0,
+            "Resistor.Value": 1,
+            "Type": 1
+        },
+        {
+            " Name": "thermal_resistance_3_A04_",
+            "Line": 0,
+            "Resistor.Description": "П, 0.00391",
+            "Resistor.Type": 1,
+            "Resistor.Value": 10,
+            "Type": 1
+        }
+    ],
+    "Parameters.List.Analog.TermoCouple": [
+        {
+            " Name": "thermocouple_1_A03_",
+            "ColdShut.Index": 0,
+            "ColdShut.Used": false,
+            "Couple.Description": "R (ТПП)",
+            "Couple.Type": 0,
+            "Line": 0,
+            "Type": 0
+        },
+        {
+            " Name": "thermocouple_2_A03_",
+            "ColdShut.Index": 0,
+            "ColdShut.Used": false,
+            "Couple.Description": "R (ТПП)",
+            "Couple.Type": 0,
+            "Line": 0,
+            "Type": 1
+        },
+        {
+            " Name": "thermocouple_3_A03_",
+            "ColdShut.Index": 0,
+            "ColdShut.Used": false,
+            "Couple.Description": "T (ТМК)",
+            "Couple.Type": 4,
+            "Line": 0,
+            "Type": 1
+        }
+    ],
+    "Parameters.List.Analog.Vibro": [
+        {
+            " Name": "A02__",
+            "Line": 0,
+            "Type": 0,
+            "Vibro.Description": "Напряжение",
+            "Vibro.Length": 0,
+            "Vibro.Ration": 0
+        },
+        {
+            " Name": "vibro_A02",
+            "Line": 0,
+            "Type": 1,
+            "Vibro.Description": "Ускорение",
+            "Vibro.Length": 30,
+            "Vibro.Ration": 50
+        }
+    ],
+    "Parameters.List.Analog.Voltage": [
+        {
+            " Name": "analog_rms_1_A08",
+            "Line": 0,
+            "Type": 0,
+            "Voltage.Description": "Мгновенное",
+            "Voltage.Hysteresis": 0,
+            "Voltage.Waves": 0
+        },
+        {
+            " Name": "analog_rms_2_A08",
+            "Line": 0,
+            "Type": 1,
+            "Voltage.Description": "Действующее",
+            "Voltage.Hysteresis": 2,
+            "Voltage.Waves": 6
+        }
+    ],
+    "Parameters.Number": 16,
+    "Parameters.Number.ARINC": 0,
+    "Parameters.Number.ARINC.Verxushka": 0,
+    "Parameters.Number.Analog": 6,
+    "Parameters.Number.Analog.TermResistance": 3,
+    "Parameters.Number.Analog.TermoCouple": 3,
+    "Parameters.Number.Analog.Vibro": 2,
+    "Parameters.Number.Analog.Voltage": 2,
+    "Parameters.Number.CAN": 0,
+    "Parameters.Number.Counter": 0,
+    "Parameters.Number.Discrete": 0,
+    "Parameters.Number.Ethernet.UDP": 0,
+    "Parameters.Number.FC-AE-ASM": 0,
+    "Parameters.Number.IRIG": 0,
+    "Parameters.Number.MIL-STD": 0,
+    "Parameters.Number.RS.IVTM": 0,
+    "Parameters.Number.SNS": 0,
+    "Parameters.Number.SysInfo": 0
 }

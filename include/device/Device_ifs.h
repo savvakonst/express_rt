@@ -9,7 +9,7 @@
 //
 #include "Module_ifs.h"
 
-class COMMON_API_ Device : public Module_ifs {
+class COMMON_API_ Device_ifs : public Module_ifs {
    private:
     struct DeviceDate {
         uint8_t day;
@@ -45,11 +45,13 @@ class COMMON_API_ Device : public Module_ifs {
     friend class DeviceManager;
 
    public:
-    Device(const void *ptr, size_t size, ExtensionManager *context);
+    Device_ifs(const void *ptr, size_t size, ExtensionManager *context);
 
-    ~Device() override;
+    ~Device_ifs() override;
 
     void setSource(const std::string &source) { source_ = source; }
+
+
     [[nodiscard]] std::string getSource() const { return source_; }
 
     [[nodiscard]] bool hasTransceiver() const override;
@@ -95,7 +97,6 @@ class COMMON_API_ Device : public Module_ifs {
 
     [[nodiscard]] Value getChannelProperty(const std::string &channel, const std::string &type) const override {
         return Value();
-        ;
     }
 
     /* not yet implemented inherited members  end*/

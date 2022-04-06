@@ -57,6 +57,13 @@ Value Module_A02_::getChannelProperty(const std::string& channel, const std::str
     if (type == "frequency") {
         auto hd = getProperty("cnl/" + channel + "/frequency");
         return hd ? hd->getValue() : Value(int64_t(0xff));
+    } else if (type == "factor") {
+        const auto& cnl = task_.cnl[std::stoi(channel)];
+        auto factor = double(cnl.range) / (1000000);
+        factor = factor / (1 << 15);
+        return Value(factor);
+    } else if (type == "signed") {
+        return Value(true);
     }
     return KSDModule::getChannelProperty(channel, type);
 }

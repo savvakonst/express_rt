@@ -53,7 +53,7 @@ class ListWidgetWrapper_ifs : public WidgetWrapper_ifs {
 };
 
 class Module_ifs;
-class Device;
+class Device_ifs;
 class ExrtAction_ifs;
 
 class DeviceViewWrapper_ifs : public WidgetWrapper_ifs {
@@ -64,7 +64,7 @@ class DeviceViewWrapper_ifs : public WidgetWrapper_ifs {
     virtual bool addToSelected(const std::string &source, const std::string &path) = 0;
     virtual bool removeFromSelected(const std::string &source, const std::string &path) = 0;
 
-    virtual Device *getActiveDevice() = 0;
+    virtual Device_ifs *getActiveDevice() = 0;
     virtual std::string getActiveDeviceSource() = 0;
 
     virtual Module_ifs *getActiveModule() = 0;

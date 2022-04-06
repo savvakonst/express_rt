@@ -10,7 +10,7 @@
 //#include "Helper_Works2.h"
 
 class Parameter_ifs;
-class Device;
+class Device_ifs;
 class ExtensionManager;
 
 class QScreenScene : public QGraphicsScene {

@@ -18,10 +18,13 @@ inline size_t getLen(void **array) {
 PseudoSyncPrmBuffer::PseudoSyncPrmBuffer(  //
     const Parameter_ifs *parent,           //
     size_t sample_frequency_log_2,         //
-    bufferType_t *init_buffer,             //
-    size_t intervals_buffer_length,        //
+    double factor, bool is_signed,
+    bufferType_t *init_buffer,       //
+    size_t intervals_buffer_length,  //
     RelativeTime buffer_interval)
     : sample_frequency_log_2_(sample_frequency_log_2),
+      factor_(factor),
+      is_signed_(is_signed),
       seed_intervals_length_(intervals_buffer_length),
       buffer_time_interval_(buffer_interval),
       buffer_length_(uint64_t(uint64_t(buffer_interval.time) * uint64_t(uint64_t(1) << sample_frequency_log_2_)) >> 32),
@@ -55,19 +58,20 @@ PseudoSyncPrmBuffer::~PseudoSyncPrmBuffer() {
 Reader_ifs *PseudoSyncPrmBuffer::createReader() {
     auto *ir = new IntervalBuffer(this, Borders(buffer_start_time_, buffer_time_interval_));
 
-    ir->seed_length_ = seed_intervals_length_;
     ir->borders_ = Borders(buffer_start_time_, buffer_time_interval_);
+
+    ir->seed_length_ = seed_intervals_length_;
+    ir->capacity_ = getIntervalCapacity(ir->borders_);
+    while (ir->capacity_ < ir->seed_length_) {
+        ir->seed_length_ >>= 1;
+    }
 
     auto size = 2 * ir->seed_length_ + 2;
     ir->data_ = new Reader_ifs::Point[2 * ir->seed_length_ + 2];
 
     for (size_t i = 0; i < size; i++) ir->data_[i] = {0, 0, 0, 0};
 
-    ir->capacity_ = getIntervalCapacity(ir->borders_);
     ir->step_ = (ir->capacity_ / ir->seed_length_);
-    if (ir->capacity_<ir->seed_length_)
-
-
 
     ir->start_pos_ = ir->capacity_ / ir->step_ + 2;
     ir->remainder_ = ir->capacity_ % ir->step_;
@@ -155,14 +159,27 @@ bool PseudoSyncPrmBuffer::update(char *data, size_t number_of_points) {
         first_end_pos = buffer_length_;
     }
 
-    bufferType_t *typed_data = (bufferType_t *)data;
+    // bufferType_t *typed_data = (bufferType_t *)data;
+    if (is_signed_) {
+        auto typed_data = (int16_t *)data;
 
-    for (size_t i = buffer_start_pos_; i < first_end_pos; i++) {
-        buffer_[i] = *(typed_data++);
-    }
+        for (size_t i = buffer_start_pos_; i < first_end_pos; i++) {
+            buffer_[i] = double(*(typed_data++)) * factor_;
+        }
 
-    for (size_t i = 0; i < second_end_pos; i++) {
-        buffer_[i] = *(typed_data++);
+        for (size_t i = 0; i < second_end_pos; i++) {
+            buffer_[i] = double(*(typed_data++)) * factor_;
+        }
+    } else {
+        auto typed_data = (uint16_t *)data;
+
+        for (size_t i = buffer_start_pos_; i < first_end_pos; i++) {
+            buffer_[i] = double(*(typed_data++)) * factor_;
+        }
+
+        for (size_t i = 0; i < second_end_pos; i++) {
+            buffer_[i] = double(*(typed_data++)) * factor_;
+        }
     }
 
     int64_t time = buffer_time_step_ * number_of_points;
@@ -192,8 +209,8 @@ bool PseudoSyncPrmBuffer::update(char *data, size_t number_of_points) {
 void PseudoSyncPrmBuffer::increasePoints(size_t number_of_points, IntervalBuffer *ir) {
     if (number_of_points >= ir->capacity_) {
         // FIXME: be attentive
-        std::cout << "ir->pos_of_right_buffer_border_: " << ir->pos_of_right_buffer_border_;
-        std::cout << ", ir->number_of_points: " << number_of_points << "\n";
+        // std::cout << "ir->pos_of_right_buffer_border_: " << ir->pos_of_right_buffer_border_;
+        // std::cout << ", ir->number_of_points: " << number_of_points << "\n";
 
         ir->pos_of_right_buffer_border_ += (number_of_points - ir->capacity_);
         ir->pos_of_right_buffer_border_ = ir->pos_of_right_buffer_border_ < buffer_length_
@@ -235,8 +252,8 @@ void PseudoSyncPrmBuffer::increasePoints(size_t number_of_points, IntervalBuffer
         // ir->itrv_ = ir->data_ + ((ir->start_pos_ + ir->length_ - 2) % ir->length_);
 
 #ifdef DEBUG_
-        std::cout << "end ir->pos_of_right_buffer_border_: " << ir->pos_of_right_buffer_border_;
-        std::cout << ", ir->number_of_points: " << number_of_points << "\n";
+        // std::cout << "end ir->pos_of_right_buffer_border_: " << ir->pos_of_right_buffer_border_;
+        // std::cout << ", ir->number_of_points: " << number_of_points << "\n";
 #endif
         return;
     }
