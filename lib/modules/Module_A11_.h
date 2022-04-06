@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <map>
 
-#include "KSDModule.h"
+#include "device/KsdModule.h"
 #include "device/ModuleStream_ifs.h"
 
 class Module_A11_ : public KSDModule {

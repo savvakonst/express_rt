@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <map>
 
-#include "KsdModule.h"
+#include "device/KsdModule.h"
 #include "device/ModuleStream_ifs.h"
 
 class EthernetDCU_Stream;

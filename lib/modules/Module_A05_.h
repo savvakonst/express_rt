@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <map>
 
-#include "KSDModule.h"
+#include "device/KsdModule.h"
 #include "device/ModuleStream_ifs.h"
 
 class Module_A05_ : public KSDModule {
@@ -49,7 +49,7 @@ class Module_A05_ : public KSDModule {
 
     [[nodiscard]] bool isChannelAvailable(const std::string& prop_path) const override;
 
-    [[nodiscard]]  Value getChannelProperty(const std::string &channel, const std::string &type) const override;
+    [[nodiscard]] Value getChannelProperty(const std::string& channel, const std::string& type) const override;
 
     bool storeTaskToBuffer(void* pointer) const override {
         memcpy(pointer, (void*)&task_, sizeof(Task));

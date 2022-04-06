@@ -28,7 +28,7 @@ define_txt = """
 
 #include <map>
 #include <cstdint>
-#include "KSDModule.h"
+#include "device/KsdModule.h"
 #include "device/ModuleStream_ifs.h"
 #include "Module_DCU_.h"
 """
