@@ -14,6 +14,17 @@
 KsdIO::KsdIO() : IO_ifs("*.ksd", "Ksd files", "") {}
 KsdIO::~KsdIO() = default;
 
+class KsdFileDevice : public Device_ifs {
+   public:
+    KsdFileDevice(const TNMLIB_RECORD_MODULES_MAP &modules_map, const void *ptr, size_t size, ExtensionManager *context)
+        : Device_ifs(ptr, size, context),modules_map_(modules_map) {
+
+    }
+
+   private:
+    const TNMLIB_RECORD_MODULES_MAP modules_map_;
+};
+
 bool KsdIO::readDocument(ExtensionManager *manager, const std::string &source_path) {
     std::ifstream in(source_path, std::ios::in | std::ios::binary);
 
@@ -43,10 +54,8 @@ bool KsdIO::readDocument(ExtensionManager *manager, const std::string &source_pa
         std::unique_ptr<Device_ifs> device(new Device_ifs(u_buffer.get(), task_size, manager));
 
         device->setSource("file://" + source_path);
-        device
-            ->
 
-            device_manager->addDevice(device.release());
+        device_manager->addDevice(device.release());
         return true;
     }
     return false;

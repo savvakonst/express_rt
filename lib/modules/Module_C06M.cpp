@@ -2,6 +2,8 @@
 
 #include "Module_C06M.h"
 
+#include "TaskMapper.h"
+
 Module_C06M::Module_C06M()
     : KSDModule(  //
           TaskMapper({{"header", header_map_}, {"inputs", u8}, {"reserved", {31, u8}}})) {

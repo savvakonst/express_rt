@@ -2,6 +2,8 @@
 
 #include "Module_D01_.h"
 
+#include "TaskMapper.h"
+
 Module_D01_::Module_D01_()
     : KSDModule(  //
           TaskMapper(

@@ -2,6 +2,7 @@
 #include <sstream>
 //
 #include "Module_DCU_.h"
+#include "TaskMapper.h"
 #include "common/ExtensionManager.h"
 #include "common/StringProcessingTools.h"
 #include "device/Device_ifs.h"

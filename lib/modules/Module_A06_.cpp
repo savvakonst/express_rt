@@ -2,6 +2,7 @@
 
 #include "Module_A06_.h"
 
+#include "TaskMapper.h"
 #include "common.h"
 typedef EthernetSyncXXXX_Stream<Module_A06_> EthernetA06_Stream;
 

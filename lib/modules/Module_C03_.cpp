@@ -2,6 +2,8 @@
 
 #include "Module_C03_.h"
 
+#include "TaskMapper.h"
+
 Module_C03_::Module_C03_()
     : KSDModule(  //
           TaskMapper({{"header", header_map_},
