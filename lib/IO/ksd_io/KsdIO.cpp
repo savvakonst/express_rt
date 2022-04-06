@@ -4,26 +4,15 @@
 #include <memory>
 #include <string>
 //
+//#include "KsdApi/tnmdefs.h"
 #include "KsdIO.h"
 #include "common/ExtensionManager.h"
 #include "device/DeviceManager.h"
 #include "device/Device_ifs.h"
-//
-#include "KsdApi/tnmdefs.h"
+#include "device/KsdDevice.h"
 
 KsdIO::KsdIO() : IO_ifs("*.ksd", "Ksd files", "") {}
 KsdIO::~KsdIO() = default;
-
-class KsdFileDevice : public Device_ifs {
-   public:
-    KsdFileDevice(const TNMLIB_RECORD_MODULES_MAP &modules_map, const void *ptr, size_t size, ExtensionManager *context)
-        : Device_ifs(ptr, size, context),modules_map_(modules_map) {
-
-    }
-
-   private:
-    const TNMLIB_RECORD_MODULES_MAP modules_map_;
-};
 
 bool KsdIO::readDocument(ExtensionManager *manager, const std::string &source_path) {
     std::ifstream in(source_path, std::ios::in | std::ios::binary);
@@ -45,13 +34,19 @@ bool KsdIO::readDocument(ExtensionManager *manager, const std::string &source_pa
     if (in) {
         in.read((char *)&offsets, sizeof(offsets));
 
-        in.seekg(std::streamsize(offsets.header_offset_ + sizeof(header)), std::ios::beg);
+        in.seekg(std::streamsize(offsets.header_offset_), std::ios::beg);
+
+        in.read((char *)&header, sizeof(header));
+
         auto task_size = offsets.data_offset_ - offsets.header_offset_ - sizeof(header);
 
         std::unique_ptr<char[]> u_buffer(new char[task_size]);
         in.read(u_buffer.get(), std::streamsize(task_size));
 
-        std::unique_ptr<Device_ifs> device(new Device_ifs(u_buffer.get(), task_size, manager));
+        std::vector<TNMLIB_RECORD_MODULE_INFO> vec(header.modules_map_.MI,
+                                                   header.modules_map_.MI + TNMLIB_CFG_MAX_MODULES_ENTRIES);
+
+        std::unique_ptr<KsdDevice> device(new KsdDevice(vec, u_buffer.get(), task_size, manager));
 
         device->setSource("file://" + source_path);
 

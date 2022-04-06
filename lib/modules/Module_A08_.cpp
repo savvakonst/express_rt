@@ -2,8 +2,8 @@
 
 #include "Module_A08_.h"
 
-#include "TaskMapper.h"
 #include "common.h"
+
 typedef EthernetSyncXXXX_Stream<Module_A08_> EthernetA08_Stream;
 
 Module_A08_::Module_A08_()
@@ -45,6 +45,7 @@ bool Module_A08_::setPropertyAsTxt(const std::string& prop_path, const std::stri
 }
 
 bool Module_A08_::isChannelAvailable(const std::string& prop_path) const {
+    if (!isAvailable()) return false;
     auto hd = getProperty("cnl/" + prop_path + "/frequency");
     if ((hd == nullptr) || !hd->isValue()) {
         return false;

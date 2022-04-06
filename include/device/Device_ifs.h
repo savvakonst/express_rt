@@ -10,7 +10,7 @@
 #include "Module_ifs.h"
 
 class COMMON_API_ Device_ifs : public Module_ifs {
-   private:
+   protected:
     struct DeviceDate {
         uint8_t day;
         uint8_t month;
@@ -50,7 +50,6 @@ class COMMON_API_ Device_ifs : public Module_ifs {
     ~Device_ifs() override;
 
     void setSource(const std::string &source) { source_ = source; }
-
 
     [[nodiscard]] std::string getSource() const { return source_; }
 
@@ -112,12 +111,6 @@ class COMMON_API_ Device_ifs : public Module_ifs {
     ModuleStream_ifs *getModuleStream() override;
 
     bool removeModuleStream() override;
-
-    // TODO : remove this
-    Module_ifs *getTopModule() {
-        if (modules_.size()) return modules_.front();
-        return nullptr;
-    }
 };
 
 #endif

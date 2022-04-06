@@ -1,4 +1,5 @@
 #include "device/DeviceManager.h"
+#include "device/KsdDevice.h"
 //
 #include "Adapters/Adapters.h"
 #include "Ping/ksdconnected.h"
@@ -37,7 +38,9 @@ class RefreshAction : public ExrtAction_ifs {
 
         for (auto &c_device : connected_devices) {
             const auto &buffer = c_device->getTask();
-            std::unique_ptr<Device_ifs> device(new Device_ifs(buffer.data(), buffer.size(), manager_));
+            //= c_device->getRecordModulesMap()
+            std::unique_ptr<KsdDevice> device(
+                new KsdDevice(c_device->getRecordModulesMap(), buffer.data(), buffer.size(), manager_));
             device->setSource(c_device->getSource());
 
             device_manager_->addDevice(device.release());

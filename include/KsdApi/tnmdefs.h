@@ -1,5 +1,5 @@
-#ifndef _tnmdefs_header_
-#define _tnmdefs_header_
+#ifndef EXRT_TNMDEFS_H
+#define EXRT_TNMDEFS_H
 
 #define TNMLIB_API __stdcall
 
@@ -165,4 +165,4 @@ typedef struct _TNMLIB_DEVICE_RECORD_PARAM {
 
 #include <poppack.h>
 
-#endif  // _tnmdefs_header_
+#endif  // EXRT_TNMDEFS_H

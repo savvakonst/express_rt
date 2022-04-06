@@ -18,6 +18,7 @@ add_library(CommonLib SHARED
         convtemplate/ParameterFieldTree.cpp
         convtemplate/StandardParameter_ifs.cpp
         device/Device_ifs.cpp
+        device/TaskMapper.cpp
         device/KsdModule.cpp
         common/StringProcessingTools.cpp)
 

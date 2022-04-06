@@ -5,19 +5,14 @@
 #include <map>
 #include <utility>
 
+#include "KsdApi/tnmdefs.h"
 #include "TaskMapper.h"
 #include "device/ModuleStream_ifs.h"
 #include "device/Module_ifs.h"
 
-/*
- *
- *
- *
- */
-
 class ExtensionManager;
 
-class KSDModule : public Module_ifs {
+class COMMON_API_ KSDModule : public Module_ifs {
    protected:
     explicit KSDModule(const TaskMapper &field_map) : field_map_(field_map) {}
 
@@ -46,12 +41,16 @@ class KSDModule : public Module_ifs {
 
     [[nodiscard]] const TaskMapper *getBranch(const std::string &prop_path) const;
 
+    TNMLIB_RECORD_MODULE_INFO record_module_info_{0, 0, 0, 0, 0};
+
    public:
+    void setStatus(const TNMLIB_RECORD_MODULE_INFO &record_module_info) { record_module_info_ = record_module_info; }
+
     [[nodiscard]] bool hasTransceiver() const override { return false; }
 
     [[nodiscard]] EthernetSettings getSrcAddress() const override { return {}; }
 
-    [[nodiscard]] bool isAvailable() const override { return true; }
+    [[nodiscard]] bool isAvailable() const override { return record_module_info_.status == 0; }
 
     [[nodiscard]] std::string getModulePath(bool full_path) const override;
 

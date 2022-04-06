@@ -9,9 +9,9 @@
 #include <map>
 #include <utility>
 
-#include "device/Module_ifs.h"
+#include "common/CustomTypes.h"
 
-class TaskMapper : public HierarchicalData_ifs {
+class COMMON_API_ TaskMapper : public HierarchicalData_ifs {
    public:
     enum StructType
     {
@@ -39,7 +39,7 @@ class TaskMapper : public HierarchicalData_ifs {
 
     [[nodiscard]] bool isValue() const override { return struct_type_ == StructType::value; };
 
-    [[nodiscard]] Value getValue() const override {  // necessarry to add guard
+    [[nodiscard]] Value getValue() const override {  // TODO: necessary to add guard
         return {ptr_, type_};
     };
 
@@ -65,10 +65,5 @@ class TaskMapper : public HierarchicalData_ifs {
     std::vector<tuple_t> vecmap_;
     std::map<std::string, HierarchicalData_ifs *> map_;
 };
-#include <cstdint>
-#include <map>
-#include <utility>
 
-#include "device/ModuleStream_ifs.h"
-#include "device/Module_ifs.h"
 #endif  // EXRT_TASKMAPPER_H
