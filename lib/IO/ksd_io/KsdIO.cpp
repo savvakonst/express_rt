@@ -59,3 +59,4 @@ bool KsdIO::readDocument(ExtensionManager *manager, const std::string &source_pa
 bool KsdIO::saveDocument(ExtensionManager *manager, const std::string &id, const std::string &dst_path) {
     return false;
 }
+bool KsdIO::saveDocument(ExtensionManager *manager, void *obj_ptr, const std::string &dst_path) { return false; }

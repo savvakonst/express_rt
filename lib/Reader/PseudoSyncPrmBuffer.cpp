@@ -62,7 +62,7 @@ Reader_ifs *PseudoSyncPrmBuffer::createReader() {
 
     ir->seed_length_ = seed_intervals_length_;
     ir->capacity_ = getIntervalCapacity(ir->borders_);
-    while (ir->capacity_ < ir->seed_length_) {
+    while ((ir->capacity_ / 2) < ir->seed_length_) {
         ir->seed_length_ >>= 1;
     }
 
@@ -197,20 +197,9 @@ bool PseudoSyncPrmBuffer::update(char *data, size_t number_of_points) {
     return true;
 }
 
-#define INSERT_CODE_()                                                       \
-    for (size_t i = ir->buffer_pos_of_right_border_; i < end; i++) {         \
-        ir->buffer_pos_of_right_border_ = EXRT_remainder(i, buffer_length_); \
-        addToPoint(interval, ir->buffer_pos_of_right_border_);               \
-    }                                                                        \
-    ir->buffer_pos_of_right_border_++;                                       \
-    ir->buffer_pos_of_right_border_ = EXRT_remainder(ir->pos_of_right_buffer_border_, buffer_length_);
-
-#include <iostream>
 void PseudoSyncPrmBuffer::increasePoints(size_t number_of_points, IntervalBuffer *ir) {
     if (number_of_points >= ir->capacity_) {
         // FIXME: be attentive
-        // std::cout << "ir->pos_of_right_buffer_border_: " << ir->pos_of_right_buffer_border_;
-        // std::cout << ", ir->number_of_points: " << number_of_points << "\n";
 
         ir->pos_of_right_buffer_border_ += (number_of_points - ir->capacity_);
         ir->pos_of_right_buffer_border_ = ir->pos_of_right_buffer_border_ < buffer_length_
@@ -248,29 +237,9 @@ void PseudoSyncPrmBuffer::increasePoints(size_t number_of_points, IntervalBuffer
 
         ir->pos_of_right_buffer_border_ = EXRT_remainder(next_index, buffer_length_);
 
-        // bool is_additional_sell = ir->step_2_ >= ir->ord_;
-        // ir->itrv_ = ir->data_ + ((ir->start_pos_ + ir->length_ - 2) % ir->length_);
-
-#ifdef DEBUG_
-        // std::cout << "end ir->pos_of_right_buffer_border_: " << ir->pos_of_right_buffer_border_;
-        // std::cout << ", ir->number_of_points: " << number_of_points << "\n";
-#endif
         return;
     }
-    /*
-        // begin calculation
-        auto tmp = number_of_points - ir->step_1_ + ir->step_;
-        ir->step_1_ = ir->step_ - ((number_of_points < ir->step_1_) ? number_of_points : tmp % ir->step_);
 
-        // end calculation
-        bool is_additional_sell = ir->step_2_ >= ir->ord_;
-        // TODO: CREATE MEMBER end_pos_ for IntervalBuffer
-        auto end_intervals_pos = (ir->start_pos_ + ir->length_ - 1 - size_t(is_additional_sell)) % ir->length_;
-
-        tmp = number_of_points + ir->step_2_;
-        auto right_step = tmp % ir->step_;
-
-        */
     auto g_pos = ir->pos_of_right_buffer_border_;
 
 #define INCREASE_G_POS() \

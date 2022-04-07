@@ -11,11 +11,11 @@ typedef void *TNMLIB_HANDLE;
 #include <stdint.h>
 #include <windows.h>  // TODO:  remove this anyway,it is best to split this file into architecture independent and architecture depended files
 
-typedef BOOL(CALLBACK *LPTNMLIB_DATAPROCESSPROC)(LPVOID lpBuffer, uint32_t dwBufferSize, LPVOID lpParam);
-typedef BOOL(CALLBACK *LPTNMLIB_PROGRESSPROC)(LPVOID lpParam);
+typedef BOOL(CALLBACK *LPTNMLIB_DATAPROCESSPROC)(LPVOID buffer, uint32_t buffer_size, LPVOID param);
+typedef BOOL(CALLBACK *LPTNMLIB_PROGRESSPROC)(LPVOID param);
 
-typedef BOOL(CALLBACK *LPTNMLIB_STAGEDREADPROC)(LPVOID lpStageBuffer, uint32_t dwStageSize, LPVOID lpParam);
-typedef BOOL(CALLBACK *LPTNMLIB_STAGEDWRITEPROC)(LPVOID *lpStageBuffer, uint32_t dwStageSize, LPVOID lpParam);
+typedef BOOL(CALLBACK *LPTNMLIB_STAGEDREADPROC)(LPVOID stage_buffer, uint32_t stage_size, LPVOID param);
+typedef BOOL(CALLBACK *LPTNMLIB_STAGEDWRITEPROC)(LPVOID *stage_buffer, uint32_t stage_size, LPVOID param);
 
 //
 #define TNMLIB_DEVICE_MEMTYPE_RAWFLASH 0

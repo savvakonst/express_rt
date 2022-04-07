@@ -412,6 +412,11 @@ class PyIO : public IO_ifs {
     bool saveDocument(ExtensionManager *manager, const std::string &id, const std::string &dst_path) override {
         PYBIND11_OVERRIDE_PURE(bool, IO_ifs, saveDocument, manager, id, dst_path);
     }
+
+    bool saveDocument(ExtensionManager *manager, void *obj_ptr, const std::string &dst_path) override {
+        PYBIND11_OVERRIDE_PURE(bool, IO_ifs, saveDocument, manager, obj_ptr, dst_path);
+    }
+
 };
 
 #endif  // EXAMPLE_BINDER_H

@@ -146,6 +146,8 @@ bool BaseIO::saveDocument(ExtensionManager *manager, const std::string &id, cons
     return false;
 }
 
+bool BaseIO::saveDocument(ExtensionManager *manager, void *obj_ptr, const std::string &dst_path) { return false; }
+
 ConversionTemplate *BaseIO::parseDocument(ExtensionManager *manager, const std::string &str,
                                           const std::string &source_path) {
     return readOrParseDocument(manager, false, str, source_path);
@@ -187,7 +189,7 @@ ConversionTemplate *BaseIO::readOrParseDocument(ExtensionManager *manager, bool 
         auto path = "changes/" + std::to_string(counter);
 
         setAlteration(path, time, edited_by);
-        
+
         for (const auto &i : get("Base.Alteration.List", doc)) {
             counter++;
             edited_by = getVal<std::string>("EditedBy", i, "");

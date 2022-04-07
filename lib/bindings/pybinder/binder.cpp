@@ -177,7 +177,9 @@ PYBIND11_MODULE(PY_BINDLIB_NAME, m) {
     py::class_<IO_ifs, PyIO, std::unique_ptr<IO_ifs, py::nodelete>>(m, "pyIO")
         .def(py::init<const std::string &, const std::string &, const std::string &>())
         .def("readDocument", &IO_ifs::readDocument)
-        .def("saveDocument", &IO_ifs::saveDocument)
+        .def<bool (IO_ifs::*)(ExtensionManager *, const std::string &, const std::string &)>("saveDocument",
+                                                                                             &IO_ifs::saveDocument)
+        .def<bool (IO_ifs::*)(ExtensionManager *, void *, const std::string &)>("saveDocument", &IO_ifs::saveDocument)
         .def_readonly("filename_pattern_", &IO_ifs::filename_pattern_)
         .def_readonly("file_type_", &IO_ifs::file_type_)
         .def_readonly("file_info_", &IO_ifs::file_info_);

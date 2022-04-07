@@ -22,8 +22,9 @@ Borders IntervalBuffer::getAvailableBorders() {
 
 std::unique_ptr<Reader_ifs::Chunk> IntervalBuffer::getPoints(const Borders &borders, Reader_ifs::Point *ptr,
                                                              size_t target_len) {
-    while (false == parent_->lock(true)) {
+    while (!parent_->lock(true)) {
     }
+
     Borders cr_borders = borders;
 
     std::unique_ptr<Chunk> ret(new Chunk());
@@ -37,6 +38,7 @@ std::unique_ptr<Reader_ifs::Chunk> IntervalBuffer::getPoints(const Borders &bord
 
     size_t pos_offset = 0;
 
+    // left out of border chunk
     if (cr_borders.begin < parent_->buffer_start_time_) {
         chunk_ptr->next_ = new Chunk();
         chunk_ptr->borders_ = {cr_borders.begin, parent_->buffer_start_time_};
@@ -49,6 +51,7 @@ std::unique_ptr<Reader_ifs::Chunk> IntervalBuffer::getPoints(const Borders &bord
         chunk_ptr = chunk_ptr->next_;
     }
 
+    // right out of border chunk
     auto parent_end_time = (parent_->buffer_start_time_ + parent_->buffer_time_interval_);
     if (cr_borders.end > parent_end_time) {
         end_chunk = new Chunk();
@@ -70,6 +73,11 @@ std::unique_ptr<Reader_ifs::Chunk> IntervalBuffer::getPoints(const Borders &bord
         if (cap == 0) return {};
         if (cap < target_len) {
             /* TODO: to implement direct reading mode */
+
+            for (size_t pos = 0; pos < cap; pos++) {
+                // parent_->buffer_start_time_
+            }
+
             return {};
         }
         capacity_ = cap;

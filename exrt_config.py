@@ -10,6 +10,7 @@ ksd_io.readDocument(manager, "data-004.ksd")
 base_io = getPyIO(manager, "base_io")
 base_io.readDocument(manager, "analog.base")
 base_io.readDocument(manager, "extended_analog.base")
+base_io.readDocument(manager, "res_analog.base")
 
 refresh_ethernet_action = getExrtAction(manager, "file/refresh_ethernet_devices")
 refresh_ethernet_action.run()
