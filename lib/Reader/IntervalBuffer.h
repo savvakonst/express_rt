@@ -19,7 +19,7 @@ class READER_API_ IntervalBuffer : public Reader_ifs {
     Parameter_ifs *getParameter() override;
 
     IntervalBuffer(PseudoSyncPrmBuffer *parent, const Borders &borders);
-    ;
+
     ~IntervalBuffer() override { delete[] data_; }
 
     std::unique_ptr<Reader_ifs::Chunk> getPoints(const Borders &borders, Point *ptr, size_t target_len) override;
@@ -42,8 +42,6 @@ class READER_API_ IntervalBuffer : public Reader_ifs {
      * (pos of first interval in buffer ) */
     size_t start_pos_ = 0;
 
-    // Point *itrv_ = 0;
-
     /*    this is the number of points which are contained
      * in "intervals_borders_" */
     size_t capacity_ = 0;
@@ -52,10 +50,11 @@ class READER_API_ IntervalBuffer : public Reader_ifs {
 
     size_t remainder_ = 0;
     size_t step_ = 0;
-    // size_t step_1_ = 0;
     size_t k_r_ = 0;
 
     size_t pos_of_right_buffer_border_ = 0;
+
+
 
     PseudoSyncPrmBuffer *parent_;
 };

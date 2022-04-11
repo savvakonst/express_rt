@@ -144,7 +144,7 @@ class Timer : public QTimer {
     Timer(QFormScreen *q_form_screen, ModuleStream_ifs *redused_module_stream)
         : q_form_screen_(q_form_screen), redused_module_stream_(redused_module_stream) {
         QObject::connect(this, &Timer::timeout, this, &Timer::onTimer);
-        setInterval(static_cast<int>(100));
+        setInterval(static_cast<int>(500));
         start(static_cast<int>(0));
     }
 

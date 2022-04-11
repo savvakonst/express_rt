@@ -131,7 +131,7 @@ bool PseudoSyncPrmBuffer::initBuffer(char *data, size_t number_of_points) {
         buffer_[i] = 0;
     }
 
-    int64_t time = buffer_time_step_ * number_of_points;
+    auto time = int64_t(buffer_time_step_ * number_of_points);
 
     // TODO: this is the worst(incorrect) approach to synchronization
     while (updating_borders_)
@@ -163,26 +163,19 @@ bool PseudoSyncPrmBuffer::update(char *data, size_t number_of_points) {
     if (is_signed_) {
         auto typed_data = (int16_t *)data;
 
-        for (size_t i = buffer_start_pos_; i < first_end_pos; i++) {
-            buffer_[i] = double(*(typed_data++)) * factor_;
-        }
+        for (size_t i = buffer_start_pos_; i < first_end_pos; i++) buffer_[i] = double(*(typed_data++)) * factor_;
 
-        for (size_t i = 0; i < second_end_pos; i++) {
-            buffer_[i] = double(*(typed_data++)) * factor_;
-        }
+        for (size_t i = 0; i < second_end_pos; i++) buffer_[i] = double(*(typed_data++)) * factor_;
+
     } else {
         auto typed_data = (uint16_t *)data;
 
-        for (size_t i = buffer_start_pos_; i < first_end_pos; i++) {
-            buffer_[i] = double(*(typed_data++)) * factor_;
-        }
+        for (size_t i = buffer_start_pos_; i < first_end_pos; i++) buffer_[i] = double(*(typed_data++)) * factor_;
 
-        for (size_t i = 0; i < second_end_pos; i++) {
-            buffer_[i] = double(*(typed_data++)) * factor_;
-        }
+        for (size_t i = 0; i < second_end_pos; i++) buffer_[i] = double(*(typed_data++)) * factor_;
     }
 
-    int64_t time = buffer_time_step_ * number_of_points;
+    auto time = int64_t(buffer_time_step_ * number_of_points);
 
     // TODO: this is the worst(incorrect) approach to synchronization
     while (updating_borders_)
@@ -242,9 +235,7 @@ void PseudoSyncPrmBuffer::increasePoints(size_t number_of_points, IntervalBuffer
 
     auto g_pos = ir->pos_of_right_buffer_border_;
 
-#define INCREASE_G_POS() \
-    g_pos++;             \
-    g_pos = EXRT_remainder(g_pos, buffer_length_)
+#define INCREASE_G_POS() g_pos = (++g_pos, EXRT_remainder(g_pos, buffer_length_))
 
     auto step = ir->step_;
     auto cnt = ir->k_r_;

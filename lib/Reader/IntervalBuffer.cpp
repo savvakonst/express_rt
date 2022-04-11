@@ -69,16 +69,59 @@ std::unique_ptr<Reader_ifs::Chunk> IntervalBuffer::getPoints(const Borders &bord
         size_t begin = parent_->getStartIndex(cr_borders);
         size_t end = parent_->getEndIndex(cr_borders);
         size_t cap = end - begin;
+        size_t begin_pos = parent_->buffer_start_pos_ + begin;
 
         if (cap == 0) return {};
         if (cap < target_len) {
             /* TODO: to implement direct reading mode */
+            Point *il = ptr;
 
-            for (size_t pos = 0; pos < cap; pos++) {
-                // parent_->buffer_start_time_
+            auto point_ptr = parent_->buffer_ + begin_pos;
+            auto pos_step = double(target_len) / double(cap);
+
+            auto point_first_end_ptr = point_ptr + cap;
+            auto point_second_end_ptr = parent_->buffer_;
+            auto reminder = begin_pos + cap - parent_->buffer_length_;
+
+            if (reminder > 0) {
+                point_first_end_ptr -= reminder;
+                point_second_end_ptr += reminder;
             }
 
-            return {};
+            size_t i = 0;
+            /*
+            for (; point_ptr < point_first_end_ptr; point_ptr++) {
+                auto point = *point_ptr;
+                il->max = point;
+                il->min = point;
+                il->sum = point;
+                il->pos = pos_offset + size_t(pos_step * double(i++));
+                il++;
+            }
+
+            for (point_ptr = parent_->buffer_; point_ptr < point_second_end_ptr; point_ptr++) {
+                auto point = *point_ptr;
+                il->max = point;
+                il->min = point;
+                il->sum = point;
+                il->pos = pos_offset + size_t(pos_step * double(i++));
+                il++;
+            }
+            */
+            for (i; i < target_len; i++) {
+                il->max = 0;
+                il->min = 0;
+                il->sum = 0;
+                il->pos = pos_offset + size_t(pos_step * double(i));
+                il++;
+            }
+
+            chunk_ptr->first_point_ = ptr;
+            chunk_ptr->number_of_points_ = target_len;
+            chunk_ptr->borders_ = cr_borders;
+            chunk_ptr->next_ = end_chunk;
+
+            return ret;
         }
         capacity_ = cap;
 
@@ -89,8 +132,7 @@ std::unique_ptr<Reader_ifs::Chunk> IntervalBuffer::getPoints(const Borders &bord
         data_ovf_ = data_ + length_;
         remainder_ = capacity_ % step_;
 
-        auto tmp = parent_->buffer_start_pos_ + begin;
-        pos_of_right_buffer_border_ = EXRT_remainder(tmp, parent_->buffer_length_);
+        pos_of_right_buffer_border_ = EXRT_remainder(begin_pos, parent_->buffer_length_);
         parent_->increasePoints(capacity_, this);
     }
 
