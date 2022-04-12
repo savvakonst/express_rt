@@ -66,10 +66,13 @@ void TopWindow::initScene() {
     Device_ifs device = Device_ifs(v.data(), v.size(), manager_);
 
     if (device.hasTransceiver()) {
-        ModuleStream_ifs *m_stream = device.getTopModule()->createModuleStream();
+
+        auto top_module= device.getSubModules()[0].second;
+
+        ModuleStream_ifs *m_stream = top_module->createModuleStream();
         auto *receiver = new Receiver(m_stream, device.getSrcAddress());
 
-        auto prm_buff = device.getTopModule()->getPrmBufferMap();
+        auto prm_buff = top_module->getPrmBufferMap();
 
         for (const auto &i : prm_buff) {
             reader_ = i.second;

@@ -287,18 +287,21 @@ void QScreenScale::drawDiag() {
 
     auto *pm = new QPixmap(image_w + kDiagramMargin, image_h + kDiagramMargin + kDiagramMargin);
     pm->fill(Qt::transparent);
-    auto *painter = new QPainter(pm);
 
-    QFont ft = painter->font();
-    ft.setPointSize(dstx_.font_size);
-    painter->setFont(ft);
 
+    QPainter painter = QPainter(pm);
     QPen pen;
+    QFont ft = painter.font();
+    ft.setPointSize(dstx_.font_size);
+    painter.setFont(ft);
+
+
+    
 
     // parameter
     pen.setColor(QColor(color_));
     pen.setWidth(dstx_.line_weight);
-    painter->setPen(pen);
+    painter.setPen(pen);
     /*
     for (auto &prm : parameters_) {
         auto const *c = prm.chunks.get();
@@ -327,7 +330,7 @@ void QScreenScale::drawDiag() {
 
             // if(last_dot.x >= 0 && !last_dot.ghost)
             //     painter->drawLine(last_dot.x, last_dot.y1, d.x, d.y1);
-            painter->drawLine(d.x, d.y0, d.x, d.y1);
+            painter.drawLine(d.x, d.y0, d.x, d.y1);
 
             last_dot = d;
         }
@@ -336,7 +339,7 @@ void QScreenScale::drawDiag() {
     // levels points
     pen.setColor(QColor(Qt::red));
     pen.setWidth(5);
-    painter->setPen(pen);
+    painter.setPen(pen);
 
     for (const auto lvl : levels_)
         for (auto &dots : list_dots_) {
@@ -349,12 +352,12 @@ void QScreenScale::drawDiag() {
                 if (lvl.cross) {
                     if (d.val_max > lvl.value) {
                         int y = image_h - static_cast<int>(floor((d.val_max - data_min) * k + 0.5)) + kDiagramMargin;
-                        painter->drawPoint(d.x, y);
+                        painter.drawPoint(d.x, y);
                     }
                 } else {
                     if (d.val_min < lvl.value) {
                         int y = image_h - static_cast<int>(floor((d.val_min - data_min) * k + 0.5)) + kDiagramMargin;
-                        painter->drawPoint(d.x, y);
+                        painter.drawPoint(d.x, y);
                     }
                 }
             }
@@ -364,14 +367,14 @@ void QScreenScale::drawDiag() {
     pen.setWidth(1);
     pen.setColor(QColor(color_).darker(150));
     pen.setStyle(Qt::DashLine);
-    painter->setPen(pen);
+    painter.setPen(pen);
 
     for (const auto lvl : levels_) {
         int y = image_h - static_cast<int>(floor((lvl.value - data_min) * k + 0.5));
-        painter->drawLine(0, y + kDiagramMargin, image_w, y + kDiagramMargin);
+        painter.drawLine(0, y + kDiagramMargin, image_w, y + kDiagramMargin);
     }
 
-    delete painter;
+    painter;
 
     img_diag_->fill(Qt::transparent);
     *img_diag_ = pm->toImage();
