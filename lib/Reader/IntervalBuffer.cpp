@@ -142,7 +142,7 @@ std::unique_ptr<Reader_ifs::Chunk> IntervalBuffer::getPoints(const Borders &bord
     auto step = buff_step / target_step;
 
     size_t begin_offset = start_pos_ + size_t(buff_step * double((cr_borders.begin - borders_.begin).time));
-    size_t first_end_offset = begin_offset + size_t(step * double(target_len));
+    size_t first_end_offset = begin_offset + size_t(step * target_len);
 
     size_t second_end_offset = 0;
 

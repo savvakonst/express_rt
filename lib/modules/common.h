@@ -36,12 +36,12 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
         auto temp_current_buffers = current_buffers_;
 
         // frequency of packet
-        decltype(task.cnl->frequency) min_frequency = kBaudRateLog2;
+        decltype(task.cnl->frequency) min_frequency_log_2 = kBaudRateLog2;
 
         for (auto& i : task.cnl)
-            if (min_frequency > i.frequency) min_frequency = i.frequency;
+            if (min_frequency_log_2 > i.frequency) min_frequency_log_2 = i.frequency;
 
-        idle_counter_max_ = (size_t(1) << (kBaudRateLog2 - min_frequency)) - 1;
+        idle_counter_max_ = (size_t(1) << (kBaudRateLog2 - min_frequency_log_2)) - 1;
 
         for (auto& i : task.cnl) {
             int fr = i.frequency;
@@ -51,7 +51,7 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
 
                 prm_buff_vec_.push_back(nullptr);
 
-                size_t temp_size = 1 << (fr - min_frequency);
+                size_t temp_size = 1 << (fr - min_frequency_log_2);
 
                 auto* d_ptr = new targetType_t[temp_size];
                 *(temp_buffers++) = d_ptr;
@@ -88,12 +88,12 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
 
         current_ptr_ = map_ptr;
 
-        if (idle_counter_max_ != idle_counter_) {
-            idle_counter_++;
-            return;
-        }
+        // if (idle_counter_max_ != idle_counter_) {
+        //     idle_counter_++;
+        //     return;
+        // }
 
-        idle_counter_ = 0;
+        // idle_counter_ = 0;
 
         temp_current_buffers = current_buffers_;
 
