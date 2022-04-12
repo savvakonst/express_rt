@@ -37,15 +37,14 @@ struct AxisYCutoff {
     double valMin;
 };*/
 
+// TODO: to remove this
 struct AxisXyDot {
     double val_max = 0;
     double val_min = 0;
-    // double val_fst = 0;
-    // double val_lst = 0;
+
     int y0 = 0;
     int y1 = 0;
-    // int yF = 0;
-    // int yL = 0;
+
     int x = 0;
     int ct = 0;
     bool ghost = true;
@@ -73,8 +72,8 @@ struct AxisYStatistics {
 
 struct SinglePrm {
     AxisYStatistics stat;
-    Reader_ifs *rdr;
-    Reader_ifs::Point *buf;
+    Reader_ifs *reader;
+    Reader_ifs::Point *buffer;
     std::unique_ptr<Reader_ifs::Chunk> chunks;
     std::vector<ControlLevel> *plevels;
 };
@@ -149,9 +148,8 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
     Margin margin_;
 
     TimeInterval ti_;
-    // RelativeTime t_step_;
 
-    QVector<RelativeTime> *p_scale_;
+    QVector<RelativeTime> *p_scale_{};
 
     std::vector<AxisYCutoff> cutoffs_;
     std::vector<ControlLevel> levels_;
@@ -163,7 +161,6 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
     int precision_ = -1;
     int precision_scale_ = -1;
 
-    // QList<QVector<AxisXReference>> list_refs_;
     QList<QVector<AxisXyDot>> list_dots_;
 
     AxisYStatistics stat_;
@@ -211,7 +208,6 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
     const int type_ = kSourceScale;
 
     std::list<SinglePrm> parameters_;
-
 
     bool disabled_ = false;
     QPair<qint64, qint64> offs_;

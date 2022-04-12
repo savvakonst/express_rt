@@ -3,8 +3,8 @@
 //#include "Helper_Works2.h"
 
 //-------------------------------------------------------------------------
-QScreenAxisX::QScreenAxisX(const TimeInterval &ti0, const LineProperties &dstx, const Margin &margin, QObject *parent) {
-    ti_ = ti0;
+QScreenAxisX::QScreenAxisX(const TimeInterval &ti, const LineProperties &dstx, const Margin &margin, QObject *parent) {
+    ti_ = ti;
     dstx_ = dstx;
     margin_ = margin;
 
@@ -16,21 +16,20 @@ QScreenAxisX::QScreenAxisX(const TimeInterval &ti0, const LineProperties &dstx, 
     pm->fill(clr_);
     *img_ = pm->toImage();
     delete pm;
-    pm = nullptr;
 }
 
 //-------------------------------------------------------------------------
 QScreenAxisX::~QScreenAxisX() {}
 
 //-------------------------------------------------------------------------
-void QScreenAxisX::setLabel(const QString &lbl0) { label_ = lbl0; }
+void QScreenAxisX::setLabel(const QString &lbl) { label_ = lbl; }
 
 //-------------------------------------------------------------------------
 void QScreenAxisX::setMargin(const Margin &margin) { margin_ = margin; }
 
 //-------------------------------------------------------------------------
-void QScreenAxisX::setInterval(const TimeInterval &ti0, const bool zoomed) {
-    ti_ = ti0;
+void QScreenAxisX::setInterval(const TimeInterval &ti, bool zoomed) {
+    ti_ = ti;
 
     if (zoomed) rescale();
 
@@ -44,17 +43,11 @@ void QScreenAxisX::resetInterval() {
 }
 
 //-------------------------------------------------------------------------
-void QScreenAxisX::setTime(const RelativeTime &t0) {
-    t_ = t0;
-    if (!b_) t_fisrt_ = t0;
+void QScreenAxisX::setTime(const RelativeTime &t) {
+    t_ = t;
 
     drawAxis();
-
-    t_last_ = t0;
 }
-
-//-------------------------------------------------------------------------
-TimeInterval QScreenAxisX::getInterval() { return ti_; }
 
 //-------------------------------------------------------------------------
 void QScreenAxisX::setSettings(const LineProperties &dstx, const Margin &margin) {
@@ -75,40 +68,32 @@ void QScreenAxisX::onResize(const qreal &w, const qreal &h) {
 //-------------------------------------------------------------------------
 void QScreenAxisX::rescale() {
     qreal w = scene_size_.width();
-    qreal axisW = scene_size_.width() - margin_.left - margin_.right;
+    qreal axis_w = scene_size_.width() - margin_.left - margin_.right;
 
-    double dt = ti_.end.toDouble() - ti_.bgn.toDouble();
-    int coCount = 3;
-    int32_t step = 10;
-    if (dt > 10) coCount = dt / 10 + 1;
-    else {
-        step = 1;
-        coCount = dt + 1;
-    }
-    /*if(coCount < 3){
-        coCount *= 5;
-        step /= 5;
-    }*/
+    auto dt = (ti_.end - ti_.bgn);
+
+    int step = 10;
+    int co_count = (dt.ls_integer >= 10) ? dt.ls_integer / 10 + 1 : (step = 1, dt.ls_integer + 1);
 
     cutoffs_.clear();
-    for (int j = 0; j < coCount; j++) {
-        AxisXCutoff co;
-        // co.val = ti.end - (10 * j);
+    for (int j = 0; j < co_count; j++) {
+        AxisXCutoff co{};
+
         co.val = 0 - (step * j);
         co.enabled = true;
 
         cutoffs_.push_back(co);
     }
 
-    pixel_weight_ = getLength(ti_).toDouble() / axisW;
+    pixel_weight_ = dt.toDouble() / axis_w;
     scale_.clear();
     int index = 0;
 
-    int x0 = margin_.left + axisW;
+    int x = int(margin_.left + axis_w);
 
-    for (int j = x0; j >= 0; j--) {
-        qreal t = 0 - (pixel_weight_ * (x0 - j));
-        RelativeTime rt;
+    for (int j = x; j >= 0; j--) {
+        qreal t = 0 - (pixel_weight_ * (x - j));
+        RelativeTime rt{};
         rt.fromDouble(t);
 
         scale_.push_front(rt);
@@ -121,10 +106,9 @@ void QScreenAxisX::rescale() {
         }
     }
 
-    for (int j = x0 + 1; j < w; j++) {
-        // qreal   t_ = ti.end + (pixel_weight_ * (j - x0));
-        qreal t = 0 + (pixel_weight_ * (j - x0));
-        RelativeTime rt;
+    for (int j = x + 1; j < w; j++) {
+        qreal t = 0 + (pixel_weight_ * (j - x));
+        RelativeTime rt{};
         rt.fromDouble(t);
         scale_.push_back(rt);
     }
@@ -136,7 +120,7 @@ void QScreenAxisX::drawAxis() {
     pm = new QPixmap(static_cast<int>(scene_size_.width()), static_cast<int>(scene_size_.height()));
     pm->fill(Qt::transparent);
 
-    QPainter *p = new QPainter(pm);
+    auto *p = new QPainter(pm);
     p->setPen(Qt::gray);
 
     QFont ft = p->font();
@@ -146,22 +130,22 @@ void QScreenAxisX::drawAxis() {
     QFontMetrics fm = p->fontMetrics();
 
     QStringList sl;
-    qreal textH = 0;
+    qreal text_h = 0;
     if (!label_.isEmpty()) {
         sl = label_.split('\n');
         for (int j = 0; j < sl.count(); ++j) {
-            textH += (fm.height() + 4);
+            text_h += (fm.height() + 4);
         }
     }
 
-    qreal H = scene_size_.height();
-    qreal W = scene_size_.width();
+    qreal scene_h = scene_size_.height();
+    qreal scene_w = scene_size_.width();
 
-    qreal axisH = H - margin_.height - textH;
-    qreal axisW = W - margin_.left - margin_.right;
-    if (axisW < 100) return;
+    qreal axis_h = scene_h - margin_.height - text_h;
+    qreal axis_w = scene_w - margin_.left - margin_.right;
+    if (axis_w < 100) return;
 
-    p->drawLine(QPointF(margin_.left, axisH), QPointF(axisW + margin_.left, axisH));
+    p->drawLine(QPointF(margin_.left, axis_h), QPointF(axis_w + margin_.left, axis_h));
 
     // rescale();
 
@@ -172,30 +156,30 @@ void QScreenAxisX::drawAxis() {
         if (co.enabled) {
             p->setPen(Qt::lightGray);
             ln.setP1(QPointF(co.pos, margin_.top));
-            ln.setP2(QPointF(co.pos, axisH));
+            ln.setP2(QPointF(co.pos, axis_h));
             p->drawLine(ln);
 
             p->setPen(Qt::gray);
-            ln.setP1(QPointF(co.pos, 6 + axisH));
-            ln.setP2(QPointF(co.pos, 1 + axisH));
+            ln.setP1(QPointF(co.pos, 6 + axis_h));
+            ln.setP2(QPointF(co.pos, 1 + axis_h));
             p->drawLine(ln);
 
             p->setPen(Qt::black);
 
-            QString s = "";
+            QString s;
             if (!ct) s = QString("%1").arg(secToHms(ti_.end));  // co.val;
             else
                 s = QString("%1").arg(co.val).replace(QLocale(QLocale::English).decimalPoint(),
                                                       QLocale::system().decimalPoint());
 
-            p->drawText(QPointF(co.pos, 20 + axisH), s);
+            p->drawText(QPointF(co.pos, 20 + axis_h), s);
 
             ct++;
         }
     }
 
-    int hAxisX = margin_.height;
-    qreal h = axisH + 3 * fm.height();
+    int h_axis_x = margin_.height;
+    qreal h = axis_h + 3 * fm.height();
 
     for (int j = 0; j < sl.count(); ++j) {
         QPointF pt(margin_.left, h);
@@ -203,20 +187,19 @@ void QScreenAxisX::drawAxis() {
         p->drawText(pt, sl.at(j));
 
         h += (fm.height() + 4);
-        hAxisX += (fm.height() + 4);
+        h_axis_x += (fm.height() + 4);
     }
 
-    emit to_height(hAxisX);
+    emit to_height(h_axis_x);
 
     delete p;
 
     *img_ = pm->toImage();
     delete pm;
-    pm = nullptr;
 }
 
 //-------------------------------------------------------------------------
-QString QScreenAxisX::secToHms(const RelativeTime &val, const int &prec) {
+QString secToHms(const RelativeTime &val, const int &prec) {
     // TODO: Check RelativeTime conversion
     int x = val.ls_integer;
     int hh = static_cast<int>(floor(x / 3600));
@@ -234,8 +217,3 @@ QString QScreenAxisX::secToHms(const RelativeTime &val, const int &prec) {
 
     return s;
 }
-
-//-------------------------------------------------------------------------
-RelativeTime QScreenAxisX::getLength(const TimeInterval &ti0) { return (ti_.end - ti_.bgn); }
-
-//-------------------------------------------------------------------------

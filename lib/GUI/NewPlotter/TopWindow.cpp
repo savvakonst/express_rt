@@ -20,8 +20,6 @@
 #include "convtemplate/Parameter_ifs.h"
 #include "convtemplate/PrmBuffer_ifs.h"
 #include "device/DeviceManager.h"
-#include "device/Device_ifs.h"
-#include "device/ModuleStream_ifs.h"
 
 //
 #include "qformscreen.h"

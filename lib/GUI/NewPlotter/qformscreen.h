@@ -1,5 +1,5 @@
-﻿#ifndef QFORMSCREEN_H
-#define QFORMSCREEN_H
+﻿#ifndef EXRT_QFORMSCREEN_H
+#define EXRT_QFORMSCREEN_H
 
 #include <QAction>
 #include <QCloseEvent>
@@ -109,11 +109,9 @@ class QFormScreen : public QDialog {
 
     void placeMarkerValues(QPainter *painter, int x);
 
-    QString formatValue(const double &val, DataOutputFormat fmt, const int &prec = -1, const bool &trim = false);
+    static QString formatValue(const double &val, DataOutputFormat fmt, const int &prec = -1, const bool &trim = false);
 
-    static int trimZeroes(const double &val, const int &prec = -1);
-
-    static QString secToHms(const RelativeTime &val, const int &prec = QLocale::FloatingPointShortest);
+    static int trimZeroes(const double &val_0, const int &prec = -1);
 
     PlotterContext_ifs *plotter_context_;
     ExtensionManager *manager_;
@@ -191,7 +189,7 @@ class QFormScreen : public QDialog {
 
     void onRefreshScene();
 
-    void onGroupupScene();
+    void onGroupScene();
 
     void onUpdateScene(const int &src = kSourceMain);
 
@@ -254,11 +252,9 @@ class QFormScreen : public QDialog {
 
     void toIndexReduced(const int &src, const int &index);
 
-    // void                                to_setInterval(const TIME_INTERVAL &ti);
+    void toTitleChanged();
 
-    void to_titleChanged();
-
-    void to_help();
+    void toHelp();
 };
 
-#endif  // QFORMSCREEN_H
+#endif

@@ -123,8 +123,8 @@ QScreenScale::QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &s
 
     SinglePrm prm;
 
-    prm.rdr = reader;
-    prm.buf = new Reader_ifs::Point[kMaxScreenWidth];
+    prm.reader = reader;
+    prm.buffer = new Reader_ifs::Point[kMaxScreenWidth];
     prm.plevels = &levels_;
 
     parameters_.push_back(std::move(prm));
@@ -149,8 +149,8 @@ void QScreenScale::setTemporaryValues(const double val_min, double const val_max
 //-------------------------------------------------------------------------
 void QScreenScale::setScale(QVector<RelativeTime> *xs) { p_scale_ = xs; }
 //-------------------------------------------------------------------------
-void QScreenScale::setTiming(const TimeInterval &ti_0, const RelativeTime &step) {
-    ti_ = ti_0;
+void QScreenScale::setTiming(const TimeInterval &ti, const RelativeTime &step) {
+    ti_ = ti;
     interval_on_ = true;
 
     drawDiag();
@@ -196,7 +196,7 @@ void QScreenScale::recountScaleValues(const int &w, AxisYStatistics &stat, Reade
             AxisXyDot dot;
             dot.val_max = pb[i].max;
             dot.val_min = pb[i].min;
-            dot.x = pb[i].pos;
+            dot.x = int(pb[i].pos);
             dot.ct++;
             dot.ghost = false;
 
@@ -241,16 +241,15 @@ void QScreenScale::drawDiag() {
 
     RelativeTime dt = ti_.end - ti_.bgn;
     dt.ms_fractional = 0;
-    // int fresh_index = image_w * (dt.toDouble() - t_step_.toDouble()) / dt.toDouble();
 
     if (!is_paused_) {
         memset(&stat_, 0, sizeof(stat_));
         for (auto &p : parameters_) {
-            Borders b = p.rdr->getAvailableBorders();
+            Borders b = p.reader->getAvailableBorders();
 
             b.begin = b.end - dt;
 
-            p.chunks = p.rdr->getPoints(b, p.buf, image_w);
+            p.chunks = p.reader->getPoints(b, p.buffer, image_w);
             recountScaleValues(image_w, p.stat, p.chunks.get());
         }
     }
@@ -296,50 +295,26 @@ void QScreenScale::drawDiag() {
 
     QPen pen;
 
-    // levels
-    pen.setColor(QColor(Qt::red));
-    pen.setWidth(5);
-    painter->setPen(pen);
-
-    for (auto &dots : list_dots_) {
-        AxisXyDot last_dot;
-
-        last_dot.x = -1;
-        for (auto &d : dots) {
-            if (d.ghost) continue;
-
-            bool warning = false;
-
-            for (auto lvl : levels_) {
-                if (lvl.cross) {
-                    if (d.val_max > lvl.value) {
-                        warning = true;
-                        int y = image_h - static_cast<int>(floor((d.val_max - data_min) * k + 0.5)) + kDiagramMargin;
-                        painter->drawPoint(d.x, y);
-                        // int y0 = image_h - static_cast<int>(floor((lvl.value - data_min) * k + 0.5));
-                        // painter->drawLine(d.x, 0, d.x, image_h);
-                        // painter->drawLine(d.x, y, d.x, y0);
-                    }
-                } else {
-                    if (d.val_min < lvl.value) {
-                        warning = true;
-                        int y = image_h - static_cast<int>(floor((d.val_min - data_min) * k + 0.5)) + kDiagramMargin;
-                        painter->drawPoint(d.x, y);
-                        // int y0 = image_h - static_cast<int>(floor((lvl.value - data_min) * k + 0.5));
-                        // painter->drawLine(d.x, 0, d.x, image_h);
-                        // painter->drawLine(d.x, y, d.x, y0);
-                    }
-                }
-            }
-
-            // if (d.x >= fresh_index) warning_ |= warning;
-        }
-    }
-
     // parameter
     pen.setColor(QColor(color_));
     pen.setWidth(dstx_.line_weight);
     painter->setPen(pen);
+    /*
+    for (auto &prm : parameters_) {
+        auto const *c = prm.chunks.get();
+        while (c) {
+            for (auto p = c->first_point_, p_end = c->first_point_ + c->number_of_points_; p < p_end; p++) {
+                auto y_min = image_h - int(floor((p->min - data_min) * k + 0.5)) + kDiagramMargin;
+                auto y_max = image_h - int(floor((p->max - data_min) * k + 0.5)) + kDiagramMargin;
+
+                painter->drawLine(p->pos, y_min, p->pos, y_max);
+            }
+            c = c->next_;
+        }
+    }
+
+*/
+
     for (auto &dots : list_dots_) {
         AxisXyDot last_dot;
 
@@ -357,6 +332,33 @@ void QScreenScale::drawDiag() {
             last_dot = d;
         }
     }
+
+    // levels points
+    pen.setColor(QColor(Qt::red));
+    pen.setWidth(5);
+    painter->setPen(pen);
+
+    for (const auto lvl : levels_)
+        for (auto &dots : list_dots_) {
+            AxisXyDot last_dot;
+
+            last_dot.x = -1;
+            for (auto &d : dots) {
+                if (d.ghost) continue;
+
+                if (lvl.cross) {
+                    if (d.val_max > lvl.value) {
+                        int y = image_h - static_cast<int>(floor((d.val_max - data_min) * k + 0.5)) + kDiagramMargin;
+                        painter->drawPoint(d.x, y);
+                    }
+                } else {
+                    if (d.val_min < lvl.value) {
+                        int y = image_h - static_cast<int>(floor((d.val_min - data_min) * k + 0.5)) + kDiagramMargin;
+                        painter->drawPoint(d.x, y);
+                    }
+                }
+            }
+        }
 
     // Levels
     pen.setWidth(1);
@@ -391,19 +393,12 @@ void QScreenScale::drawScale() {
     painter->setFont(ft);
 
     QFontMetrics fm = painter->fontMetrics();
-    int txtH = fm.height();
+    int txt_h = fm.height();
 
     int h = static_cast<int>(rt.height());
-    double val_max = 2;
-    double val_min = -2;
 
-    if (maximum_.automatic) val_max = stat_.val_max;  // prm->d_out.valMax;
-    else
-        val_max = maximum_.value;
-
-    if (minimum_.automatic) val_min = stat_.val_min;  // prm->d_out.valMin;
-    else
-        val_min = minimum_.value;
+    double val_max = maximum_.automatic ? stat_.val_max : maximum_.value;
+    double val_min = minimum_.automatic ? stat_.val_min : minimum_.value;
 
     if (val_max <= val_min) {
         val_max += 1.0001;
@@ -429,7 +424,7 @@ void QScreenScale::drawScale() {
 
     qreal dot_weight = rng_abs / h;
 
-    qreal y_from = val_max;
+    qreal y_from;
     int last_pos = 0;
 
     if (step_.automatic) {
@@ -456,10 +451,10 @@ void QScreenScale::drawScale() {
 
         step = floor(step / pow(10, p)) * pow(10, p);
 
-        int nx = rng_abs / step;
+        auto nx = int(rng_abs / step);
         while (nx / nmbr > 2) {
             step *= 2;
-            nx = rng_abs / step;
+            nx = int(rng_abs / step);
         }
     }
 
@@ -477,7 +472,7 @@ void QScreenScale::drawScale() {
                 co.enabled = true;
                 last_pos = co.pos;
             } else {
-                if ((co.pos - last_pos) >= txtH) {
+                if ((co.pos - last_pos) >= txt_h) {
                     co.enabled = true;
                     last_pos = co.pos;
                 }
@@ -489,7 +484,7 @@ void QScreenScale::drawScale() {
         y = y_from - (ct * step);
     }
 
-    if (step_.automatic) step_.value = cutoffs_.size();
+    if (step_.automatic) step_.value = qreal(cutoffs_.size());
 
     precision_ = -1;
     rng_pow = static_cast<int>(floor(log10(rng_abs)));
@@ -500,8 +495,8 @@ void QScreenScale::drawScale() {
         precision_ = static_cast<int>(fabs(rng_pow) + 1);
 
     precision_scale_ = precision_;
-    int stepPow = static_cast<int>(floor(log10(step)));
-    if (stepPow < rng_pow) precision_scale_++;
+    int step_pow = static_cast<int>(floor(log10(step)));
+    if (step_pow < rng_pow) precision_scale_++;
 
     for (auto co : cutoffs_) {
         painter->drawLine(1, co.pos, 6, co.pos);
@@ -517,10 +512,10 @@ void QScreenScale::drawScale() {
 
 //-------------------------------------------------------------------------
 void QScreenScale::createPopupMenu(const QPoint &pt) {
-    bool scaleAutoState = maximum_.automatic & minimum_.automatic;
+    bool scale_auto_state = maximum_.automatic & minimum_.automatic;
 
-    act_scale_auto_->setVisible(!scaleAutoState);
-    act_scale_fix_->setVisible(scaleAutoState);
+    act_scale_auto_->setVisible(!scale_auto_state);
+    act_scale_fix_->setVisible(scale_auto_state);
 
     auto *menu = new QMenu();
     menu->addAction(act_settings_);
@@ -555,9 +550,9 @@ void QScreenScale::onSetX(const int &index, const int &x) {
     if (index == index_) X_ = x;
 }
 //-------------------------------------------------------------------------
-void QScreenScale::onIndexReduce(const int &src, const int &index_0) {
+void QScreenScale::onIndexReduce(const int &src, const int &index) {
     if (src != type_) return;
-    if (index_ > index_0) index_--;
+    if (index_ > index) index_--;
 }
 //-------------------------------------------------------------------------
 void QScreenScale::onSettingsShow() { emit toTuned(type_, index_); }
@@ -581,12 +576,11 @@ void QScreenScale::onSetPause(const bool is_paused) { is_paused_ = is_paused; }
 void QScreenScale::changeScaleBorder(const bool &high, const int &delta) {
     if (delta == 0) return;
 
-    qreal val = 0;
-    qreal ref = 0;
-
     maximum_.automatic = false;
     minimum_.automatic = false;
 
+    qreal val;
+    qreal ref;
     if (high) {
         val = maximum_.value;
         ref = minimum_.value;
@@ -594,39 +588,34 @@ void QScreenScale::changeScaleBorder(const bool &high, const int &delta) {
         val = minimum_.value;
         ref = maximum_.value;
     }
-    int sign = 1;
-    if (val < 0) sign = -1;
-
-    qreal vabs = std::max(fabs(val), fabs(ref));
-    int pabs = 0;
-    if (vabs > 0) pabs = static_cast<int>(floor(log10(vabs) + 0.5));
+    int sign = (val < 0) ? -1 : 1;
 
     qreal rng = maximum_.value - minimum_.value;
     int prng = 0;
     if (rng > 0) prng = static_cast<int>(floor(log10(rng)));
 
     qreal step = pow(10, prng);
-    qreal st10 = step / 10.0;
-    qreal st100 = step / 100.0;
-    qreal val0 = floor(val / step) * step;
+    qreal st_10 = step / 10.0;
+    qreal st_100 = step / 100.0;
+    qreal val_0 = floor(val / step) * step;
 
-    while (val0 < fabs(val)) {
-        val0 += st10;
-        if ((val0 + st100) >= fabs(val)) break;
+    while (val_0 < fabs(val)) {
+        val_0 += st_10;
+        if ((val_0 + st_100) >= fabs(val)) break;
     }
-    val0 *= sign;
+    val_0 *= sign;
 
     if (high) {
-        if (delta > 0) maximum_.value = val0 + st10;
+        if (delta > 0) maximum_.value = val_0 + st_10;
         else {
-            qreal val1 = val0 - st10;
-            if (val1 > ref) maximum_.value = val1;
+            qreal val_1 = val_0 - st_10;
+            if (val_1 > ref) maximum_.value = val_1;
         }
     } else {
-        if (delta < 0) minimum_.value = val0 - st10;
+        if (delta < 0) minimum_.value = val_0 - st_10;
         else {
-            qreal val1 = val0 + st10;
-            if (val1 < ref) minimum_.value = val1;
+            qreal val_1 = val_0 + st_10;
+            if (val_1 < ref) minimum_.value = val_1;
         }
     }
 }
@@ -793,96 +782,15 @@ void QScreenScale::wheelEvent(QGraphicsSceneWheelEvent *event) {
 }
 
 //-------------------------------------------------------------------------
-const QList<uint32_t> QScreenScale::diag_colors_ = {0xEF5350,
-                                                    0xF44336,
-                                                    0xE53935,
-                                                    0xD32F2F,
-                                                    0xC62828,
-                                                    0xB71C1C,
-                                                    0xEC407A,
-                                                    0xE91E63,
-                                                    0xD81B60,
-                                                    0xC2185B,
-                                                    0xAD1457,
-                                                    0x880E4F,
-                                                    0xAB47BC,
-                                                    0x9C27B0,
-                                                    0x8E24AA,
-                                                    0x7B1FA2,
-                                                    0x6A1B9A,
-                                                    0x4A148C,
-                                                    0x7E57C2,
-                                                    0x673AB7,
-                                                    0x5E35B1,
-                                                    0x512DA8,
-                                                    0x4527A0,
-                                                    0x311B92,
-                                                    0x5C6BC0,
-                                                    0x3F51B5,
-                                                    0x3949AB,
-                                                    0x303F9F,
-                                                    0x283593,
-                                                    0x1A237E,
-                                                    0x42A5F5,
-                                                    0x2196F3,
-                                                    0x1E88E5,
-                                                    0x1976D2,
-                                                    0x1565C0,
-                                                    0x0D47A1,
-                                                    0x29B6F6,
-                                                    0x03A9F4,
-                                                    0x039BE5,
-                                                    0x0288D1,
-                                                    0x0277BD,
-                                                    0x01579B,
-                                                    0x26C6DA,
-                                                    0x00BCD4,
-                                                    0x00ACC1,
-                                                    0x0097A7,
-                                                    0x00838F,
-                                                    0x006064,
-                                                    0x26A69A,
-                                                    0x009688,
-                                                    0x00897B,
-                                                    0x00796B,
-                                                    0x00695C,
-                                                    0x004D40,
-                                                    0x66BB6A,
-                                                    0x4CAF50,
-                                                    0x43A047,
-                                                    0x388E3C,
-                                                    0x2E7D32,
-                                                    0x1B5E20,
-                                                    0x9CCC65,
-                                                    0x8BC34A,
-                                                    0x7CB342,
-                                                    0x689F38,
-                                                    0x558B2F,
-                                                    0x33691E,
-                                                    0xD4E157,
-                                                    0xCDDC39,
-                                                    0xC0CA33,
-                                                    0xAFB42B,
-                                                    0x9E9D24,
-                                                    0x827717,
-                                                    /*0xFFEE58, 0xFFEB3B, 0xFDD835*/ 0xFBC02D,
-                                                    0xF9A825,
-                                                    0xF57F17,
-                                                    /*0xFFCA28, 0xFFC107*/ 0xFFB300,
-                                                    0xFFA000,
-                                                    0xFF8F00,
-                                                    0xFF6F00,
-                                                    0xFFA726,
-                                                    0xFF9800,
-                                                    0xFB8C00,
-                                                    0xF57C00,
-                                                    0xEF6C00,
-                                                    0xE65100,
-                                                    0xFF7043,
-                                                    0xFF5722,
-                                                    0xF4511E,
-                                                    0xE64A19,
-                                                    0xD84315,
-                                                    0xBF360C};
+const QList<uint32_t> QScreenScale::diag_colors_ = {
+    0xEF5350, 0xF44336, 0xE53935, 0xD32F2F, 0xC62828, 0xB71C1C, 0xEC407A, 0xE91E63, 0xD81B60, 0xC2185B, 0xAD1457,
+    0x880E4F, 0xAB47BC, 0x9C27B0, 0x8E24AA, 0x7B1FA2, 0x6A1B9A, 0x4A148C, 0x7E57C2, 0x673AB7, 0x5E35B1, 0x512DA8,
+    0x4527A0, 0x311B92, 0x5C6BC0, 0x3F51B5, 0x3949AB, 0x303F9F, 0x283593, 0x1A237E, 0x42A5F5, 0x2196F3, 0x1E88E5,
+    0x1976D2, 0x1565C0, 0x0D47A1, 0x29B6F6, 0x03A9F4, 0x039BE5, 0x0288D1, 0x0277BD, 0x01579B, 0x26C6DA, 0x00BCD4,
+    0x00ACC1, 0x0097A7, 0x00838F, 0x006064, 0x26A69A, 0x009688, 0x00897B, 0x00796B, 0x00695C, 0x004D40, 0x66BB6A,
+    0x4CAF50, 0x43A047, 0x388E3C, 0x2E7D32, 0x1B5E20, 0x9CCC65, 0x8BC34A, 0x7CB342, 0x689F38, 0x558B2F, 0x33691E,
+    0xD4E157, 0xCDDC39, 0xC0CA33, 0xAFB42B, 0x9E9D24, 0x827717, 0xFBC02D, 0xF9A825, 0xF57F17, 0xFFB300, 0xFFA000,
+    0xFF8F00, 0xFF6F00, 0xFFA726, 0xFF9800, 0xFB8C00, 0xF57C00, 0xEF6C00, 0xE65100, 0xFF7043, 0xFF5722, 0xF4511E,
+    0xE64A19, 0xD84315, 0xBF360C};
 
 //-------------------------------------------------------------------------

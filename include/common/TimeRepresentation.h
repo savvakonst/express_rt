@@ -11,13 +11,14 @@ struct RelativeTime {
         };
         int64_t time;
     };
-    double toDouble() const {
+
+    [[nodiscard]] double toDouble() const {
         double d = ls_integer;
         d += (static_cast<double>(ms_fractional) / (1ull << 32));
         return d;
     }
 
-    int32_t toInt() const {
+    [[nodiscard]] int32_t toInt() const {
         int32_t result = ls_integer + std::lround(static_cast<double>(ms_fractional) / (1ull << 32));
         return result;
     }

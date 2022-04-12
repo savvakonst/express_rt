@@ -89,7 +89,7 @@ std::unique_ptr<Reader_ifs::Chunk> IntervalBuffer::getPoints(const Borders &bord
             }
 
             size_t i = 0;
-            /*
+
             for (; point_ptr < point_first_end_ptr; point_ptr++) {
                 auto point = *point_ptr;
                 il->max = point;
@@ -108,16 +108,15 @@ std::unique_ptr<Reader_ifs::Chunk> IntervalBuffer::getPoints(const Borders &bord
                 il++;
             }
 
-            */
-
+            /*
             for (i; i < target_len; i++) {
-                il->max = 256;
-                il->min = 256;
-                il->sum = 256;
-                il->pos = pos_offset + i;
+                il->max = 0;
+                il->min = 0;
+                il->sum = 0;
+                il->pos = pos_offset + size_t(pos_step * double(i));
                 il++;
             }
-
+            */
             parent_->lock(false);
 
             chunk_ptr->first_point_ = ptr;
@@ -143,7 +142,7 @@ std::unique_ptr<Reader_ifs::Chunk> IntervalBuffer::getPoints(const Borders &bord
     auto step = buff_step / target_step;
 
     size_t begin_offset = start_pos_ + size_t(buff_step * double((cr_borders.begin - borders_.begin).time));
-    size_t first_end_offset = begin_offset + size_t(step * target_len);
+    size_t first_end_offset = begin_offset + size_t(step * double(target_len));
 
     size_t second_end_offset = 0;
 
