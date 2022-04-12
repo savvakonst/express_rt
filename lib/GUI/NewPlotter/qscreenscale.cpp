@@ -112,7 +112,6 @@ QScreenScale::QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &s
 
     // Example
     // p_ = createNewPrmBufferSimulator(16);
-    p_ = nullptr;
 
     ControlLevel lvl;
     // lvl.cross = true;
@@ -152,13 +151,10 @@ void QScreenScale::setScale(QVector<RelativeTime> *xs) { p_scale_ = xs; }
 //-------------------------------------------------------------------------
 void QScreenScale::setTiming(const TimeInterval &ti_0, const RelativeTime &step) {
     ti_ = ti_0;
-    // t_step_ = step;
     interval_on_ = true;
 
     drawDiag();
     drawScale();
-
-    emit toProgressed(index_);
 }
 
 //-------------------------------------------------------------------------
@@ -553,8 +549,6 @@ void QScreenScale::onResize(const qreal &w, const qreal &h) {
     scene_size_.setHeight(h);
 
     drawDiag();
-
-    emit toProgressed(index_);
 }
 //-------------------------------------------------------------------------
 void QScreenScale::onSetX(const int &index, const int &x) {

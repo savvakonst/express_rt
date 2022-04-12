@@ -107,17 +107,21 @@ std::unique_ptr<Reader_ifs::Chunk> IntervalBuffer::getPoints(const Borders &bord
                 il->pos = pos_offset + size_t(pos_step * double(i++));
                 il++;
             }
+
             */
+
             for (i; i < target_len; i++) {
-                il->max = 0;
-                il->min = 0;
-                il->sum = 0;
-                il->pos = pos_offset + size_t(pos_step * double(i));
+                il->max = 256;
+                il->min = 256;
+                il->sum = 256;
+                il->pos = pos_offset + i;
                 il++;
             }
 
+            parent_->lock(false);
+
             chunk_ptr->first_point_ = ptr;
-            chunk_ptr->number_of_points_ = target_len;
+            chunk_ptr->number_of_points_ = cap;
             chunk_ptr->borders_ = cr_borders;
             chunk_ptr->next_ = end_chunk;
 

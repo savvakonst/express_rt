@@ -192,8 +192,6 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
    private:
     void changeScaleBorder(const bool &high, const int &delta);
 
-    Device_ifs *device_ = nullptr;
-
     QAction *act_settings_;
     QAction *act_remove_;
 
@@ -213,7 +211,7 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
     const int type_ = kSourceScale;
 
     std::list<SinglePrm> parameters_;
-    PrmBuffer_ifs *p_;
+
 
     bool disabled_ = false;
     QPair<qint64, qint64> offs_;
@@ -265,8 +263,6 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
     void toFocused(const int &src, const int &index);
 
     void toAlign(const int &src, const int &index, const int &val);
-
-    void toProgressed(const int &index);  // not used
 };
 
 #endif  // QSCREENSCALE_H

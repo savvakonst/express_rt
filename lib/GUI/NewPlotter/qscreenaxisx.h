@@ -39,7 +39,7 @@ class QScreenAxisX : public QObject {
     void rescale();
     void drawAxis();
 
-    QString secToHMS(const RelativeTime &val, const int &prec = -1);
+    static QString secToHms(const RelativeTime &val, const int &prec = -1);
 
     QImage *img_;
     QColor clr_ = Qt::white;

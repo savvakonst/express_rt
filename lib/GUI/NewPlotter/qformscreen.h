@@ -111,9 +111,9 @@ class QFormScreen : public QDialog {
 
     QString formatValue(const double &val, DataOutputFormat fmt, const int &prec = -1, const bool &trim = false);
 
-    int trimZeroes(const double &val, const int &prec = -1);
+    static int trimZeroes(const double &val, const int &prec = -1);
 
-    QString secToHMS(const RelativeTime &val, const int &prec = QLocale::FloatingPointShortest);
+    static QString secToHms(const RelativeTime &val, const int &prec = QLocale::FloatingPointShortest);
 
     PlotterContext_ifs *plotter_context_;
     ExtensionManager *manager_;
@@ -226,10 +226,6 @@ class QFormScreen : public QDialog {
     void onShowSettings();
 
     void onSaveConf();
-
-    void onProgress(const int &index);
-
-    void onProgress2(const int &j, const int &n);
 
     void onReport(const QString &s);
 

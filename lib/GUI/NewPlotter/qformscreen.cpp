@@ -225,7 +225,6 @@ QScreenScale *QFormScreen::addScale(QScreenScale *p_scale) {
     connect(p_scale, &QScreenScale::toRemoved, this, &QFormScreen::onRemoveItem);
     connect(p_scale, &QScreenScale::toTuned, this, &QFormScreen::onTuneItem);
     connect(p_scale, &QScreenScale::toAlign, this, &QFormScreen::onAlignItem);
-    connect(p_scale, &QScreenScale::toProgressed, this, &QFormScreen::onProgress);
 
     connect(p_scale, &QScreenScale::toChanged, this, &QFormScreen::onUpdateScene);
     connect(p_scale, &QScreenScale::toFocused, this, &QFormScreen::onUpdateFocus);
@@ -268,9 +267,9 @@ void QFormScreen::onRefresh(const RelativeTime &t, const bool zoomed) {
     current_time_.bgn = t - time_width_;
 
     axis_x_->setInterval(current_time_, zoomed);
-    for (auto scale : scales_) {
+    for (auto scale : scales_)
         scale->setTiming(current_time_, {});
-    }
+
 
     onUpdateScene();
 }
@@ -601,7 +600,7 @@ void QFormScreen::placeMarker(QPainter *painter, const QScreenMarker *mrk) {
                     .replace(QLocale(QLocale::English).decimalPoint(), QLocale::system().decimalPoint());
 
     // TODO "axis_t_hms_" value is always true. is it normal?
-    if (is_axis_t_hms_) s = secToHMS(mrk->t_);
+    if (is_axis_t_hms_) s = secToHms(mrk->t_);
 
     painter->drawText(ptT, s);
 
@@ -645,7 +644,7 @@ void QFormScreen::placeMarkerFloat(QPainter *painter) {
     RelativeTime t = mark_f_.t + current_time_.end;
     // QString s = QString("%1").arg(t_, 0, 'f', prec);
     // if(dstx.axisT.hms)
-    QString s = secToHMS(t, prec);
+    QString s = secToHms(t, prec);
 
     QFontMetrics fm = painter->fontMetrics();
     int width = fm.width(s) + 2;
@@ -700,7 +699,7 @@ void QFormScreen::placeMarkerAnchor(QPainter *painter) {
     if (pixelPow < 0) prec = static_cast<int>(fabs(pixelPow)) + 1;
 
     RelativeTime t = mark_a_.t + current_time_.end;
-    QString s = secToHMS(t, prec);
+    QString s = secToHms(t, prec);
     painter->drawText(ptT, s);
 
     if (axis_y_current_) placeMarkerValues(painter, x);
@@ -910,7 +909,7 @@ int QFormScreen::trimZeroes(const double &val0, const int &prec) {
 }
 
 //-------------------------------------------------------------------------
-QString QFormScreen::secToHMS(const RelativeTime &val, const int &prec) {
+QString QFormScreen::secToHms(const RelativeTime &val, const int &prec) {
     // TODO: Check RelativeTime conversion
     int x = val.ls_integer;
     int hh = static_cast<int>(floor(x / 3600));
@@ -918,13 +917,13 @@ QString QFormScreen::secToHMS(const RelativeTime &val, const int &prec) {
     int mm = static_cast<int>(floor(x / 60));
     x -= (mm * 60);
 
-    int64_t fract = 100.0 * val.ms_fractional / pow(2, 32);
+    int64_t fractional = 100 * val.ms_fractional / int64_t(pow(2, 32));
 
     QString s = QString("%1:%2:%3,%4")
                     .arg(hh, 2, 10, QChar('0'))
                     .arg(mm, 2, 10, QChar('0'))
                     .arg(x, 2, 10, QChar('0'))
-                    .arg(fract, 2, 10, QChar('0'));
+                    .arg(fractional, 2, 10, QChar('0'));
 
     return s;
 }
@@ -1540,30 +1539,6 @@ void QFormScreen::onSaveConf() {
     f->add(0, sTitle, labelMain, geometry(), dstx, axisX, diagrams, markers,
     labels); bool    success = f->save(dlg.selectedFiles().first()); if(!success)
         return;*/
-}
-//-------------------------------------------------------------------------
-void QFormScreen::onProgress(const int &index) {
-    if (index < 0) return;
-
-    counter_++;
-
-    int value = scales_.isEmpty() ? 100 : (100 * counter_ / scales_.count());
-
-    if (index == scales_.count() - 1) value = 100;
-
-    if (counter_ == scales_.count()) counter_ = 0;
-
-    progress_->setValue(value);
-    progress_->setVisible(static_cast<bool>(100 - value));
-}
-
-//-------------------------------------------------------------------------
-void QFormScreen::onProgress2(const int &j, const int &n) {
-    if (n <= 0) progress_->setValue(0);
-    else
-        progress_->setValue(100 * j / n);
-
-    progress_->setVisible(static_cast<bool>(n - j));
 }
 //-------------------------------------------------------------------------
 void QFormScreen::onReport(const QString &s) { statusbar_->showMessage(s); }

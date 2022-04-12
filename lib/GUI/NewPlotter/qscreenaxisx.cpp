@@ -183,7 +183,7 @@ void QScreenAxisX::drawAxis() {
             p->setPen(Qt::black);
 
             QString s = "";
-            if (!ct) s = QString("%1").arg(secToHMS(ti_.end));  // co.val;
+            if (!ct) s = QString("%1").arg(secToHms(ti_.end));  // co.val;
             else
                 s = QString("%1").arg(co.val).replace(QLocale(QLocale::English).decimalPoint(),
                                                       QLocale::system().decimalPoint());
@@ -216,7 +216,7 @@ void QScreenAxisX::drawAxis() {
 }
 
 //-------------------------------------------------------------------------
-QString QScreenAxisX::secToHMS(const RelativeTime &val, const int &prec) {
+QString QScreenAxisX::secToHms(const RelativeTime &val, const int &prec) {
     // TODO: Check RelativeTime conversion
     int x = val.ls_integer;
     int hh = static_cast<int>(floor(x / 3600));
@@ -224,14 +224,13 @@ QString QScreenAxisX::secToHMS(const RelativeTime &val, const int &prec) {
     int mm = static_cast<int>(floor(x / 60));
     x -= (mm * 60);
 
-    double divider = pow(2, 32);
-    int64_t fract = 100.0 * val.ms_fractional / divider;
+    int64_t fractional = 100 * val.ms_fractional / int64_t(pow(2, 32));
 
     QString s = QString("%1:%2:%3,%4")
                     .arg(hh, 2, 10, QChar('0'))
                     .arg(mm, 2, 10, QChar('0'))
                     .arg(x, 2, 10, QChar('0'))
-                    .arg(fract, 2, 10, QChar('0'));
+                    .arg(fractional, 2, 10, QChar('0'));
 
     return s;
 }
