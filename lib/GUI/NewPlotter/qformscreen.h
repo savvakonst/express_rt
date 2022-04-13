@@ -30,6 +30,9 @@ class QFormScreen;
 
 class ExtensionManager;
 
+/*
+ * Главное окно экрана содержащее в себе сцену, меню настроек и прочее
+ */
 class QFormScreen : public QDialog {
     Q_OBJECT
 

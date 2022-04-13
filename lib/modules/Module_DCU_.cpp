@@ -26,7 +26,7 @@ class EthernetDCU_Stream : public ModuleStream_ifs {
    protected:
     bool lock_ = true;
 
-    RelativeTime time_;
+    RelativeTime time_{0, 0};
 
     Module_ifs *module_;
     ModuleStream_ifs **sub_streams_;

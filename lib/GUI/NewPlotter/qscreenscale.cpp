@@ -10,25 +10,21 @@ QScreenScale::QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &s
     scene_size_ = sz;
 
     auto parameter = reader->getParameter();
-    if (parameter) s_label_ = parameter->getPropertyAsTxt("common/name").data();
-    // if (index_ == 0) s_label_ = QString("синус");
-    // else if (index_ == 1)
-    //     s_label_ = QString("меандр");
-    // else
-    //     s_label_ = QString("канал_%1").arg(index_ + 1);
+    if (parameter) {
+        s_label_ = parameter->getPropertyAsTxt("common/name").data();
 
-    // parameter->getPropertyAsTxt("common/name").data()
+        QString s_unit = parameter->getPropertyAsTxt("common/units").data();
+        if (!s_unit.isEmpty()) s_label_ += QString(", ") + s_unit;
+    }
 
     dstx_ = dstx;
     margin_ = margin;
     color_ = diag_colors_.at(rand() % (diag_colors_.count() - 1));
-    // QColor(rand()%255, rand()%255, rand()%255).rgb();
 
     setFlag(QGraphicsItem::ItemIsSelectable);
     setFlag(QGraphicsItem::ItemIsFocusable);
     setFlag(QGraphicsItem::ItemIsMovable);
     setFocus();
-    // setOpacity(50);
 
     setPen(QColor(color_));
     setPen(Qt::NoPen);
@@ -153,8 +149,8 @@ void QScreenScale::setTiming(const TimeInterval &ti, const RelativeTime &step) {
     ti_ = ti;
     interval_on_ = true;
 
-    // drawDiag();
-    // drawScale();
+    drawDiag();
+    drawScale();
 }
 
 //-------------------------------------------------------------------------
@@ -461,14 +457,14 @@ void QScreenScale::drawScale() {
     qreal y = y_from;
     int ct = 0;
 
-    cutoffs_.clear();
+    cut_off_.clear();
     while (y >= val_min) {
         if (y <= val_max) {
             AxisYCutoff co{};
             memset(&co, 0, sizeof(co));
             co.val = y;
             co.pos = static_cast<int>(h - floor(((y - val_min) / dot_weight) + 0.5));
-            if (cutoffs_.empty()) {
+            if (cut_off_.empty()) {
                 co.enabled = true;
                 last_pos = co.pos;
             } else {
@@ -477,14 +473,14 @@ void QScreenScale::drawScale() {
                     last_pos = co.pos;
                 }
             }
-            cutoffs_.push_back(co);
+            cut_off_.push_back(co);
         }
 
         ct++;
         y = y_from - (ct * step);
     }
 
-    if (step_.automatic) step_.value = qreal(cutoffs_.size());
+    if (step_.automatic) step_.value = qreal(cut_off_.size());
 
     precision_ = -1;
     rng_pow = static_cast<int>(floor(log10(rng_abs)));
@@ -498,7 +494,7 @@ void QScreenScale::drawScale() {
     int step_pow = static_cast<int>(floor(log10(step)));
     if (step_pow < rng_pow) precision_scale_++;
 
-    for (auto co : cutoffs_) {
+    for (auto co : cut_off_) {
         painter->drawLine(1, co.pos, 6, co.pos);
     }
 

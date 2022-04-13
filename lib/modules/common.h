@@ -16,6 +16,7 @@ std::vector<unsigned char> createChannelsMap(const std::vector<int>& vec);
 const uint8_t kBaudRateLog2 = 10;
 
 template <typename ModuleClass>
+
 class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
 #define COUNT_OF(x) ((sizeof(x) / sizeof(0 [x])) / ((size_t)(!(sizeof(x) % sizeof(0 [x])))))
    public:
@@ -41,7 +42,7 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
         for (auto& i : task.cnl)
             if (min_frequency_log_2 > i.frequency) min_frequency_log_2 = i.frequency;
 
-        idle_counter_max_ = (size_t(1) << (kBaudRateLog2 - min_frequency_log_2)) - 1;
+        write_every_cycle_ = min_frequency_log_2 == kBaudRateLog2;
 
         for (auto& i : task.cnl) {
             int fr = i.frequency;
@@ -88,12 +89,8 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
 
         current_ptr_ = map_ptr;
 
-        // if (idle_counter_max_ != idle_counter_) {
-        //     idle_counter_++;
-        //     return;
-        // }
-
-        // idle_counter_ = 0;
+        if(!write_every_cycle_ && map_ptr!=channels_map_)
+            return;
 
         temp_current_buffers = current_buffers_;
 
@@ -171,8 +168,7 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
     size_t* size_buffers_ = nullptr;
     targetType_t** current_buffers_ = nullptr;
 
-    size_t idle_counter_max_ = 0;
-    size_t idle_counter_ = 0;
+    bool write_every_cycle_ = true;
 
 #undef COUNT_OF
 };

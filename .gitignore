@@ -11,6 +11,8 @@ ClionBuild/
 cmake-build*/
 debug*/
 release*/
+docs/html/
+docs/latex/
 *_*.qm
 *.ksd
 tools/set_*_env.bat

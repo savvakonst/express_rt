@@ -371,45 +371,47 @@ void QFormScreen::placeDiag(QPainter *painter, const QScreenScale *scl) const {
 
 //-------------------------------------------------------------------------
 void QFormScreen::placeScale(QPainter *painter, const QScreenScale *scl) {
-    QPointF pt = scl->scenePos();
+    QPointF scene_pos = scl->scenePos();
     QRectF rt = scl->img_scale_->rect();
 
-    QFontMetrics fm = painter->fontMetrics();
+    QFontMetrics font_metrics = painter->fontMetrics();
     int txt_w = 0;
-    int txt_h = fm.height();
+    int txt_h = font_metrics.height();
     QRect txt_rt;
 
     if (!is_axis_hidden_) {
-        painter->drawPixmap(pt, QPixmap::fromImage(*scl->img_scale_), rt);
+        painter->drawPixmap(scene_pos, QPixmap::fromImage(*scl->img_scale_), rt);
 
-        pt.setY(pt.y() - 5);
+        scene_pos.setY(scene_pos.y() - 5);
         painter->setPen(QColor(scl->color_));
 
-        for (auto co : scl->cutoffs_) {
+        for (auto co : scl->cut_off_) {
             if (!co.enabled) continue;
 
             QString s = formatValue(co.val, scl->axis_y_.fmt_scale, scl->precision_scale_);
 
-            txt_w = fm.width(s) + 14;
-            txt_rt = fm.boundingRect(int(pt.x() + 9), int(pt.y() + co.pos), txt_w, txt_h + 1, 0, s);
+            txt_w = font_metrics.width(s) + 14;
+            txt_rt =
+                font_metrics.boundingRect(int(scene_pos.x() + 9), int(scene_pos.y() + co.pos), txt_w, txt_h + 1, 0, s);
 
             painter->fillRect(txt_rt, QBrush(Qt::white));
-            painter->drawText(int(pt.x() + 10), int(pt.y() + co.pos + (txt_h * 0.8)), s);
+            painter->drawText(int(scene_pos.x() + 10), int(scene_pos.y() + co.pos + (txt_h * 0.8)), s);
         }
 
-        painter->drawText(pt, scl->s_label_);
+        painter->drawText(scene_pos, scl->s_label_);
+        painter->drawText(scene_pos - QPointF(0, txt_h), scl->s_label_);
     }
 
     // TODO: "scl->axis_y_.greed" variable is used only once .
-    if (!scl->axis_y_.greed || scl->cutoffs_.empty()) return;
+    if (!scl->axis_y_.greed || scl->cut_off_.empty()) return;
 
     // QPen    pen(Qt::lightGray);
     QPen pen(QColor(0x33, 0x33, 0x33, 0x5F));
     pen.setStyle(Qt::DashLine);
     painter->setPen(pen);
 
-    for (auto co : scl->cutoffs_) {
-        qreal y = pt.y() + co.pos + kDiagramMargin;
+    for (auto co : scl->cut_off_) {
+        qreal y = scene_pos.y() + co.pos + kDiagramMargin;
         painter->drawLine(QPointF(margin_.left - kDiagramMargin, y), QPointF(width() - margin_.right, y));
     }
 }

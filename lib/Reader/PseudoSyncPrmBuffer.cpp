@@ -105,7 +105,7 @@ void PseudoSyncPrmBuffer::setData(char *data, size_t length, DataStatus status) 
 
     auto ir_buffers = ir_buffers_;
 
-    // while (*ir_buffers) increasePoints(length, *(ir_buffers++));
+    while (*ir_buffers) increasePoints(length, *(ir_buffers++));
 
     set_data_in_progress_ = false;
 }

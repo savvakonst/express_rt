@@ -132,7 +132,7 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
 
     void createPopupMenu(const QPoint &pt);
 
-    QString s_label_ = "Имя_параметра";
+    QString s_label_ = "no_name";
 
     // Settings
     QRgb color_ = Qt::gray;
@@ -151,7 +151,7 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
 
     QVector<RelativeTime> *p_scale_{};
 
-    std::vector<AxisYCutoff> cutoffs_;
+    std::vector<AxisYCutoff> cut_off_;
     std::vector<ControlLevel> levels_;
 
     int img_shift_y_ = 0;
