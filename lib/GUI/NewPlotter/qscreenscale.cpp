@@ -136,6 +136,28 @@ QScreenScale::QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &s
 QScreenScale::~QScreenScale() = default;
 //-------------------------------------------------------------------------
 int QScreenScale::getIndex() const { return index_; }
+
+//-------------------------------------------------------------------------
+
+void QScreenScale::placeDiag(QPainter *painter) const {
+
+    QPointF pt = pos();
+    pt.setX(0);
+
+    int y = static_cast<int>(pt.y());
+    y -= kDiagramMargin;
+    y += img_shift_y_;
+    pt.setY(y);
+    int x = static_cast<int>(pt.x());
+    x += margin_.left;
+    pt.setX(x);
+
+    QRectF rt = img_diag_->rect();
+
+    painter->drawPixmap(pt, QPixmap::fromImage(*img_diag_), rt);
+}
+
+
 //-------------------------------------------------------------------------
 
 void QScreenScale::placeScale(QPainter *painter, bool is_axis_hidden) {
@@ -232,6 +254,104 @@ void QScreenScale::placeStat(QPainter *painter) {
     }
 
     //TODO: you can find deleted part of this function
+
+
+    /*int fieldsCount = 1;
+    for (int j = 1; j < static_cast<int>(sizeof(stats_)); j++) {
+        if (stats_.b[j])
+            fieldsCount++;
+    }
+
+    qreal step = (dstx_.font_size + 8);
+    qreal x = scene_->width() - dstx_.pos.right + 6;
+    qreal y = (scl->getIndex()) * (fieldsCount * step) + step;
+
+    painter->setPen(QColor(scl->color_));
+    painter->drawText(QPointF(x, y), scl->s_label_);
+    y += step;
+
+
+    if (stats_.current) {
+        QString curValue = "";
+
+        for (int j = 0; j < scl->list_dots_.count(); j++) {
+            if (j)
+                curValue += "";
+
+            QVector<AxisXReference> refs = scl->list_refs_.at(j);
+            QVector<AxisXyDot> dots = scl->list_dots_.at(j);
+
+            do {
+                AxisXReference ref = refs.at(mark_f_.x);
+                if (ref.index < 0)
+                    break;
+                if (ref.index >= dots.count())
+                    break;
+
+                AxisXyDot dot = dots.at(ref.index);
+
+                curValue += QString("   %1").arg(formatValue(
+                    dot.val_min, scl->axis_y_.fmt_value, scl->precision_ + 1));
+
+                // Max Value
+                if (dot.ct > 1 && (dot.val_min != dot.val_max))
+                    curValue += QString("..%1").arg(formatValue(
+                        dot.val_max, scl->axis_y_.fmt_value, scl->precision_ + 1));
+
+                painter->drawText(QPointF(x, y), curValue);
+                curValue = "";
+                y += step;
+            } while (false);
+        }
+    }
+
+    if (stats_.count) {
+        painter->drawText(QPointF(x, y), "N: " + QString::number(scl->stat_.ct));
+        y += step;
+    }
+    if (stats_.minimum) {
+        painter->drawText(
+            QPointF(x, y),
+            QString("min: %1").arg(formatValue(
+                scl->stat_.val_min, scl->axis_y_.fmt_value, scl->precision_ + 1)));
+        y += step;
+    }
+    if (stats_.maximum) {
+        painter->drawText(
+            QPointF(x, y),
+            QString("max: %1").arg(formatValue(
+                scl->stat_.val_max, scl->axis_y_.fmt_value, scl->precision_ + 1)));
+        y += step;
+    }
+    if (stats_.m) {
+        painter->drawText(QPointF(x, y),
+                          QString("M: %1")
+                              .arg(static_cast<double>(scl->stat_.m))
+                              .replace(QLocale(QLocale::English).decimalPoint(),
+                                       QLocale::system().decimalPoint()));
+        y += step;
+    }
+    if (stats_.sd) {
+        painter->drawText(QPointF(x, y),
+                          QString("σ: %1")
+                              .arg(static_cast<double>(scl->stat_.sd))
+                              .replace(QLocale(QLocale::English).decimalPoint(),
+                                       QLocale::system().decimalPoint()));
+        y += step;
+    }
+
+    if (stats_.frequency) {
+        if (scl->stat_.time_length > 0) {
+            double freq = scl->stat_.ct / scl->stat_.time_length;
+            painter->drawText(QPointF(x, y),
+                              tr("F: %1 Гц")
+                                  .arg(freq)
+                                  .replace(QLocale(QLocale::English).decimalPoint(),
+                                           QLocale::system().decimalPoint()));
+            y += step;
+        }
+    }*/
+
 
 }
 
@@ -890,5 +1010,6 @@ const QList<uint32_t> QScreenScale::diag_colors_ = {
     0xD4E157, 0xCDDC39, 0xC0CA33, 0xAFB42B, 0x9E9D24, 0x827717, 0xFBC02D, 0xF9A825, 0xF57F17, 0xFFB300, 0xFFA000,
     0xFF8F00, 0xFF6F00, 0xFFA726, 0xFF9800, 0xFB8C00, 0xF57C00, 0xEF6C00, 0xE65100, 0xFF7043, 0xFF5722, 0xF4511E,
     0xE64A19, 0xD84315, 0xBF360C};
+
 
 //-------------------------------------------------------------------------

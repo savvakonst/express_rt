@@ -92,6 +92,8 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
 
     [[nodiscard]] int getIndex() const;
 
+    void placeDiag(QPainter *painter) const;
+
     void placeScale(QPainter *painter, bool is_axis_hidden);
 
     void placeStat(QPainter *painter);

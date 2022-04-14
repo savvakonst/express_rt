@@ -99,12 +99,6 @@ class QFormScreen : public QDialog {
 
     static void placeAxisX(QPainter *painter, const QScreenAxisX *axis);
 
-    void placeDiag(QPainter *painter, const QScreenScale *scl) const;
-
-    void placeScale(QPainter *painter, const QScreenScale *scl);
-
-    void placeStat(QPainter *painter, const QScreenScale *scl);
-
     void placeMarker(QPainter *painter, const QScreenMarker *mrk);
 
     void placeMarkerFloat(QPainter *painter);

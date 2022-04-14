@@ -352,215 +352,6 @@ void QFormScreen::placeAxisX(QPainter *painter, const QScreenAxisX *axis) {
 }
 
 //-------------------------------------------------------------------------
-void QFormScreen::placeDiag(QPainter *painter, const QScreenScale *scl) const {
-    QPointF pt = scl->pos();
-    pt.setX(0);
-
-    int y = static_cast<int>(pt.y());
-    y -= kDiagramMargin;
-    y += scl->img_shift_y_;
-    pt.setY(y);
-    int x = static_cast<int>(pt.x());
-    x += margin_.left;
-    pt.setX(x);
-
-    QRectF rt = scl->img_diag_->rect();
-
-    painter->drawPixmap(pt, QPixmap::fromImage(*scl->img_diag_), rt);
-}
-
-//-------------------------------------------------------------------------
-void QFormScreen::placeScale(QPainter *painter, const QScreenScale *scl) {
-    QPointF scene_pos = scl->scenePos();
-    QRectF rt = scl->img_scale_->rect();
-
-    QFontMetrics font_metrics = painter->fontMetrics();
-    int txt_w = 0;
-    int txt_h = font_metrics.height();
-    QRect txt_rt;
-
-    if (!is_axis_hidden_) {
-        painter->drawPixmap(scene_pos, QPixmap::fromImage(*scl->img_scale_), rt);
-
-        scene_pos.setY(scene_pos.y() - 5);
-        painter->setPen(QColor(scl->color_));
-
-        for (auto co : scl->cut_off_) {
-            if (!co.enabled) continue;
-
-            QString s = formatValue(co.val, scl->axis_y_.fmt_scale, scl->precision_scale_);
-
-            txt_w = font_metrics.width(s) + 14;
-            txt_rt =
-                font_metrics.boundingRect(int(scene_pos.x() + 9), int(scene_pos.y() + co.pos), txt_w, txt_h + 1, 0, s);
-
-            painter->fillRect(txt_rt, QBrush(Qt::white));
-            painter->drawText(int(scene_pos.x() + 10), int(scene_pos.y() + co.pos + (txt_h * 0.8)), s);
-        }
-
-        painter->drawText(scene_pos, scl->s_label_);
-        painter->drawText(scene_pos - QPointF(0, txt_h), scl->s_label_);
-    }
-
-    // TODO: "scl->axis_y_.greed" variable is used only once .
-    if (!scl->axis_y_.greed || scl->cut_off_.empty()) return;
-
-    // QPen    pen(Qt::lightGray);
-    QPen pen(QColor(0x33, 0x33, 0x33, 0x5F));
-    pen.setStyle(Qt::DashLine);
-    painter->setPen(pen);
-
-    for (auto co : scl->cut_off_) {
-        qreal y = scene_pos.y() + co.pos + kDiagramMargin;
-        painter->drawLine(QPointF(margin_.left - kDiagramMargin, y), QPointF(width() - margin_.right, y));
-    }
-}
-//-------------------------------------------------------------------------
-void QFormScreen::placeStat(QPainter *painter, const QScreenScale *scl) {
-    if (scl->list_dots_.isEmpty()) return;
-
-    QPointF pt = scl->scenePos();
-
-    pt.setX(scl->scene()->width() - margin_.right + kDiagramMargin);
-
-    QFontMetrics fm = painter->fontMetrics();
-
-    scl->list_dots_.last();
-
-    QString s;
-    QColor clr_back = Qt::white;
-    QColor clr_text = scl->color_;
-    if (scl->warning_) {
-        clr_back = Qt::red;
-        clr_text = Qt::white;
-    }
-    painter->setPen(clr_text);
-
-    for (const auto &dots : scl->list_dots_) {
-        if (dots.last().val_max != dots.last().val_min) {
-            s = QString("max: %1").arg(dots.last().val_max);
-
-            QSize txt_size = fm.size(Qt::TextSingleLine, s);
-
-            painter->fillRect(static_cast<int>(pt.x() - 2), int(pt.y()) - txt_size.height() + 1, txt_size.width() + 5,
-                              txt_size.height() + 2, clr_back);
-            painter->drawText(pt, s);
-            pt.setY(pt.y() + fm.size(Qt::TextSingleLine, s).height() + 2);
-
-            s = QString("min: %1").arg(dots.last().val_max);
-
-            txt_size = fm.size(Qt::TextSingleLine, s);
-
-            painter->fillRect(static_cast<int>(pt.x() - 2), int(pt.y()) - txt_size.height() + 1, txt_size.width() + 5,
-                              txt_size.height() + 2, clr_back);
-            painter->drawText(pt, s);
-            pt.setY(pt.y() + fm.size(Qt::TextSingleLine, s).height() + 2);
-        } else {
-            s = QString("val: %1").arg(dots.last().val_max);
-
-            painter->drawText(pt, s);
-            pt.setY(pt.y() + fm.size(Qt::TextSingleLine, s).height() + 2);
-        }
-    }
-
-    /*int fieldsCount = 1;
-    for (int j = 1; j < static_cast<int>(sizeof(stats_)); j++) {
-        if (stats_.b[j])
-            fieldsCount++;
-    }
-
-    qreal step = (dstx_.font_size + 8);
-    qreal x = scene_->width() - dstx_.pos.right + 6;
-    qreal y = (scl->getIndex()) * (fieldsCount * step) + step;
-
-    painter->setPen(QColor(scl->color_));
-    painter->drawText(QPointF(x, y), scl->s_label_);
-    y += step;
-
-
-    if (stats_.current) {
-        QString curValue = "";
-
-        for (int j = 0; j < scl->list_dots_.count(); j++) {
-            if (j)
-                curValue += "";
-
-            QVector<AxisXReference> refs = scl->list_refs_.at(j);
-            QVector<AxisXyDot> dots = scl->list_dots_.at(j);
-
-            do {
-                AxisXReference ref = refs.at(mark_f_.x);
-                if (ref.index < 0)
-                    break;
-                if (ref.index >= dots.count())
-                    break;
-
-                AxisXyDot dot = dots.at(ref.index);
-
-                curValue += QString("   %1").arg(formatValue(
-                        dot.val_min, scl->axis_y_.fmt_value, scl->precision_ + 1));
-
-                // Max Value
-                if (dot.ct > 1 && (dot.val_min != dot.val_max))
-                    curValue += QString("..%1").arg(formatValue(
-                            dot.val_max, scl->axis_y_.fmt_value, scl->precision_ + 1));
-
-                painter->drawText(QPointF(x, y), curValue);
-                curValue = "";
-                y += step;
-            } while (false);
-        }
-    }
-
-    if (stats_.count) {
-        painter->drawText(QPointF(x, y), "N: " + QString::number(scl->stat_.ct));
-        y += step;
-    }
-    if (stats_.minimum) {
-        painter->drawText(
-                QPointF(x, y),
-                QString("min: %1").arg(formatValue(
-                        scl->stat_.val_min, scl->axis_y_.fmt_value, scl->precision_ + 1)));
-        y += step;
-    }
-    if (stats_.maximum) {
-        painter->drawText(
-                QPointF(x, y),
-                QString("max: %1").arg(formatValue(
-                        scl->stat_.val_max, scl->axis_y_.fmt_value, scl->precision_ + 1)));
-        y += step;
-    }
-    if (stats_.m) {
-        painter->drawText(QPointF(x, y),
-                          QString("M: %1")
-                                  .arg(static_cast<double>(scl->stat_.m))
-                                  .replace(QLocale(QLocale::English).decimalPoint(),
-                                           QLocale::system().decimalPoint()));
-        y += step;
-    }
-    if (stats_.sd) {
-        painter->drawText(QPointF(x, y),
-                          QString("σ: %1")
-                                  .arg(static_cast<double>(scl->stat_.sd))
-                                  .replace(QLocale(QLocale::English).decimalPoint(),
-                                           QLocale::system().decimalPoint()));
-        y += step;
-    }
-
-    if (stats_.frequency) {
-        if (scl->stat_.time_length > 0) {
-            double freq = scl->stat_.ct / scl->stat_.time_length;
-            painter->drawText(QPointF(x, y),
-                              tr("F: %1 Гц")
-                                      .arg(freq)
-                                      .replace(QLocale(QLocale::English).decimalPoint(),
-                                               QLocale::system().decimalPoint()));
-            y += step;
-        }
-    }*/
-}
-
-//-------------------------------------------------------------------------
 void QFormScreen::placeMarker(QPainter *painter, const QScreenMarker *mrk) {
     QPointF pt = mrk->scenePos();
     QRectF rt = mrk->img->rect();
@@ -938,24 +729,25 @@ void QFormScreen::onUpdateScene(const int &src) {
     placeAxisX(painter, axis_x_);
 
     // Diagrams & Scales
-    const QScreenScale *last = nullptr;
+    QScreenScale *last = nullptr;
     for (auto d : scales_) {
-        if (d->getIndex() != scale_index_) placeDiag(painter, d);
+        if (d->getIndex() != scale_index_) d->placeDiag(painter);
         else
             last = d;
 
         warning |= d->warning_;
     }
-    if (last != nullptr) placeDiag(painter, last);
+    if (last != nullptr) last->placeDiag(painter);
     for (auto d : scales_) {
         if (d->getIndex() != scale_index_) {
-            placeScale(painter, d);
-            if (stats_.enabled) placeStat(painter, last);
+            d->placeScale(painter, is_axis_hidden_);
+
+            if (stats_.enabled) d->placeStat(painter);
         }
     }
     if (last != nullptr) {
-        placeScale(painter, last);
-        if (stats_.enabled) placeStat(painter, last);
+        last->placeScale(painter, is_axis_hidden_);
+        if (stats_.enabled) last->placeStat(painter);
     }
 
     // Markers
