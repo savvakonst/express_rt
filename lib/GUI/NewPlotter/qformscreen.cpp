@@ -731,13 +731,13 @@ void QFormScreen::onUpdateScene(const int &src) {
     // Diagrams & Scales
     QScreenScale *last = nullptr;
     for (auto d : scales_) {
-        if (d->getIndex() != scale_index_) d->placeDiag(painter);
+        if (d->getIndex() != scale_index_) d->placePoints(painter);
         else
             last = d;
 
         warning |= d->warning_;
     }
-    if (last != nullptr) last->placeDiag(painter);
+    if (last != nullptr) last->placePoints(painter);
     for (auto d : scales_) {
         if (d->getIndex() != scale_index_) {
             d->placeScale(painter, is_axis_hidden_);
@@ -1102,7 +1102,7 @@ void QFormScreen::onAlignItem(const int &src, const int &index, const int &val) 
         default:
             if (d->getIndex() != index) {
                 d->setRect(d->rect().x(), d->rect().y(), d->rect().width(), rt.height());
-                d->drawDiag();
+                d->drawPoints();
                 d->drawScale();
             }
         }

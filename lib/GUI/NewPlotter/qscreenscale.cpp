@@ -60,7 +60,7 @@ QScreenScale::QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &s
     sceneSize.setWidth(sceneW);
     sceneSize.setHeight(sceneH);*/
 
-    img_diag_ = new QImage;
+    img_points_ = new QImage;
     img_scale_ = new QImage;
 
     // Popup Menu
@@ -139,8 +139,7 @@ int QScreenScale::getIndex() const { return index_; }
 
 //-------------------------------------------------------------------------
 
-void QScreenScale::placeDiag(QPainter *painter) const {
-
+void QScreenScale::placePoints(QPainter *painter) const {
     QPointF pt = pos();
     pt.setX(0);
 
@@ -152,11 +151,10 @@ void QScreenScale::placeDiag(QPainter *painter) const {
     x += margin_.left;
     pt.setX(x);
 
-    QRectF rt = img_diag_->rect();
+    QRectF rt = img_points_->rect();
 
-    painter->drawPixmap(pt, QPixmap::fromImage(*img_diag_), rt);
+    painter->drawPixmap(pt, QPixmap::fromImage(*img_points_), rt);
 }
-
 
 //-------------------------------------------------------------------------
 
@@ -253,8 +251,7 @@ void QScreenScale::placeStat(QPainter *painter) {
         }
     }
 
-    //TODO: you can find deleted part of this function
-
+    // TODO: you can find deleted part of this function in commit "add Plotter refactoring/development fixation 2"
 
     /*int fieldsCount = 1;
     for (int j = 1; j < static_cast<int>(sizeof(stats_)); j++) {
@@ -351,8 +348,6 @@ void QScreenScale::placeStat(QPainter *painter) {
             y += step;
         }
     }*/
-
-
 }
 
 //-------------------------------------------------------------------------
@@ -371,7 +366,7 @@ void QScreenScale::setTiming(const TimeInterval &ti, const RelativeTime &step) {
     ti_ = ti;
     interval_on_ = true;
 
-    drawDiag();
+    drawPoints();
     drawScale();
 }
 
@@ -446,7 +441,7 @@ void QScreenScale::recountScaleValues(const int &w, AxisYStatistics &stat, Reade
 }
 
 //-------------------------------------------------------------------------
-void QScreenScale::drawDiag() {
+void QScreenScale::drawPoints() {
     if (!interval_on_) return;
 
     int scale_h = static_cast<int>(rect().height());
@@ -591,8 +586,8 @@ void QScreenScale::drawDiag() {
 
     delete painter;
 
-    img_diag_->fill(Qt::transparent);
-    *img_diag_ = pm->toImage();
+    img_points_->fill(Qt::transparent);
+    *img_points_ = pm->toImage();
 
     delete pm;
 }
@@ -761,7 +756,7 @@ void QScreenScale::onResize(const qreal &w, const qreal &h) {
     scene_size_.setWidth(w);
     scene_size_.setHeight(h);
 
-    drawDiag();
+    drawPoints();
 }
 //-------------------------------------------------------------------------
 void QScreenScale::onSetX(const int &index, const int &x) {
@@ -853,7 +848,7 @@ void QScreenScale::onScaleAuto() {
     minimum_.automatic = true;
     maximum_.automatic = true;
 
-    drawDiag();
+    drawPoints();
     drawScale();
 }
 //-------------------------------------------------------------------------
@@ -990,7 +985,7 @@ void QScreenScale::wheelEvent(QGraphicsSceneWheelEvent *event) {
         setRect(r);
     }
 
-    drawDiag();
+    drawPoints();
     drawScale();
 
     emit toChanged(type_);
@@ -1010,6 +1005,5 @@ const QList<uint32_t> QScreenScale::diag_colors_ = {
     0xD4E157, 0xCDDC39, 0xC0CA33, 0xAFB42B, 0x9E9D24, 0x827717, 0xFBC02D, 0xF9A825, 0xF57F17, 0xFFB300, 0xFFA000,
     0xFF8F00, 0xFF6F00, 0xFFA726, 0xFF9800, 0xFB8C00, 0xF57C00, 0xEF6C00, 0xE65100, 0xFF7043, 0xFF5722, 0xF4511E,
     0xE64A19, 0xD84315, 0xBF360C};
-
 
 //-------------------------------------------------------------------------

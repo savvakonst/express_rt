@@ -92,7 +92,15 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
 
     [[nodiscard]] int getIndex() const;
 
-    void placeDiag(QPainter *painter) const;
+    /**
+     * передает в painter, сформированное методом QScreenScale::drawPoints(), изображение точек графика для отрисовки
+     */
+
+    void placePoints(QPainter *painter) const;
+
+    /**
+     * передает в painter сформированное изображение шкал
+     */
 
     void placeScale(QPainter *painter, bool is_axis_hidden);
 
@@ -112,7 +120,11 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
 
     void recountScaleValues(const int &w, AxisYStatistics &stat, Reader_ifs::Chunk *c_ptr);
 
-    void drawDiag();
+    /**
+     *  формирует и сохраняет до следующего вызова изображение (QImage) точек графика
+     */
+
+    void drawPoints();
 
     void drawScale();
 
@@ -141,7 +153,7 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
     std::vector<ControlLevel> levels_;
 
     int img_shift_y_ = 0;
-    QImage *img_diag_;
+    QImage *img_points_;
     QImage *img_scale_;
 
     int precision_ = -1;
