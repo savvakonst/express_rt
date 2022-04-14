@@ -15,6 +15,8 @@
 # sys.path.insert(0, os.path.abspath('.'))
 
 import textwrap
+# import exhale.utils
+from exhale import utils
 
 # -- Project information -----------------------------------------------------
 
@@ -32,37 +34,14 @@ extensions = ["breathe", 'exhale', "sphinx.ext.graphviz"]
 # Breathe Configuration
 breathe_default_project = "exrt"
 
+graphviz_output_format = "svg"
+
+graphviz_dot = "C:/Program Files/Graphviz/bin/dot.bat"
+# graphviz_dot = "C:/Users/SVK/Desktop/aaa/dot.bat"
+
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
-
-# Setup the exhale extension
-exhale_args = {
-    # These arguments are required
-    "containmentFolder": "./api",
-    "rootFileName": "library_root.rst",
-    "doxygenStripFromPath": "..",
-    # Heavily encouraged optional argument (see docs)
-    "rootFileTitle": "Library API",
-    # Suggested optional arguments
-    "createTreeView": True,
-    # TIP: if using the sphinx-bootstrap-theme, you need
-    # "treeViewIsBootstrap": True,
-    "exhaleExecutesDoxygen": True,
-    # "exhaleDoxygenStdin": "INPUT = ../include",
-    "exhaleDoxygenStdin": textwrap.dedent('''
-        EXTRACT_ALL = YES
-        SOURCE_BROWSER = YES
-        EXTRACT_STATIC = YES
-        OPTIMIZE_OUTPUT_FOR_C  = YES
-        HIDE_SCOPE_NAMES = YES
-        QUIET = YES
-        INPUT = ../include ../src
-        FILE_PATTERNS = *.c *.h
-        EXAMPLE_RECURSIVE = YES
-        GENERATE_TREEVIEW = YES
-    ''')
-
-}
 
 # Tell sphinx what the primary language being documented is.
 primary_domain = 'cpp'
@@ -76,6 +55,66 @@ highlight_language = 'cpp'
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
 language = 'ru'
+
+
+# somewhere in `conf.py`, *BERORE* declaring `exhale_args`
+def specificationsForKind(kind):
+    '''
+    For a given input ``kind``, return the list of reStructuredText specifications
+    for the associated Breathe directive.
+    '''
+    # Change the defaults for .. doxygenclass:: and .. doxygenstruct::
+    if kind == "class" or kind == "struct":
+        return [
+            ":members:",
+            ":protected-members:",
+            ":private-members:",
+            ":allow-dot-graphs:",
+            ":undoc-members:"
+        ]
+    # Change the defaults for .. doxygenenum::
+    elif kind == "enum":
+        return [":no-link:"]
+    # An empty list signals to Exhale to use the defaults
+    else:
+        return []
+
+
+"""
+    "exhaleDoxygenStdin": textwrap.dedent('''
+        EXTRACT_ALL = YES
+        SOURCE_BROWSER = YES
+        EXTRACT_STATIC = YES
+        OPTIMIZE_OUTPUT_FOR_C  = YES
+        HIDE_SCOPE_NAMES = YES
+        QUIET = YES
+        INPUT = ../include ../src
+        FILE_PATTERNS = *.c *.h
+        EXAMPLE_RECURSIVE = YES
+        GENERATE_TREEVIEW = YES
+    '''),
+"""
+
+# Setup the exhale extension
+exhale_args = {
+    # These arguments are required
+    "containmentFolder": "./api",
+    "rootFileName": "library_root.rst",
+    "doxygenStripFromPath": "..",
+    # Heavily encouraged optional argument (see docs)
+    "rootFileTitle": u"API библиотеки",
+
+    # Suggested optional arguments
+    "createTreeView": True,
+    # TIP: if using the sphinx-bootstrap-theme, you need
+    # "treeViewIsBootstrap": True,
+    "exhaleExecutesDoxygen": True,
+    "exhaleDoxygenStdin": "INPUT = ../include",
+    "customSpecificationsMapping": utils.makeCustomSpecificationsMapping(
+        specificationsForKind
+    )
+
+}
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

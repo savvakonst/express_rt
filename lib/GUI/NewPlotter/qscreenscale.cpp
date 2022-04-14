@@ -1,6 +1,9 @@
 ﻿#include "qscreenscale.h"
 
+#include <QGraphicsScene>
+
 #include "convtemplate/Parameter_ifs.h"
+
 //-------------------------------------------------------------------------
 QScreenScale::QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &sz, const LineProperties &dstx,
                            const Margin &margin, QWidget *parent) {
@@ -133,6 +136,105 @@ QScreenScale::QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &s
 QScreenScale::~QScreenScale() = default;
 //-------------------------------------------------------------------------
 int QScreenScale::getIndex() const { return index_; }
+//-------------------------------------------------------------------------
+
+void QScreenScale::placeScale(QPainter *painter, bool is_axis_hidden) {
+    QPointF scene_pos = scenePos();
+    QRectF rt = img_scale_->rect();
+
+    QFontMetrics font_metrics = painter->fontMetrics();
+    int txt_w = 0;
+    int txt_h = font_metrics.height();
+    QRect txt_rt;
+
+    if (!is_axis_hidden) {
+        painter->drawPixmap(scene_pos, QPixmap::fromImage(*img_scale_), rt);
+
+        scene_pos.setY(scene_pos.y() - 5);
+        painter->setPen(QColor(color_));
+
+        for (auto co : cut_off_) {
+            if (!co.enabled) continue;
+
+            QString s = formatValue(co.val, axis_y_.fmt_scale, precision_scale_);
+
+            txt_w = font_metrics.width(s) + 14;
+            txt_rt =
+                font_metrics.boundingRect(int(scene_pos.x() + 9), int(scene_pos.y() + co.pos), txt_w, txt_h + 1, 0, s);
+
+            painter->fillRect(txt_rt, QBrush(Qt::white));
+            painter->drawText(int(scene_pos.x() + 10), int(scene_pos.y() + co.pos + (txt_h * 0.8)), s);
+        }
+
+        painter->drawText(scene_pos, s_label_);
+        painter->drawText(scene_pos - QPointF(0, txt_h), s_label_);
+    }
+
+    // TODO: "scl->axis_y_.greed" variable is used only once .
+    if (!axis_y_.greed || cut_off_.empty()) return;
+
+    QPen pen(QColor(0x33, 0x33, 0x33, 0x5F));
+    pen.setStyle(Qt::DashLine);
+    painter->setPen(pen);
+
+    for (auto co : cut_off_) {
+        qreal y = scene_pos.y() + co.pos + kDiagramMargin;
+        painter->drawLine(QPointF(margin_.left - kDiagramMargin, y), QPointF(scene()->width() - margin_.right, y));
+    }
+}
+
+//-------------------------------------------------------------------------
+
+void QScreenScale::placeStat(QPainter *painter) {
+    if (list_dots_.isEmpty()) return;
+
+    QPointF pt = scenePos();
+
+    pt.setX(scene()->width() - margin_.right + kDiagramMargin);
+
+    QFontMetrics fm = painter->fontMetrics();
+
+    list_dots_.last();
+
+    QColor clr_back = Qt::white;
+    QColor clr_text = color_;
+    if (warning_) {
+        clr_back = Qt::red;
+        clr_text = Qt::white;
+    }
+    painter->setPen(clr_text);
+
+    for (const auto &dots : list_dots_) {
+        if (dots.last().val_max != dots.last().val_min) {
+            auto s = QString("max: %1").arg(dots.last().val_max);
+
+            QSize txt_size = fm.size(Qt::TextSingleLine, s);
+
+            painter->fillRect(static_cast<int>(pt.x() - 2), int(pt.y()) - txt_size.height() + 1, txt_size.width() + 5,
+                              txt_size.height() + 2, clr_back);
+            painter->drawText(pt, s);
+            pt.setY(pt.y() + fm.size(Qt::TextSingleLine, s).height() + 2);
+
+            s = QString("min: %1").arg(dots.last().val_max);
+
+            txt_size = fm.size(Qt::TextSingleLine, s);
+
+            painter->fillRect(static_cast<int>(pt.x() - 2), int(pt.y()) - txt_size.height() + 1, txt_size.width() + 5,
+                              txt_size.height() + 2, clr_back);
+            painter->drawText(pt, s);
+            pt.setY(pt.y() + fm.size(Qt::TextSingleLine, s).height() + 2);
+        } else {
+            auto s = QString("val: %1").arg(dots.last().val_max);
+
+            painter->drawText(pt, s);
+            pt.setY(pt.y() + fm.size(Qt::TextSingleLine, s).height() + 2);
+        }
+    }
+
+    //TODO: you can find deleted part of this function
+
+}
+
 //-------------------------------------------------------------------------
 void QScreenScale::setTemporaryValues(const double val_min, double const val_max) {
     stat_.ct = 1;

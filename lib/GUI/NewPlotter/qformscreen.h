@@ -30,9 +30,10 @@ class QFormScreen;
 
 class ExtensionManager;
 
-/*
- * Главное окно экрана содержащее в себе сцену, меню настроек и прочее
+/**
+ * \brief  Главное окно экрана содержащее в себе сцену, меню настроек и прочее
  */
+
 class QFormScreen : public QDialog {
     Q_OBJECT
 
@@ -111,10 +112,6 @@ class QFormScreen : public QDialog {
     void placeMarkerAnchor(QPainter *painter);
 
     void placeMarkerValues(QPainter *painter, int x);
-
-    static QString formatValue(const double &val, DataOutputFormat fmt, const int &prec = -1, const bool &trim = false);
-
-    static int trimZeroes(const double &val_0, const int &prec = -1);
 
     PlotterContext_ifs *plotter_context_;
     ExtensionManager *manager_;

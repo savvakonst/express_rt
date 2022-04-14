@@ -23,7 +23,6 @@
 #include "qformlevel.h"
 #include "qscreenaxisx.h"
 
-#pragma pack(push, 1)
 struct AxisYCutoff {
     double val;
     int pos;
@@ -31,13 +30,6 @@ struct AxisYCutoff {
     bool reserved[3];
 };
 
-/*struct Dot {
-    qint64 ct;
-    double valMax;
-    double valMin;
-};*/
-
-// TODO: to remove this
 struct AxisXyDot {
     double val_max = 0;
     double val_min = 0;
@@ -49,11 +41,6 @@ struct AxisXyDot {
     int ct = 0;
     bool ghost = true;
     bool warning = false;
-};
-
-struct AxisXReference {
-    bool enabled = false;
-    int index = -1;
 };
 
 struct AxisYStatistics {
@@ -68,8 +55,6 @@ struct AxisYStatistics {
     double time_length = 0;
 };
 
-#pragma pack(pop)
-
 struct SinglePrm {
     AxisYStatistics stat;
     Reader_ifs *reader;
@@ -77,11 +62,6 @@ struct SinglePrm {
     std::unique_ptr<Reader_ifs::Chunk> chunks;
     std::vector<ControlLevel> *plevels;
 };
-
-/*typedef struct _POINT : Reader_ifs::Point {
-    int32_t     y_min;
-    int32_t     y_max;
-} POINT;*/
 
 class Parameter_ifs;
 class Device_ifs;
@@ -111,6 +91,10 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
     ~QScreenScale() override;
 
     [[nodiscard]] int getIndex() const;
+
+    void placeScale(QPainter *painter, bool is_axis_hidden);
+
+    void placeStat(QPainter *painter);
 
     void setTemporaryValues(double val_min = -100, double val_max = 100);
 

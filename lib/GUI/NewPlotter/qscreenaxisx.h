@@ -12,8 +12,6 @@
 #include "Express_Online_Screen.h"
 #include "common/TimeRepresentation.h"
 
-QString secToHms(const RelativeTime &val, const int &prec = -1);
-
 class QScreenAxisX : public QObject {
     Q_OBJECT
    public:
@@ -69,5 +67,11 @@ class QScreenAxisX : public QObject {
 
     void to_height(const int &h);
 };
+
+QString secToHms(const RelativeTime &val, const int &prec = -1);
+
+QString formatValue(const double &val, DataOutputFormat fmt, const int &prec = -1, const bool &trim = false);
+
+int trimZeroes(const double &val, const int &prec = -1);
 
 #endif  // QSCREENAXISX_H
