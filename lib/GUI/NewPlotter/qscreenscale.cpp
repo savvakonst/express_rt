@@ -129,7 +129,7 @@ QScreenScale::QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &s
     parameters_.push_back(std::move(prm));
     //
 
-    drawScale();
+    formScaleImage();
 }
 
 //-------------------------------------------------------------------------
@@ -252,102 +252,6 @@ void QScreenScale::placeStat(QPainter *painter) {
     }
 
     // TODO: you can find deleted part of this function in commit "add Plotter refactoring/development fixation 2"
-
-    /*int fieldsCount = 1;
-    for (int j = 1; j < static_cast<int>(sizeof(stats_)); j++) {
-        if (stats_.b[j])
-            fieldsCount++;
-    }
-
-    qreal step = (dstx_.font_size + 8);
-    qreal x = scene_->width() - dstx_.pos.right + 6;
-    qreal y = (scl->getIndex()) * (fieldsCount * step) + step;
-
-    painter->setPen(QColor(scl->color_));
-    painter->drawText(QPointF(x, y), scl->s_label_);
-    y += step;
-
-
-    if (stats_.current) {
-        QString curValue = "";
-
-        for (int j = 0; j < scl->list_dots_.count(); j++) {
-            if (j)
-                curValue += "";
-
-            QVector<AxisXReference> refs = scl->list_refs_.at(j);
-            QVector<AxisXyDot> dots = scl->list_dots_.at(j);
-
-            do {
-                AxisXReference ref = refs.at(mark_f_.x);
-                if (ref.index < 0)
-                    break;
-                if (ref.index >= dots.count())
-                    break;
-
-                AxisXyDot dot = dots.at(ref.index);
-
-                curValue += QString("   %1").arg(formatValue(
-                    dot.val_min, scl->axis_y_.fmt_value, scl->precision_ + 1));
-
-                // Max Value
-                if (dot.ct > 1 && (dot.val_min != dot.val_max))
-                    curValue += QString("..%1").arg(formatValue(
-                        dot.val_max, scl->axis_y_.fmt_value, scl->precision_ + 1));
-
-                painter->drawText(QPointF(x, y), curValue);
-                curValue = "";
-                y += step;
-            } while (false);
-        }
-    }
-
-    if (stats_.count) {
-        painter->drawText(QPointF(x, y), "N: " + QString::number(scl->stat_.ct));
-        y += step;
-    }
-    if (stats_.minimum) {
-        painter->drawText(
-            QPointF(x, y),
-            QString("min: %1").arg(formatValue(
-                scl->stat_.val_min, scl->axis_y_.fmt_value, scl->precision_ + 1)));
-        y += step;
-    }
-    if (stats_.maximum) {
-        painter->drawText(
-            QPointF(x, y),
-            QString("max: %1").arg(formatValue(
-                scl->stat_.val_max, scl->axis_y_.fmt_value, scl->precision_ + 1)));
-        y += step;
-    }
-    if (stats_.m) {
-        painter->drawText(QPointF(x, y),
-                          QString("M: %1")
-                              .arg(static_cast<double>(scl->stat_.m))
-                              .replace(QLocale(QLocale::English).decimalPoint(),
-                                       QLocale::system().decimalPoint()));
-        y += step;
-    }
-    if (stats_.sd) {
-        painter->drawText(QPointF(x, y),
-                          QString("σ: %1")
-                              .arg(static_cast<double>(scl->stat_.sd))
-                              .replace(QLocale(QLocale::English).decimalPoint(),
-                                       QLocale::system().decimalPoint()));
-        y += step;
-    }
-
-    if (stats_.frequency) {
-        if (scl->stat_.time_length > 0) {
-            double freq = scl->stat_.ct / scl->stat_.time_length;
-            painter->drawText(QPointF(x, y),
-                              tr("F: %1 Гц")
-                                  .arg(freq)
-                                  .replace(QLocale(QLocale::English).decimalPoint(),
-                                           QLocale::system().decimalPoint()));
-            y += step;
-        }
-    }*/
 }
 
 //-------------------------------------------------------------------------
@@ -366,8 +270,8 @@ void QScreenScale::setTiming(const TimeInterval &ti, const RelativeTime &step) {
     ti_ = ti;
     interval_on_ = true;
 
-    drawPoints();
-    drawScale();
+    formPointsImage();
+    formScaleImage();
 }
 
 //-------------------------------------------------------------------------
@@ -441,7 +345,7 @@ void QScreenScale::recountScaleValues(const int &w, AxisYStatistics &stat, Reade
 }
 
 //-------------------------------------------------------------------------
-void QScreenScale::drawPoints() {
+void QScreenScale::formPointsImage() {
     if (!interval_on_) return;
 
     int scale_h = static_cast<int>(rect().height());
@@ -593,7 +497,7 @@ void QScreenScale::drawPoints() {
 }
 
 //-------------------------------------------------------------------------
-void QScreenScale::drawScale() {
+void QScreenScale::formScaleImage() {
     QRectF rt = rect();
 
     auto *pm = new QPixmap(static_cast<int>(rt.width()), static_cast<int>(rt.height() + 1));
@@ -756,7 +660,7 @@ void QScreenScale::onResize(const qreal &w, const qreal &h) {
     scene_size_.setWidth(w);
     scene_size_.setHeight(h);
 
-    drawPoints();
+    formPointsImage();
 }
 //-------------------------------------------------------------------------
 void QScreenScale::onSetX(const int &index, const int &x) {
@@ -848,8 +752,8 @@ void QScreenScale::onScaleAuto() {
     minimum_.automatic = true;
     maximum_.automatic = true;
 
-    drawPoints();
-    drawScale();
+    formPointsImage();
+    formScaleImage();
 }
 //-------------------------------------------------------------------------
 void QScreenScale::onScaleFix() {
@@ -985,8 +889,8 @@ void QScreenScale::wheelEvent(QGraphicsSceneWheelEvent *event) {
         setRect(r);
     }
 
-    drawPoints();
-    drawScale();
+    formPointsImage();
+    formScaleImage();
 
     emit toChanged(type_);
 

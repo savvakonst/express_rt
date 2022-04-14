@@ -68,7 +68,7 @@ void QScreenMarker::advance(int phase) { Q_UNUSED(phase) }
 //-------------------------------------------------------------------------
 int QScreenMarker::type() const { return Type; }
 //-------------------------------------------------------------------------
-void QScreenMarker::on_resize(const qreal &w, const qreal &h) {
+void QScreenMarker::onResize(const qreal &w, const qreal &h) {
     sceneSize_.setWidth(w);
     sceneSize_.setHeight(h);
 
@@ -80,7 +80,7 @@ void QScreenMarker::on_resize(const qreal &w, const qreal &h) {
     drawMarker();
 }
 //-------------------------------------------------------------------------
-void QScreenMarker::on_setValid(const TimeInterval &ti, const bool &total) {
+void QScreenMarker::onSetValid(const TimeInterval &ti, const bool &total) {
     valid_ = true;
     if (t_ < ti.bgn || t_ > ti.end) valid_ = false;
     else
@@ -90,7 +90,7 @@ void QScreenMarker::on_setValid(const TimeInterval &ti, const bool &total) {
     setEnabled(valid_);
 }
 //-------------------------------------------------------------------------
-void QScreenMarker::on_indexReduce(const int &src, const int &index) {
+void QScreenMarker::onIndexReduce(const int &src, const int &index) {
     if (src != Type) return;
     if (index_ > index) index_--;
 }
@@ -120,7 +120,7 @@ void QScreenMarker::drawMarker() {
     delete p;
 
     img->fill(Qt::transparent);
-    *img = pm->toImage();
+    //*img = pm->toImage();
 
     delete pm;
 }

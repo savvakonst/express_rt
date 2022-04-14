@@ -4,6 +4,7 @@
 #include <QCursor>
 #include <QGraphicsItem>
 #include <QGraphicsRectItem>
+#include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneWheelEvent>
 #include <QKeyEvent>
@@ -30,6 +31,42 @@ class QScreenMarker : public QObject, public QGraphicsRectItem {
 
     int getIndex();
 
+    /*
+        void placeMarker(QPainter *painter, const QScreenMarker *mrk) {
+            QPointF pt = mrk->scenePos();
+            QRectF rt = mrk->img->rect();
+
+            if (mrk->isVisible()) painter->drawPixmap(pt, QPixmap::fromImage(*mrk->img), rt);
+            else
+                return;
+
+            // Markers
+            if (!mrk->valid_) return;
+
+            int x = static_cast<int>(pt.x() + MARKER_SHIFT);
+
+            // Time Value
+            QPointF pt_t;
+            pt_t.setX(x);
+            pt_t.setY(scene()->height() - height_axis_x_ + 10);  // SCREEN_OFFSET_BOTTOM
+            painter->setPen(mrk->color_);
+
+            QFont ft = painter->font();
+            ft.setPointSize(lining_.font_size);
+            painter->setFont(ft);
+
+            QString s = QString("%1")
+                            .arg(mrk->t_.toDouble(), 0, 'f', 2, QChar('0'))
+                            .replace(QLocale(QLocale::English).decimalPoint(), QLocale::system().decimalPoint());
+
+            // TODO "axis_t_hms_" value is always true. is it normal?
+            if (is_axis_t_hms_) s = secToHms(mrk->t_);
+
+            painter->drawText(pt_t, s);
+
+            placeMarkerValues(painter, x);
+        }
+    */
     void setTime(const RelativeTime &time);
 
     void checkState(const qreal &x);
@@ -54,11 +91,11 @@ class QScreenMarker : public QObject, public QGraphicsRectItem {
     QColor color_ = Qt::blue;
 
    public slots:
-    void on_resize(const qreal &w, const qreal &h);
+    void onResize(const qreal &w, const qreal &h);
 
-    void on_setValid(const TimeInterval &ti, const bool &total);
+    void onSetValid(const TimeInterval &ti, const bool &total);
 
-    void on_indexReduce(const int &src, const int &index);
+    void onIndexReduce(const int &src, const int &index);
 
    private:
     void drawMarker();

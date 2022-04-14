@@ -99,7 +99,7 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
     void placePoints(QPainter *painter) const;
 
     /**
-     * передает в painter сформированное изображение шкал
+     * передает в painter сформированное методом QScreenScale::formScaleImage() изображение шкал
      */
 
     void placeScale(QPainter *painter, bool is_axis_hidden);
@@ -124,9 +124,13 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
      *  формирует и сохраняет до следующего вызова изображение (QImage) точек графика
      */
 
-    void drawPoints();
+    void formPointsImage();
 
-    void drawScale();
+    /**
+     *  формирует и сохраняет до следующего вызова изображение (QImage) шкалы графика
+     */
+
+    void formScaleImage();
 
     void createPopupMenu(const QPoint &pt);
 

@@ -173,6 +173,8 @@ QFormScreen::QFormScreen(ExtensionManager *manager, PlotterContext_ifs *plotter_
     p_layout->addWidget(statusbar_);
 
     stats_.enabled = true;
+
+    onAddMarker({15, 15});
 }
 #include <QDebug>
 //-------------------------------------------------------------------------
@@ -297,8 +299,8 @@ void QFormScreen::onAddMakerExt(const RelativeTime &t_0) {
     connect(mrk, &QScreenMarker::to_focused, this, &QFormScreen::onUpdateFocus);
     connect(mrk, &QScreenMarker::to_focused, scene_, &QScreenScene::onSelectItem);
 
-    connect(this, &QFormScreen::toSceneResized, mrk, &QScreenMarker::on_resize);
-    connect(this, &QFormScreen::toIndexReduced, mrk, &QScreenMarker::on_indexReduce);
+    connect(this, &QFormScreen::toSceneResized, mrk, &QScreenMarker::onResize);
+    connect(this, &QFormScreen::toIndexReduced, mrk, &QScreenMarker::onIndexReduce);
 
     // connect(axisX, &QScreenAxisX::to_changedInterval, mrk,
     // &QScreenMarker::on_setValid);
@@ -838,8 +840,8 @@ void QFormScreen::onAddMarker(const QPointF &pt) {
     connect(mrk, &QScreenMarker::to_focused, this, &QFormScreen::onUpdateFocus);
     connect(mrk, &QScreenMarker::to_focused, scene_, &QScreenScene::onSelectItem);
 
-    connect(this, &QFormScreen::toSceneResized, mrk, &QScreenMarker::on_resize);
-    connect(this, &QFormScreen::toIndexReduced, mrk, &QScreenMarker::on_indexReduce);
+    connect(this, &QFormScreen::toSceneResized, mrk, &QScreenMarker::onResize);
+    connect(this, &QFormScreen::toIndexReduced, mrk, &QScreenMarker::onIndexReduce);
 
     // connect(axisX, &QScreenAxisX::to_changedInterval, mrk,
     // &QScreenMarker::on_setValid);
@@ -1102,8 +1104,8 @@ void QFormScreen::onAlignItem(const int &src, const int &index, const int &val) 
         default:
             if (d->getIndex() != index) {
                 d->setRect(d->rect().x(), d->rect().y(), d->rect().width(), rt.height());
-                d->drawPoints();
-                d->drawScale();
+                d->formPointsImage();
+                d->formScaleImage();
             }
         }
     }
