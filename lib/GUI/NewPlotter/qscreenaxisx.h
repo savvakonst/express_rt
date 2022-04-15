@@ -37,6 +37,15 @@ class QScreenAxisX : public QObject {
     void rescale();
     void drawAxis();
 
+    inline RelativeTime getRelativeTime(qreal i) const {
+        qreal t = (pixel_weight_ * i);
+        RelativeTime rt{};
+        rt.fromDouble(t);
+        return rt;
+    }
+
+    inline qreal getXPos(const RelativeTime &rt) const { return rt.toDouble() / pixel_weight_; }
+
     QImage *img_;
     QColor clr_ = Qt::white;
 
@@ -45,6 +54,8 @@ class QScreenAxisX : public QObject {
     QVector<AxisXCutoff> cutoffs_;
     QVector<RelativeTime> scale_;
 
+    TimeInterval current_borders_;
+
    public slots:
 
     void onResize(const qreal &w, const qreal &h);
@@ -52,7 +63,6 @@ class QScreenAxisX : public QObject {
    private:
     const int type_ = kSourceAxisX;
 
-    TimeInterval ti_;
     LineProperties dstx_;
     Margin margin_;
 

@@ -59,8 +59,11 @@ QFormScreen::QFormScreen(ExtensionManager *manager, PlotterContext_ifs *plotter_
     setWindowIcon(QIcon("://image_w"));
 
     time_width_.fromInt(30);
-    current_time_.end.fromInt(30);
-    current_time_.bgn = current_time_.end - time_width_;
+
+    TimeInterval current_interval;
+
+    current_interval.end.fromInt(30);
+    current_interval.bgn = current_interval.end - time_width_;
 
     // scene
     scene_ = new QScreenScene(manager, this);
@@ -77,7 +80,7 @@ QFormScreen::QFormScreen(ExtensionManager *manager, PlotterContext_ifs *plotter_
     sz.setHeight(scene_->height());
 
     // Axis X
-    axis_x_ = new QScreenAxisX(current_time_, lining_, margin_, this);
+    axis_x_ = new QScreenAxisX(current_interval, lining_, margin_, this);
 
     connect(this, &QFormScreen::toSceneResized, axis_x_, &QScreenAxisX::onResize);
     // connect(scene, &QScreenScene::to_leftGestured, axisX, &QScreenAxisX::on_zoom);
@@ -261,12 +264,12 @@ void QFormScreen::onExit() {}
 //-------------------------------------------------------------------------
 
 void QFormScreen::onRefresh(const RelativeTime &t, const bool zoomed) {
-    current_time_.end = t;
-    current_time_.bgn = t - time_width_;
+    axis_x_->current_borders_.end = t;
+    axis_x_->current_borders_.bgn = t - time_width_;
 
-    axis_x_->setInterval(current_time_, zoomed);
+    axis_x_->setInterval(axis_x_->current_borders_, zoomed);
 
-    for (auto scale : scales_) scale->setTiming(current_time_, {});
+    for (auto scale : scales_) scale->setTiming(axis_x_->current_borders_, {});
 
     onUpdateScene();
 }
@@ -289,10 +292,9 @@ void QFormScreen::onAddMakerExt(const RelativeTime &t_0) {
 
     int index = markers_.count();
 
-    auto *mrk = new QScreenMarker(index, pt, sz, lining_, this);
+    auto *mrk = new QScreenMarker(axis_x_, index, pt, sz, lining_, this);
 
-    mrk->setTime(t_0);
-    mrk->pScale_ = &axis_x_->scale_;
+    mrk->p_scale_ = &axis_x_->scale_;
 
     connect(mrk, &QScreenMarker::to_removed, this, &QFormScreen::onRemoveItem);
     connect(mrk, &QScreenMarker::to_changed, this, &QFormScreen::onUpdateScene);
@@ -355,27 +357,36 @@ void QFormScreen::placeAxisX(QPainter *painter, const QScreenAxisX *axis) {
 
 //-------------------------------------------------------------------------
 void QFormScreen::placeMarker(QPainter *painter, const QScreenMarker *mrk) {
-    QPointF pt = mrk->scenePos();
-    QRectF rt = mrk->img->rect();
+    QPointF pos = mrk->scenePos();
+    QRectF rt = mrk->img_->rect();
 
-    if (mrk->isVisible()) painter->drawPixmap(pt, QPixmap::fromImage(*mrk->img), rt);
-    else
-        return;
+    RelativeTime relative_time = mrk->relative_time_ - axis_x_->current_borders_.bgn;
 
+    auto x = axis_x_->getXPos(relative_time);
+
+    // x = pos.x();
+    qreal scene_h = scene_->height();
+    /*
+        if (mrk->isVisible()) painter->drawPixmap(pos, QPixmap::fromImage(*mrk->img_), rt);
+        else
+            return;
+    */
     // Markers
     if (!mrk->valid_) return;
 
-    int x = static_cast<int>(pt.x() + MARKER_SHIFT);
-
-    // Time Value
-    QPointF pt_t;
-    pt_t.setX(x);
-    pt_t.setY(scene_->height() - height_axis_x_ + 10);  // SCREEN_OFFSET_BOTTOM
-    painter->setPen(mrk->color_);
+    QPen pen(Qt::red);
+    pen.setStyle(Qt::DashLine);
+    painter->setPen(pen);
 
     QFont ft = painter->font();
     ft.setPointSize(lining_.font_size);
     painter->setFont(ft);
+
+    painter->drawLine(QPointF(x, 0), QPointF(x, scene_h));
+
+    QPointF text_pos(x, scene_->height() - height_axis_x_ + 10);
+
+    painter->setPen(mrk->color_);
 
     QString s = QString("%1")
                     .arg(mrk->t_.toDouble(), 0, 'f', 2, QChar('0'))
@@ -384,23 +395,18 @@ void QFormScreen::placeMarker(QPainter *painter, const QScreenMarker *mrk) {
     // TODO "axis_t_hms_" value is always true. is it normal?
     if (is_axis_t_hms_) s = secToHms(mrk->t_);
 
-    painter->drawText(pt_t, s);
+    painter->drawText(text_pos, s);
 
     placeMarkerValues(painter, x);
 }
 
 //-------------------------------------------------------------------------
-void QFormScreen::placeMarkerFloat(QPainter *painter) {
-    // if(!diagrams.count())
-    //    return;
-
-    if (!mark_f_.enabled) return;
+void QFormScreen::placeTimeIndependentMarker(QPainter *painter, MarkerSimple &marker, RelativeTime distance) {
+    if (!marker.enabled) return;
 
     qreal scene_h = scene_->height();
 
-    int x = static_cast<int>(mark_f_.x);
-
-    mark_f_.t = axis_x_->scale_.at(x);
+    marker.t = axis_x_->getRelativeTime(marker.x);
 
     QPen pen(Qt::black);
     pen.setStyle(Qt::DashLine);
@@ -410,85 +416,30 @@ void QFormScreen::placeMarkerFloat(QPainter *painter) {
     ft.setPointSize(lining_.font_size);
     painter->setFont(ft);
 
-    painter->drawLine(QPointF(mark_f_.x, 0), QPointF(mark_f_.x, scene_h));
-    if (axis_y_marker_)
-        painter->drawLine(QPointF(margin_.left - kDiagramMargin, mark_f_.y),
-                          QPointF(scene_->width() - margin_.right + kDiagramMargin, mark_f_.y));
+    painter->drawLine(QPointF(marker.x, 0), QPointF(marker.x, scene_h));
 
-    QPointF pt_t;
-    pt_t.setX(x + 5);
-    pt_t.setY(scene_->height() - height_axis_x_ - 11);  // SCREEN_OFFSET_BOTTOM
+    QPointF text_pos(marker.x + 5, scene_->height() - height_axis_x_ - 10);
 
     double pixel_pow = log10(axis_x_->pixel_weight_);
-    int prec = 0;
-    if (pixel_pow < 0) prec = static_cast<int>(fabs(pixel_pow)) + 1;
+    int prec = (pixel_pow < 0) ? static_cast<int>(fabs(pixel_pow)) + 1 : 0;
 
-    RelativeTime t = mark_f_.t + current_time_.end;
-    // QString s = QString("%1").arg(t_, 0, 'f', prec);
-    // if(dstx.axisT.hms)
+    RelativeTime t = marker.t + axis_x_->current_borders_.end;
+
     QString s = secToHms(t, prec);
+    painter->drawText(text_pos, s);
 
-    QFontMetrics fm = painter->fontMetrics();
-    int width = fm.width(s) + 2;
-    int y = static_cast<int>(pt_t.y() - lining_.font_size - 1);
-
-    pen.setColor(Qt::white);
-    painter->setPen(pen);
-    painter->fillRect(static_cast<int>(pt_t.x() - 2), y - 2, width + 1, lining_.font_size + 4, QBrush(Qt::black));
-    painter->drawText(pt_t, s);
-
-    if (mark_a_.enabled) {
-        RelativeTime dt = mark_f_.t - mark_a_.t;
-
-        pt_t.setY(scene_->height() - height_axis_x_ - 1);  // SCREEN_OFFSET_BOTTOM
-
-        pen.setColor(Qt::black);
-        painter->setPen(pen);
-        painter->drawText(pt_t, QString("Δt: %1").arg(dt.toDouble(), 0, 'f', prec));
+    if (!(distance == RelativeTime{0, 0})) {
+        QFontMetrics fm = painter->fontMetrics();
+        auto offset = QPointF(0, qreal(fm.height()));
+        painter->drawText(text_pos + offset, QString("Δt: %1").arg(distance.toDouble(), 0, 'f', prec));
     }
 
-    if (axis_y_current_) placeMarkerValues(painter, x);
-}
-
-//-------------------------------------------------------------------------
-void QFormScreen::placeMarkerAnchor(QPainter *painter) {
-    // if(!diagrams.count())
-    //    return;
-
-    if (!mark_a_.enabled) return;
-
-    qreal scene_h = scene_->height();
-    int x = static_cast<int>(mark_a_.x);
-
-    mark_a_.t = axis_x_->scale_.at(x);
-
-    QPen pen(Qt::black);
-    pen.setStyle(Qt::DashLine);
-    painter->setPen(pen);
-
-    QFont ft = painter->font();
-    ft.setPointSize(lining_.font_size);
-    painter->setFont(ft);
-
-    painter->drawLine(QPointF(mark_a_.x, 0), QPointF(mark_a_.x, scene_h));
-
-    QPointF pt_t;
-    pt_t.setX(x + 5);
-    pt_t.setY(scene_->height() - height_axis_x_ + 10);  // SCREEN_OFFSET_BOTTOM
-
-    double pixel_pow = log10(axis_x_->pixel_weight_);
-    int prec = 0;
-    if (pixel_pow < 0) prec = static_cast<int>(fabs(pixel_pow)) + 1;
-
-    RelativeTime t = mark_a_.t + current_time_.end;
-    QString s = secToHms(t, prec);
-    painter->drawText(pt_t, s);
-
-    if (axis_y_current_) placeMarkerValues(painter, x);
+    if (axis_y_current_) placeMarkerValues(painter, marker.x);
 }
 
 //-------------------------------------------------------------------------
 void QFormScreen::placeMarkerValues(QPainter *painter, int x) {
+    /*
     int y = 0;
     QPointF pt;
     QFontMetrics fm = painter->fontMetrics();
@@ -581,6 +532,7 @@ void QFormScreen::placeMarkerValues(QPainter *painter, int x) {
             }
         }
     }
+     */
 }
 
 //-------------------------------------------------------------------------
@@ -632,7 +584,7 @@ void QFormScreen::onZoom(const QPointF &pt, const int &delta) {
 
     time_width_.fromDouble(t);
 
-    onRefresh(current_time_.end, true);
+    onRefresh(axis_x_->current_borders_.end, true);
 }
 //-------------------------------------------------------------------------
 void QFormScreen::onPause() {
@@ -753,19 +705,17 @@ void QFormScreen::onUpdateScene(const int &src) {
     }
 
     // Markers
-    /*do {
-        if (marker_index_ < 0)
-            break;
-        for (auto mrk: markers_) {
-            if (mrk->index_ != marker_index_)
-                placeMarker(painter, mrk);
+
+    if (marker_index_ >= 0) {
+        for (auto mrk : markers_) {
+            if (mrk->index_ != marker_index_) placeMarker(painter, mrk);
         }
         placeMarker(painter, markers_.at(marker_index_));
-    } while (false);*/
+    }
 
     // Simple Markers
-    placeMarkerAnchor(painter);
-    placeMarkerFloat(painter);
+    placeTimeIndependentMarker(painter, mark_a_, {0, 0});
+    placeTimeIndependentMarker(painter, mark_f_, mark_a_.enabled ? (mark_f_.t - mark_a_.t) : RelativeTime{0, 0});
 
     delete painter;
 
@@ -828,12 +778,9 @@ void QFormScreen::onAddMarker(const QPointF &pt) {
     sz.setHeight(scene_->height());
 
     int index = markers_.count();
-    auto *mrk = new QScreenMarker(index, pt, sz, lining_, this);
+    auto *mrk = new QScreenMarker(axis_x_, index, pt, sz, lining_, this);
 
-    mrk->pScale_ = &axis_x_->scale_;
-
-    int x = static_cast<int>(pt.x());
-    if (x < axis_x_->scale_.count()) mrk->setTime(axis_x_->scale_.at(x));
+    mrk->p_scale_ = &axis_x_->scale_;
 
     connect(mrk, &QScreenMarker::to_removed, this, &QFormScreen::onRemoveItem);
     connect(mrk, &QScreenMarker::to_changed, this, &QFormScreen::onUpdateScene);
@@ -883,7 +830,7 @@ void QFormScreen::onAddMarkerAnchor(const QPointF &pt) {
     mark_a_.enabled = true;
     mark_a_.x = pt.x();
     mark_a_.y = pt.y();  // not used
-    mark_a_.t = axis_x_->scale_.at(static_cast<int>(pt.x()));
+    mark_a_.t = axis_x_->getRelativeTime(pt.x());
 
     onUpdateScene(kSourceMarkerAnchor);
 }
@@ -901,7 +848,7 @@ void QFormScreen::onUpdateMarkerFloat(const QPointF &pt) {
     mark_f_.enabled = true;
     mark_f_.x = pt.x();
     mark_f_.y = pt.y();
-    mark_f_.t = axis_x_->scale_.at(static_cast<int>(pt.x()));
+    mark_f_.t = axis_x_->getRelativeTime(pt.x());
 
     onUpdateScene(kSourceMarkerFloat);
 }
@@ -918,13 +865,13 @@ void QFormScreen::onChangeSettings(const QString &title, const SettingsCommon &s
     saving_ = stx_cmn.saving;
 
     // scales
-    current_time_.bgn = current_time_.end - time_width_;
+    axis_x_->current_borders_.bgn = axis_x_->current_borders_.end - time_width_;
 
     axis_x_->setMargin(margin_);
-    axis_x_->setInterval(current_time_, true);
+    axis_x_->setInterval(axis_x_->current_borders_, true);
     for (auto scale : scales_) {
         scale->setMargins(margin_);
-        scale->setTiming(current_time_, {});
+        scale->setTiming(axis_x_->current_borders_, {});
     }
 }
 //-------------------------------------------------------------------------

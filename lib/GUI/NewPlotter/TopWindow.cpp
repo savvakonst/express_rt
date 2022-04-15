@@ -147,7 +147,9 @@ class Timer : public QTimer {
     }
 
    public slots:
-    void onTimer() { q_form_screen_->onRefresh(redused_module_stream_->getTime()); };
+    void onTimer() {
+        //q_form_screen_->onRefresh(redused_module_stream_->getTime());
+    };
 
    private:
     ModuleStream_ifs *redused_module_stream_;

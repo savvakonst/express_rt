@@ -24,50 +24,12 @@ class QScreenMarker : public QObject, public QGraphicsRectItem {
     Q_OBJECT
 
    public:
-    explicit QScreenMarker(const int &index0, const QPointF &pt, const QSizeF &sz, const LineProperties &dstx0,
-                           QWidget *parent = nullptr);
+    explicit QScreenMarker(QScreenAxisX *axis_x, const int &index_0, const QPointF &pt, const QSizeF &sz,
+                           const LineProperties &dstx_0, QWidget *parent = nullptr);
 
     ~QScreenMarker() override;
 
     int getIndex();
-
-    /*
-        void placeMarker(QPainter *painter, const QScreenMarker *mrk) {
-            QPointF pt = mrk->scenePos();
-            QRectF rt = mrk->img->rect();
-
-            if (mrk->isVisible()) painter->drawPixmap(pt, QPixmap::fromImage(*mrk->img), rt);
-            else
-                return;
-
-            // Markers
-            if (!mrk->valid_) return;
-
-            int x = static_cast<int>(pt.x() + MARKER_SHIFT);
-
-            // Time Value
-            QPointF pt_t;
-            pt_t.setX(x);
-            pt_t.setY(scene()->height() - height_axis_x_ + 10);  // SCREEN_OFFSET_BOTTOM
-            painter->setPen(mrk->color_);
-
-            QFont ft = painter->font();
-            ft.setPointSize(lining_.font_size);
-            painter->setFont(ft);
-
-            QString s = QString("%1")
-                            .arg(mrk->t_.toDouble(), 0, 'f', 2, QChar('0'))
-                            .replace(QLocale(QLocale::English).decimalPoint(), QLocale::system().decimalPoint());
-
-            // TODO "axis_t_hms_" value is always true. is it normal?
-            if (is_axis_t_hms_) s = secToHms(mrk->t_);
-
-            painter->drawText(pt_t, s);
-
-            placeMarkerValues(painter, x);
-        }
-    */
-    void setTime(const RelativeTime &time);
 
     void checkState(const qreal &x);
 
@@ -78,16 +40,20 @@ class QScreenMarker : public QObject, public QGraphicsRectItem {
 
     int type() const override;
 
-    QImage *img;
+    QImage *img_;
 
     int index_ = 0;
     RelativeTime t_ = {0};
+    RelativeTime relative_time_ = {0};
 
     bool valid_ = true;
     bool enabled_ = false;
-    bool leftPressed_ = false;
+    bool left_pressed_ = false;
 
-    QVector<RelativeTime> *pScale_;
+    QVector<RelativeTime> *p_scale_;
+
+    const QScreenAxisX *axis_x_;
+
     QColor color_ = Qt::blue;
 
    public slots:

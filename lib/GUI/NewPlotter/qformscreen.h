@@ -101,9 +101,11 @@ class QFormScreen : public QDialog {
 
     void placeMarker(QPainter *painter, const QScreenMarker *mrk);
 
-    void placeMarkerFloat(QPainter *painter);
+    /**
+     * Отрисовывает маркер и дистанцию distance если distance != RelativeTime{0,0}
+     */
 
-    void placeMarkerAnchor(QPainter *painter);
+    void placeTimeIndependentMarker(QPainter *painter, MarkerSimple &marker, RelativeTime distance);
 
     void placeMarkerValues(QPainter *painter, int x);
 
@@ -156,8 +158,7 @@ class QFormScreen : public QDialog {
     // TODO: only one occurrence in the code. no assignments. maybe remove it?
     bool axis_y_marker_ = false;
     bool axis_y_current_ = true;
-
-    TimeInterval current_time_;
+    
     RelativeTime time_width_ = {0};
     Timing time_;
 
