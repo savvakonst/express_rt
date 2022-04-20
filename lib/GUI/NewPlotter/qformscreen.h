@@ -48,10 +48,6 @@ class QFormScreen : public QDialog {
 
     QSizeF getSceneSize();
 
-
-
-    void setInterval(const TimeInterval &ti_0);
-
     QScreenScale *addScale(QScreenScale *p_scale);
 
     QScreenScale *addScale(Reader_ifs *reader);
@@ -147,7 +143,6 @@ class QFormScreen : public QDialog {
     MarkerSimple mark_f_;
     MarkerSimple mark_a_;
 
-
     // Settings
     bool is_axis_t_hms_ = true;
     bool is_axis_hidden_ = false;
@@ -158,7 +153,7 @@ class QFormScreen : public QDialog {
     // TODO: only one occurrence in the code. no assignments. maybe remove it?
     bool axis_y_marker_ = false;
     bool axis_y_current_ = true;
-    
+
     RelativeTime time_width_ = {0};
     Timing time_;
 
@@ -178,7 +173,6 @@ class QFormScreen : public QDialog {
 
     void onResizeScene();
     void onZoom(const QPointF &pt, const int &delta);
-
 
     void onClearScene();
 
@@ -234,7 +228,6 @@ class QFormScreen : public QDialog {
     void resizeEvent(QResizeEvent *event) override;
 
    signals:
-
 
     void toSceneChanged();
 

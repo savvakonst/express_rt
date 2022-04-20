@@ -198,14 +198,6 @@ QSizeF QFormScreen::getSceneSize() {
 }
 
 //-------------------------------------------------------------------------
-void QFormScreen::setInterval(const TimeInterval &ti_0) {
-    /*axisX->setInterval(ti0);
-    for(auto scale_ : scales){
-        scale_->onSetInterval(ti);
-    }*/
-}
-
-//-------------------------------------------------------------------------
 
 QScreenScale *QFormScreen::addScale(QScreenScale *p_scale) {
     // scl->setParameter(name, prm);
@@ -582,7 +574,6 @@ void QFormScreen::onZoom(const QPointF &pt, const int &delta) {
 //-------------------------------------------------------------------------
 void QFormScreen::onClearScene() {
     scene_->blockSignals(true);
-
 
     label_index_ = -1;
 
