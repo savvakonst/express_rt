@@ -19,7 +19,7 @@ class QScreenAxisX : public QObject {
 
     explicit QScreenAxisX(const TimeInterval &ti0, const LineProperties &dstx, const Margin &margin,
                           QObject *parent = nullptr);
-
+ 
     ~QScreenAxisX() override;
 
     void setLabel(const QString &lbl);
@@ -32,19 +32,19 @@ class QScreenAxisX : public QObject {
 
     void setTime(const RelativeTime &t);
 
-    void setSettings(const LineProperties &dstx, const Margin &margin);
+
 
     void rescale();
     void drawAxis();
 
     inline RelativeTime getRelativeTime(qreal i) const {
-        qreal t = (pixel_weight_ * i);
+        qreal t = (pixel_weight_ * (i - margin_.left));
         RelativeTime rt{};
         rt.fromDouble(t);
         return rt;
     }
 
-    inline qreal getXPos(const RelativeTime &rt) const { return rt.toDouble() / pixel_weight_; }
+    inline qreal getXPos(const RelativeTime &rt) const { return rt.toDouble() / pixel_weight_ + margin_.left; }
 
     QImage *img_;
     QColor clr_ = Qt::white;
@@ -63,7 +63,7 @@ class QScreenAxisX : public QObject {
    private:
     const int type_ = kSourceAxisX;
 
-    LineProperties dstx_;
+    LineProperties lining_;
     Margin margin_;
 
     RelativeTime t_ = {0};

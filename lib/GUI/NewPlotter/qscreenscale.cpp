@@ -1,9 +1,9 @@
 ﻿#include "qscreenscale.h"
 
+#include <QDebug>
 #include <QGraphicsScene>
 
 #include "convtemplate/Parameter_ifs.h"
-
 //-------------------------------------------------------------------------
 QScreenScale::QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &sz, const LineProperties &dstx,
                            const Margin &margin, QWidget *parent) {
@@ -20,7 +20,7 @@ QScreenScale::QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &s
         if (!s_unit.isEmpty()) s_label_ += QString(", ") + s_unit;
     }
 
-    dstx_ = dstx;
+    lining_ = dstx;
     margin_ = margin;
     color_ = diag_colors_.at(rand() % (diag_colors_.count() - 1));
 
@@ -153,6 +153,8 @@ void QScreenScale::placePoints(QPainter *painter) const {
 
     QRectF rt = img_points_->rect();
 
+    // rt.setWidth(scene()->width());
+    // rt.setX(0);
     painter->drawPixmap(pt, QPixmap::fromImage(*img_points_), rt);
 }
 
@@ -359,17 +361,17 @@ void QScreenScale::formPointsImage() {
     RelativeTime dt = ti_.end - ti_.bgn;
     dt.ms_fractional = 0;
 
-    if (!is_paused_) {
-        memset(&stat_, 0, sizeof(stat_));
-        for (auto &p : parameters_) {
-            Borders b = p.reader->getAvailableBorders();
 
-            b.begin = b.end - dt;
+    memset(&stat_, 0, sizeof(stat_));
+    for (auto &p : parameters_) {
+        Borders b = p.reader->getAvailableBorders();
 
-            p.chunks = p.reader->getPoints(b, p.buffer, image_w);
-            recountScaleValues(image_w, p.stat, p.chunks.get());
-        }
+        b.begin = b.end - dt;
+
+        p.chunks = p.reader->getPoints(b, p.buffer, image_w);
+        recountScaleValues(image_w, p.stat, p.chunks.get());
     }
+    
 
     double scale_min = stat_.val_min;
     if (!minimum_.automatic) scale_min = minimum_.value;
@@ -407,14 +409,14 @@ void QScreenScale::formPointsImage() {
     auto *painter = new QPainter(pm);
 
     QFont ft = painter->font();
-    ft.setPointSize(dstx_.font_size);
+    ft.setPointSize(lining_.font_size);
     painter->setFont(ft);
 
     QPen pen;
 
     // parameter
     pen.setColor(QColor(color_));
-    pen.setWidth(dstx_.line_weight);
+    pen.setWidth(lining_.line_weight);
     painter->setPen(pen);
     /*
     for (auto &prm : parameters_) {
@@ -506,7 +508,7 @@ void QScreenScale::formScaleImage() {
     auto *painter = new QPainter(pm);
 
     QFont ft = painter->font();
-    ft.setPointSize(dstx_.font_size);
+    ft.setPointSize(lining_.font_size);
     painter->setFont(ft);
 
     QFontMetrics fm = painter->fontMetrics();
@@ -687,8 +689,7 @@ void QScreenScale::onAddLevelEnd(const ControlLevel &lvl, const bool &flag, cons
     else  // new
         levels_.push_back(lvl);
 }
-//-------------------------------------------------------------------------
-void QScreenScale::onSetPause(const bool is_paused) { is_paused_ = is_paused; }
+
 //-------------------------------------------------------------------------
 void QScreenScale::changeScaleBorder(const bool &high, const int &delta) {
     if (delta == 0) return;

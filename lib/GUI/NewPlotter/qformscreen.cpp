@@ -87,7 +87,6 @@ QFormScreen::QFormScreen(ExtensionManager *manager, PlotterContext_ifs *plotter_
     connect(scene_, &QScreenScene::toLeftClicked, this, &QFormScreen::onAddMarkerAnchor);
     // connect(scene, &QScreenScene::to_rightGestured, axisX, &QScreenAxisX::on_move);
     connect(scene_, &QScreenScene::toMouseWheeled, this, &QFormScreen::onZoom);
-    connect(scene_, &QScreenScene::toPaused, this, &QFormScreen::onPause);
     connect(scene_, &QScreenScene::toMouseMoved, this, &QFormScreen::onUpdateMarkerFloat);
 
     // connect(axisX, &QScreenAxisX::toChanged, this, &QFormScreen::onUpdateScene);
@@ -199,16 +198,6 @@ QSizeF QFormScreen::getSceneSize() {
 }
 
 //-------------------------------------------------------------------------
-void QFormScreen::setSettings(const LineProperties &dstx) {
-    lining_ = dstx;
-
-    act_scale_hide_->setChecked(is_axis_hidden_);
-    if (is_axis_hidden_) act_scale_hide_->setText(tr("Показать шкалы"));
-    else
-        act_scale_hide_->setText(tr("Скрыть шкалы"));
-}
-
-//-------------------------------------------------------------------------
 void QFormScreen::setInterval(const TimeInterval &ti_0) {
     /*axisX->setInterval(ti0);
     for(auto scale_ : scales){
@@ -233,10 +222,8 @@ QScreenScale *QFormScreen::addScale(QScreenScale *p_scale) {
 
     connect(this, &QFormScreen::toIndexReduced, p_scale, &QScreenScale::onIndexReduce);
     connect(this, &QFormScreen::toSceneResized, p_scale, &QScreenScale::onResize);
-    connect(this, &QFormScreen::toPaused, p_scale, &QScreenScale::onSetPause);
 
     scales_.push_back(p_scale);
-    scale_index_ = scales_.count() - 1;
 
     scene_->addItem(p_scale);
 
@@ -296,10 +283,10 @@ void QFormScreen::onAddMakerExt(const RelativeTime &t_0) {
 
     mrk->p_scale_ = &axis_x_->scale_;
 
-    connect(mrk, &QScreenMarker::to_removed, this, &QFormScreen::onRemoveItem);
+    connect(mrk, &QScreenMarker::toRemoved, this, &QFormScreen::onRemoveItem);
     connect(mrk, &QScreenMarker::to_changed, this, &QFormScreen::onUpdateScene);
-    connect(mrk, &QScreenMarker::to_focused, this, &QFormScreen::onUpdateFocus);
-    connect(mrk, &QScreenMarker::to_focused, scene_, &QScreenScene::onSelectItem);
+    connect(mrk, &QScreenMarker::toFocused, this, &QFormScreen::onUpdateFocus);
+    connect(mrk, &QScreenMarker::toFocused, scene_, &QScreenScene::onSelectItem);
 
     connect(this, &QFormScreen::toSceneResized, mrk, &QScreenMarker::onResize);
     connect(this, &QFormScreen::toIndexReduced, mrk, &QScreenMarker::onIndexReduce);
@@ -310,7 +297,7 @@ void QFormScreen::onAddMakerExt(const RelativeTime &t_0) {
     markers_.push_back(mrk);
     scene_->addItem(mrk);
 
-    emit mrk->to_focused(kSourceMarker, index);
+    emit mrk->toFocused(kSourceMarker, index);
     emit mrk->to_changed(kSourceMarker);
 }
 //-------------------------------------------------------------------------
@@ -423,11 +410,15 @@ void QFormScreen::placeTimeIndependentMarker(QPainter *painter, MarkerSimple &ma
     double pixel_pow = log10(axis_x_->pixel_weight_);
     int prec = (pixel_pow < 0) ? static_cast<int>(fabs(pixel_pow)) + 1 : 0;
 
-    RelativeTime t = marker.t + axis_x_->current_borders_.end;
+    RelativeTime t = marker.t + axis_x_->current_borders_.bgn;
 
     QString s = secToHms(t, prec);
     painter->drawText(text_pos, s);
-
+    /*
+        painter->drawText(
+            text_pos,
+            QString("%1: %2").arg(qlonglong(t.ls_integer)).arg(double(t.ms_fractional) / double(1ll << 32), 0, 'f', 3));
+    */
     if (!(distance == RelativeTime{0, 0})) {
         QFontMetrics fm = painter->fontMetrics();
         auto offset = QPointF(0, qreal(fm.height()));
@@ -587,17 +578,12 @@ void QFormScreen::onZoom(const QPointF &pt, const int &delta) {
     onRefresh(axis_x_->current_borders_.end, true);
 }
 //-------------------------------------------------------------------------
-void QFormScreen::onPause() {
-    is_pause_ = !is_pause_;
 
-    emit toPaused(is_pause_);
-}
 //-------------------------------------------------------------------------
 void QFormScreen::onClearScene() {
     scene_->blockSignals(true);
 
-    scale_index_ = -1;
-    marker_index_ = -1;
+
     label_index_ = -1;
 
     scene_->blockSignals(true);
@@ -683,34 +669,16 @@ void QFormScreen::onUpdateScene(const int &src) {
     placeAxisX(painter, axis_x_);
 
     // Diagrams & Scales
-    QScreenScale *last = nullptr;
     for (auto d : scales_) {
-        if (d->getIndex() != scale_index_) d->placePoints(painter);
-        else
-            last = d;
-
+        d->placePoints(painter);
+        d->placeScale(painter, is_axis_hidden_);
+        if (stats_.enabled) d->placeStat(painter);
         warning |= d->warning_;
-    }
-    if (last != nullptr) last->placePoints(painter);
-    for (auto d : scales_) {
-        if (d->getIndex() != scale_index_) {
-            d->placeScale(painter, is_axis_hidden_);
-
-            if (stats_.enabled) d->placeStat(painter);
-        }
-    }
-    if (last != nullptr) {
-        last->placeScale(painter, is_axis_hidden_);
-        if (stats_.enabled) last->placeStat(painter);
     }
 
     // Markers
-
-    if (marker_index_ >= 0) {
-        for (auto mrk : markers_) {
-            if (mrk->index_ != marker_index_) placeMarker(painter, mrk);
-        }
-        placeMarker(painter, markers_.at(marker_index_));
+    for (auto mrk : markers_) {
+        placeMarker(painter, mrk);
     }
 
     // Simple Markers
@@ -782,10 +750,10 @@ void QFormScreen::onAddMarker(const QPointF &pt) {
 
     mrk->p_scale_ = &axis_x_->scale_;
 
-    connect(mrk, &QScreenMarker::to_removed, this, &QFormScreen::onRemoveItem);
+    connect(mrk, &QScreenMarker::toRemoved, this, &QFormScreen::onRemoveItem);
     connect(mrk, &QScreenMarker::to_changed, this, &QFormScreen::onUpdateScene);
-    connect(mrk, &QScreenMarker::to_focused, this, &QFormScreen::onUpdateFocus);
-    connect(mrk, &QScreenMarker::to_focused, scene_, &QScreenScene::onSelectItem);
+    connect(mrk, &QScreenMarker::toFocused, this, &QFormScreen::onUpdateFocus);
+    connect(mrk, &QScreenMarker::toFocused, scene_, &QScreenScene::onSelectItem);
 
     connect(this, &QFormScreen::toSceneResized, mrk, &QScreenMarker::onResize);
     connect(this, &QFormScreen::toIndexReduced, mrk, &QScreenMarker::onIndexReduce);
@@ -796,7 +764,7 @@ void QFormScreen::onAddMarker(const QPointF &pt) {
     markers_.push_back(mrk);
     scene_->addItem(mrk);
 
-    emit mrk->to_focused(kSourceMarker, index);
+    emit mrk->toFocused(kSourceMarker, index);
     emit mrk->to_changed(kSourceMarker);
 }
 //-------------------------------------------------------------------------
@@ -819,9 +787,6 @@ void QFormScreen::onAddLabelFromMenu() {
 }
 //-------------------------------------------------------------------------
 void QFormScreen::onAddMarkerAnchor(const QPointF &pt) {
-    // if(!diagrams.count())
-    //    return;
-
     if ((pt.x() < margin_.left) || (pt.x() > scene_->width() - margin_.right)) {
         mark_a_.enabled = false;
         return;
@@ -837,9 +802,6 @@ void QFormScreen::onAddMarkerAnchor(const QPointF &pt) {
 
 //-------------------------------------------------------------------------
 void QFormScreen::onUpdateMarkerFloat(const QPointF &pt) {
-    // if(!diagrams.count())
-    //    return;
-
     if ((pt.x() < margin_.left) || (pt.x() > scene_->width() - margin_.right)) {
         mark_f_.enabled = false;
         return;
@@ -905,7 +867,6 @@ void QFormScreen::onRemoveItem(const int &src, const int &index) {
             p->deleteLater();
         }
 
-        scale_index_ = scales_.count() - 1;
     } break;
     case kSourceMarker: {
         QList<int> list;
@@ -933,7 +894,6 @@ void QFormScreen::onRemoveItem(const int &src, const int &index) {
             p->deleteLater();
         }
 
-        marker_index_ = markers_.count() - 1;
     } break;
         /*case SOURCE_LABEL:{
             QList<int>  list;
@@ -972,35 +932,7 @@ void QFormScreen::onRemoveItem(const int &src, const int &index) {
     scene_->blockSignals(false);
 }
 //-------------------------------------------------------------------------
-void QFormScreen::onTuneItem(const int &src, const int &index) {
-    /*QFormDiagSettings   *fs = new QFormDiagSettings(this);
-
-    connect(fs, &QFormDiagSettings::to_confirmed, this,
-    &QFormDiag::on_changeSettings);
-
-    int     indexTab    = 0;
-    QString nameDiag    = "";
-    int     indexLbl    = -1;
-
-    switch(src){
-    case SOURCE_DIAGRAM:
-        nameDiag    = diagrams.at(index)->sName;
-        indexTab    = 1;
-        break;
-    case SOURCE_LABEL:
-        indexLbl    = index;
-        indexTab    = 2;
-        break;
-    default:
-        ;
-    }
-
-    fs->setStxCommon(sTitle, labelMain, dstx);
-    fs->setStxSingle(nameDiag, getDiagNameList(), getDiagSettingsMap());
-    fs->setStxLabel(indexLbl, getLabelCaptionList(), getLabelSettingsList());
-    fs->setActiveTab(indexTab);
-    fs->show();*/
-}
+void QFormScreen::onTuneItem(const int &src, const int &index) {}
 //-------------------------------------------------------------------------
 void QFormScreen::onAlignItem(const int &src, const int &index, const int &val) {
     if (src != kSourceScale) return;
@@ -1089,54 +1021,9 @@ void QFormScreen::onShowSettings() {
 
     fs->setActiveTab(0);
     fs->show();
-
-    /*QString     name = "";
-    QStringList list;
-    QMap<QString, SETTINGS_DIAGITEM>    m_dstx;
-
-    for(QDiagItem *d : diagrams){
-        list.push_back(d->sName);
-        m_dstx.insert(d->sName, d->dstx);
-    }
-    if(!list.isEmpty())
-        name = list.first();
-
-    QFormDiagSettings   *fs = new QFormDiagSettings(this);
-
-    connect(fs, &QFormDiagSettings::to_confirmed, this, &QFormDiag::on_changeSettings);
-
-    fs->setStxCommon(sTitle, labelMain, dstx);
-    fs->setStxSingle("", list, m_dstx);
-    fs->setActiveTab(0);
-    fs->show();*/
 }
 //-------------------------------------------------------------------------
-void QFormScreen::onSaveConf() {
-    /*QSettings   ini(g_supportPath + INI_FILE_NAME_EXP, QSettings::IniFormat);
-    QString     path = ini.value(INI_RAW_SAVE, g_supportPath).toString();
-
-    QFileDialog dlg(this, tr("Сохранение конфигурации экрана"));
-    dlg.setDefaultSuffix(CONF_FILE_EXT);
-
-    dlg.setNameFilters(QStringList() << tr("Файл конфигурации экрана
-    (*%1)").arg(CONF_FILE_EXT));
-    dlg.setAcceptMode(QFileDialog::AcceptMode::AcceptSave);
-
-    int result = dlg.exec();
-    if(result != QFileDialog::Accepted)
-        return;
-
-    QString s = QFileInfo(dlg.selectedFiles().first()).fileName();
-    s = s.left(s.lastIndexOf(CONF_FILE_EXT));
-    if(sTitle.isEmpty())
-        sTitle = s;
-
-    QFileDiagConfiguration  *f = new QFileDiagConfiguration(this);
-
-    f->add(0, sTitle, labelMain, geometry(), dstx, axisX, diagrams, markers,
-    labels); bool    success = f->save(dlg.selectedFiles().first()); if(!success)
-        return;*/
-}
+void QFormScreen::onSaveConf() {}
 //-------------------------------------------------------------------------
 void QFormScreen::onReport(const QString &s) { statusbar_->showMessage(s); }
 //-------------------------------------------------------------------------

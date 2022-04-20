@@ -6,7 +6,7 @@
 //-------------------------------------------------------------------------
 QScreenAxisX::QScreenAxisX(const TimeInterval &ti, const LineProperties &dstx, const Margin &margin, QObject *parent) {
     current_borders_ = ti;
-    dstx_ = dstx;
+    lining_ = dstx;
     margin_ = margin;
 
     scene_size_.setWidth(kDiagramOffsetLeft + kDiagramOffsetRight + kScreenOffset);
@@ -50,11 +50,6 @@ void QScreenAxisX::setTime(const RelativeTime &t) {
     drawAxis();
 }
 
-//-------------------------------------------------------------------------
-void QScreenAxisX::setSettings(const LineProperties &dstx, const Margin &margin) {
-    dstx_ = dstx;
-    margin_ = margin;
-}
 
 //-------------------------------------------------------------------------
 void QScreenAxisX::onResize(const qreal &w, const qreal &h) {
@@ -74,7 +69,6 @@ void QScreenAxisX::rescale() {
     auto interval = current_borders_.end - current_borders_.bgn;
     auto d_interval = interval.toDouble();
 
-
     pixel_weight_ = d_interval / axis_width;
 
     int step = 10;
@@ -85,6 +79,10 @@ void QScreenAxisX::rescale() {
 
     int co_count = floor(d_interval / d_step);
 
+    if (co_count == 1) {
+        d_step /= 10;
+        co_count = floor(d_interval / d_step);
+    }
     qDebug() << "co_count: " << co_count;
     auto end = current_borders_.end.toDouble();
 
@@ -96,7 +94,7 @@ void QScreenAxisX::rescale() {
         temp.fromDouble(d_step * j);
 
         co.val = 0 - (d_step * j);
-        co.pos = getXPos((interval - temp) );
+        co.pos = getXPos((interval - temp));
         co.enabled = true;
 
         cutoffs_.push_back(co);
@@ -113,14 +111,6 @@ void QScreenAxisX::rescale() {
         rt.fromDouble(t);
 
         scale_.push_front(rt);
-/*
-                if (index < cutoffs_.count()) {
-                    if (t <= cutoffs_.at(index).val) {
-                        cutoffs_[index].pos = j;
-                        index++;
-                    }
-                }
-*/
     }
 
     // what is it?
@@ -142,7 +132,7 @@ void QScreenAxisX::drawAxis() {
     painter->setPen(Qt::gray);
 
     QFont ft = painter->font();
-    ft.setPointSize(dstx_.font_size);
+    ft.setPointSize(lining_.font_size);
     painter->setFont(ft);
 
     QFontMetrics fm = painter->fontMetrics();
@@ -225,13 +215,13 @@ QString secToHms(const RelativeTime &val, const int &prec) {
     int mm = static_cast<int>(floor(x / 60));
     x -= (mm * 60);
 
-    int64_t fractional = 100 * val.ms_fractional / int64_t(pow(2, 32));
+    uint64_t fractional = uint64_t(-val.ms_fractional) * 1000 / (1ll << 32);
 
     QString s = QString("%1:%2:%3,%4")
                     .arg(hh, 2, 10, QChar('0'))
                     .arg(mm, 2, 10, QChar('0'))
                     .arg(x, 2, 10, QChar('0'))
-                    .arg(fractional, 2, 10, QChar('0'));
+                    .arg(fractional, 3, 10, QChar('0'));
 
     return s;
 }

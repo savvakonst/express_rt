@@ -1,0 +1,38 @@
+/*! \mainpage EXRT Project
+
+   \section intro_sec Введение
+
+   тут должно быть введение
+
+   \section install_sec установка
+
+   зависимости:
+     - doxygen (для генерации документации)
+     - graphviz (для генерации документации)
+     - cmake
+     - python 3.6+ (далее указанны необходимые пакеты):
+          -# ruamel.yaml (Можно установить с помощью команды: pip install ruamel.yaml)
+          -# pybind11 (pip install pybind11)
+
+
+   \section brief_description Описание библиотек
+
+   \subsection Plotter Библиотека окна отрисовки графиков
+
+   главный класс QFormScreen - предоставляет окно со сценой и меню
+
+   \dot
+   digraph example {
+       node [shape=record, fontname=Helvetica, fontsize=10];
+       QFormScreen [ label="class QFormScreen" URL="\ref QFormScreen"];
+       QScreenScale [ label="class QList\<QScreenScale*\>" URL="\ref QScreenScale"];
+       QScreenAxisX [ label="class QScreenAxisX" URL="\ref QScreenAxisX"];
+       QScreenMarker [ label="class QList\<QScreenMarker*\>" URL="\ref QScreenMarker"];
+       MarkerSimple  [ label="struct MarkerSimple" URL="\ref MarkerSimple"]
+       QFormScreen -> QScreenScale [ dir="back",color="darkorchid3",arrowhead="open", style="dashed" , label = "scales_" ];
+       QFormScreen -> QScreenAxisX [ dir="back",color="darkorchid3",arrowhead="open", style="dashed" , label = "axis_x_" ];
+       QFormScreen -> QScreenMarker [ dir="back",color="darkorchid3",arrowhead="open", style="dashed" , label = "markers_" ];
+       QFormScreen -> MarkerSimple [ dir="back",color="darkorchid3",arrowhead="open", style="dashed" , label = "mark_f_\nmark_a_" ];
+   }
+   \enddot
+ */

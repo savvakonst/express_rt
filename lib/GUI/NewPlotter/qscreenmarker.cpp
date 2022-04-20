@@ -4,13 +4,15 @@
 
 //-------------------------------------------------------------------------
 QScreenMarker::QScreenMarker(QScreenAxisX *axis_x, const int &index_0, const QPointF &pt, const QSizeF &sz,
-                             const LineProperties &dstx_0, QWidget *parent)
+                             const LineProperties &dstx, QWidget *parent)
     : axis_x_(axis_x) {
     Q_UNUSED(parent)
 
     index_ = index_0;
 
     sceneSize_ = sz;
+
+    lining_ = dstx;
 
     // setFlag(QGraphicsItem::ItemIsSelectable);
     setFlag(QGraphicsItem::ItemIsFocusable);
@@ -61,8 +63,7 @@ void QScreenMarker::checkState(const qreal &x) {
     enabled_ = !miss;
     valid_ = !miss;
 }
-//-------------------------------------------------------------------------
-void QScreenMarker::setSettings(const LineProperties &dstx) { dstx_ = dstx; }
+
 //-------------------------------------------------------------------------
 void QScreenMarker::setMargin(const Margin &margin) { margin_ = margin; }
 //-------------------------------------------------------------------------
@@ -106,7 +107,7 @@ void QScreenMarker::drawMarker() {
     auto *p = new QPainter(pm);
 
     QFont ft = p->font();
-    ft.setPointSize(dstx_.font_size);
+    ft.setPointSize(lining_.font_size);
     p->setFont(ft);
 
     QPen pen;
@@ -184,7 +185,7 @@ void QScreenMarker::mousePressEvent(QGraphicsSceneMouseEvent *event) {
         setFlag(QGraphicsItem::ItemIsSelectable);
 
         left_pressed_ = true;
-        emit to_focused(Type, index_);
+        emit toFocused(Type, index_);
     } break;
     default:;
     }
@@ -238,7 +239,7 @@ void QScreenMarker::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 }
 //-------------------------------------------------------------------------
 void QScreenMarker::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
-    to_removed(Type, index_);
+    toRemoved(Type, index_);
 
     update();
     QGraphicsItem::mouseDoubleClickEvent(event);

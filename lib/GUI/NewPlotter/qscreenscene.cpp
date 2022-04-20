@@ -44,7 +44,7 @@ void QScreenScene::keyPressEvent(QKeyEvent* event) {
     case Qt::RightArrow:
         break;
     case Qt::Key_Pause:
-        emit toPaused();
+        // TODO: some code which will produce pause 
         break;
     default:;
     }

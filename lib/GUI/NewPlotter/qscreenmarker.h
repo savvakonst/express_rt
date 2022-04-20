@@ -25,7 +25,7 @@ class QScreenMarker : public QObject, public QGraphicsRectItem {
 
    public:
     explicit QScreenMarker(QScreenAxisX *axis_x, const int &index_0, const QPointF &pt, const QSizeF &sz,
-                           const LineProperties &dstx_0, QWidget *parent = nullptr);
+                           const LineProperties &dstx, QWidget *parent = nullptr);
 
     ~QScreenMarker() override;
 
@@ -33,7 +33,6 @@ class QScreenMarker : public QObject, public QGraphicsRectItem {
 
     void checkState(const qreal &x);
 
-    void setSettings(const LineProperties &dstx);
     void setMargin(const Margin &margin);
 
     void advance(int phase) override;
@@ -72,7 +71,7 @@ class QScreenMarker : public QObject, public QGraphicsRectItem {
 
     QSizeF sceneSize_;
 
-    LineProperties dstx_;
+    LineProperties lining_;
     Margin margin_;
 
    protected:
@@ -89,11 +88,11 @@ class QScreenMarker : public QObject, public QGraphicsRectItem {
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
    signals:
-    void to_removed(const int &src, const int &index);
+    void toRemoved(const int &src, const int &index);
 
     void to_changed(const int &src);
 
-    void to_focused(const int &src, const int &index);
+    void toFocused(const int &src, const int &index);
 
     void to_moved(const int &x);
 };

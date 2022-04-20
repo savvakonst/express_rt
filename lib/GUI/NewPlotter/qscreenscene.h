@@ -54,7 +54,6 @@ class QScreenScene : public QGraphicsScene {
     void toRightGestured(const QPointF& pt_1, const QPointF& pt_2);
     void toRightClicked(const QPointF& pt);
     void toMouseWheeled(const QPointF& pt, const int& delta);
-    void toPaused();
     void toMouseMoved(const QPointF& pt);
     void toDropParameter(const QPointF& pt, const std::string& name);
 };

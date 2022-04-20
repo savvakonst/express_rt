@@ -48,7 +48,7 @@ class QFormScreen : public QDialog {
 
     QSizeF getSceneSize();
 
-    void setSettings(const LineProperties &dstx);
+
 
     void setInterval(const TimeInterval &ti_0);
 
@@ -147,7 +147,7 @@ class QFormScreen : public QDialog {
     MarkerSimple mark_f_;
     MarkerSimple mark_a_;
 
-    bool is_pause_ = false;
+
     // Settings
     bool is_axis_t_hms_ = true;
     bool is_axis_hidden_ = false;
@@ -178,7 +178,7 @@ class QFormScreen : public QDialog {
 
     void onResizeScene();
     void onZoom(const QPointF &pt, const int &delta);
-    void onPause();
+
 
     void onClearScene();
 
@@ -235,9 +235,6 @@ class QFormScreen : public QDialog {
 
    signals:
 
-    void toRemoved(const int &index);
-
-    void toPaused(bool is_paused);
 
     void toSceneChanged();
 

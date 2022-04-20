@@ -146,7 +146,7 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
 
     AxisSettings step_ = AxisSettings();
 
-    LineProperties dstx_;
+    LineProperties lining_;
     Margin margin_;
 
     TimeInterval ti_;
@@ -168,6 +168,10 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
     AxisYStatistics stat_;
     bool interval_on_ = false;
 
+    /*
+     * this field signals that picture should be saved
+     */
+
     bool warning_ = false;
 
    public slots:
@@ -186,7 +190,6 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
 
     void onAddLevelEnd(const ControlLevel &lvl, const bool &flag, const int &index);
 
-    void onSetPause(bool is_paused);
 
    private:
     void changeScaleBorder(const bool &high, const int &delta);
@@ -220,7 +223,6 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
 
     QSizeF scene_size_;
 
-    bool is_paused_ = false;
     bool left_pressed_ = false;
     bool right_pressed_ = false;
 
