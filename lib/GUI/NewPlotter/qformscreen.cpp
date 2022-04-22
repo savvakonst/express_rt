@@ -88,18 +88,36 @@ QFormScreen::QFormScreen(ExtensionManager *manager, PlotterContext_ifs *plotter_
     connect(scene_, &QScreenScene::toMouseMoved, this, &QFormScreen::onUpdateMarkerFloat);
     connect(axis_x_, &QScreenAxisX::toHeight, this, &QFormScreen::onSetAxisXHeight);
 
+    setupMenuBar();
+
+    stats_.enabled = true;
+
+    onAddMarker({15, 15});
+}
+#include <QDebug>
+
+//-------------------------------------------------------------------------
+QFormScreen::~QFormScreen() {
+    qDebug() << "~QFormScreen()";
+    delete plotter_context_;
+    delete ui_;
+}
+
+//-------------------------------------------------------------------------
+void QFormScreen::setupMenuBar() {
     auto *p_layout = reinterpret_cast<QHBoxLayout *>(layout());
 
     mn_file_ = new QMenu(tr("Экран"), this);
     toolbar_ = new QToolBar();
 
-    QAction *action_ptr = new CAction(QIcon("://shot"), tr("Снимок"), this,  //
-                                      Qt::CTRL + Qt::Key_S, &QFormScreen::onMakeShotAuto);
-    mn_file_->addAction(action_ptr);
-    toolbar_->addAction(action_ptr);
+    QAction *action = new CAction(QIcon("://shot"), tr("Снимок"), this,  //
+                                  Qt::CTRL + Qt::Key_S, &QFormScreen::onMakeShotAuto);
+    mn_file_->addAction(action);
+    toolbar_->addAction(action);
 
-    action_ptr = new CAction(QIcon("://shot"), tr("Сохранить снимок как ..."), this,  //
-                             Qt::CTRL + Qt::SHIFT + Qt::Key_S, &QFormScreen::onMakeShotManual);
+    action = new CAction(QIcon("://marker_off"), tr("видимость маркера"), this, {}, &QFormScreen::onHideMarker);
+
+    toolbar_->addAction(action);
 
     mn_file_->addSeparator();
 
@@ -108,14 +126,14 @@ QFormScreen::QFormScreen(ExtensionManager *manager, PlotterContext_ifs *plotter_
     mn_file_->addAction(new CAction(QIcon("://greed"), tr("Сгруппировать"), this,  //
                                     Qt::CTRL + Qt::Key_G, &QFormScreen::onGroupScene));
 
-    QIcon icon;
+    QIcon icon = QIcon();
     icon.addPixmap(QPixmap("://visible_on"), QIcon::Normal, QIcon::Off);
     icon.addPixmap(QPixmap("://visible_off"), QIcon::Normal, QIcon::On);
-    action_ptr = new QAction(icon, tr("видимость шкал"), this);
-    action_ptr->setCheckable(true);
-    action_ptr->setChecked(is_axis_hidden_);
-    connect(action_ptr, &QAction::triggered, this, &QFormScreen::onHideScale);
-    mn_file_->addAction(action_ptr);
+    action = new QAction(icon, tr("видимость шкал"), this);
+    action->setCheckable(true);
+    action->setChecked(is_axis_hidden_);
+    connect(action, &QAction::triggered, this, &QFormScreen::onHideScale);
+    mn_file_->addAction(action);
 
     mn_file_->addSeparator();
 
@@ -147,21 +165,7 @@ QFormScreen::QFormScreen(ExtensionManager *manager, PlotterContext_ifs *plotter_
     statusbar_ = new QStatusBar(this);
 
     p_layout->addWidget(statusbar_);
-
-    stats_.enabled = true;
-
-    onAddMarker({15, 15});
 }
-#include <QDebug>
-//-------------------------------------------------------------------------
-QFormScreen::~QFormScreen() {
-    qDebug() << "~QFormScreen()";
-    delete plotter_context_;
-    delete ui_;
-}
-
-//-------------------------------------------------------------------------
-
 //-------------------------------------------------------------------------
 QSizeF QFormScreen::getSceneSize() {
     QSizeF sz;
@@ -645,8 +649,10 @@ void QFormScreen::onUpdateScene(const int &src) {
     }
 
     // Simple Markers
-    placeTimeIndependentMarker(painter, mark_a_, {0, 0});
-    placeTimeIndependentMarker(painter, mark_f_, mark_a_.enabled ? (mark_f_.t - mark_a_.t) : RelativeTime{0, 0});
+    if (mark_f_.enabled) {
+        placeTimeIndependentMarker(painter, mark_a_, {0, 0});
+        placeTimeIndependentMarker(painter, mark_f_, mark_a_.enabled ? (mark_f_.t - mark_a_.t) : RelativeTime{0, 0});
+    }
 
     delete painter;
 
@@ -959,6 +965,12 @@ void QFormScreen::onSetAxisXHeight(const int &h) { height_axis_x_ = h; }
 //-------------------------------------------------------------------------
 void QFormScreen::onHideScale(bool checked) { is_axis_hidden_ = checked; }
 //-------------------------------------------------------------------------
+void QFormScreen::onHideMarker(bool checked) {
+    mark_f_.enabled = false;
+    mark_a_.enabled = false;
+}
+//-------------------------------------------------------------------------
+
 void QFormScreen::onShowSettings() {
     auto *fs = new QFormScreenSettings(this);
 

@@ -75,6 +75,9 @@ class QFormScreen : public QDialog {
     void onMessageShow(const QString &s);
 
    private:
+
+    void setupMenuBar();
+
     struct AxisYStats {
         union {
             struct {
@@ -125,11 +128,10 @@ class QFormScreen : public QDialog {
 
     QList<QScreenScale *> scales_;
     QList<QScreenMarker *> markers_;
-    // QList<QScreenLabel*>                labels;
+
 
     QString title_ = "";
 
-    // RelativeTime t_ = {0};
 
     // Float Marker
     MarkerSimple mark_f_;
@@ -163,7 +165,10 @@ class QFormScreen : public QDialog {
 
    private slots:
 
+
+
     void onResizeScene();
+
     void onZoom(const QPointF &pt, const int &delta);
 
     void onClearScene();
@@ -201,6 +206,8 @@ class QFormScreen : public QDialog {
     void onSetAxisXHeight(const int &h);
 
     void onHideScale(bool checked);
+
+    void onHideMarker(bool checked);
 
     void onShowSettings();
 

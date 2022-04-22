@@ -18,5 +18,7 @@
         <file alias="open">png/folder_open_16.png</file>
         <file alias="add">png/add_16.png</file>
         <file alias="right">png/arrow_a_right_16.png</file>
+        <file alias="marker_on">png/marker_on_16.png</file>
+        <file alias="marker_off">png/marker_off_16.png</file>
     </qresource>
 </RCC>
