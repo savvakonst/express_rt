@@ -19,7 +19,7 @@ class QScreenAxisX : public QObject {
 
     explicit QScreenAxisX(const TimeInterval &ti0, const LineProperties &dstx, const Margin &margin,
                           QObject *parent = nullptr);
- 
+
     ~QScreenAxisX() override;
 
     void setLabel(const QString &lbl);
@@ -31,8 +31,6 @@ class QScreenAxisX : public QObject {
     void resetInterval();
 
     void setTime(const RelativeTime &t);
-
-
 
     void rescale();
     void drawAxis();
@@ -75,7 +73,7 @@ class QScreenAxisX : public QObject {
 
    signals:
 
-    void to_height(const int &h);
+    void toHeight(const int &h);
 };
 
 QString secToHms(const RelativeTime &val, const int &prec = -1);

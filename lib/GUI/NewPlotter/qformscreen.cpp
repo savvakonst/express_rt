@@ -83,59 +83,47 @@ QFormScreen::QFormScreen(ExtensionManager *manager, PlotterContext_ifs *plotter_
     axis_x_ = new QScreenAxisX(current_interval, lining_, margin_, this);
 
     connect(this, &QFormScreen::toSceneResized, axis_x_, &QScreenAxisX::onResize);
-    // connect(scene, &QScreenScene::to_leftGestured, axisX, &QScreenAxisX::on_zoom);
     connect(scene_, &QScreenScene::toLeftClicked, this, &QFormScreen::onAddMarkerAnchor);
-    // connect(scene, &QScreenScene::to_rightGestured, axisX, &QScreenAxisX::on_move);
     connect(scene_, &QScreenScene::toMouseWheeled, this, &QFormScreen::onZoom);
     connect(scene_, &QScreenScene::toMouseMoved, this, &QFormScreen::onUpdateMarkerFloat);
-
-    // connect(axisX, &QScreenAxisX::toChanged, this, &QFormScreen::onUpdateScene);
-    connect(axis_x_, &QScreenAxisX::to_height, this, &QFormScreen::onSetAxisXHeight);
+    connect(axis_x_, &QScreenAxisX::toHeight, this, &QFormScreen::onSetAxisXHeight);
 
     auto *p_layout = reinterpret_cast<QHBoxLayout *>(layout());
 
-    auto image_path = QCoreApplication::applicationDirPath() + "/png/common/play.png";
-    QIcon run_icon = QIcon::fromTheme("run", QIcon(image_path));
-    auto *act_run = new QAction(run_icon, tr("Ru&n"), this);
-    // connect(this, &QAction::triggered, this, &RunAction::run);
-    setStatusTip(tr("run"));
-
-    // menu File
-    act_shot_ = new CAction(QIcon("://shot"), tr("Снимок"), this,  //
-                            Qt::CTRL + Qt::Key_S, &QFormScreen::onMakeShotAuto);
-
-    act_shot_as_ = new CAction(QIcon("://shot"), tr("Сохранить снимок как ..."), this,  //
-                               Qt::CTRL + Qt::SHIFT + Qt::Key_S, &QFormScreen::onMakeShotManual);
-
-    act_refresh_ = new CAction(QIcon("://refresh"), tr("Обновить"), this,  //
-                               Qt::CTRL + Qt::Key_R, &QFormScreen::onRefreshScene);
-
-    act_group_up_ = new CAction(QIcon("://greed"), tr("Сгруппировать"), this,  //
-                                Qt::CTRL + Qt::Key_G, &QFormScreen::onGroupScene);
-
-    act_scale_hide_ = new QAction(QIcon("://hidden"), tr("Скрыть все шкалы"), this);
-    act_scale_hide_->setCheckable(true);
-    act_scale_hide_->setChecked(is_axis_hidden_);
-    if (is_axis_hidden_) act_scale_hide_->setText(tr("Показать шкалы"));
-    connect(act_scale_hide_, &QAction::triggered, this, &QFormScreen::onHideScale);
-
-    act_clear_ = new CAction(QIcon("://clear"), tr("Очистить"), this,  //
-                             Qt::CTRL + Qt::Key_Delete, &QFormScreen::onClearScene);
-
-    act_exit_ = new CAction(QIcon("://close"), tr("Выход"), this,  //
-                            Qt::ALT + Qt::Key_F4, &QFormScreen::onExit);
-
     mn_file_ = new QMenu(tr("Экран"), this);
-    mn_file_->addAction(act_shot_);
+    toolbar_ = new QToolBar();
+
+    QAction *action_ptr = new CAction(QIcon("://shot"), tr("Снимок"), this,  //
+                                      Qt::CTRL + Qt::Key_S, &QFormScreen::onMakeShotAuto);
+    mn_file_->addAction(action_ptr);
+    toolbar_->addAction(action_ptr);
+
+    action_ptr = new CAction(QIcon("://shot"), tr("Сохранить снимок как ..."), this,  //
+                             Qt::CTRL + Qt::SHIFT + Qt::Key_S, &QFormScreen::onMakeShotManual);
+
     mn_file_->addSeparator();
-    mn_file_->addAction(act_refresh_);
-    mn_file_->addAction(act_group_up_);
-    mn_file_->addAction(act_scale_hide_);
+
+    mn_file_->addAction(new CAction(QIcon("://refresh"), tr("Обновить"), this,  //
+                                    Qt::CTRL + Qt::Key_R, &QFormScreen::onRefreshScene));
+    mn_file_->addAction(new CAction(QIcon("://greed"), tr("Сгруппировать"), this,  //
+                                    Qt::CTRL + Qt::Key_G, &QFormScreen::onGroupScene));
+
+    QIcon icon;
+    icon.addPixmap(QPixmap("://visible_on"), QIcon::Normal, QIcon::Off);
+    icon.addPixmap(QPixmap("://visible_off"), QIcon::Normal, QIcon::On);
+    action_ptr = new QAction(icon, tr("видимость шкал"), this);
+    action_ptr->setCheckable(true);
+    action_ptr->setChecked(is_axis_hidden_);
+    connect(action_ptr, &QAction::triggered, this, &QFormScreen::onHideScale);
+    mn_file_->addAction(action_ptr);
+
     mn_file_->addSeparator();
-    mn_file_->addAction(act_clear_);
+
+    mn_file_->addAction(new CAction(QIcon("://clear"), tr("Очистить"), this,  //
+                                    Qt::CTRL + Qt::Key_Delete, &QFormScreen::onClearScene));
     mn_file_->addSeparator();
-    mn_file_->addAction(act_exit_);
-    mn_file_->addAction(act_run);
+    mn_file_->addAction(new CAction(QIcon("://close"), tr("Выход"), this,  //
+                                    Qt::ALT + Qt::Key_F4, &QFormScreen::onExit));
 
     // menu Settings
     act_settings_ = new CAction(QIcon(":/settings"), tr("Настройки"), this,  //
@@ -153,24 +141,10 @@ QFormScreen::QFormScreen(ExtensionManager *manager, PlotterContext_ifs *plotter_
     menubar_->addMenu(mn_settings_);
     p_layout->setMenuBar(menubar_);
 
-    // toolbar
-    toolbar_ = new QToolBar();
-    toolbar_->addAction(act_shot_);
-    toolbar_->addAction(act_run);
-    // toolbar->addAction(actShotAs);
-
     p_layout->insertWidget(0, toolbar_);
 
     // status & progress
-    statusbar_ = new QStatusBar(this);  // Progress Bar
-
-    progress_ = new QProgressBar(statusbar_);
-    progress_->setAlignment(Qt::AlignRight);
-    progress_->setMaximumWidth(200);
-    progress_->setMaximum(100);
-    progress_->setVisible(false);
-
-    statusbar_->addPermanentWidget(progress_);
+    statusbar_ = new QStatusBar(this);
 
     p_layout->addWidget(statusbar_);
 
@@ -200,9 +174,7 @@ QSizeF QFormScreen::getSceneSize() {
 //-------------------------------------------------------------------------
 
 QScreenScale *QFormScreen::addScale(QScreenScale *p_scale) {
-    // scl->setParameter(name, prm);
     p_scale->setScale(&axis_x_->scale_);
-    // scl->setToolTip(prm->info().join("\n"));
 
     connect(p_scale, &QScreenScale::toRemoved, this, &QFormScreen::onRemoveItem);
     connect(p_scale, &QScreenScale::toTuned, this, &QFormScreen::onTuneItem);
@@ -985,15 +957,7 @@ void QFormScreen::onAlignItem(const int &src, const int &index, const int &val) 
 //-------------------------------------------------------------------------
 void QFormScreen::onSetAxisXHeight(const int &h) { height_axis_x_ = h; }
 //-------------------------------------------------------------------------
-void QFormScreen::onHideScale() {
-    is_axis_hidden_ = !is_axis_hidden_;
-
-    if (is_axis_hidden_) act_scale_hide_->setText(tr("Показать шкалы"));
-    else
-        act_scale_hide_->setText(tr("Скрыть шкалы"));
-
-    act_scale_hide_->setChecked(is_axis_hidden_);
-}
+void QFormScreen::onHideScale(bool checked) { is_axis_hidden_ = checked; }
 //-------------------------------------------------------------------------
 void QFormScreen::onShowSettings() {
     auto *fs = new QFormScreenSettings(this);

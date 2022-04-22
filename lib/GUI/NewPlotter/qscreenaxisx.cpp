@@ -50,7 +50,6 @@ void QScreenAxisX::setTime(const RelativeTime &t) {
     drawAxis();
 }
 
-
 //-------------------------------------------------------------------------
 void QScreenAxisX::onResize(const qreal &w, const qreal &h) {
     scene_size_.setWidth(w);
@@ -198,7 +197,7 @@ void QScreenAxisX::drawAxis() {
         h_axis_x += (fm.height() + 4);
     }
 
-    emit to_height(h_axis_x);
+    emit toHeight(h_axis_x);
 
     delete painter;
 

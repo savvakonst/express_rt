@@ -112,18 +112,10 @@ class QFormScreen : public QDialog {
     QMenuBar *menubar_;
     QToolBar *toolbar_;
     QStatusBar *statusbar_;
-    QProgressBar *progress_;
+
 
     QMenu *mn_file_;
     QMenu *mn_settings_;
-
-    QAction *act_exit_;
-    QAction *act_shot_;
-    QAction *act_shot_as_;
-    QAction *act_clear_;
-    QAction *act_refresh_;
-    QAction *act_group_up_;
-    QAction *act_scale_hide_;
 
     QAction *act_settings_;
     QAction *act_conf_save_;
@@ -208,7 +200,7 @@ class QFormScreen : public QDialog {
 
     void onSetAxisXHeight(const int &h);
 
-    void onHideScale();
+    void onHideScale(bool checked);
 
     void onShowSettings();
 
