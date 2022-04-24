@@ -99,9 +99,8 @@ class COMMON_API_ KSDModule : public Module_ifs {
 
     ModuleStream_ifs *getModuleStream() override { return ethernet_stream_; }
 
-    bool removeModuleStream() override {
+    bool deattachModuleStream() override {
         if (ethernet_stream_) {
-            delete ethernet_stream_;
             ethernet_stream_ = nullptr;
             return true;
         }

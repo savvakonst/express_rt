@@ -196,7 +196,7 @@ class PyModule : public Module_ifs {
         PYBIND11_OVERRIDE_PURE(ModuleStream_ifs *, Module_ifs, getModuleStream);
     }
 
-    bool removeModuleStream() override { PYBIND11_OVERRIDE_PURE(bool, Module_ifs, removeModuleStream); }
+    bool deattachModuleStream() override { PYBIND11_OVERRIDE_PURE(bool, Module_ifs, deattachModuleStream); }
 };
 
 class PyParameter : public Parameter_ifs {

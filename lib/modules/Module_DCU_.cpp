@@ -19,7 +19,7 @@ class EthernetDCU_Stream : public ModuleStream_ifs {
         return 0;
     }
 
-    const RelativeTime &getTime() const override;
+    [[nodiscard]] const RelativeTime &getTime() const override;
 
     const Module_ifs *getModule() override { return module_; }
 
@@ -33,6 +33,65 @@ class EthernetDCU_Stream : public ModuleStream_ifs {
     size_t number_of_slots_ = 0;
     size_t data_offset_ = 0;
 };
+
+EthernetDCU_Stream::EthernetDCU_Stream(Module_DCU_ *module) : module_(module) {
+    sub_streams_ = new ModuleStream_ifs *[module->modules_.size() + 1];  // module->modules_.size();
+
+    // TODO: need to choose only available modules
+    auto ptr = sub_streams_;
+    for (auto i : module->modules_)
+        if (i->isAvailable()) {
+            *(ptr++) = i->createModuleStream();
+            number_of_slots_ += 1;
+        }
+    *(ptr) = nullptr;
+
+    time_ = {0, 0};
+
+    data_offset_ = 2 + 4 + number_of_slots_ * 2 + 2;
+}
+
+EthernetDCU_Stream::~EthernetDCU_Stream()  {
+    module_->deattachModuleStream();
+
+    for(size_t i = 0 ; i<number_of_slots_; i++ )
+        delete sub_streams_[i];
+}
+
+const size_t g_cnt_offset = 6;
+
+const RelativeTime &EthernetDCU_Stream::getTime() const { return time_; }
+
+void EthernetDCU_Stream::readFramePeace(ModuleStreamContext_ifs *context, char *ptr, size_t size) {
+    uint32_t time = *((uint32_t *)(ptr + 2));
+
+    if ((0x3ff & time) == 0) lock_ = false;
+    if (lock_) return;
+
+    time_ = time_ + RelativeTime{1 << (32 - 10), 0};
+
+    ModuleStream_ifs **module_ptr = sub_streams_;
+
+    auto *cnt = (uint16_t *)(ptr + g_cnt_offset);
+    uint16_t *cnt_end = cnt + number_of_slots_;
+
+    auto *data_ptr = (uint16_t *)(ptr + data_offset_);
+    while (cnt != cnt_end) {
+        if ((*cnt != 0) && (*module_ptr != nullptr)) (*module_ptr)->readFramePeace(context, (char *)data_ptr, *(cnt));
+        module_ptr++;
+        data_ptr += *cnt;
+        cnt++;
+    }
+}
+
+/*
+ *
+ *
+ *
+ *
+ *
+ */
+
 
 static std::string createCHxxId(size_t slots) {
     char data[3] = {0, 0, 0};
@@ -175,47 +234,3 @@ bool Module_DCU_::isChannelAvailable(const std::string &prop_path) const {
  *
  */
 
-EthernetDCU_Stream::EthernetDCU_Stream(Module_DCU_ *module) : module_(module) {
-    sub_streams_ = new ModuleStream_ifs *[module->modules_.size() + 1];  // module->modules_.size();
-
-    // TODO: need to choose only available modules
-    auto ptr = sub_streams_;
-    for (auto i : module->modules_)
-        if (i->isAvailable()) {
-            *(ptr++) = i->createModuleStream();
-            number_of_slots_ += 1;
-        }
-    *(ptr) = nullptr;
-
-    time_ = {0, 0};
-
-    data_offset_ = 2 + 4 + number_of_slots_ * 2 + 2;
-}
-
-EthernetDCU_Stream::~EthernetDCU_Stream() = default;
-
-const size_t g_cnt_offset = 6;
-
-const RelativeTime &EthernetDCU_Stream::getTime() const { return time_; }
-
-void EthernetDCU_Stream::readFramePeace(ModuleStreamContext_ifs *context, char *ptr, size_t size) {
-    uint32_t time = *((uint32_t *)(ptr + 2));
-
-    if ((0x3ff & time) == 0) lock_ = false;
-    if (lock_) return;
-
-    time_ = time_ + RelativeTime{1 << (32 - 10), 0};
-
-    ModuleStream_ifs **module_ptr = sub_streams_;
-
-    auto *cnt = (uint16_t *)(ptr + g_cnt_offset);
-    uint16_t *cnt_end = cnt + number_of_slots_;
-
-    auto *data_ptr = (uint16_t *)(ptr + data_offset_);
-    while (cnt != cnt_end) {
-        if ((*cnt != 0) && (*module_ptr != nullptr)) (*module_ptr)->readFramePeace(context, (char *)data_ptr, *(cnt));
-        module_ptr++;
-        data_ptr += *cnt;
-        cnt++;
-    }
-}

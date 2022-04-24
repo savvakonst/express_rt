@@ -71,21 +71,28 @@ Receiver::Receiver(ModuleStream_ifs *m_stream, Sockaddr dst_address, Sockaddr sr
 
     hidden_->sock_ = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (hidden_->sock_ == INVALID_SOCKET) {
-        this->error_message_ = getWSALastErrorText();
+        this->error_message_ = "socket: " + getWSALastErrorText();
         return;
     }
 
     status =
         ::setsockopt(hidden_->sock_, SOL_SOCKET, SO_RCVBUF, (char *)&socket_buffer_size_, sizeof(socket_buffer_size_));
     if (status != 0) {
-        this->error_message_ = getWSALastErrorText();
+        this->error_message_ = "SO_RCVBUF: " + getWSALastErrorText();
         return;
     }
 
     bool val = true;
     status = ::setsockopt(hidden_->sock_, SOL_SOCKET, SO_REUSEADDR, (char *)&val, sizeof(val));
     if (status != 0) {
-        this->error_message_ = getWSALastErrorText();
+        this->error_message_ = "SO_REUSEADDR: " + getWSALastErrorText();
+        return;
+    }
+
+    uint32_t timeout = 5000;
+    status = ::setsockopt(hidden_->sock_, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
+    if (status != 0) {
+        this->error_message_ = "SO_RCVTIMEO: " + getWSALastErrorText();
         return;
     }
 
@@ -149,24 +156,19 @@ void receiverThread(ModuleStream_ifs *m_stream, SOCKET sock_, char *data_buffer_
     int32_t source_address_length = sizeof(source_address);
 
     while (1) {
-        // std::cout << "received from: " << source_address.sin_addr << "\n";
         auto length =
             recvfrom(sock_, data_buffer_, data_buffer_size_, 0, (sockaddr *)&source_address, &source_address_length);
 
-
-
         if (length == SOCKET_ERROR) {
-            std::cout << getWSALastErrorText() << "\n";
+            std::cout << "length == SOCKET_ERROR: " + getWSALastErrorText() << "\n";
             return;
         }
 
-        //if (3372263616 == source_address.sin_addr)
-            m_stream->readFramePeace(nullptr, data_buffer_, length);
-        // std::cout << "received from: " << source_address.sin_addr << "\n";
+        m_stream->readFramePeace(nullptr, data_buffer_, length);
+
         if (cmd_) {
             return;
         }
-        // std::cout << "received from: " << source_address.sin_addr << "\n";
     }
 }
 

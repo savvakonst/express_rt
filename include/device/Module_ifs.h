@@ -69,7 +69,7 @@ class COMMON_API_ Module_ifs : public Properties_ifs {
 
     virtual ModuleStream_ifs *getModuleStream() = 0;
 
-    virtual bool removeModuleStream() = 0;
+    virtual bool deattachModuleStream() = 0;
 
    protected:
 };

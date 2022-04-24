@@ -12,9 +12,9 @@ class Module_M01_;
 
 class EthernetM01_Stream : public ModuleStream_ifs {
    public:
-    EthernetM01_Stream(Module_M01_* module);
+    explicit EthernetM01_Stream(Module_M01_* module);
 
-    ~EthernetM01_Stream() {}
+    ~EthernetM01_Stream() override { module_->deattachModuleStream(); }
 
     void readFramePeace(ModuleStreamContext_ifs* context, char* ptr, size_t size) override;
 
@@ -68,14 +68,14 @@ class Module_M01_ : public KSDModule {
 
     Module_M01_(const void* ptr, size_t size, ExtensionManager* manager);
 
-    ~Module_M01_();
+    ~Module_M01_() override;
 
-    bool hasTransceiver() const override {
+    [[nodiscard]] bool hasTransceiver() const override {
         bool b = (task_.out.flags & 0x01) == 0x01;
         return b;
     }
 
-    EthernetSettings getSrcAddress() const override {
+    [[nodiscard]] EthernetSettings getSrcAddress() const override {
         if (!hasTransceiver()) return EthernetSettings();
         EthernetSettings e{*((EthernetAddress*)&task_.out.dst), *((EthernetAddress*)&task_.out.src)};
         return e;

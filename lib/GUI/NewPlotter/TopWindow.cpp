@@ -159,9 +159,11 @@ class OnlinePlotterContext : public PlotterContext_ifs {
     explicit OnlinePlotterContext(Receiver *receiver, ModuleStream_ifs *module_stream)
         : receiver_(receiver), module_stream_(module_stream) {}
     ~OnlinePlotterContext() override {
+        qDebug() << "~OnlinePlotterContext()";
         if (timer_) timer_->stop();
         delete timer_;
         delete receiver_;
+        delete module_stream_;
     };
 
     void setPlotter(QFormScreen *q_form_screen) {

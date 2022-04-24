@@ -110,7 +110,7 @@ class COMMON_API_ Device_ifs : public Module_ifs {
 
     ModuleStream_ifs *getModuleStream() override;
 
-    bool removeModuleStream() override;
+    bool deattachModuleStream() override;
 };
 
 #endif

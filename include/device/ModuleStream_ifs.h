@@ -18,7 +18,10 @@ class ModuleStream_ifs : public BaseClass_ifs {
 
     virtual bool addPrmBuffer(const std::string& path, PrmBuffer_ifs* prm_buffer) { return false; }
 
-    [[nodiscard]] virtual const RelativeTime& getTime() const { return {0, 0}; }
+    [[nodiscard]] virtual const RelativeTime& getTime() const {
+        static RelativeTime zero{0, 0};
+        return zero;
+    }
 
     // TODO: need to delete
     virtual std::map<std::string, PrmBuffer_ifs*> getPrmBufferMap() { return {}; }

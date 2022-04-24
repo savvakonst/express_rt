@@ -118,7 +118,10 @@ class EthernetDeviceStream : public ModuleStream_ifs {
         sub_stream_ = modules.front().second->createModuleStream();
     }
 
-    ~EthernetDeviceStream() override = default;
+    ~EthernetDeviceStream() override {
+        device_->deattachModuleStream();
+        delete sub_stream_;
+    }
 
     void readFramePeace(ModuleStreamContext_ifs *context, char *ptr, size_t size) override {
         sub_stream_->readFramePeace(context, ptr, size);
@@ -143,8 +146,7 @@ ModuleStream_ifs *Device_ifs::createModuleStream() {
 
 ModuleStream_ifs *Device_ifs::getModuleStream() { return current_stream_; }
 
-bool Device_ifs::removeModuleStream() {
-    delete current_stream_;
+bool Device_ifs::deattachModuleStream() {
     if (current_stream_) {
         current_stream_ = nullptr;
         return true;

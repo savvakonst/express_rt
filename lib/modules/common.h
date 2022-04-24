@@ -54,7 +54,7 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
 
                 size_t temp_size = 1 << (fr - min_frequency_log_2);
 
-                auto* d_ptr = new targetType_t[temp_size];
+                auto d_ptr = new targetType_t[temp_size];
                 *(temp_buffers++) = d_ptr;
                 *(temp_size_buffers++) = temp_size;
                 *(temp_current_buffers++) = d_ptr;
@@ -68,7 +68,14 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
         channels_map_end_ = channels_map_ + vec_.size();
     }
 
-    ~EthernetSyncXXXX_Stream() override = default;
+    ~EthernetSyncXXXX_Stream() override {
+        module_->deattachModuleStream();
+        const size_t channels_number = COUNT_OF(module_->getTask().cnl);
+        for (size_t i = 0; i < channels_number; i++) delete buffers_[i];
+        delete buffers_;
+        delete size_buffers_;
+        delete current_buffers_;
+    }
 
     void readFramePeace(ModuleStreamContext_ifs* context, char* ptr, size_t size) override {
         auto* c_ptr = (int16_t*)ptr;
@@ -89,8 +96,7 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
 
         current_ptr_ = map_ptr;
 
-        if(!write_every_cycle_ && map_ptr!=channels_map_)
-            return;
+        if (!write_every_cycle_ && map_ptr != channels_map_) return;
 
         temp_current_buffers = current_buffers_;
 
