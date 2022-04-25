@@ -9,6 +9,7 @@
 #include <QDockWidget>
 #include <QDragEnterEvent>
 #include <QDropEvent>
+#include <QInputDialog>
 #include <QMimeData>
 #include <QTreeView>
 ///
@@ -197,14 +198,14 @@ class OnlinePlotterContext : public PlotterContext_ifs {
 ParametersToPlot::ParametersToPlot(TopWindow *plotter_main_window, Device_ifs *device, ExtensionManager *manager,
                                    QWidget *parent)
     : plotter_main_window_(plotter_main_window), device_(device), manager_(manager), QWidget(parent) {
-    auto table = new QTreeView();
-    model_ = new ParameterBufferTableModel(device, manager);
+    tree_view_ = new QTreeView();
+    model_ = new ParameterBufferModel(device, manager);
 
-    table->setParent(this);
+    tree_view_->setParent(this);
     model_->setParent(this);
 
     auto layout = new QVBoxLayout(this);
-    layout->addWidget(table);
+    layout->addWidget(tree_view_);
 
     QIcon run_icon;
     run_icon.addPixmap(getPixmap("/png/common/play.png"), QIcon::Normal, QIcon::Off);
@@ -213,11 +214,34 @@ ParametersToPlot::ParametersToPlot(TopWindow *plotter_main_window, Device_ifs *d
     auto *action_run = new QAction(run_icon, QObject::tr("Ru&n"), this);
     connect(action_run, &QAction::triggered, this, &ParametersToPlot::runAndClose);
 
-    table->setDragDropMode(QAbstractItemView::DragDrop);
-    table->setDragEnabled(true);
-    table->setDropIndicatorShown(true);
-    table->setAcceptDrops(true);
-    table->setModel(model_);
+    tree_view_->setDragDropMode(QAbstractItemView::DragDrop);
+    tree_view_->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
+    tree_view_->setContextMenuPolicy(Qt::ActionsContextMenu);
+    tree_view_->setDragEnabled(true);
+    tree_view_->setDropIndicatorShown(true);
+    tree_view_->setAcceptDrops(true);
+    tree_view_->setModel(model_);
+
+    auto group_action = new FuncProxyQAction(
+        [&]() {
+            auto group_name = QInputDialog::getText(tree_view_, "Имя группы", "group");
+
+            auto index_list = tree_view_->selectionModel()->selectedRows();
+            // for (auto i : index_list)
+            //     if (i.row() == 0)
+            //         model_->
+            //
+            //             return true;
+
+            // NameDialog(tree_view_).show();
+            //  name_dialog.show();
+            return true;
+        },
+        tree_view_);
+
+    group_action->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
+    group_action->setText("&Создать группу");
+    tree_view_->addAction(group_action);
 
     auto p_layout = reinterpret_cast<QHBoxLayout *>(this->layout());
     auto toolbar = new QToolBar(this);
@@ -272,7 +296,7 @@ void ParametersToPlot::runAndClose() {
  *
  */
 
-ParameterBufferTableModel::ParameterBufferTableModel(Device_ifs *device, ExtensionManager *manager) : device_(device) {
+ParameterBufferModel::ParameterBufferModel(Device_ifs *device, ExtensionManager *manager) : device_(device) {
     parameter_view_wrapper_ =
         (ParameterViewWrapper_ifs *)manager->getLastVersionExtensionObject("widget_wrapper", "parameter_view_wrapper");
 
@@ -280,32 +304,38 @@ ParameterBufferTableModel::ParameterBufferTableModel(Device_ifs *device, Extensi
     if (schema) list_of_entries_ = schema->getMapList();
     else
         std::cerr << "can't find data_schema;\n";
+
+    root_node_ = new TreeNode("");
 }
 
-QVariant ParameterBufferTableModel::headerData(int section, Qt::Orientation orientation, int role) const {
+QVariant ParameterBufferModel::headerData(int section, Qt::Orientation orientation, int role) const {
     if (role == Qt::DisplayRole) return QString(list_of_entries_[section]->description_.data());
     return {};
 }
 
-QVariant ParameterBufferTableModel::data(const QModelIndex &index, int role) const {
+QVariant ParameterBufferModel::data(const QModelIndex &index, int role) const {
     if (role == Qt::DisplayRole) {
-        auto prm = parameters_[index.row()];
+        auto node = getNode(index);
         auto name = list_of_entries_[index.column()]->name_;
-        auto h_data = prm->getProperty("common/" + name);
-        return h_data->getValue().asString().data();
+        // auto prm = parameters_[index.row()];
+        // auto h_data = prm->getProperty("common/" + name);
+        // return h_data->getValue().asString().data();
+        return node->getData(name);
     }
     return {};
 }
 
-Qt::ItemFlags ParameterBufferTableModel::flags(const QModelIndex &index) const {
-    Qt::ItemFlags flags = QAbstractTableModel::flags(index);
+Qt::ItemFlags ParameterBufferModel::flags(const QModelIndex &index) const {
+    Qt::ItemFlags flags = QAbstractItemModel::flags(index);
+    if (index.isValid()) flags |= Qt::ItemNeverHasChildren;
+
     if (index.isValid()) return flags | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
     else
         return flags | Qt::ItemIsDropEnabled;
 }
 
-bool ParameterBufferTableModel::canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
-                                                const QModelIndex &parent) const {
+bool ParameterBufferModel::canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
+                                           const QModelIndex &parent) const {
     if (data->hasFormat("text/parameter")) {
         auto list = split(data->data("text/parameter").data(), '\n');
         if (list.size() > 1) return true;
@@ -316,9 +346,8 @@ bool ParameterBufferTableModel::canDropMimeData(const QMimeData *data, Qt::DropA
 
         if (cnv_template) {
             auto parameter = (Parameter_ifs *)cnv_template->getParameter(name);
-            if (parameter && !parameters_.contains(parameter)) {
+            if (parameter && !root_node_->contains(parameter)) {
                 auto path = firstCharPos(parameter->getProperty("common/path")->getValue().asString(), '/');
-
                 if (device_->isChannelAvailable(path.second)) {
                     return true;
                 }
@@ -328,8 +357,8 @@ bool ParameterBufferTableModel::canDropMimeData(const QMimeData *data, Qt::DropA
     return false;
 }
 
-bool ParameterBufferTableModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
-                                             const QModelIndex &parent) {
+bool ParameterBufferModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
+                                        const QModelIndex &parent) {
     auto ret = false;
     if (data->hasFormat("text/parameter")) {
         auto list = split(data->data("text/parameter").data(), '\n');
@@ -339,11 +368,12 @@ bool ParameterBufferTableModel::dropMimeData(const QMimeData *data, Qt::DropActi
             if (cnv_template) {
                 auto parameter = (Parameter_ifs *)cnv_template->getParameter(name);
 
-                if (parameter && !parameters_.contains(parameter)) {
+                if (parameter && !root_node_->contains(parameter)) {
                     auto path = firstCharPos(parameter->getProperty("common/path")->getValue().asString(), '/');
 
                     if (device_->isChannelAvailable(path.second)) {
-                        parameters_.push_back(parameter);
+                        root_node_->addSubNode(parameter);
+
                         ret = true;
                     }
                 }
@@ -352,4 +382,19 @@ bool ParameterBufferTableModel::dropMimeData(const QMimeData *data, Qt::DropActi
     }
     if (ret) layoutChanged();
     return ret;
+}
+bool ParameterBufferModel::moveRows(const QModelIndex &source_parent, int source_row, int count,
+                                    const QModelIndex &destination_parent, int destination_child) {
+    qDebug() << "ParameterBufferModel::moveRows: " << source_parent << ", " << source_row;
+    return true;
+}
+
+QString ParameterBufferModel::TreeNode::getData(const std::string &name) {
+    if (isParameter()) {
+        auto h_data = parameter_->getProperty("common/" + name);
+        return h_data->getValue().asString().data();
+    } else if (name != "name")
+        return "";
+    else
+        return data_;
 }

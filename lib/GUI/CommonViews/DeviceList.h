@@ -64,14 +64,14 @@ class DeviceListModel : public QAbstractItemModel {
         [[nodiscard]] bool isDevice() const { return (m_object != nullptr) && (parent->parent == nullptr); }
 
         ~TreeNode() {
-            for (auto i : child_vector) delete i;
+            for (auto i : child_vector_) delete i;
         }
 
         bool removeChild(size_t index) {
-            if (index < child_vector.size()) return false;
-            delete child_vector[index];
+            if (index < child_vector_.size()) return false;
+            delete child_vector_[index];
 
-            auto s = child_vector.erase(child_vector.begin() + ptrdiff_t(index));
+            auto s = child_vector_.erase(child_vector_.begin() + ptrdiff_t(index));
             return true;
         }
 
@@ -87,7 +87,7 @@ class DeviceListModel : public QAbstractItemModel {
 
         Module_ifs *m_object;
 
-        std::vector<TreeNode *> child_vector;
+        std::vector<TreeNode *> child_vector_;
         size_t self_index = 0;
     };
 
@@ -97,7 +97,7 @@ class DeviceListModel : public QAbstractItemModel {
     QMap<QString, QIcon> icons_map_;
 
     std::map<std::string, TreeNode *> node_map_;
-    TreeNode *root_ = nullptr;
+    TreeNode *root_node_ = nullptr;
     TreeNode *active_device_ = nullptr;
     DeviceManager *device_manager_ = nullptr;
 };

@@ -44,6 +44,8 @@ class EthernetSyncXXXX_Stream : public ModuleStream_ifs {
 
         write_every_cycle_ = min_frequency_log_2 == kBaudRateLog2;
 
+        for (size_t i = 0; i < channels_number; i++)  buffers_[i]= nullptr;
+
         for (auto& i : task.cnl) {
             int fr = i.frequency;
 

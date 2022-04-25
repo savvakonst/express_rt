@@ -89,7 +89,7 @@ Receiver::Receiver(ModuleStream_ifs *m_stream, Sockaddr dst_address, Sockaddr sr
         return;
     }
 
-    uint32_t timeout = 5000;
+    uint32_t timeout = 500;
     status = ::setsockopt(hidden_->sock_, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
     if (status != 0) {
         this->error_message_ = "SO_RCVTIMEO: " + getWSALastErrorText();
@@ -156,19 +156,20 @@ void receiverThread(ModuleStream_ifs *m_stream, SOCKET sock_, char *data_buffer_
     int32_t source_address_length = sizeof(source_address);
 
     while (1) {
+        if (cmd_) return;
+
         auto length =
             recvfrom(sock_, data_buffer_, data_buffer_size_, 0, (sockaddr *)&source_address, &source_address_length);
 
         if (length == SOCKET_ERROR) {
+            auto error_code = WSAGetLastError();
+            if (WSAETIMEDOUT == error_code) continue;
+
             std::cout << "length == SOCKET_ERROR: " + getWSALastErrorText() << "\n";
             return;
         }
 
         m_stream->readFramePeace(nullptr, data_buffer_, length);
-
-        if (cmd_) {
-            return;
-        }
     }
 }
 
