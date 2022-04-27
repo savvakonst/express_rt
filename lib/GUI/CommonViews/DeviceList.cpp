@@ -304,14 +304,15 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
         tree_view_->setStyleSheet(
             "QTreeView {background-color: #D2DCDF;  show-decoration-selected: 1;}"
             "QHeaderView::section {background-color: #D2DCDF}");
-        tree_view_->setContextMenuPolicy(Qt::ActionsContextMenu);
-        tree_view_->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
 
-        // widget_->setSelectionMode(QAbstractItemView::SingleSelection);
         tree_view_->setDragDropMode(QAbstractItemView::DragDrop);
+        tree_view_->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
+        tree_view_->setContextMenuPolicy(Qt::ActionsContextMenu);
         tree_view_->setDragEnabled(true);
         tree_view_->setDropIndicatorShown(true);
         tree_view_->setAcceptDrops(true);
+
+        // widget_->setSelectionMode(QAbstractItemView::SingleSelection);
     }
 
     void init(ExtensionManager *manager) {

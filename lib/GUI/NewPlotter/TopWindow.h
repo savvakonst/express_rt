@@ -111,13 +111,12 @@ class ParameterBufferModel : public QAbstractItemModel {
 
     [[nodiscard]] Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-    bool moveRows(const QModelIndex &source_parent, int source_row, int count, const QModelIndex &destination_parent,
-                  int destination_child) override;
-
     //////////////
     [[nodiscard]] QStringList mimeTypes() const override {
-        return {QAbstractItemModel::mimeTypes().at(0), "text/parameter"};
+        return {QAbstractItemModel::mimeTypes().at(0), "text/parameter", "int/parameters_to_plot"};
     }
+
+    [[nodiscard]] QMimeData *mimeData(const QModelIndexList &indexes) const override;
 
     bool canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
                          const QModelIndex &parent) const override;
@@ -134,7 +133,6 @@ class ParameterBufferModel : public QAbstractItemModel {
         // for (auto i : index_list)
         //      if (i.row() == 0)
         //          model_->
-
         //              return true;
     }
 
@@ -160,6 +158,17 @@ class ParameterBufferModel : public QAbstractItemModel {
             if (start_index > child_vector_.size()) return false;
             child_vector_.insert(child_vector_.begin() + start_index, nodes.begin(), nodes.end());
             return true;
+        }
+
+        std::list<TreeNode *> removeSubNodes(const std::list<TreeNode *> &nodes) {
+            if (start_index >= child_vector_.size()) return {};
+            auto end_index = start_index + len;
+            auto last = end_index < child_vector_.size() ? child_vector_.begin() + end_index : child_vector_.end();
+
+            std::list<TreeNode *> ret;
+            std::copy(child_vector_.begin() + end_index, last, std::back_inserter(ret));
+            child_vector_.erase(child_vector_.begin() + start_index, last);
+            return ret;
         }
 
         std::list<TreeNode *> removeSubNodes(int start_index, int len = 1) {

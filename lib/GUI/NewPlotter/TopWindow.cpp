@@ -327,16 +327,62 @@ QVariant ParameterBufferModel::data(const QModelIndex &index, int role) const {
 
 Qt::ItemFlags ParameterBufferModel::flags(const QModelIndex &index) const {
     Qt::ItemFlags flags = QAbstractItemModel::flags(index);
-    if (index.isValid()) flags |= Qt::ItemNeverHasChildren;
+    // if (index.isValid()) flags |= Qt::ItemNeverHasChildren;
 
-    if (index.isValid()) return flags | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+    if (index.isValid()) return flags | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable;
     else
         return flags | Qt::ItemIsDropEnabled;
 }
 
+QMimeData *ParameterBufferModel::mimeData(const QModelIndexList &indexes) const {
+    auto mime_data = QAbstractItemModel::mimeData(indexes);
+
+    std::list<int> row_list;
+
+    int size = 0;
+
+    for (auto &i : indexes) {
+        int cnt = 0;
+        auto c = getNode(i);
+        while (!c->isRoot()) {
+            row_list.push_front(c->getIndex());
+            c = c->parent_;
+            cnt++;
+        }
+        row_list.push_front(cnt);
+        size++;
+    }
+
+    row_list.push_front(size);
+
+    QByteArray byte_array;
+    byte_array.reserve((int)row_list.size() * sizeof(int));
+    auto data = (int *)byte_array.data();
+
+    for (auto &i : row_list) *(data++) = i;
+
+    mime_data->setData("int/parameters_to_plot", byte_array);
+
+    return mime_data;
+}
+
 bool ParameterBufferModel::canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
                                            const QModelIndex &parent) const {
-    if (data->hasFormat("text/parameter")) {
+    if (QAbstractItemModel::canDropMimeData(data, action, row, column, parent)) return true;
+
+    if (data->hasFormat("int/parameters_to_plot")) {
+        auto int_data = (int *)data->data("int/parameters_to_plot").data();
+        auto size = *(int_data++);
+        std::list<TreeNode *> node_list;
+        while (size--) {
+            auto depth = *(int_data++);
+            auto node = root_node_;
+            while (depth--) node = node->getChild(*(int_data++));
+
+            node_list.push_back(node);
+        }
+
+    } else if (data->hasFormat("text/parameter")) {
         auto list = split(data->data("text/parameter").data(), '\n');
         if (list.size() > 1) return true;
 
@@ -359,6 +405,15 @@ bool ParameterBufferModel::canDropMimeData(const QMimeData *data, Qt::DropAction
 
 bool ParameterBufferModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
                                         const QModelIndex &parent) {
+    QString format = data->formats().at(0);
+
+    QByteArray encoded = data->data(format);
+    QDataStream stream(&encoded, QIODevice::ReadOnly);
+
+    if (action == Qt::MoveAction) qDebug() << "action == Qt::MoveAction: " << stream;
+
+    if (QAbstractItemModel::dropMimeData(data, action, row, column, parent)) return true;
+
     auto ret = false;
     if (data->hasFormat("text/parameter")) {
         auto list = split(data->data("text/parameter").data(), '\n');
@@ -382,11 +437,6 @@ bool ParameterBufferModel::dropMimeData(const QMimeData *data, Qt::DropAction ac
     }
     if (ret) layoutChanged();
     return ret;
-}
-bool ParameterBufferModel::moveRows(const QModelIndex &source_parent, int source_row, int count,
-                                    const QModelIndex &destination_parent, int destination_child) {
-    qDebug() << "ParameterBufferModel::moveRows: " << source_parent << ", " << source_row;
-    return true;
 }
 
 QString ParameterBufferModel::TreeNode::getData(const std::string &name) {
