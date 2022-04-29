@@ -194,14 +194,21 @@ class OnlinePlotterContext : public PlotterContext_ifs {
  *
  *
  */
+class ParametersToPlotTreeView : public QTreeView {
+   public:
+    explicit ParametersToPlotTreeView(QWidget *parent = nullptr) : QTreeView(parent) {}
+
+    void dragEnterEvent(QDragEnterEvent *event) override {
+        QTreeView::dragEnterEvent(event);
+        this->selectionModel()->clearSelection();
+    }
+};
 
 ParametersToPlot::ParametersToPlot(TopWindow *plotter_main_window, Device_ifs *device, ExtensionManager *manager,
                                    QWidget *parent)
     : plotter_main_window_(plotter_main_window), device_(device), manager_(manager), QWidget(parent) {
-    tree_view_ = new QTreeView();
+    tree_view_ = new ParametersToPlotTreeView(this);
     model_ = new ParameterBufferModel(device, manager);
-
-    tree_view_->setParent(this);
     model_->setParent(this);
 
     auto layout = new QVBoxLayout(this);
@@ -337,29 +344,51 @@ Qt::ItemFlags ParameterBufferModel::flags(const QModelIndex &index) const {
 QMimeData *ParameterBufferModel::mimeData(const QModelIndexList &indexes) const {
     auto mime_data = QAbstractItemModel::mimeData(indexes);
 
-    std::list<int> row_list;
+    std::list<std::list<int>> row_list;
 
+    int rows_num = 0;
     int size = 0;
 
     for (auto &i : indexes) {
-        int cnt = 0;
-        auto c = getNode(i);
-        while (!c->isRoot()) {
-            row_list.push_front(c->getIndex());
-            c = c->parent_;
-            cnt++;
+        if (i.column() == 0) {
+            std::list<int> node_list;
+            int cnt = 0;
+            auto c = getNode(i);
+
+            while (!c->isRoot()) {
+                node_list.push_front(c->getIndex());
+                c = c->parent_;
+                cnt++;
+            }
+
+            node_list.push_front(cnt);
+            row_list.push_back(std::move(node_list));
+            rows_num++;
+
+            size += cnt + 1;
         }
-        row_list.push_front(cnt);
-        size++;
     }
 
-    row_list.push_front(size);
+    row_list.sort([](const std::list<int> &a, const std::list<int> &b) {
+        auto it_a = ++a.begin(), it_b = ++b.begin();
+        for (; it_a != a.end() && it_b != b.end(); ++it_a, ++it_b) {
+            if (*it_a < *it_b) return true;
+            else if (*it_a > *it_b)
+                return false;
+        }
+        return false;
+    });
 
+    row_list.reverse();
+
+    size++;
     QByteArray byte_array;
-    byte_array.reserve((int)row_list.size() * sizeof(int));
+    byte_array.resize(size * int(sizeof(int)));
     auto data = (int *)byte_array.data();
+    *(data++) = rows_num;
 
-    for (auto &i : row_list) *(data++) = i;
+    for (auto &row : row_list)
+        for (auto &i : row) *(data++) = i;
 
     mime_data->setData("int/parameters_to_plot", byte_array);
 
@@ -368,20 +397,12 @@ QMimeData *ParameterBufferModel::mimeData(const QModelIndexList &indexes) const 
 
 bool ParameterBufferModel::canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
                                            const QModelIndex &parent) const {
-    if (QAbstractItemModel::canDropMimeData(data, action, row, column, parent)) return true;
+    // if (QAbstractItemModel::canDropMimeData(data, action, row, column, parent)) return true;
 
     if (data->hasFormat("int/parameters_to_plot")) {
-        auto int_data = (int *)data->data("int/parameters_to_plot").data();
-        auto size = *(int_data++);
-        std::list<TreeNode *> node_list;
-        while (size--) {
-            auto depth = *(int_data++);
-            auto node = root_node_;
-            while (depth--) node = node->getChild(*(int_data++));
+        auto valid_row = row != -1;
 
-            node_list.push_back(node);
-        }
-
+        return valid_row || !parent.isValid();
     } else if (data->hasFormat("text/parameter")) {
         auto list = split(data->data("text/parameter").data(), '\n');
         if (list.size() > 1) return true;
@@ -405,17 +426,40 @@ bool ParameterBufferModel::canDropMimeData(const QMimeData *data, Qt::DropAction
 
 bool ParameterBufferModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
                                         const QModelIndex &parent) {
-    QString format = data->formats().at(0);
-
-    QByteArray encoded = data->data(format);
-    QDataStream stream(&encoded, QIODevice::ReadOnly);
-
-    if (action == Qt::MoveAction) qDebug() << "action == Qt::MoveAction: " << stream;
-
-    if (QAbstractItemModel::dropMimeData(data, action, row, column, parent)) return true;
-
     auto ret = false;
-    if (data->hasFormat("text/parameter")) {
+
+    if (data->hasFormat("int/parameters_to_plot")) {
+        auto node_to_insert = parent.isValid() ? getNode(parent) : root_node_;
+        auto row_index_to_insert = row;
+        node_to_insert = (node_to_insert->isParameter() ? node_to_insert->parent_ : node_to_insert);
+
+        auto byte_array = data->data("int/parameters_to_plot");
+        auto int_data = (int *)byte_array.data();
+
+        auto rows_num = *(int_data++);
+        std::list<TreeNode *> node_list;
+
+        while (rows_num--) {
+            auto depth = *(int_data++);
+            auto node = root_node_;
+            while (depth--) node = node->getChild(*(int_data++));
+
+            auto parent_node = node->parent_;
+            auto row_to_remove = *(int_data - 1);
+
+            if (parent_node == node_to_insert)
+                if (row_to_remove <= row_index_to_insert) row_index_to_insert--;
+
+            parent_node->removeSubNodes(row_to_remove);
+
+            node_list.push_front(node);
+        }
+
+        node_to_insert->insertNodes(row_index_to_insert, node_list);
+
+        ret = true;
+
+    } else if (data->hasFormat("text/parameter")) {
         auto list = split(data->data("text/parameter").data(), '\n');
         auto cnv_template = parameter_view_wrapper_->currentConversionTemplate();
 

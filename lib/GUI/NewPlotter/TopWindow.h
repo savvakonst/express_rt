@@ -155,21 +155,14 @@ class ParameterBufferModel : public QAbstractItemModel {
         }
 
         bool insertNodes(int start_index, const std::list<TreeNode *> &nodes) {
-            if (start_index > child_vector_.size()) return false;
+            start_index = int(start_index < 0 ? child_vector_.size() : start_index);
+            start_index = int(start_index > child_vector_.size() ? child_vector_.size() : start_index);
+
             child_vector_.insert(child_vector_.begin() + start_index, nodes.begin(), nodes.end());
             return true;
         }
 
-        std::list<TreeNode *> removeSubNodes(const std::list<TreeNode *> &nodes) {
-            if (start_index >= child_vector_.size()) return {};
-            auto end_index = start_index + len;
-            auto last = end_index < child_vector_.size() ? child_vector_.begin() + end_index : child_vector_.end();
-
-            std::list<TreeNode *> ret;
-            std::copy(child_vector_.begin() + end_index, last, std::back_inserter(ret));
-            child_vector_.erase(child_vector_.begin() + start_index, last);
-            return ret;
-        }
+        // std::list<TreeNode *> removeSubNodes(const std::list<TreeNode *> &nodes);
 
         std::list<TreeNode *> removeSubNodes(int start_index, int len = 1) {
             if (start_index >= child_vector_.size()) return {};
