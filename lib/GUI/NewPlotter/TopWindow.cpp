@@ -234,14 +234,12 @@ ParametersToPlot::ParametersToPlot(TopWindow *plotter_main_window, Device_ifs *d
             auto group_name = QInputDialog::getText(tree_view_, "Имя группы", "group");
 
             auto index_list = tree_view_->selectionModel()->selectedRows();
-            // for (auto i : index_list)
-            //     if (i.row() == 0)
-            //         model_->
-            //
-            //             return true;
+            auto current_index = tree_view_->selectionModel()->currentIndex();
 
-            // NameDialog(tree_view_).show();
-            //  name_dialog.show();
+            // if (group_name.isEmpty())
+            //     return false;
+            model_->addGroup(group_name, current_index, index_list);
+
             return true;
         },
         tree_view_);
@@ -324,9 +322,6 @@ QVariant ParameterBufferModel::data(const QModelIndex &index, int role) const {
     if (role == Qt::DisplayRole) {
         auto node = getNode(index);
         auto name = list_of_entries_[index.column()]->name_;
-        // auto prm = parameters_[index.row()];
-        // auto h_data = prm->getProperty("common/" + name);
-        // return h_data->getValue().asString().data();
         return node->getData(name);
     }
     return {};
@@ -335,8 +330,8 @@ QVariant ParameterBufferModel::data(const QModelIndex &index, int role) const {
 Qt::ItemFlags ParameterBufferModel::flags(const QModelIndex &index) const {
     Qt::ItemFlags flags = QAbstractItemModel::flags(index);
     // if (index.isValid()) flags |= Qt::ItemNeverHasChildren;
-
-    if (index.isValid()) return flags | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable;
+    //| Qt::ItemIsUserCheckable
+    if (index.isValid()) return flags | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
     else
         return flags | Qt::ItemIsDropEnabled;
 }
@@ -402,6 +397,8 @@ bool ParameterBufferModel::canDropMimeData(const QMimeData *data, Qt::DropAction
     if (data->hasFormat("int/parameters_to_plot")) {
         auto valid_row = row != -1;
 
+        if (parent.isValid() && !getNode(parent)->isParameter() && (getNode(parent)->parent_ == root_node_))
+            return true;
         return valid_row || !parent.isValid();
     } else if (data->hasFormat("text/parameter")) {
         auto list = split(data->data("text/parameter").data(), '\n');
@@ -483,6 +480,28 @@ bool ParameterBufferModel::dropMimeData(const QMimeData *data, Qt::DropAction ac
     return ret;
 }
 
+bool ParameterBufferModel::addGroup(const QString &name, const QModelIndex &current_index,
+                                    const QList<QModelIndex> &index_list) {
+    // TODO: add to group in run
+
+    int row = current_index.row();
+    if (current_index.isValid())
+        if (getNode(current_index) != root_node_) row = getNode(current_index)->parent_->getIndex();
+
+    auto childs = root_node_->getChildVector();
+
+    for (auto i : childs)
+        if (!i->isParameter())
+            if (i->getName() == name) return false;
+
+    beginInsertRows(QModelIndex(), 0, 0);
+    root_node_->insertNodes(0, {new TreeNode(name)});
+    endInsertRows();
+    dataChanged(QModelIndex(), QModelIndex());
+    // emit layoutChanged();
+    return true;
+}
+
 QString ParameterBufferModel::TreeNode::getData(const std::string &name) {
     if (isParameter()) {
         auto h_data = parameter_->getProperty("common/" + name);
@@ -490,5 +509,12 @@ QString ParameterBufferModel::TreeNode::getData(const std::string &name) {
     } else if (name != "name")
         return "";
     else
-        return data_;
+        return name_;
+}
+QString ParameterBufferModel::TreeNode::getName() {
+    if (isParameter()) {
+        auto h_data = parameter_->getProperty("common/name");
+        return h_data->getValue().asString().data();
+    } else
+        return name_;
 }

@@ -90,12 +90,12 @@ class ParameterBufferModel : public QAbstractItemModel {
     [[nodiscard]] QModelIndex sibling(int row, int column, const QModelIndex &model_index) const override {
         return index(row, column, model_index.parent());
     }
-
-    [[nodiscard]] bool hasChildren(const QModelIndex &parent) const override {
-        if (!parent.isValid()) return rowCount(parent) > 0 && columnCount(parent) > 0;
-        return false;
-    }
-
+    /*
+        [[nodiscard]] bool hasChildren(const QModelIndex &parent) const override {
+            if (parent.isValid()) return rowCount(parent) > 0 && columnCount(parent) > 0;
+            return false;
+        }
+    */
     [[nodiscard]] int rowCount(const QModelIndex &parent) const override {
         if (parent.column() > 0) return 0;
         auto node = parent.isValid() ? getNode(parent) : root_node_;
@@ -129,12 +129,7 @@ class ParameterBufferModel : public QAbstractItemModel {
         return parameters_;
     }
 
-    void addGroup(const QList<QModelIndex> &index_list) {
-        // for (auto i : index_list)
-        //      if (i.row() == 0)
-        //          model_->
-        //              return true;
-    }
+    bool addGroup(const QString &name, const QModelIndex &current_index, const QList<QModelIndex> &index_list);
 
    protected:
     class TreeNode {
@@ -144,7 +139,7 @@ class ParameterBufferModel : public QAbstractItemModel {
             parent_ = parent;
         }
 
-        explicit TreeNode(const QString &name) { data_ = name; }
+        explicit TreeNode(const QString &name) { name_ = name; }
 
         [[nodiscard]] bool isParameter() const { return parameter_ != nullptr; }
 
@@ -157,7 +152,7 @@ class ParameterBufferModel : public QAbstractItemModel {
         bool insertNodes(int start_index, const std::list<TreeNode *> &nodes) {
             start_index = int(start_index < 0 ? child_vector_.size() : start_index);
             start_index = int(start_index > child_vector_.size() ? child_vector_.size() : start_index);
-
+            for (auto i : nodes) i->parent_ = this;
             child_vector_.insert(child_vector_.begin() + start_index, nodes.begin(), nodes.end());
             return true;
         }
@@ -187,7 +182,7 @@ class ParameterBufferModel : public QAbstractItemModel {
 
         QString getData(const std::string &name);
 
-        /// TreeNode* getParent(){return parent_;}
+        QString getName();
 
         [[nodiscard]] bool isRoot() const { return parent_ == nullptr; }
 
@@ -199,7 +194,10 @@ class ParameterBufferModel : public QAbstractItemModel {
             return false;
         }
 
-        [[nodiscard]] int rowsCount() const { return int(child_vector_.size()); }
+        [[nodiscard]] int rowsCount() const {
+            //(child_vector_.size()>0) && (parent_ != nullptr)
+            return int(child_vector_.size());
+        }
 
         QList<Parameter_ifs *> getParametersList() {
             QList<Parameter_ifs *> ret;
@@ -211,6 +209,8 @@ class ParameterBufferModel : public QAbstractItemModel {
             return ret;
         }
 
+        const std::vector<TreeNode *> &getChildVector() { return child_vector_; }
+
         TreeNode *getChild(int i) { return child_vector_[i]; }
 
         TreeNode *parent_ = nullptr;
@@ -218,7 +218,7 @@ class ParameterBufferModel : public QAbstractItemModel {
        private:
         std::vector<TreeNode *> child_vector_;
         Parameter_ifs *parameter_ = nullptr;
-        QString data_ = "";
+        QString name_ = "";
     };
 
     static TreeNode *getNode(const QModelIndex &index) { return (TreeNode *)index.internalPointer(); }
