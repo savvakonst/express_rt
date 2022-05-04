@@ -341,6 +341,8 @@ QMimeData *ParameterBufferModel::mimeData(const QModelIndexList &indexes) const 
 
     std::list<std::list<int>> row_list;
 
+    // std::list<std::list<int>> containers;
+
     int rows_num = 0;
     int size = 0;
 
@@ -357,6 +359,7 @@ QMimeData *ParameterBufferModel::mimeData(const QModelIndexList &indexes) const 
             }
 
             node_list.push_front(cnt);
+
             row_list.push_back(std::move(node_list));
             rows_num++;
 
@@ -371,9 +374,47 @@ QMimeData *ParameterBufferModel::mimeData(const QModelIndexList &indexes) const 
             else if (*it_a > *it_b)
                 return false;
         }
-        return false;
+        return it_a == a.end();
     });
 
+    auto belongs = [](const std::list<int> &a, const std::list<int> &b) {
+        if (a.front() >= b.front()) return false;
+        auto it_a = ++a.begin(), it_b = ++b.begin();
+        for (; it_a != a.end(); ++it_a, ++it_b)
+            if (*it_a != *it_b) return false;
+
+        return true;
+    };
+
+    {
+        auto base = row_list.front();
+        for (auto it = ++row_list.begin(); it != row_list.end();) {
+            if (belongs(base, *it)) {
+                size -= it->front() + 1;
+                rows_num--;
+                it = row_list.erase(it);
+
+            } else {
+                base = *it;
+                it++;
+            }
+        }
+    }
+    /*
+    {
+        auto base = row_list.front();
+        auto it = ++row_list.begin();
+        while (it != row_list.end()) {
+            if (belongs(base, *it)) {
+                it = row_list.erase(it);
+                size--;
+            } else {
+                base = *it;
+                ++it;
+            }
+        }
+    }
+*/
     row_list.reverse();
 
     size++;
@@ -387,7 +428,7 @@ QMimeData *ParameterBufferModel::mimeData(const QModelIndexList &indexes) const 
 
     mime_data->setData("int/parameters_to_plot", byte_array);
 
-    return mime_data;
+    return mime_data;  // 10-16
 }
 
 bool ParameterBufferModel::canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
@@ -397,8 +438,7 @@ bool ParameterBufferModel::canDropMimeData(const QMimeData *data, Qt::DropAction
     if (data->hasFormat("int/parameters_to_plot")) {
         auto valid_row = row != -1;
 
-        if (parent.isValid() && !getNode(parent)->isParameter() && (getNode(parent)->parent_ == root_node_))
-            return true;
+        if (parent.isValid() && !getNode(parent)->isTerminal() && (getNode(parent)->parent_ == root_node_)) return true;
         return valid_row || !parent.isValid();
     } else if (data->hasFormat("text/parameter")) {
         auto list = split(data->data("text/parameter").data(), '\n');
@@ -428,7 +468,7 @@ bool ParameterBufferModel::dropMimeData(const QMimeData *data, Qt::DropAction ac
     if (data->hasFormat("int/parameters_to_plot")) {
         auto node_to_insert = parent.isValid() ? getNode(parent) : root_node_;
         auto row_index_to_insert = row;
-        node_to_insert = (node_to_insert->isParameter() ? node_to_insert->parent_ : node_to_insert);
+        node_to_insert = (node_to_insert->isTerminal() ? node_to_insert->parent_ : node_to_insert);
 
         auto byte_array = data->data("int/parameters_to_plot");
         auto int_data = (int *)byte_array.data();
@@ -491,7 +531,7 @@ bool ParameterBufferModel::addGroup(const QString &name, const QModelIndex &curr
     auto childs = root_node_->getChildVector();
 
     for (auto i : childs)
-        if (!i->isParameter())
+        if (!i->isTerminal())
             if (i->getName() == name) return false;
 
     beginInsertRows(QModelIndex(), 0, 0);
@@ -503,7 +543,7 @@ bool ParameterBufferModel::addGroup(const QString &name, const QModelIndex &curr
 }
 
 QString ParameterBufferModel::TreeNode::getData(const std::string &name) {
-    if (isParameter()) {
+    if (isTerminal()) {
         auto h_data = parameter_->getProperty("common/" + name);
         return h_data->getValue().asString().data();
     } else if (name != "name")
@@ -512,7 +552,7 @@ QString ParameterBufferModel::TreeNode::getData(const std::string &name) {
         return name_;
 }
 QString ParameterBufferModel::TreeNode::getName() {
-    if (isParameter()) {
+    if (isTerminal()) {
         auto h_data = parameter_->getProperty("common/name");
         return h_data->getValue().asString().data();
     } else

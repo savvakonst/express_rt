@@ -141,10 +141,10 @@ class ParameterBufferModel : public QAbstractItemModel {
 
         explicit TreeNode(const QString &name) { name_ = name; }
 
-        [[nodiscard]] bool isParameter() const { return parameter_ != nullptr; }
+        [[nodiscard]] bool isTerminal() const { return parameter_ != nullptr; }
 
         bool addSubNode(Parameter_ifs *parameter) {
-            if (isParameter()) return false;
+            if (isTerminal()) return false;
             child_vector_.push_back(new TreeNode(parameter, this));
             return true;
         }
@@ -188,7 +188,7 @@ class ParameterBufferModel : public QAbstractItemModel {
 
         bool contains(Parameter_ifs *parameter) const {
             if (parameter == parameter_) return true;
-            if (!isParameter())
+            if (!isTerminal())
                 for (auto i : child_vector_)
                     if (i->contains(parameter)) return true;
             return false;
