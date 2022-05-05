@@ -129,6 +129,8 @@ class ParameterBufferModel : public QAbstractItemModel {
         return parameters_;
     }
 
+    bool removeRows(const QList<QModelIndex> &index_list);
+
     bool addGroup(const QString &name, const QModelIndex &current_index, const QList<QModelIndex> &index_list);
 
    protected:
@@ -141,6 +143,10 @@ class ParameterBufferModel : public QAbstractItemModel {
 
         explicit TreeNode(const QString &name) { name_ = name; }
 
+        ~TreeNode() {
+            for (auto i : child_vector_) delete i;
+        }
+
         [[nodiscard]] bool isTerminal() const { return parameter_ != nullptr; }
 
         bool addSubNode(Parameter_ifs *parameter) {
@@ -152,12 +158,23 @@ class ParameterBufferModel : public QAbstractItemModel {
         bool insertNodes(int start_index, const std::list<TreeNode *> &nodes) {
             start_index = int(start_index < 0 ? child_vector_.size() : start_index);
             start_index = int(start_index > child_vector_.size() ? child_vector_.size() : start_index);
+
             for (auto i : nodes) i->parent_ = this;
+
             child_vector_.insert(child_vector_.begin() + start_index, nodes.begin(), nodes.end());
             return true;
         }
 
         // std::list<TreeNode *> removeSubNodes(const std::list<TreeNode *> &nodes);
+
+        bool hasAsProgenitor(TreeNode *node) {
+            auto p = this;
+            while (p) {
+                if (p == node) return true;
+                p = p->parent_;
+            }
+            return false;
+        }
 
         std::list<TreeNode *> removeSubNodes(int start_index, int len = 1) {
             if (start_index >= child_vector_.size()) return {};

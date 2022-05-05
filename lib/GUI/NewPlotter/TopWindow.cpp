@@ -8,7 +8,6 @@
 #include <QDebug>
 #include <QDockWidget>
 #include <QDragEnterEvent>
-#include <QDropEvent>
 #include <QInputDialog>
 #include <QMimeData>
 #include <QTreeView>
@@ -25,7 +24,7 @@
 //
 #include "qformscreen.h"
 
-TopWindow::TopWindow(QWidget *parent) {
+TopWindow::TopWindow(QWidget *parent) : QMainWindow(parent) {
     setAcceptDrops(true);
     setUnifiedTitleAndToolBarOnMac(true);
 }
@@ -231,7 +230,7 @@ ParametersToPlot::ParametersToPlot(TopWindow *plotter_main_window, Device_ifs *d
 
     auto group_action = new FuncProxyQAction(
         [&]() {
-            auto group_name = QInputDialog::getText(tree_view_, "Имя группы", "group");
+            auto group_name = QInputDialog::getText(tree_view_, "Имя группы", "Имя группы:");
 
             auto index_list = tree_view_->selectionModel()->selectedRows();
             auto current_index = tree_view_->selectionModel()->currentIndex();
@@ -248,6 +247,19 @@ ParametersToPlot::ParametersToPlot(TopWindow *plotter_main_window, Device_ifs *d
     group_action->setText("&Создать группу");
     tree_view_->addAction(group_action);
 
+    auto delete_action = new FuncProxyQAction(
+        [&]() {
+            auto index_list = tree_view_->selectionModel()->selectedRows();
+            model_->removeRows(index_list);
+            return true;
+        },
+        tree_view_);
+
+    delete_action->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
+    delete_action->setShortcut(QKeySequence::Delete);
+    delete_action->setText("&Удалить");
+    tree_view_->addAction(delete_action);
+
     auto p_layout = reinterpret_cast<QHBoxLayout *>(this->layout());
     auto toolbar = new QToolBar(this);
     toolbar->addAction(action_run);
@@ -257,7 +269,7 @@ ParametersToPlot::ParametersToPlot(TopWindow *plotter_main_window, Device_ifs *d
 ParametersToPlot::~ParametersToPlot() {
     qDebug() << "ParametersToPlot::~ParametersToPlot()";
     plotter_main_window_->block_ = false;
-};
+}
 
 void ParametersToPlot::runAndClose() {
     auto list = model_->getParameters().toStdList();
@@ -323,14 +335,16 @@ QVariant ParameterBufferModel::data(const QModelIndex &index, int role) const {
         auto node = getNode(index);
         auto name = list_of_entries_[index.column()]->name_;
         return node->getData(name);
+    } else if (role == Qt::DecorationRole && (index.column() == 0)) {
+        return getNode(index)->isTerminal() ? QVariant() : QIcon(":/open");
     }
+
     return {};
 }
 
 Qt::ItemFlags ParameterBufferModel::flags(const QModelIndex &index) const {
     Qt::ItemFlags flags = QAbstractItemModel::flags(index);
-    // if (index.isValid()) flags |= Qt::ItemNeverHasChildren;
-    //| Qt::ItemIsUserCheckable
+
     if (index.isValid()) return flags | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
     else
         return flags | Qt::ItemIsDropEnabled;
@@ -340,8 +354,6 @@ QMimeData *ParameterBufferModel::mimeData(const QModelIndexList &indexes) const 
     auto mime_data = QAbstractItemModel::mimeData(indexes);
 
     std::list<std::list<int>> row_list;
-
-    // std::list<std::list<int>> containers;
 
     int rows_num = 0;
     int size = 0;
@@ -400,21 +412,7 @@ QMimeData *ParameterBufferModel::mimeData(const QModelIndexList &indexes) const 
             }
         }
     }
-    /*
-    {
-        auto base = row_list.front();
-        auto it = ++row_list.begin();
-        while (it != row_list.end()) {
-            if (belongs(base, *it)) {
-                it = row_list.erase(it);
-                size--;
-            } else {
-                base = *it;
-                ++it;
-            }
-        }
-    }
-*/
+
     row_list.reverse();
 
     size++;
@@ -474,12 +472,18 @@ bool ParameterBufferModel::dropMimeData(const QMimeData *data, Qt::DropAction ac
         auto int_data = (int *)byte_array.data();
 
         auto rows_num = *(int_data++);
-        std::list<TreeNode *> node_list;
+        std::list<TreeNode *> nodes_to_insert;
+        std::list<std::pair<TreeNode *, int>> indexes_to_remove;
 
         while (rows_num--) {
             auto depth = *(int_data++);
             auto node = root_node_;
             while (depth--) node = node->getChild(*(int_data++));
+
+            if (!node->isTerminal()) {
+                // if (node->hasAsProgenitor(node_to_insert)) return false;
+                if (node_to_insert != root_node_) return false;
+            }
 
             auto parent_node = node->parent_;
             auto row_to_remove = *(int_data - 1);
@@ -487,12 +491,15 @@ bool ParameterBufferModel::dropMimeData(const QMimeData *data, Qt::DropAction ac
             if (parent_node == node_to_insert)
                 if (row_to_remove <= row_index_to_insert) row_index_to_insert--;
 
-            parent_node->removeSubNodes(row_to_remove);
+            // parent_node->removeSubNodes(row_to_remove);
 
-            node_list.push_front(node);
+            indexes_to_remove.emplace_back(parent_node, row_to_remove);
+            nodes_to_insert.push_front(node);
         }
 
-        node_to_insert->insertNodes(row_index_to_insert, node_list);
+        for (auto &p : indexes_to_remove) p.first->removeSubNodes(p.second);
+
+        node_to_insert->insertNodes(row_index_to_insert, nodes_to_insert);
 
         ret = true;
 
@@ -520,6 +527,19 @@ bool ParameterBufferModel::dropMimeData(const QMimeData *data, Qt::DropAction ac
     return ret;
 }
 
+bool ParameterBufferModel::removeRows(const QList<QModelIndex> &index_list) {
+    beginRemoveRows(QModelIndex(), 0, 0);
+    for (auto &index : index_list) {
+        if (index.column() == 0) {
+            auto c = getNode(index);
+            c->parent_->removeSubNodes(c->getIndex());
+        }
+    }
+
+    endRemoveRows();
+    return false;
+}
+
 bool ParameterBufferModel::addGroup(const QString &name, const QModelIndex &current_index,
                                     const QList<QModelIndex> &index_list) {
     // TODO: add to group in run
@@ -528,17 +548,16 @@ bool ParameterBufferModel::addGroup(const QString &name, const QModelIndex &curr
     if (current_index.isValid())
         if (getNode(current_index) != root_node_) row = getNode(current_index)->parent_->getIndex();
 
-    auto childs = root_node_->getChildVector();
+    auto child_vector = root_node_->getChildVector();
 
-    for (auto i : childs)
+    for (auto i : child_vector)
         if (!i->isTerminal())
             if (i->getName() == name) return false;
 
     beginInsertRows(QModelIndex(), 0, 0);
-    root_node_->insertNodes(0, {new TreeNode(name)});
+    root_node_->insertNodes(row, {new TreeNode(name)});
     endInsertRows();
-    dataChanged(QModelIndex(), QModelIndex());
-    // emit layoutChanged();
+
     return true;
 }
 
