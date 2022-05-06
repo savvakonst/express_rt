@@ -273,7 +273,8 @@ ParametersToPlot::~ParametersToPlot() {
 
 void ParametersToPlot::runAndClose() {
     auto list = model_->getParameters().toStdList();
-    // auto module_stream = generateStream(manager_, "dynamic_prm_buffer", device_, list);
+    // model_->getTree();
+    //  auto module_stream = generateStream(manager_, "dynamic_prm_buffer", device_, list);
 
     ModuleStream_ifs *top_m_stream = device_->createModuleStream();
 
@@ -296,7 +297,7 @@ void ParametersToPlot::runAndClose() {
                 if (module_stream) {
                     auto prm_buffer = constructor(module_stream->getModule(), prm, manager_);
                     module_stream->addPrmBuffer(path.second, prm_buffer);
-                    form_screen->addScale(prm_buffer->createReader());
+                    form_screen->createScale(prm_buffer->createReader());
                 }
             }
         }

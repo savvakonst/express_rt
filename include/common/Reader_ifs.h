@@ -48,14 +48,17 @@ class Reader_ifs {
             }
         }
 
-        Borders borders_;
+        Chunk* next_ = nullptr;
 
         Point* first_point_ = nullptr;
         size_t number_of_points_ = 0;
 
-        Chunk::Status error_code_ = Status::success;
+        // readerData_t max_ = std::numeric_limits<readerData_t>::min();
+        // readerData_t min_ = std::numeric_limits<readerData_t>::max();
 
-        Chunk* next_ = nullptr;
+        Borders borders_;
+
+        Chunk::Status error_code_ = Status::success;
     };
 
     virtual Parameter_ifs* getParameter() { return nullptr; }

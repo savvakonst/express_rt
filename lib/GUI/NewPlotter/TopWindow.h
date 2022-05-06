@@ -73,66 +73,6 @@ class ParameterBufferModel : public QAbstractItemModel {
 
     ~ParameterBufferModel() override { delete root_node_; }
 
-    [[nodiscard]] QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override {
-        if (!hasIndex(row, column, parent)) return {};
-        auto node = parent.isValid() ? getNode(parent) : root_node_;
-        if (node->rowsCount() > size_t(row)) return createIndex(row, column, node->getChild(row));
-        return {};
-    }
-
-    [[nodiscard]] QModelIndex parent(const QModelIndex &index) const override {
-        if (!index.isValid()) return {};
-        auto parent_node = getNode(index)->parent_;
-        if (parent_node == root_node_) return {};
-        return createIndex(int(parent_node->getIndex()), 0, parent_node);
-    }
-
-    [[nodiscard]] QModelIndex sibling(int row, int column, const QModelIndex &model_index) const override {
-        return index(row, column, model_index.parent());
-    }
-    /*
-        [[nodiscard]] bool hasChildren(const QModelIndex &parent) const override {
-            if (parent.isValid()) return rowCount(parent) > 0 && columnCount(parent) > 0;
-            return false;
-        }
-    */
-    [[nodiscard]] int rowCount(const QModelIndex &parent) const override {
-        if (parent.column() > 0) return 0;
-        auto node = parent.isValid() ? getNode(parent) : root_node_;
-        if (node) return int(node->rowsCount());
-        return 0;
-    }
-
-    [[nodiscard]] int columnCount(const QModelIndex &parent) const override { return (int)list_of_entries_.size(); }
-
-    [[nodiscard]] QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-
-    [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
-
-    [[nodiscard]] Qt::ItemFlags flags(const QModelIndex &index) const override;
-
-    //////////////
-    [[nodiscard]] QStringList mimeTypes() const override {
-        return {QAbstractItemModel::mimeTypes().at(0), "text/parameter", "int/parameters_to_plot"};
-    }
-
-    [[nodiscard]] QMimeData *mimeData(const QModelIndexList &indexes) const override;
-
-    bool canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
-                         const QModelIndex &parent) const override;
-
-    bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
-                      const QModelIndex &parent) override;
-
-    const QList<Parameter_ifs *> &getParameters() {
-        parameters_ = root_node_->getParametersList();
-        return parameters_;
-    }
-
-    bool removeRows(const QList<QModelIndex> &index_list);
-
-    bool addGroup(const QString &name, const QModelIndex &current_index, const QList<QModelIndex> &index_list);
-
    protected:
     class TreeNode {
        public:
@@ -237,6 +177,76 @@ class ParameterBufferModel : public QAbstractItemModel {
         Parameter_ifs *parameter_ = nullptr;
         QString name_ = "";
     };
+
+   public:
+
+
+    [[nodiscard]] QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override {
+        if (!hasIndex(row, column, parent)) return {};
+        auto node = parent.isValid() ? getNode(parent) : root_node_;
+        if (node->rowsCount() > size_t(row)) return createIndex(row, column, node->getChild(row));
+        return {};
+    }
+
+    [[nodiscard]] QModelIndex parent(const QModelIndex &index) const override {
+        if (!index.isValid()) return {};
+        auto parent_node = getNode(index)->parent_;
+        if (parent_node == root_node_) return {};
+        return createIndex(int(parent_node->getIndex()), 0, parent_node);
+    }
+
+    [[nodiscard]] QModelIndex sibling(int row, int column, const QModelIndex &model_index) const override {
+        return index(row, column, model_index.parent());
+    }
+    /*
+        [[nodiscard]] bool hasChildren(const QModelIndex &parent) const override {
+            if (parent.isValid()) return rowCount(parent) > 0 && columnCount(parent) > 0;
+            return false;
+        }
+    */
+    [[nodiscard]] int rowCount(const QModelIndex &parent) const override {
+        if (parent.column() > 0) return 0;
+        auto node = parent.isValid() ? getNode(parent) : root_node_;
+        if (node) return int(node->rowsCount());
+        return 0;
+    }
+
+    [[nodiscard]] int columnCount(const QModelIndex &parent) const override { return (int)list_of_entries_.size(); }
+
+    [[nodiscard]] QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+
+    [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
+
+    [[nodiscard]] Qt::ItemFlags flags(const QModelIndex &index) const override;
+
+    //////////////
+    [[nodiscard]] QStringList mimeTypes() const override {
+        return {QAbstractItemModel::mimeTypes().at(0), "text/parameter", "int/parameters_to_plot"};
+    }
+
+    [[nodiscard]] QMimeData *mimeData(const QModelIndexList &indexes) const override;
+
+    bool canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
+                         const QModelIndex &parent) const override;
+
+    bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column,
+                      const QModelIndex &parent) override;
+
+    const QList<Parameter_ifs *> &getParameters() {
+        parameters_ = root_node_->getParametersList();
+        return parameters_;
+    }
+
+    const TreeNode *getTree() {
+        return root_node_;
+    }
+
+    bool removeRows(const QList<QModelIndex> &index_list);
+
+    bool addGroup(const QString &name, const QModelIndex &current_index, const QList<QModelIndex> &index_list);
+
+   protected:
+
 
     static TreeNode *getNode(const QModelIndex &index) { return (TreeNode *)index.internalPointer(); }
 

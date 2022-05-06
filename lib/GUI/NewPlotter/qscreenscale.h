@@ -55,12 +55,13 @@ struct AxisYStatistics {
     double time_length = 0;
 };
 
-struct SinglePrm {
-    AxisYStatistics stat;
+struct PrmAttributes {
+    // AxisYStatistics stat;
     Reader_ifs *reader;
     Reader_ifs::Point *buffer;
     std::unique_ptr<Reader_ifs::Chunk> chunks;
     std::vector<ControlLevel> *plevels;
+    QString label_;
 };
 
 class Parameter_ifs;
@@ -88,7 +89,12 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
     explicit QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &sz, const LineProperties &dstx,
                           const Margin &margin, QWidget *parent);
 
+    explicit QScreenScale(const int &index, const QSizeF &sz, const LineProperties &dstx, const Margin &margin,
+                          QWidget *parent);
+
     ~QScreenScale() override;
+
+    bool addReader(Reader_ifs *reader);
 
     [[nodiscard]] int getIndex() const;
 
@@ -190,7 +196,6 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
 
     void onAddLevelEnd(const ControlLevel &lvl, const bool &flag, const int &index);
 
-
    private:
     void changeScaleBorder(const bool &high, const int &delta);
 
@@ -212,7 +217,7 @@ class QScreenScale : public QObject, public QGraphicsRectItem {
 
     const int type_ = kSourceScale;
 
-    std::list<SinglePrm> parameters_;
+    std::list<PrmAttributes> prm_attributes_list_;
 
     bool disabled_ = false;
     QPair<qint64, qint64> offs_;

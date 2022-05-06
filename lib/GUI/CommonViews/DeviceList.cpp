@@ -55,7 +55,6 @@ QVariant DeviceListModel::data(const QModelIndex &index, int role) const {
     if (role == Qt::DecorationRole) {
         if (node == active_device_) return icons_map_["DEV_CHECK"];
         if (node->m_object) return icons_map_[node->module_type.c_str()];
-
         return {};
     } else if (role == Qt::TextColorRole) {
         if (node->m_object && !node->m_object->isAvailable()) return QColor(200, 100, 100);

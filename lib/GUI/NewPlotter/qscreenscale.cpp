@@ -4,21 +4,14 @@
 #include <QGraphicsScene>
 
 #include "convtemplate/Parameter_ifs.h"
+
 //-------------------------------------------------------------------------
-QScreenScale::QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &sz, const LineProperties &dstx,
-                           const Margin &margin, QWidget *parent) {
+QScreenScale::QScreenScale(const int &index, const QSizeF &sz, const LineProperties &dstx, const Margin &margin,
+                           QWidget *parent) {
     Q_UNUSED(parent)
 
     index_ = index;
     scene_size_ = sz;
-
-    auto parameter = reader->getParameter();
-    if (parameter) {
-        s_label_ = parameter->getPropertyAsTxt("common/name").data();
-
-        QString s_unit = parameter->getPropertyAsTxt("common/units").data();
-        if (!s_unit.isEmpty()) s_label_ += QString(", ") + s_unit;
-    }
 
     lining_ = dstx;
     margin_ = margin;
@@ -120,20 +113,54 @@ QScreenScale::QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &s
     lvl.value = -0.75;
     levels_.push_back(lvl);
 
-    SinglePrm prm;
-
-    prm.reader = reader;
-    prm.buffer = new Reader_ifs::Point[kMaxScreenWidth];
-    prm.plevels = &levels_;
-
-    parameters_.push_back(std::move(prm));
     //
 
     formScaleImage();
 }
 
 //-------------------------------------------------------------------------
+QScreenScale::QScreenScale(Reader_ifs *reader, const int &index, const QSizeF &sz, const LineProperties &dstx,
+                           const Margin &margin, QWidget *parent)
+    : QScreenScale(index, sz, dstx, margin, parent) {
+    auto parameter = reader->getParameter();
+
+    PrmAttributes prm_attributes;
+    if (parameter) {
+        prm_attributes.label_ = parameter->getPropertyAsTxt("common/name").data();
+
+        QString s_unit = parameter->getPropertyAsTxt("common/units").data();
+        if (!s_unit.isEmpty()) prm_attributes.label_ += QString(", ") + s_unit;
+    }
+
+    prm_attributes.reader = reader;
+    prm_attributes.buffer = new Reader_ifs::Point[kMaxScreenWidth];
+    prm_attributes.plevels = &levels_;
+
+    prm_attributes_list_.push_back(std::move(prm_attributes));
+}
+//-------------------------------------------------------------------------
+
 QScreenScale::~QScreenScale() = default;
+//-------------------------------------------------------------------------
+
+bool QScreenScale::addReader(Reader_ifs *reader) {
+    auto parameter = reader->getParameter();
+
+    PrmAttributes prm_attributes;
+    if (parameter) {
+        prm_attributes.label_ = parameter->getPropertyAsTxt("common/name").data();
+
+        QString s_unit = parameter->getPropertyAsTxt("common/units").data();
+        if (!s_unit.isEmpty()) prm_attributes.label_ += QString(", ") + s_unit;
+    }
+
+    prm_attributes.reader = reader;
+    prm_attributes.buffer = new Reader_ifs::Point[kMaxScreenWidth];
+    prm_attributes.plevels = &levels_;
+
+    prm_attributes_list_.push_back(std::move(prm_attributes));
+}
+
 //-------------------------------------------------------------------------
 int QScreenScale::getIndex() const { return index_; }
 
@@ -188,8 +215,11 @@ void QScreenScale::placeScale(QPainter *painter, bool is_axis_hidden) {
             painter->drawText(int(scene_pos.x() + 10), int(scene_pos.y() + co.pos + (txt_h * 0.8)), s);
         }
 
-        painter->drawText(scene_pos, s_label_);
-        painter->drawText(scene_pos - QPointF(0, txt_h), s_label_);
+        auto pos = scene_pos;
+        for (auto &i : prm_attributes_list_) {
+            painter->drawText(pos, i.label_, );
+            pos -= QPointF(0, txt_h);
+        }
     }
 
     // TODO: "scl->axis_y_.greed" variable is used only once .
@@ -361,22 +391,31 @@ void QScreenScale::formPointsImage() {
     RelativeTime dt = ti_.end - ti_.bgn;
     dt.ms_fractional = 0;
 
-
     memset(&stat_, 0, sizeof(stat_));
-    for (auto &p : parameters_) {
-        Borders b = p.reader->getAvailableBorders();
 
+    double scale_min = std::numeric_limits<double>::max();
+    double scale_max = std::numeric_limits<double>::min();
+
+    for (auto &attributes : prm_attributes_list_) {
+        Borders b = attributes.reader->getAvailableBorders();
         b.begin = b.end - dt;
+        attributes.chunks = attributes.reader->getPoints(b, attributes.buffer, image_w);
 
-        p.chunks = p.reader->getPoints(b, p.buffer, image_w);
-        recountScaleValues(image_w, p.stat, p.chunks.get());
+        auto const *c = attributes.chunks.get();
+        while (c) {
+            for (auto p = c->first_point_, p_end = c->first_point_ + c->number_of_points_; p < p_end; p++) {
+                scale_min = std::min(scale_min, p->min);
+                scale_max = std::max(scale_max, p->max);
+            }
+            c = c->next_;
+        }
     }
-    
 
-    double scale_min = stat_.val_min;
+    stat_.val_min = scale_min;
+    stat_.val_max = scale_max;
+
     if (!minimum_.automatic) scale_min = minimum_.value;
 
-    double scale_max = stat_.val_max;
     if (!maximum_.automatic) scale_max = maximum_.value;
 
     if (scale_min >= scale_max) {
@@ -418,8 +457,8 @@ void QScreenScale::formPointsImage() {
     pen.setColor(QColor(color_));
     pen.setWidth(lining_.line_weight);
     painter->setPen(pen);
-    /*
-    for (auto &prm : parameters_) {
+
+    for (auto &prm : prm_attributes_list_) {
         auto const *c = prm.chunks.get();
         while (c) {
             for (auto p = c->first_point_, p_end = c->first_point_ + c->number_of_points_; p < p_end; p++) {
@@ -431,8 +470,6 @@ void QScreenScale::formPointsImage() {
             c = c->next_;
         }
     }
-
-    */
 
     for (auto &dots : list_dots_) {
         AxisXyDot last_dot;
@@ -458,24 +495,26 @@ void QScreenScale::formPointsImage() {
     painter->setPen(pen);
 
     for (const auto lvl : levels_)
-        for (auto &dots : list_dots_) {
-            AxisXyDot last_dot;
-
-            last_dot.x = -1;
-            for (auto &d : dots) {
-                if (d.ghost) continue;
-
+        for (auto &prm : prm_attributes_list_) {
+            auto const *c = prm.chunks.get();
+            while (c) {
                 if (lvl.cross) {
-                    if (d.val_max > lvl.value) {
-                        int y = image_h - static_cast<int>(floor((d.val_max - data_min) * k + 0.5)) + kDiagramMargin;
-                        painter->drawPoint(d.x, y);
-                    }
+                    for (auto p = c->first_point_, p_end = c->first_point_ + c->number_of_points_; p < p_end; p++)
+                        if (p->max > lvl.value) {
+                            auto p_max = p->min <= lvl.value ? lvl.value : p->max;
+                            auto y_max = image_h - int(floor((p_max - data_min) * k + 0.5)) + kDiagramMargin;
+
+                            painter->drawPoint(p->pos, y_max);
+                        }
                 } else {
-                    if (d.val_min < lvl.value) {
-                        int y = image_h - static_cast<int>(floor((d.val_min - data_min) * k + 0.5)) + kDiagramMargin;
-                        painter->drawPoint(d.x, y);
-                    }
+                    for (auto p = c->first_point_, p_end = c->first_point_ + c->number_of_points_; p < p_end; p++)
+                        if (p->min < lvl.value) {
+                            auto p_min = p->max >= lvl.value ? lvl.value : p->min;
+                            auto y_min = image_h - int(floor((p_min - data_min) * k + 0.5)) + kDiagramMargin;
+                            painter->drawPoint(p->pos, y_min);
+                        }
                 }
+                c = c->next_;
             }
         }
 

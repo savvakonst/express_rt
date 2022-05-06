@@ -50,7 +50,7 @@ class QFormScreen : public QDialog {
 
     QScreenScale *addScale(QScreenScale *p_scale);
 
-    QScreenScale *addScale(Reader_ifs *reader);
+    QScreenScale *createScale(Reader_ifs *reader);
 
     QScreenScale *getScale(const int &index);
 
@@ -75,7 +75,6 @@ class QFormScreen : public QDialog {
     void onMessageShow(const QString &s);
 
    private:
-
     void setupMenuBar();
 
     struct AxisYStats {
@@ -116,7 +115,6 @@ class QFormScreen : public QDialog {
     QToolBar *toolbar_;
     QStatusBar *statusbar_;
 
-
     QMenu *mn_file_;
     QMenu *mn_settings_;
 
@@ -129,9 +127,7 @@ class QFormScreen : public QDialog {
     QList<QScreenScale *> scales_;
     QList<QScreenMarker *> markers_;
 
-
     QString title_ = "";
-
 
     // Float Marker
     MarkerSimple mark_f_;
@@ -164,8 +160,6 @@ class QFormScreen : public QDialog {
     int counter_ = 0;
 
    private slots:
-
-
 
     void onResizeScene();
 

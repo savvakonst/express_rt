@@ -200,7 +200,7 @@ QScreenScale *QFormScreen::addScale(QScreenScale *p_scale) {
     return p_scale;
 }
 
-QScreenScale *QFormScreen::addScale(Reader_ifs *reader) {
+QScreenScale *QFormScreen::createScale(Reader_ifs *reader) {
     auto *p_scale =
         new QScreenScale(reader, scales_.count(), QSizeF(scene_->width(), scene_->height()), lining_, margin_, this);
     return addScale(p_scale);
