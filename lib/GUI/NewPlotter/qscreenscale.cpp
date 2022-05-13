@@ -159,6 +159,8 @@ bool QScreenScale::addReader(Reader_ifs *reader) {
     prm_attributes.plevels = &levels_;
 
     prm_attributes_list_.push_back(std::move(prm_attributes));
+
+    return true;
 }
 
 //-------------------------------------------------------------------------
@@ -217,7 +219,7 @@ void QScreenScale::placeScale(QPainter *painter, bool is_axis_hidden) {
 
         auto pos = scene_pos;
         for (auto &i : prm_attributes_list_) {
-            painter->drawText(pos, i.label_, );
+            painter->drawText(pos, i.label_);
             pos -= QPointF(0, txt_h);
         }
     }
