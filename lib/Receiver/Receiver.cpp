@@ -106,7 +106,8 @@ Receiver::Receiver(ModuleStream_ifs *m_stream, Sockaddr dst_address, Sockaddr sr
 }
 
 Receiver::Receiver(ModuleStream_ifs *m_stream, const EthernetSettings &ethernet_settings)
-    : Receiver(m_stream, {AF_INET, ethernet_settings.dst_.port, ethernet_settings.dst_.ip, 0}, Sockaddr{0, 0, 0, 0}) {}
+    : Receiver(m_stream, {AF_INET, ethernet_settings.dst_.port, ethernet_settings.dst_.ip, 0},
+               Sockaddr{0, 0, ethernet_settings.src_.ip, 0}) {}
 //{0, htons(*((uint16_t *)ethernet_settings.src_.port)), *((uint32_t *)ethernet_settings.src_.ip_b), 0}) {}
 
 Receiver::~Receiver() {
@@ -160,6 +161,8 @@ void receiverThread(ModuleStream_ifs *m_stream, SOCKET sock_, char *data_buffer_
 
         auto length =
             recvfrom(sock_, data_buffer_, data_buffer_size_, 0, (sockaddr *)&source_address, &source_address_length);
+
+        //if (source_address.sin_addr != source_address_.sin_addr) continue;
 
         if (length == SOCKET_ERROR) {
             auto error_code = WSAGetLastError();

@@ -463,7 +463,7 @@ void QScreenScale::formPointsImage() {
     for (auto &prm : prm_attributes_list_) {
         auto const *c = prm.chunks.get();
         while (c) {
-            for (auto p = c->first_point_, p_end = c->first_point_ + c->number_of_points_; p < p_end; p++) {
+            for (auto p = c->first_point_ + 1, p_end = c->first_point_ + c->number_of_points_; p < p_end; p++) {
                 auto y_min = image_h - int(floor((p->min - data_min) * k + 0.5)) + kDiagramMargin;
                 auto y_max = image_h - int(floor((p->max - data_min) * k + 0.5)) + kDiagramMargin;
 
@@ -501,7 +501,7 @@ void QScreenScale::formPointsImage() {
             auto const *c = prm.chunks.get();
             while (c) {
                 if (lvl.cross) {
-                    for (auto p = c->first_point_, p_end = c->first_point_ + c->number_of_points_; p < p_end; p++)
+                    for (auto p = c->first_point_ + 1, p_end = c->first_point_ + c->number_of_points_; p < p_end; p++)
                         if (p->max > lvl.value) {
                             auto p_max = p->min <= lvl.value ? lvl.value : p->max;
                             auto y_max = image_h - int(floor((p_max - data_min) * k + 0.5)) + kDiagramMargin;
@@ -509,7 +509,7 @@ void QScreenScale::formPointsImage() {
                             painter->drawPoint(p->pos, y_max);
                         }
                 } else {
-                    for (auto p = c->first_point_, p_end = c->first_point_ + c->number_of_points_; p < p_end; p++)
+                    for (auto p = c->first_point_ + 1, p_end = c->first_point_ + c->number_of_points_; p < p_end; p++)
                         if (p->min < lvl.value) {
                             auto p_min = p->max >= lvl.value ? lvl.value : p->min;
                             auto y_min = image_h - int(floor((p_min - data_min) * k + 0.5)) + kDiagramMargin;
