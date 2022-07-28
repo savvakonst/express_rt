@@ -43,8 +43,6 @@ add_custom_command(OUTPUT ${DOXYGEN_INDEX_FILE}
 add_custom_target(Doxygen ALL DEPENDS ${DOXYGEN_INDEX_FILE})
 
 
-#find_package(Sphinx REQUIRED)
-
 find_program(SPHINX_EXECUTABLE
         NAMES sphinx-build
         DOC "Path to sphinx-build executable")

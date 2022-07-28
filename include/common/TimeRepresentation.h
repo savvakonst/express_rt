@@ -1,8 +1,8 @@
 ﻿#ifndef EXRT_TIMEREPRESENTATION_H
 #define EXRT_TIMEREPRESENTATION_H
 
-#include <cstdint>
 #include <cmath>
+#include <cstdint>
 struct RelativeTime {
     union {
         struct {
@@ -117,20 +117,20 @@ inline AbsoluteTime operator-(const AbsoluteTime& left, const RelativeTime& righ
 }
 
 inline RelativeTime operator+(const RelativeTime& left, const RelativeTime& right) {
-    RelativeTime ret;
+    RelativeTime ret{};
     ret.time = left.time + right.time;
     return ret;
 }
 
 // TODO: Check result ::Don't work
 inline RelativeTime operator+=(const RelativeTime& left, const RelativeTime& right) {
-    RelativeTime ret;
+    RelativeTime ret{};
     ret.time = left.time + right.time;
     return ret;
 }
 
 inline RelativeTime operator-(const RelativeTime& left, const RelativeTime& right) {
-    RelativeTime ret;
+    RelativeTime ret{};
     ret.time = left.time - right.time;
     return ret;
 }

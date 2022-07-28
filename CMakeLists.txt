@@ -26,7 +26,7 @@ add_subdirectory(examples)
 add_subdirectory(doctest)
 add_subdirectory(docs)
 
-if (MSVC)
+if (MSVC_VERSION)
     target_compile_options(CommonLib PUBLIC /wd4251)
 endif ()
 
