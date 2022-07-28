@@ -13,7 +13,11 @@ struct PropBuilder {
 
     PropBuilder(Parameter_ifs* item, HierarchicalData_ifs* header) : item_(item), header_(header) { setCommon(); }
 
-
+    /**
+     * gets data from a field named src and write it in to a field named dst
+     * @param dst
+     * @param src
+     */
     void setData(const std::string& dst, const std::string& src) const {
         auto u = header_->getMapUnit(src);
         if (u) {
@@ -81,7 +85,6 @@ class ThermoResistanceParserBuilder : public PDefaultBaseIO_ifs {
     Parameter_ifs* parse(ExtensionManager* manager, HierarchicalData_ifs* other, HierarchicalData_ifs* header,
                          const std::string& path_to_module) const override;
 };
-
 
 #define ANALOG_VOLTAGE_PB 8
 class AnalogVoltageParserBuilder : public PDefaultBaseIO_ifs {

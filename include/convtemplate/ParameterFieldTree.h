@@ -5,6 +5,7 @@
 #include "common/CustomTypes.h"
 #include "common/DataSchema_ifs.h"
 
+// TODO maybe it should be named as something like EditableHierarchicalData
 class ParameterFieldTree_ifs : public HierarchicalData_ifs {
    public:
     [[nodiscard]] bool isArray() const override { return false; }
