@@ -43,12 +43,14 @@ ext_set:
         type: "f64"
 
       - name: "approximation"
-        description: "точки аппроксимации"
+        description: "градуировочная таблица"
         dims: [ 0 ]
         type:
           - name: "x"
+            description: "код"
             type: "f64"
           - name: "y"
+            description: "значение"
             type: "f64"
 
   - name: "ethernet_udp"

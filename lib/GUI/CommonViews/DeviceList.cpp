@@ -358,6 +358,7 @@ class DeviceViewWrapper : public DeviceViewWrapper_ifs {
         auto *set_active_action = new FuncProxyQAction(
             [&]() {
                 auto node = model_->getNode(tree_view_->selectionModel()->currentIndex());
+                if (node == nullptr) return false;
                 while (!node->isDevice()) node = node->parent;
                 setActive(node->getPath().first, "");
                 return true;

@@ -58,8 +58,8 @@ struct PropBuilder {
             for (auto i : points_list->getArray()) {
                 auto path_prefix = "common/approximation/" + std::to_string(index++);
                 item_->setProperty(path_prefix, nullptr);
-                item_->setProperty(path_prefix + "x", i->getMapUnit("Code")->getValue());
-                item_->setProperty(path_prefix + "y", i->getMapUnit("Value")->getValue());
+                item_->setProperty(path_prefix + "/x", i->getMapUnit("Code")->getValue());
+                item_->setProperty(path_prefix + "/y", i->getMapUnit("Value")->getValue());
             }
     }
 };
