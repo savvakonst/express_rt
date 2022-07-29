@@ -4,8 +4,9 @@
 #define EXRT_TOOLS_H
 
 #include <cstring>
-#include <regex>
 #include <list>
+#include <regex>
+
 #include "common/Port.h"
 
 inline std::list<std::string> split(const std::string &text, char character) {
@@ -73,6 +74,7 @@ inline std::pair<std::string, std::string> lastCharPos(const std::string &text, 
 inline bool isNumber(const char *val) {
     auto it = val;
     if (*it == 0) return false;
+    if (*it == '-') it++;
     while ((*it != 0) && std::isdigit(*it)) it++;
     return *it == 0;
 }

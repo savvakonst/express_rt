@@ -74,27 +74,27 @@ void saveAsJson(const YAML::Node &node, std::stringstream &s, const std::string 
     }
 }
 
-YAML::Node get(std::string key, const YAML::Node &node) {
+YAML::Node get(const std::string &key, const YAML::Node &node) {
     auto res = node[key];
     if (!res) throw YAML::Exception(node.Mark(), "cant find field with key: \"" + key + "\"");
     return res;
 }
 
 template <typename T>
-T getVal(std::string key, const YAML::Node &node, T default_v) {
+T getVal(const std::string &key, const YAML::Node &node, T default_v) {
     auto res = node[key];
     if (!res) return default_v;
     return res.as<T>();
 }
 
 template <typename T>
-T getVal(std::string key, const YAML::Node &node) {
+T getVal(const std::string &key, const YAML::Node &node) {
     auto res = node[key];
     if (!res) throw YAML::Exception(node.Mark(), "cant find field with key: \"" + key + "\"");
     return res.as<T>();
 }
 
-std::string getStrID(std::string key, const YAML::Node &node) {
+std::string getStrID(const std::string &key, const YAML::Node &node) {
     auto id = get(key, node).as<uint32_t>();
     uint64_t u64_id = uint64_t(id) & 0xffffffff;
     return std::string((char *)&u64_id);

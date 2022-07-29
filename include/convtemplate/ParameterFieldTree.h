@@ -37,6 +37,18 @@ class ParameterFieldTree_ifs : public HierarchicalData_ifs {
     bool removeUnit(const std::string &prop_path, std::string &error_message);
 
     [[maybe_unused]] bool setValue(const std::string &prop_path, const Value &value, std::string &error_message);
+
+    /**
+     * it isn't finished yet, at now only passing nullptr to expand the array works.
+     * it copies content of hierarchical data to the destination path if data is valid.
+     * if prop_path points to the next element after the last element in the array or to the "-1" element, array will be extended
+     * with new element, also you may pas nullptr to the corresponding path for array extending, in other cases
+     * passing nullptr will have no effect.
+     * @param prop_path
+     * @param hierarchical_data
+     * @param error_message
+     * @return true if success otherwise return false
+     */
     [[maybe_unused]] bool setValue(const std::string &prop_path, const HierarchicalData_ifs *hierarchical_data,
                                    std::string &error_message);
     [[maybe_unused]] bool setValueAsTxt(const std::string &prop_path, const std::string &, std::string &error_message);

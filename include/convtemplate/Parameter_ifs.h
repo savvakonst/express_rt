@@ -31,6 +31,12 @@ class COMMON_API_ Parameter_ifs : public Properties_ifs {
 
     [[nodiscard]] std::string getPropertyAsTxt(const std::string &prop_path) const override = 0;
 
+    /**
+     *
+     * @param prop_path path to the property, for example : "common/name"
+     * @param value value which will be stored in corresponding path
+     * @return true if successful
+     */
     bool setProperty(const std::string &prop_path, const Value &value) override = 0;
 
     bool setProperty(const std::string &prop_path, const HierarchicalData_ifs *hierarchical_data) override = 0;

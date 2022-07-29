@@ -24,8 +24,7 @@ class Reader_ifs {
 
     class Chunk {
        public:
-        enum Status : size_t
-        {
+        enum Status : size_t {
             success = 0,
             out_of_borders = 1,
             no_valid_data = 2,

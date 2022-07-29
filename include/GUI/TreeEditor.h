@@ -30,7 +30,8 @@ class TreeEditor : public QTreeWidget {
     void addExtensionUint(ExtensionManager *manager);
 
    private:
-    void addProperty(DataSchema_ifs *ds, QTreeWidgetItem *parent_item = nullptr, const std::string &path = "");
+    void addProperty(DataSchema_ifs *ds, size_t dim, QTreeWidgetItem *parent_item = nullptr,
+                     const std::string &path = "");
 
     class UpdateSignal : public Signal_ifs {
        public:

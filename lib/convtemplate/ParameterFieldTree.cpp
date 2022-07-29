@@ -153,12 +153,15 @@ bool ParameterFieldTree_ifs::removeUnit(const std::string &prop_path, std::strin
 
 bool ParameterFieldTree_ifs::setValue(const std::string &prop_path, const HierarchicalData_ifs *hierarchical_data,
                                       std::string &error_message) {
+    // TODO finish it
     auto path = lastCharPos(prop_path, '/');
 
     auto ptr = (ParameterFieldTree_ifs *)getBranch(this, path.first);
     if (!isNumber(path.second) || !ptr->isArray()) return false;
 
-    auto pos = size_t(std::stoi(path.second));
+    auto pos = std::stoi(path.second);
+
+    if (pos == -1) return ptr->addArrayUnit();
 
     if ((pos != 0) && (ptr->getArrayUnit(pos - 1) == nullptr)) return false;
 

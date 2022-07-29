@@ -43,6 +43,24 @@ struct PropBuilder {
         setData("common/category", "Category");
         setData("common/department", "Department");
         setData("common/description", "Description");
+
+        auto polynom_list = header_->getMapUnit("Points.Polymon.List");
+        size_t index = 0;
+        if (polynom_list && polynom_list->isArray())
+            for (auto i : polynom_list->getArray()) {
+                item_->setProperty("common/polynomial/-1", nullptr);
+                item_->setProperty("common/polynomial/" + std::to_string(index++), i->getMapUnit("Value")->getValue());
+            }
+
+        auto points_list = header_->getMapUnit("Points.List");
+        index = 0;
+        if (points_list && points_list->isArray())
+            for (auto i : points_list->getArray()) {
+                auto path_prefix = "common/approximation/" + std::to_string(index++);
+                item_->setProperty(path_prefix, nullptr);
+                item_->setProperty(path_prefix + "x", i->getMapUnit("Code")->getValue());
+                item_->setProperty(path_prefix + "y", i->getMapUnit("Value")->getValue());
+            }
     }
 };
 

@@ -37,6 +37,11 @@ ext_set:
         description: "физический адрес параметра"
         help: "номер слота, канал и т.д"
 
+      - name: "polynomial"
+        description: "коэффициенты полинома"
+        dims: [ 0 ]
+        type: "f64"
+
       - name: "approximation"
         description: "точки аппроксимации"
         dims: [ 0 ]

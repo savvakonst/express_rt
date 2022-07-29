@@ -34,31 +34,53 @@ TreeEditor::TreeEditor(QWidget *parent) : QTreeWidget(parent), update_signal_(th
 void TreeEditor::setupProperties(Parameter_ifs *parameter) {
     clear();
     const DataSchema_ifs *ds = parameter->getPropertySchema();
+    parameter->getProperty("");
     parameter_ = parameter;
 
     if (ds->isMap()) {
         auto map_list = ds->getMapList();
         for (auto i : map_list) {
-            addProperty(i, nullptr, i->name_);
+            addProperty(i,0, nullptr, i->name_);
         }
     }
     expandAll();
 }
+#include <QPushButton>
+class AddNewItemToListButton :QPushButton{
+    AddNewItemToListButton(): QPushButton("+"){
 
-void TreeEditor::addProperty(DataSchema_ifs *ds, QTreeWidgetItem *parent_item, const std::string &path) {
+    }
+};
+
+void TreeEditor::addProperty(DataSchema_ifs *ds, size_t dim, QTreeWidgetItem *parent_item, const std::string &path) { // NOLINT(misc-no-recursion)
     auto item = parent_item ? new QTreeWidgetItem(parent_item) : new QTreeWidgetItem(this);
 
     auto name = ds->description_.c_str();
-    item->setText(0, name);
+    item->setText(0, dim?"":name);
+
+    if (ds->isArray() ) {
+        auto dims = ds->getDims();
+        if( dim<dims.size() ){
+            auto list = parameter_->getProperty(path);
+            int index = 0 ;
+            if (list) {
+                for (auto i : list->getArray()) addProperty(ds,dim+1, item, path + "/" + std::to_string(index++));
+            }
+
+            if (dims[0] == 0) {
+                // TODO: to implement this branch of logic
+
+            }
+            return;
+        }
+    }
 
     if (ds->isMap()) {
         auto map_list = ds->getMapList();
         for (auto i : map_list) {
-            addProperty(i, item, path + "/" + i->name_);
+            addProperty(i,0, item, path + "/" + i->name_);
         }
-    } else if (ds->isArray()) {
-        // TODO: realise this branch of logic
-    } else {
+    } else{
         auto type = ds->getRepresentationType();
         auto cm = constructors_map_.find(type);
 
