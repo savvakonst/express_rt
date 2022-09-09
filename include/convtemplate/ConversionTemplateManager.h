@@ -4,16 +4,38 @@
 #include <iterator>
 #include <string>
 
+#include "ThreadedATI.h"
 #include "common/BaseClass_ifs.h"
 #include "common/CustomTypes.h"
 #include "common/DataSchema_ifs.h"
 #include "common/StringProcessingTools.h"
 #include "convtemplate/ConversionTemplate.h"
 
+struct CTNode {
+    ConversionTemplate* cnv_template;
+    Ati* tree;
+};
+
+int comparison(void* arg_a, void* arg_b) {
+    auto* a = (CTNode*)arg_a;
+    auto* b = (CTNode*)arg_b;
+
+    std::string a_str =
+        a->tree ? std::string((char*)a->cnv_template) : a->cnv_template->getPropertyAsTxt("common/name");
+
+    std::string b_str =
+        b->tree ? std::string((char*)b->cnv_template) : b->cnv_template->getPropertyAsTxt("common/name");
+
+    return a_str < b_str;
+}
+
 class ConversionTemplateManager : public BaseClass_ifs {
    public:
+    ConversionTemplateManager() { tree_ = newAti(comparison); }
+
     void addConversionTemplate(ConversionTemplate* conversion_template) {
         vector_.push_back(conversion_template);
+
         emit_();
     }
 
@@ -46,16 +68,13 @@ class ConversionTemplateManager : public BaseClass_ifs {
         return true;
     }
 
-    std::vector<int> getIndexesOfPath(const std::string & path) {
+    std::vector<int> getIndexesOfPath(const std::string& path) {
         std::vector<int> ret;
 
-        auto chunks = split(path,'/');
+        auto chunks = split(path, '/');
 
-        for (const auto & i : chunks){
-
+        for (const auto& i : chunks) {
         }
-
-
     }
 
     size_t getIndex(ConversionTemplate* ptr) {
@@ -77,6 +96,8 @@ class ConversionTemplateManager : public BaseClass_ifs {
     [[nodiscard]] const std::vector<ConversionTemplate*>& getConversionTemplateList() const { return vector_; }
 
    private:
+    Ati* tree_ = nullptr;
+
     std::vector<ConversionTemplate*> vector_;
 };
 
