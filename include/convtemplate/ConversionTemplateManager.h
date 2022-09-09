@@ -7,6 +7,7 @@
 #include "common/BaseClass_ifs.h"
 #include "common/CustomTypes.h"
 #include "common/DataSchema_ifs.h"
+#include "common/StringProcessingTools.h"
 #include "convtemplate/ConversionTemplate.h"
 
 class ConversionTemplateManager : public BaseClass_ifs {
@@ -33,6 +34,28 @@ class ConversionTemplateManager : public BaseClass_ifs {
         vector_.erase(vector_.begin() + index);
         emit_();
         return true;
+    }
+
+    bool removeConversionTemplateByPath(size_t index) {
+        if (index >= vector_.size()) {
+            error_message_ = "index is out of range";
+            return false;
+        }
+        vector_.erase(vector_.begin() + index);
+        emit_();
+        return true;
+    }
+
+    std::vector<int> getIndexesOfPath(const std::string & path) {
+        std::vector<int> ret;
+
+        auto chunks = split(path,'/');
+
+        for (const auto & i : chunks){
+
+        }
+
+
     }
 
     size_t getIndex(ConversionTemplate* ptr) {

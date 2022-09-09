@@ -81,12 +81,12 @@ class AddNewItemToListButton : public QPushButton {
           ds_(ds),
           dim_(dim),
           parent_item_(parent_item),
-          path_(std::move(path)) {
-        auto child_cnt = parent_item_->childCount();
-    }
+          path_(std::move(path)) {}
+
     void mousePressEvent(QMouseEvent *event) override {
         QPushButton::mousePressEvent(event);
         auto child_cnt = parent_item_->childCount();
+        tree_editor_->parameter_->setProperty(path_ + "/-1", nullptr);
         tree_editor_->addProperty(ds_, dim_ + 1, parent_item_, path_ + "/" + std::to_string(child_cnt));
     }
 
@@ -112,7 +112,7 @@ void TreeEditor::addProperty(DataSchema_ifs *ds, size_t dim, QTreeWidgetItem *pa
 
             if (dims[0] == 0) {
                 // TODO: to implement this branch of logic
-                //auto add_new_button_item = new QTreeWidgetItem(item);
+                // auto add_new_button_item = new QTreeWidgetItem(item);
                 auto w = new AddNewItemToListButton(this, ds, dim, item, path);
                 w->setStyleSheet(item_stylesheet_);
                 this->setItemWidget(item, 1, w);
@@ -121,7 +121,6 @@ void TreeEditor::addProperty(DataSchema_ifs *ds, size_t dim, QTreeWidgetItem *pa
             if (list) {
                 for (auto i : list->getArray()) addProperty(ds, dim + 1, item, path + "/" + std::to_string(index++));
             }
-
 
             return;
         }

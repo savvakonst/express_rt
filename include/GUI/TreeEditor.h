@@ -29,10 +29,10 @@ class TreeEditor : public QTreeWidget {
 
     void addExtensionUint(ExtensionManager *manager);
 
+   private:
     void addProperty(DataSchema_ifs *ds, size_t dim, QTreeWidgetItem *parent_item = nullptr,
                      const std::string &path = "");
 
-   private:
     class UpdateSignal : public Signal_ifs {
        public:
         explicit UpdateSignal(TreeEditor *tree_widget) : tree_widget_(tree_widget) {}
@@ -60,6 +60,7 @@ class TreeEditor : public QTreeWidget {
 
     QString item_stylesheet_;
 
+    friend class AddNewItemToListButton;
     // const DataSchema_ifs *data_schema_ = nullptr;
 };
 
