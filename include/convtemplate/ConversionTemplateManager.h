@@ -16,22 +16,11 @@ struct CTNode {
     Ati* tree;
 };
 
-int comparison(void* arg_a, void* arg_b) {
-    auto* a = (CTNode*)arg_a;
-    auto* b = (CTNode*)arg_b;
-
-    std::string a_str =
-        a->tree ? std::string((char*)a->cnv_template) : a->cnv_template->getPropertyAsTxt("common/name");
-
-    std::string b_str =
-        b->tree ? std::string((char*)b->cnv_template) : b->cnv_template->getPropertyAsTxt("common/name");
-
-    return a_str < b_str;
-}
+extern int keyComparison(void* arg_a, void* arg_b);
 
 class ConversionTemplateManager : public BaseClass_ifs {
    public:
-    ConversionTemplateManager() { tree_ = newAti(comparison); }
+    ConversionTemplateManager() { tree_ = newAti(keyComparison); }
 
     void addConversionTemplate(ConversionTemplate* conversion_template) {
         vector_.push_back(conversion_template);

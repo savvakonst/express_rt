@@ -6,9 +6,9 @@ Module_A10_::Module_A10_()
     : KSDModule(  //
           TaskMapper({{"header", header_map_},
                       {"cnl",
-                       {18, TaskMapper({{"frequency", u8},
-                                        {"frequency2", u8},
-                                        {"frequency3", u8},
+                       {18, TaskMapper({{"iiv_frequency", u8},
+                                        {"rms_frequency", u8},
+                                        {"freq_frequency", u8},
                                         {"flags", u8},
                                         {"range", i32},
                                         {"waves", i32},
